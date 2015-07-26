@@ -2,8 +2,3 @@ name: FortressPlugin
 main: me.newyith.FortressPlugin
 version: 0.1
 author: NewYith
-description: Fortress Plugin
-commands:
-    hello:
-        description: It replies with a greeting to the player!
-        usage: /<command>
