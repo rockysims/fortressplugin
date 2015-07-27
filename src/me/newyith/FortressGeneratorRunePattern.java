@@ -11,6 +11,7 @@ import java.util.ArrayList;
 public class FortressGeneratorRunePattern {
 	private Block anchorBlock;
 	private ArrayList<Point> pointsInPattern = null;
+	private Point redstoneWirePoint = null;
 
 	public FortressGeneratorRunePattern(Block anchorBlock) {
 		this.anchorBlock = anchorBlock;
