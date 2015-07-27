@@ -9,7 +9,7 @@ public class FortressPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         log.info("FortressPlugin onEnable called");
-        new PlayerListener(this);
+        new EventListener(this);
     }
 
     @Override
