@@ -53,7 +53,7 @@ public class EventListener implements Listener {
 //    }
 
     @EventHandler
-    public void onBlockRedstoneEvent(BlockRedstoneEvent event) { //TODO: change to diamond once rune activation moves it
+    public void onBlockRedstoneEvent(BlockRedstoneEvent event) {
         Block poweredBlock = event.getBlock();
         Point p = new Point(poweredBlock.getLocation());
         Point pBottom = new Point(p.world, p.x, p.y - 1, p.z);
@@ -64,7 +64,7 @@ public class EventListener implements Listener {
             points.add(new Point(p.world, p.x + 0, p.y, p.z + 1));
             points.add(new Point(p.world, p.x + 0, p.y, p.z - 1));
             for (Point point : points) {
-                if (point.matches(Material.GOLD_BLOCK)) {
+                if (point.matches(Material.GOLD_BLOCK)) { //TODO: change to diamond once rune activation moves it
                     FortressGeneratorRunesManager.onPotentialRedstoneEvent(point.getBlock(), event.getNewCurrent());
                     break;
                 }

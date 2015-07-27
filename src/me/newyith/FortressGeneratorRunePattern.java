@@ -109,32 +109,7 @@ public class FortressGeneratorRunePattern {
 		return this.anchorBlock;
 	}
 
-	public boolean setSignText(String line1) {
-		return setSignText(line1, "", "");
-	}
-	public boolean setSignText(String line1, String line2) {
-		return setSignText(line1, line2, "");
-	}
-	public boolean setSignText(String line1, String line2, String line3) {
-		Point signPoint = this.getSignPoint();
-		if (signPoint != null) {
-			Block signBlock = signPoint.getBlock();
-			if (signBlock != null) {
-				Sign sign = (Sign)signBlock.getState();
-				if (sign != null) {
-					sign.setLine(0, "Fortress:");
-					sign.setLine(1, line1);
-					sign.setLine(2, line2);
-					sign.setLine(3, line3);
-					sign.update();
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	private Point getSignPoint() {
+	public Point getSignPoint() {
 		Point a = new Point(this.anchorBlock.getLocation());
 
 		ArrayList<Point> points = new ArrayList<Point>();
