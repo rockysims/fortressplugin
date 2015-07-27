@@ -18,5 +18,5 @@ public class FortressPlugin extends JavaPlugin {
     }
 }
 
-//TODO: allow piston events to break rune(s)
 //TODO: make indicator blocks move to show fortress generator rune state
+//TODO: allow piston events to break rune(s)

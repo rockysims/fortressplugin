@@ -12,7 +12,7 @@ public class FortressGeneratorRunesManager {
 
 	public static void onPlayerRightClickBlock(Player player, Block clickedBlock) {
 		FortressGeneratorRunePattern runePattern = new FortressGeneratorRunePattern(clickedBlock);
-		if (runePattern.matchesReadyPattern()) {
+		if (runePattern.matchedReadyPattern()) {
 			boolean runeAlreadyCreated = false;
 			for (FortressGeneratorRune rune : runeInstances) {
 				Point a = new Point(rune.getPattern().getAnchorBlock().getLocation());
@@ -25,6 +25,8 @@ public class FortressGeneratorRunesManager {
 				FortressGeneratorRune rune = new FortressGeneratorRune(runePattern);
 				runeInstances.add(rune);
 				rune.onCreated();
+			} else {
+				player.sendMessage("Failed to create rune because rune already created here.");
 			}
 		}
 	}
@@ -33,6 +35,7 @@ public class FortressGeneratorRunesManager {
 		for (Iterator<FortressGeneratorRune> it = runeInstances.iterator(); it.hasNext();) {
 			FortressGeneratorRune rune = it.next();
 
+			//Bukkit.broadcastMessage("onPotentialRedstoneEvent checking rune at " + new Point(rune.getPattern().getAnchorBlock().getLocation()));
 			Point a = new Point(rune.getPattern().getAnchorBlock().getLocation());
 			Point b = new Point(block.getLocation());
 			if (a.equals(b)) {
@@ -58,6 +61,7 @@ public class FortressGeneratorRunesManager {
 		for (Iterator<FortressGeneratorRune> it = runeInstances.iterator(); it.hasNext();) {
 			FortressGeneratorRune rune = it.next();
 
+			Bukkit.broadcastMessage("onRuneMightHaveBeenBrokenBy checking rune at " + new Point(rune.getPattern().getAnchorBlock().getLocation()));
 			if (rune.getPattern().contains(block)) {
 				rune.onBroken();
 				it.remove();

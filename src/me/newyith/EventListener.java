@@ -64,7 +64,7 @@ public class EventListener implements Listener {
             points.add(new Point(p.world, p.x + 0, p.y, p.z + 1));
             points.add(new Point(p.world, p.x + 0, p.y, p.z - 1));
             for (Point point : points) {
-                if (point.matches(Material.GOLD_BLOCK)) { //TODO: change to diamond once rune activation moves it
+                if (point.matches(Material.DIAMOND_BLOCK)) {
                     FortressGeneratorRunesManager.onPotentialRedstoneEvent(point.getBlock(), event.getNewCurrent());
                     break;
                 }

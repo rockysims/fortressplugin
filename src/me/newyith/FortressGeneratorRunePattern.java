@@ -4,26 +4,32 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
 
 import java.util.ArrayList;
 
 public class FortressGeneratorRunePattern {
 	private Block anchorBlock;
-	private ArrayList<Point> pointsInPattern = null;
-	private Point redstoneWirePoint = null;
+	private ArrayList<Point> pointsInPattern = new ArrayList<Point>();
+	private boolean matchedReadyPattern = false;
+	public Point anchorPoint = null;
+	public Point pausePoint = null;
+	public Point runningPoint = null;
+	public Point fuelPoint = null;
+	public Point signPoint = null;
 
 	public FortressGeneratorRunePattern(Block anchorBlock) {
 		this.anchorBlock = anchorBlock;
+		this.runPatternMatch();
 	}
 
-	public boolean matchesReadyPattern() {
+	public void runPatternMatch() {
 		if (this.anchorBlock.getType() == Material.GOLD_BLOCK) {
 			World world = this.anchorBlock.getWorld();
 			Point a = new Point(this.anchorBlock.getLocation());
+			anchorPoint = new Point(a);
 
 			//set towardFront, towardBack, towardLeft, towardRight
-			Point signPoint = this.getSignPoint();
+			Point signPoint = this.findSignPoint();
 			if (signPoint != null) {
 				Point towardFront = new Point(signPoint.subtract(a));
 				Point towardLeft = new Point(world, towardFront.z, 0, towardFront.x);
@@ -40,20 +46,24 @@ public class FortressGeneratorRunePattern {
 				p = new Point(a);
 				matches = matches && p.matches(Material.GOLD_BLOCK);
 				p.add(towardBack); //N
+				this.runningPoint = new Point(p);
 				matches = matches && p.matches(Material.DIAMOND_BLOCK);
 				p.add(towardRight); //NE
+				this.fuelPoint = new Point(p);
 				matches = matches && p.matches(Material.IRON_BLOCK);
 				p.add(towardFront); //E
 				matches = matches && p.matches(Material.CHEST);
 				p.add(towardFront); //SE
 				matches = matches && p.matches(Material.AIR);
 				p.add(towardLeft); //S
+				this.signPoint = new Point(p);
 				matches = matches && p.matches(Material.WALL_SIGN);
 				p.add(towardLeft); //SW
 				matches = matches && p.matches(Material.AIR);
 				p.add(towardBack); //W
 				matches = matches && p.matches(Material.REDSTONE_WIRE);
 				p.add(towardBack); //NW
+				this.pausePoint = new Point(p);
 				matches = matches && p.matches(Material.IRON_BLOCK);
 
 
@@ -77,39 +87,25 @@ public class FortressGeneratorRunePattern {
 				p.add(towardBack); //NW
 				matches = matches && p.matches(Material.OBSIDIAN);
 
-				Bukkit.broadcastMessage("matches: " + matches);
-				return matches;
-			} else {
-				Bukkit.broadcastMessage("matches: false");
-				return false;
-			}
-		} else {
-			return false;
-		}
-	}
-
-	public boolean contains(Block block) {
-		if (this.pointsInPattern == null) {
-			this.pointsInPattern = new ArrayList<Point>();
-
-			Point a = new Point(this.anchorBlock.getLocation());
-			for (int y = -1; y <= 0; y++) {
-				for (int x = -1; x <= 1; x++) {
-					for (int z = -1; z <= 1; z++) {
-						this.pointsInPattern.add(new Point(a.world, a.x + x, a.y + y, a.z + z));
+				//fill pointsInPattern
+				for (int y = -1; y <= 0; y++) {
+					for (int x = -1; x <= 1; x++) {
+						for (int z = -1; z <= 1; z++) {
+							this.pointsInPattern.add(new Point(a.world, a.x + x, a.y + y, a.z + z));
+						}
 					}
 				}
+
+				Bukkit.broadcastMessage("matches: " + matches);
+				this.matchedReadyPattern = matches;
+			} else {
+				this.matchedReadyPattern = false;
 			}
+		} else {
+			this.matchedReadyPattern = false;
 		}
-
-		return this.pointsInPattern.contains(new Point(block.getLocation()));
 	}
-
-	public Block getAnchorBlock() {
-		return this.anchorBlock;
-	}
-
-	public Point getSignPoint() {
+	public Point findSignPoint() {
 		Point a = new Point(this.anchorBlock.getLocation());
 
 		ArrayList<Point> points = new ArrayList<Point>();
@@ -127,5 +123,17 @@ public class FortressGeneratorRunePattern {
 		}
 
 		return signPoint;
+	}
+
+	public boolean matchedReadyPattern() {
+		return this.matchedReadyPattern;
+	}
+
+	public boolean contains(Block block) {
+		return this.pointsInPattern.contains(new Point(block.getLocation()));
+	}
+
+	public Block getAnchorBlock() {
+		return this.anchorBlock;
 	}
 }

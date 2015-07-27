@@ -1,12 +1,9 @@
 package me.newyith;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
-import java.util.Iterator;
 
 public class FortressGeneratorRune {
     private FortressGeneratorRunePattern pattern;
@@ -21,16 +18,25 @@ public class FortressGeneratorRune {
 	}
 
 	public void onCreated() {
-		this.setSignText("created", null, null);
+		this.setSignText("created", "", "");
+		//TODO: make this more robust. maybe this.setState("running") or something
+		this.swapBlocks(pattern.anchorPoint, pattern.runningPoint);
 	}
 
     public void onBroken() {
-		this.setSignText("broken", null, null);
+		this.setSignText("broken", "", "");
     }
 
 	public void setPowered(boolean powered) {
 		this.powered = powered;
-		this.setSignText("powered:", "" + powered, null);
+		this.setSignText("powered:", "" + powered, "");
+
+		//TODO: make this more robust. maybe this.setState("paused") or something
+		if (powered) {
+			this.swapBlocks(pattern.pausePoint, pattern.runningPoint);
+		} else {
+			this.swapBlocks(pattern.runningPoint, pattern.pausePoint);
+		}
 	}
 
 	public boolean isPowered() {
@@ -38,7 +44,7 @@ public class FortressGeneratorRune {
 	}
 
 	public boolean setSignText(String line1, String line2, String line3) {
-		Point signPoint = this.pattern.getSignPoint();
+		Point signPoint = this.pattern.signPoint;
 		if (signPoint != null) {
 			Block signBlock = signPoint.getBlock();
 			if (signBlock != null) {
@@ -60,5 +66,12 @@ public class FortressGeneratorRune {
 			}
 		}
 		return false;
+	}
+
+	private void swapBlocks(Point a, Point b) {
+		Material aMat = a.getBlock().getType();
+		Material bMat = b.getBlock().getType();
+		a.getBlock().setType(bMat);
+		b.getBlock().setType(aMat);
 	}
 }
