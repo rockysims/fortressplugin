@@ -40,6 +40,7 @@ public class FortressGeneratorRunePattern implements SaveLoadConfig {
 	//------------------------------------------------------------------------------------------------------------------
 
 	public FortressGeneratorRunePattern(Block anchorBlock) {
+		this.anchorPoint = new Point(anchorBlock.getLocation());
 		this.runPatternMatch(anchorBlock);
 	}
 
@@ -64,7 +65,6 @@ public class FortressGeneratorRunePattern implements SaveLoadConfig {
 
 				//Layer 2 (top)
 				p = new Point(a);
-				this.anchorPoint = new Point(p);
 				matches = matches && p.matches(Material.GOLD_BLOCK);
 				p.add(towardBack); //N
 				this.runningPoint = new Point(p);
