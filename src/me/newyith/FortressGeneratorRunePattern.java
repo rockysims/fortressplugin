@@ -4,11 +4,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.ArrayList;
 
-public class FortressGeneratorRunePattern {
-	private Block anchorBlock;
+public class FortressGeneratorRunePattern implements SaveLoadConfig {
 	private ArrayList<Point> pointsInPattern = new ArrayList<Point>();
 	private boolean matchedReadyPattern = false;
 	public Point anchorPoint = null;
@@ -17,19 +17,39 @@ public class FortressGeneratorRunePattern {
 	public Point fuelPoint = null;
 	public Point signPoint = null;
 
-	public FortressGeneratorRunePattern(Block anchorBlock) {
-		this.anchorBlock = anchorBlock;
-		this.runPatternMatch();
+	public void saveToConfig(ConfigurationSection config) {
+		ConfigManager.savePoints(config, "pointsInPattern", pointsInPattern);
+		ConfigManager.save(config, "matchedReadyPattern", matchedReadyPattern);
+		ConfigManager.save(config, "anchorPoint", anchorPoint);
+		ConfigManager.save(config, "pausePoint", pausePoint);
+		ConfigManager.save(config, "runningPoint", runningPoint);
+		ConfigManager.save(config, "fuelPoint", fuelPoint);
+		ConfigManager.save(config, "signPoint", signPoint);
 	}
 
-	public void runPatternMatch() {
-		if (this.anchorBlock.getType() == Material.GOLD_BLOCK) {
-			World world = this.anchorBlock.getWorld();
-			Point a = new Point(this.anchorBlock.getLocation());
-			anchorPoint = new Point(a);
+	public void loadFromConfig(ConfigurationSection config) {
+		pointsInPattern = ConfigManager.loadPoints(config, "pointsInPattern");
+		matchedReadyPattern = ConfigManager.loadBoolean(config, "matchedReadyPattern");
+		anchorPoint = ConfigManager.loadPoint(config, "anchorPoint");
+		pausePoint = ConfigManager.loadPoint(config, "pausePoint");
+		runningPoint = ConfigManager.loadPoint(config, "runningPoint");
+		fuelPoint = ConfigManager.loadPoint(config, "fuelPoint");
+		signPoint = ConfigManager.loadPoint(config, "signPoint");
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+
+	public FortressGeneratorRunePattern(Block anchorBlock) {
+		this.runPatternMatch(anchorBlock);
+	}
+
+	public void runPatternMatch(Block anchorBlock) {
+		if (anchorBlock != null && anchorBlock.getType() == Material.GOLD_BLOCK) {
+			World world = anchorBlock.getWorld();
+			Point a = new Point(anchorBlock.getLocation());
 
 			//set towardFront, towardBack, towardLeft, towardRight
-			Point signPoint = this.findSignPoint();
+			Point signPoint = this.findSignPoint(world);
 			if (signPoint != null) {
 				Point towardFront = new Point(signPoint.subtract(a));
 				Point towardLeft = new Point(world, towardFront.z, 0, towardFront.x);
@@ -44,6 +64,7 @@ public class FortressGeneratorRunePattern {
 
 				//Layer 2 (top)
 				p = new Point(a);
+				this.anchorPoint = new Point(p);
 				matches = matches && p.matches(Material.GOLD_BLOCK);
 				p.add(towardBack); //N
 				this.runningPoint = new Point(p);
@@ -105,8 +126,8 @@ public class FortressGeneratorRunePattern {
 			this.matchedReadyPattern = false;
 		}
 	}
-	public Point findSignPoint() {
-		Point a = new Point(this.anchorBlock.getLocation());
+	private Point findSignPoint(World world) {
+		Point a = this.anchorPoint;
 
 		ArrayList<Point> points = new ArrayList<Point>();
 		points.add(new Point(a.world, a.x + 1, a.y, a.z));
@@ -116,7 +137,7 @@ public class FortressGeneratorRunePattern {
 
 		Point signPoint = null;
 		for (Point p : points) {
-			Block block = anchorBlock.getWorld().getBlockAt(p);
+			Block block = world.getBlockAt(p);
 			if (block.getType() == Material.WALL_SIGN) {
 				signPoint = p;
 			}
@@ -131,9 +152,5 @@ public class FortressGeneratorRunePattern {
 
 	public boolean contains(Block block) {
 		return this.pointsInPattern.contains(new Point(block.getLocation()));
-	}
-
-	public Block getAnchorBlock() {
-		return this.anchorBlock;
 	}
 }

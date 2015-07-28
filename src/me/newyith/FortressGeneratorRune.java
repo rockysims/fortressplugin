@@ -1,20 +1,32 @@
 package me.newyith;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.configuration.ConfigurationSection;
 
-public class FortressGeneratorRune {
-    private FortressGeneratorRunePattern pattern;
+public class FortressGeneratorRune implements SaveLoadConfig {
+    private FortressGeneratorRunePattern pattern = null; //set by constructor
 	private boolean powered = false;
 
-    public FortressGeneratorRune(FortressGeneratorRunePattern runePattern) {
+	public void saveToConfig(ConfigurationSection config) {
+		ConfigManager.save(config, "pattern", pattern);
+		ConfigManager.save(config, "powered", powered);
+	}
+
+	public void loadFromConfig(ConfigurationSection config) {
+		pattern = ConfigManager.loadFortressGeneratorRunePattern(config, "pattern");
+		powered = ConfigManager.loadBoolean(config, "powered");
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+
+	public FortressGeneratorRune(FortressGeneratorRunePattern runePattern) {
         this.pattern = runePattern;
     }
 
 	public FortressGeneratorRunePattern getPattern() {
-		return  this.pattern;
+		return this.pattern;
 	}
 
 	public void onCreated() {

@@ -2,6 +2,7 @@ package me.newyith;
 
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -10,12 +11,22 @@ import java.util.Iterator;
 public class FortressGeneratorRunesManager {
 	private static ArrayList<FortressGeneratorRune> runeInstances = new ArrayList<FortressGeneratorRune>();
 
+	public static void saveToConfig(ConfigurationSection config) {
+		ConfigManager.saveFortressGeneratorRunes(config, "runeInstances", runeInstances);
+	}
+
+	public static void loadFromConfig(ConfigurationSection config) {
+		runeInstances = ConfigManager.loadFortressGeneratorRunes(config, "runeInstances");
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+
 	public static void onPlayerRightClickBlock(Player player, Block clickedBlock) {
 		FortressGeneratorRunePattern runePattern = new FortressGeneratorRunePattern(clickedBlock);
 		if (runePattern.matchedReadyPattern()) {
 			boolean runeAlreadyCreated = false;
 			for (FortressGeneratorRune rune : runeInstances) {
-				Point a = new Point(rune.getPattern().getAnchorBlock().getLocation());
+				Point a = rune.getPattern().anchorPoint;
 				Point p = new Point(clickedBlock.getLocation());
 				if (a.equals(p)) {
 					runeAlreadyCreated = true;
@@ -28,6 +39,10 @@ public class FortressGeneratorRunesManager {
 			} else {
 				player.sendMessage("Failed to create rune because rune already created here.");
 			}
+//			player.getInventory().addItem(new ItemStack(Material.GLOWING_REDSTONE_ORE));
+//			player.getInventory().addItem(new ItemStack(Material.SPONGE));
+			//player.getInventory().addItem(new ItemStack(Material.BURNING_FURNACE));
+//			player.getInventory().addItem(new ItemStack(Material.FARMLAND));
 		}
 	}
 
@@ -35,8 +50,7 @@ public class FortressGeneratorRunesManager {
 		for (Iterator<FortressGeneratorRune> it = runeInstances.iterator(); it.hasNext();) {
 			FortressGeneratorRune rune = it.next();
 
-			//Bukkit.broadcastMessage("onPotentialRedstoneEvent checking rune at " + new Point(rune.getPattern().getAnchorBlock().getLocation()));
-			Point a = new Point(rune.getPattern().getAnchorBlock().getLocation());
+			Point a = rune.getPattern().anchorPoint;
 			Point b = new Point(block.getLocation());
 			if (a.equals(b)) {
 				if (rune.isPowered() && signal <= 0) {
@@ -61,7 +75,7 @@ public class FortressGeneratorRunesManager {
 		for (Iterator<FortressGeneratorRune> it = runeInstances.iterator(); it.hasNext();) {
 			FortressGeneratorRune rune = it.next();
 
-			Bukkit.broadcastMessage("onRuneMightHaveBeenBrokenBy checking rune at " + new Point(rune.getPattern().getAnchorBlock().getLocation()));
+			Bukkit.broadcastMessage("onRuneMightHaveBeenBrokenBy checking rune at " + rune.getPattern().anchorPoint);
 			if (rune.getPattern().contains(block)) {
 				rune.onBroken();
 				it.remove();
