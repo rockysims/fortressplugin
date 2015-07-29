@@ -8,7 +8,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.ArrayList;
 
-public class FortressGeneratorRunePattern implements SaveLoadConfig {
+public class FortressGeneratorRunePattern implements Memorable {
 	private ArrayList<Point> pointsInPattern = new ArrayList<Point>();
 	private boolean matchedReadyPattern = false;
 	public Point anchorPoint = null;
@@ -17,24 +17,31 @@ public class FortressGeneratorRunePattern implements SaveLoadConfig {
 	public Point fuelPoint = null;
 	public Point signPoint = null;
 
-	public void saveToConfig(ConfigurationSection config) {
-		ConfigManager.savePoints(config, "pointsInPattern", pointsInPattern);
-		ConfigManager.save(config, "matchedReadyPattern", matchedReadyPattern);
-		ConfigManager.save(config, "anchorPoint", anchorPoint);
-		ConfigManager.save(config, "pausePoint", pausePoint);
-		ConfigManager.save(config, "runningPoint", runningPoint);
-		ConfigManager.save(config, "fuelPoint", fuelPoint);
-		ConfigManager.save(config, "signPoint", signPoint);
+	public void saveTo(Memory m) {
+		m.save("pointsInPattern", pointsInPattern);
+		m.save("matchedReadyPattern", matchedReadyPattern);
+		m.save("anchorPoint", anchorPoint);
+		m.save("pausePoint", pausePoint);
+		m.save("runningPoint", runningPoint);
+		m.save("fuelPoint", fuelPoint);
+		m.save("signPoint", signPoint);
 	}
 
-	public void loadFromConfig(ConfigurationSection config) {
-		pointsInPattern = ConfigManager.loadPoints(config, "pointsInPattern");
-		matchedReadyPattern = ConfigManager.loadBoolean(config, "matchedReadyPattern");
-		anchorPoint = ConfigManager.loadPoint(config, "anchorPoint");
-		pausePoint = ConfigManager.loadPoint(config, "pausePoint");
-		runningPoint = ConfigManager.loadPoint(config, "runningPoint");
-		fuelPoint = ConfigManager.loadPoint(config, "fuelPoint");
-		signPoint = ConfigManager.loadPoint(config, "signPoint");
+	public static FortressGeneratorRunePattern loadFrom(Memory m) {
+		ArrayList<Point> pointsInPattern = m.loadPoints("pointsInPattern");
+		boolean matchedReadyPattern = m.loadBoolean("matchedReadyPattern");
+		FortressGeneratorRunePattern instance = new FortressGeneratorRunePattern(pointsInPattern, matchedReadyPattern);
+		instance.anchorPoint = m.loadPoint("anchorPoint");
+		instance.pausePoint = m.loadPoint("pausePoint");
+		instance.runningPoint = m.loadPoint("runningPoint");
+		instance.fuelPoint = m.loadPoint("fuelPoint");
+		instance.signPoint = m.loadPoint("signPoint");
+		return instance;
+	}
+
+	private FortressGeneratorRunePattern(ArrayList<Point> pointsInPattern, boolean matchedReadyPattern) {
+		this.pointsInPattern = pointsInPattern;
+		this.matchedReadyPattern = matchedReadyPattern;
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

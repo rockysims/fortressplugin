@@ -46,12 +46,6 @@ public class EventListener implements Listener {
         FortressGeneratorRunesManager.onBlockPlaceEvent(event.getBlock());
     }
 
-//    @EventHandler
-//    public void onBlockRedstoneEvent(BlockRedstoneEvent event) {
-//        FortressGeneratorRune.onBlockRedstoneEvent(event.getBlock(), event.getNewCurrent());
-//
-//    }
-
     @EventHandler
     public void onBlockRedstoneEvent(BlockRedstoneEvent event) {
         Block poweredBlock = event.getBlock();

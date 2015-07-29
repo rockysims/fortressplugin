@@ -5,9 +5,27 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 
-public class Point extends Location {
+public class Point extends Location implements Memorable {
 	public World world;
 	public double x, y, z;
+
+	public void saveTo(Memory m) {
+		m.save("worldName", world.getName());
+		m.save("x", (int) x);
+		m.save("y", (int) y);
+		m.save("z", (int) z);
+	}
+
+	public static Point loadFrom(Memory m) {
+		String worldName = m.loadString("worldName");
+		World world = Bukkit.getWorld(worldName);
+		int x = m.loadInt("x");
+		int y = m.loadInt("y");
+		int z = m.loadInt("z");
+		return new Point(world, x, y, z);
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
 
 	public Point(Location loc) {
 		super(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ());

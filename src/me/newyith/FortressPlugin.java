@@ -12,13 +12,13 @@ public class FortressPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         new EventListener(this);
-        this.configManager = new ConfigManager(this);
-        this.configManager.onEnable();
+        configManager = new ConfigManager(this);
+        configManager.onEnable();
     }
 
     @Override
     public void onDisable() {
-        this.configManager.onDisable();
+        configManager.onDisable();
     }
 }
 

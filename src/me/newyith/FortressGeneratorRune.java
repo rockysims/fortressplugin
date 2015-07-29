@@ -5,25 +5,31 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.configuration.ConfigurationSection;
 
-public class FortressGeneratorRune implements SaveLoadConfig {
+public class FortressGeneratorRune implements Memorable {
     private FortressGeneratorRunePattern pattern = null; //set by constructor
 	private boolean powered = false;
 
-	public void saveToConfig(ConfigurationSection config) {
-		ConfigManager.save(config, "pattern", pattern);
-		ConfigManager.save(config, "powered", powered);
+	public void saveTo(Memory m) {
+		m.save("pattern", pattern);
+		m.save("powered", powered);
 	}
 
-	public void loadFromConfig(ConfigurationSection config) {
-		pattern = ConfigManager.loadFortressGeneratorRunePattern(config, "pattern");
-		powered = ConfigManager.loadBoolean(config, "powered");
+	public static FortressGeneratorRune loadFrom(Memory m) {
+		FortressGeneratorRunePattern pattern = m.loadFortressGeneratorRunePattern("pattern");
+		boolean powered = m.loadBoolean("powered");
+		return new FortressGeneratorRune(pattern, powered);
+	}
+
+	private FortressGeneratorRune(FortressGeneratorRunePattern runePattern, boolean powered) {
+		this.pattern = runePattern;
+		this.powered = powered;
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
 
 	public FortressGeneratorRune(FortressGeneratorRunePattern runePattern) {
-        this.pattern = runePattern;
-    }
+		this.pattern = runePattern;
+	}
 
 	public FortressGeneratorRunePattern getPattern() {
 		return this.pattern;

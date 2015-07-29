@@ -11,12 +11,12 @@ import java.util.Iterator;
 public class FortressGeneratorRunesManager {
 	private static ArrayList<FortressGeneratorRune> runeInstances = new ArrayList<FortressGeneratorRune>();
 
-	public static void saveToConfig(ConfigurationSection config) {
-		ConfigManager.saveFortressGeneratorRunes(config, "runeInstances", runeInstances);
+	public static void saveTo(Memory m) {
+		m.save("runeInstances", runeInstances);
 	}
 
-	public static void loadFromConfig(ConfigurationSection config) {
-		runeInstances = ConfigManager.loadFortressGeneratorRunes(config, "runeInstances");
+	public static void loadFrom(Memory m) {
+		runeInstances = m.loadFortressGeneratorRunes("runeInstances");
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
