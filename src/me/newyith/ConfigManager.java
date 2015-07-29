@@ -11,14 +11,14 @@ public class ConfigManager {
 		Memory memory = new Memory(plugin.getConfig());
 
 		Memory m = new Memory(memory.section("RunesManager"));
-		FortressGeneratorRunesManager.saveTo(m);
+		FortressGeneratorRunesManager.loadFrom(m);
 	}
 
 	public void onDisable() {
 		Memory memory = new Memory(plugin.getConfig());
 
 		Memory m = new Memory(memory.section("RunesManager"));
-		FortressGeneratorRunesManager.loadFrom(m);
+		FortressGeneratorRunesManager.saveTo(m);
 
 		plugin.saveConfig();
 	}
