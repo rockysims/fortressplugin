@@ -4,6 +4,8 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 
+import java.util.ArrayList;
+
 public class FortressGeneratorRune implements Memorable {
     private FortressGeneratorRunePattern pattern = null; //set by constructor
 	private boolean powered = false;
@@ -36,23 +38,44 @@ public class FortressGeneratorRune implements Memorable {
 
 	public void onCreated() {
 		this.setSignText("created", "", "");
-		//TODO: make this more robust. maybe this.setState("running") or something
-		this.swapBlocks(pattern.anchorPoint, pattern.runningPoint);
+
+		this.moveBlockTo(Material.GOLD_BLOCK, pattern.runningPoint);
+		this.moveBlockTo(Material.DIAMOND_BLOCK, pattern.anchorPoint);
 	}
 
     public void onBroken() {
 		this.setSignText("broken", "", "");
-    }
+
+		this.moveBlockTo(Material.GOLD_BLOCK, pattern.anchorPoint);
+		this.moveBlockTo(Material.DIAMOND_BLOCK, pattern.runningPoint);
+	}
+
+	private void moveBlockTo(Material material, Point targetPoint) {
+		Point materialPoint = null;
+		ArrayList<Point> points = new ArrayList<Point>();
+		points.add(pattern.anchorPoint);
+		points.add(pattern.runningPoint);
+		points.add(pattern.pausePoint);
+		points.add(pattern.fuelPoint);
+		for (Point p : points) {
+			if (p.matches(material)) {
+				materialPoint = p;
+			}
+		}
+
+		if (materialPoint != null) {
+			this.swapBlocks(materialPoint, targetPoint);
+		}
+	}
 
 	public void setPowered(boolean powered) {
 		this.powered = powered;
 		this.setSignText("powered:", "" + powered, "");
 
-		//TODO: make this more robust. maybe this.setState("paused") or something
 		if (powered) {
-			this.swapBlocks(pattern.pausePoint, pattern.runningPoint);
+			this.moveBlockTo(Material.GOLD_BLOCK, pattern.pausePoint);
 		} else {
-			this.swapBlocks(pattern.runningPoint, pattern.pausePoint);
+			this.moveBlockTo(Material.GOLD_BLOCK, pattern.runningPoint);
 		}
 	}
 

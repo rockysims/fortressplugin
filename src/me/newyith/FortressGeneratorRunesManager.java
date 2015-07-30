@@ -72,6 +72,7 @@ public class FortressGeneratorRunesManager {
 		onRuneMightHaveBeenBrokenBy(placedBlock);
 	}
 	private static void onRuneMightHaveBeenBrokenBy(Block block) {
+		//TODO: rewrite this to make it more efficient (it gets called a LOT)
 		for (Iterator<FortressGeneratorRune> it = runeInstances.iterator(); it.hasNext();) {
 			FortressGeneratorRune rune = it.next();
 

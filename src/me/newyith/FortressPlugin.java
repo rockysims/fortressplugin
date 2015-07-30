@@ -22,8 +22,17 @@ public class FortressPlugin extends JavaPlugin {
     }
 }
 
-//TODO: work on saving state
+//TODO: make onRuneMightHaveBeenBrokenBy more efficient (it gets called a LOT)
 //TODO: make indicator blocks move to show fortress generator rune state
-//TODO: allow piston events to break rune(s)
+//    done except for Needs Fuel state
 //TODO: work on fortress fuel (detecting it in chest and using it up and tracking how much fuel is currently burning)
+//TODO: allow piston events to break rune(s)
 //  TODO: work on handling fortress generator state (maybe time to look at FortressMod code?)
+//TODO: test adding particles
+
+/* New Feature:
+make pistons transmit generation when extended
+    this will serve as a switch to allow nearby buildings to connect/disconnect from fortress generation
+    pistons should have particles to indicate when the piston has been found by a fortress generator (onGeneratorStart searches)
+    pistons should not be protected (breakable)
+//*/

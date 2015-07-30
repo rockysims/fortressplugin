@@ -96,7 +96,7 @@ public class FortressGeneratorRunePattern implements Memorable {
 
 				//Layer 1 (bottom)
 				p = new Point(world, a.x, a.y - 1, a.z);
-				matches = matches && p.matches(Material.COBBLESTONE);
+				matches = matches && p.matches(Material.OBSIDIAN);
 				p.add(towardBack); //N
 				matches = matches && p.matches(Material.OBSIDIAN);
 				p.add(towardRight); //NE
