@@ -3,11 +3,13 @@ package me.newyith.generator;
 import me.newyith.memory.Memorable;
 import me.newyith.memory.Memory;
 import me.newyith.util.Point;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class FortressGeneratorRune implements Memorable {
     private FortressGeneratorRunePattern pattern = null; //set by constructor
@@ -37,6 +39,17 @@ public class FortressGeneratorRune implements Memorable {
 
 	public FortressGeneratorRunePattern getPattern() {
 		return this.pattern;
+	}
+
+	private int temp = 0; //TODO: delete this line
+	public void onTick() {
+		//TODO: if (no glowstone in chest) call onNeedsFuel()
+
+		temp++;
+		if (temp % 20*5 == 0) { //every 5 seconds
+			long now = (new Date()).getTime();
+			Bukkit.broadcastMessage("FortressGeneratorRune onTick(). " + now);
+		}
 	}
 
 	public void onCreated() {

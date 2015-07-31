@@ -1,5 +1,7 @@
 package me.newyith.main;
 
+import me.newyith.event.EventListener;
+import me.newyith.event.TickListener;
 import me.newyith.memory.ConfigManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -19,7 +21,8 @@ public class FortressPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        new EventListener(this);
+        new EventListener(this); //TODO: wrap this up in EventListener.onEnable(this)
+		TickListener.onEnable(this);
         configManager = new ConfigManager(this);
         configManager.onEnable();
 

@@ -1,6 +1,7 @@
-package me.newyith.main;
+package me.newyith.event;
 
 import me.newyith.generator.FortressGeneratorRunesManager;
+import me.newyith.main.FortressPlugin;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.block.Block;

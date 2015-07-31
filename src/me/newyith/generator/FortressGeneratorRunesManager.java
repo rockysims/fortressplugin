@@ -29,6 +29,12 @@ public class FortressGeneratorRunesManager {
 
 	//------------------------------------------------------------------------------------------------------------------
 
+	public static void onTick() {
+		for (FortressGeneratorRune rune : runeInstances) {
+			rune.onTick();
+		}
+	}
+
 	public static void onPlayerRightClickBlock(Player player, Block clickedBlock) {
 		FortressGeneratorRunePattern runePattern = new FortressGeneratorRunePattern(clickedBlock);
 		if (runePattern.matchedReadyPattern()) {
