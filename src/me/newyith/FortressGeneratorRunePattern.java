@@ -159,4 +159,8 @@ public class FortressGeneratorRunePattern implements Memorable {
 	public boolean contains(Block block) {
 		return this.pointsInPattern.contains(new Point(block.getLocation()));
 	}
+
+	public ArrayList<Point> getPoints() {
+		return this.pointsInPattern;
+	}
 }

@@ -1,5 +1,7 @@
 package me.newyith;
 
+import org.bukkit.ChatColor;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.util.logging.Logger;
 
@@ -14,11 +16,26 @@ public class FortressPlugin extends JavaPlugin {
         new EventListener(this);
         configManager = new ConfigManager(this);
         configManager.onEnable();
+
+        sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
+        sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
+        sendToConsole("         >> ON <<           ", ChatColor.GREEN);
+        sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
     }
 
     @Override
     public void onDisable() {
         configManager.onDisable();
+
+        sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
+        sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
+        sendToConsole("         >> OFF <<          ", ChatColor.RED);
+        sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
+    }
+
+    private void sendToConsole(String s, ChatColor color) {
+        ConsoleCommandSender console = this.getServer().getConsoleSender();
+        console.sendMessage(color + s);
     }
 }
 

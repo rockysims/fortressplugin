@@ -48,21 +48,6 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onBlockRedstoneEvent(BlockRedstoneEvent event) {
-        Block poweredBlock = event.getBlock();
-        Point p = new Point(poweredBlock.getLocation());
-        Point pBottom = new Point(p.world, p.x, p.y - 1, p.z);
-        if (pBottom.matches(Material.OBSIDIAN) && p.matches(Material.REDSTONE_WIRE)) {
-            ArrayList<Point> points = new ArrayList<Point>();
-            points.add(new Point(p.world, p.x + 1, p.y, p.z + 0));
-            points.add(new Point(p.world, p.x - 1, p.y, p.z + 0));
-            points.add(new Point(p.world, p.x + 0, p.y, p.z + 1));
-            points.add(new Point(p.world, p.x + 0, p.y, p.z - 1));
-            for (Point point : points) {
-                if (point.matches(Material.DIAMOND_BLOCK)) {
-                    FortressGeneratorRunesManager.onPotentialRedstoneEvent(point.getBlock(), event.getNewCurrent());
-                    break;
-                }
-            }
-        }
+        FortressGeneratorRunesManager.onBlockRedstoneEvent(event.getBlock(), event.getNewCurrent());
     }
 }
