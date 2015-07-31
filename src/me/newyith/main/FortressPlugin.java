@@ -1,8 +1,14 @@
-package me.newyith;
+package me.newyith.main;
 
+import me.newyith.memory.ConfigManager;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Date;
 import java.util.logging.Logger;
 
 public class FortressPlugin extends JavaPlugin {
@@ -37,9 +43,31 @@ public class FortressPlugin extends JavaPlugin {
         ConsoleCommandSender console = this.getServer().getConsoleSender();
         console.sendMessage(color + s);
     }
+
+
+
+
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        if (cmd.getName().equalsIgnoreCase("test")) {
+
+
+            long now = (new Date()).getTime();
+            Bukkit.broadcastMessage("/test. now: " + now);
+            Bukkit.broadcastMessage("/test. (new Date()): " + (new Date()));
+
+
+
+            return true;
+        }
+        return false;
+    }
+
+
+
+
+
 }
 
-//TODO: make onRuneMightHaveBeenBrokenBy more efficient (it gets called a LOT)
 //TODO: make indicator blocks move to show fortress generator rune state
 //    done except for Needs Fuel state
 //TODO: work on fortress fuel (detecting it in chest and using it up and tracking how much fuel is currently burning)

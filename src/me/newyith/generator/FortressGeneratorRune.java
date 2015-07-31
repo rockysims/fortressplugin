@@ -1,5 +1,8 @@
-package me.newyith;
+package me.newyith.generator;
 
+import me.newyith.memory.Memorable;
+import me.newyith.memory.Memory;
+import me.newyith.util.Point;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -50,22 +53,10 @@ public class FortressGeneratorRune implements Memorable {
 		this.moveBlockTo(Material.DIAMOND_BLOCK, pattern.runningPoint);
 	}
 
-	private void moveBlockTo(Material material, Point targetPoint) {
-		Point materialPoint = null;
-		ArrayList<Point> points = new ArrayList<Point>();
-		points.add(pattern.anchorPoint);
-		points.add(pattern.runningPoint);
-		points.add(pattern.pausePoint);
-		points.add(pattern.fuelPoint);
-		for (Point p : points) {
-			if (p.matches(material)) {
-				materialPoint = p;
-			}
-		}
+	private void onNeedsFuel() { //TODO: call this some where
+		this.setSignText("needs fuel", "", "");
 
-		if (materialPoint != null) {
-			this.swapBlocks(materialPoint, targetPoint);
-		}
+		this.moveBlockTo(Material.GOLD_BLOCK, pattern.fuelPoint);
 	}
 
 	public void setPowered(boolean powered) {
@@ -106,6 +97,24 @@ public class FortressGeneratorRune implements Memorable {
 			}
 		}
 		return false;
+	}
+
+	private void moveBlockTo(Material material, Point targetPoint) {
+		Point materialPoint = null;
+		ArrayList<Point> points = new ArrayList<Point>();
+		points.add(pattern.anchorPoint);
+		points.add(pattern.runningPoint);
+		points.add(pattern.pausePoint);
+		points.add(pattern.fuelPoint);
+		for (Point p : points) {
+			if (p.matches(material)) {
+				materialPoint = p;
+			}
+		}
+
+		if (materialPoint != null) {
+			this.swapBlocks(materialPoint, targetPoint);
+		}
 	}
 
 	private void swapBlocks(Point a, Point b) {

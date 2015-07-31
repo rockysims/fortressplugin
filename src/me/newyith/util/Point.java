@@ -1,5 +1,7 @@
-package me.newyith;
+package me.newyith.util;
 
+import me.newyith.memory.Memorable;
+import me.newyith.memory.Memory;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;

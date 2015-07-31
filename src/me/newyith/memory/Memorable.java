@@ -1,9 +1,7 @@
-package me.newyith;
-
-import org.bukkit.configuration.ConfigurationSection;
+package me.newyith.memory;
 
 public interface Memorable {
-	public void saveTo(Memory m);
+	void saveTo(Memory m);
 	/*
 	Note: The following is required but not enforced by the compiler.
 	public static Object/Point/etc loadFrom(Memory m);

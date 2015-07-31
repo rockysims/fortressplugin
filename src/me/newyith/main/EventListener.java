@@ -1,5 +1,6 @@
-package me.newyith;
+package me.newyith.main;
 
+import me.newyith.generator.FortressGeneratorRunesManager;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.block.Block;
@@ -11,8 +12,6 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
-
-import java.util.ArrayList;
 
 public class EventListener implements Listener {
 

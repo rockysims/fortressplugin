@@ -1,5 +1,7 @@
-package me.newyith;
+package me.newyith.generator;
 
+import me.newyith.memory.Memory;
+import me.newyith.util.Point;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 

@@ -1,4 +1,7 @@
-package me.newyith;
+package me.newyith.memory;
+
+import me.newyith.generator.FortressGeneratorRunesManager;
+import me.newyith.main.FortressPlugin;
 
 public class ConfigManager {
 	private FortressPlugin plugin;

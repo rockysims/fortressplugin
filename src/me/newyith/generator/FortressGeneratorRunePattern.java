@@ -1,5 +1,8 @@
-package me.newyith;
+package me.newyith.generator;
 
+import me.newyith.memory.Memorable;
+import me.newyith.memory.Memory;
+import me.newyith.util.Point;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;

@@ -1,4 +1,9 @@
 name: FortressPlugin
-main: me.newyith.FortressPlugin
+main: me.newyith.main.FortressPlugin
 version: 0.1
 author: NewYith
+
+commands:
+    test:
+        description: Test command for debugging
+        usage: /<command>

@@ -1,5 +1,8 @@
-package me.newyith;
+package me.newyith.memory;
 
+import me.newyith.generator.FortressGeneratorRune;
+import me.newyith.generator.FortressGeneratorRunePattern;
+import me.newyith.util.Point;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.ArrayList;
