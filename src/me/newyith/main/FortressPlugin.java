@@ -70,9 +70,9 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
-//TODO: make indicator blocks move to show fortress generator rune state
-//    done except for Needs Fuel state
+//TODO: make it so generator can't be paused unless it could turn on (not out of fuel)
 //TODO: work on fortress fuel (detecting it in chest and using it up and tracking how much fuel is currently burning)
+//	done except for making displayed remaining time include reserve fuel in chest
 //TODO: allow piston events to break rune(s)
 //  TODO: work on handling fortress generator state (maybe time to look at FortressMod code?)
 //TODO: test adding particles
