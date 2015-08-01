@@ -2,6 +2,7 @@ package me.newyith.generator;
 
 import me.newyith.memory.Memory;
 import me.newyith.util.Point;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -81,14 +82,50 @@ public class FortressGeneratorRunesManager {
 			FortressGeneratorRune rune = runeByPoint.get(new Point(block.getLocation()));
 
 			if (rune.getPattern().contains(block)) {
-				rune.onBroken();
+				doBreakRune(rune);
+			}
+		}
+	}
 
-				for (Point p : rune.getPattern().getPoints()) {
-					runeByPoint.remove(p);
+	public static void doBreakRune(FortressGeneratorRune rune) {
+		rune.onBroken();
+
+		for (Point p : rune.getPattern().getPoints()) {
+			runeByPoint.remove(p);
+		}
+
+		runeInstances.remove(rune);
+	}
+
+	public static void onNonStickyPistonEvent(Point piston, Point target, ArrayList<Block> pushed) {
+		if (target != null) { //extending
+			FortressGeneratorRune rune;
+
+			while (true) {
+				//try to find matching rune
+				rune = null;
+				if (runeByPoint.containsKey(piston)) {
+					rune = runeByPoint.get(piston);
+				} else if (runeByPoint.containsKey(target)) {
+					rune = runeByPoint.get(target);
+				} else {
+					for (Block b : pushed) {
+						Point p = new Point(b.getLocation());
+						if (runeByPoint.containsKey(p)) {
+							rune = runeByPoint.get(p);
+							break;
+						}
+					}
 				}
 
-				runeInstances.remove(rune);
+				if (rune != null) {
+					doBreakRune(rune);
+				} else {
+					break;
+				}
 			}
+		} else { //retracting
+			//ignore for now
 		}
 	}
 }

@@ -2,17 +2,17 @@ package me.newyith.event;
 
 import me.newyith.generator.FortressGeneratorRunesManager;
 import me.newyith.main.FortressPlugin;
+import me.newyith.util.Point;
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.block.BlockRedstoneEvent;
+
+import java.util.ArrayList;
 
 public class EventListener implements Listener {
 
@@ -53,5 +53,30 @@ public class EventListener implements Listener {
     @EventHandler
     public void onBlockRedstoneEvent(BlockRedstoneEvent event) {
         FortressGeneratorRunesManager.onBlockRedstoneEvent(event.getBlock(), event.getNewCurrent());
+    }
+
+    @EventHandler
+    public void onBlockPistonExtendEvent(BlockPistonExtendEvent event) {
+        if (!event.isSticky()) {
+            Point p = new Point(event.getBlock().getLocation());
+
+			BlockFace d = event.getDirection();
+			int x = d.getModX();
+			int y = d.getModY();
+			int z = d.getModZ();
+			Point t = new Point(p.world, p.x + x, p.y + y, p.z + z);
+
+			ArrayList<Block> pushed = new ArrayList<>(event.getBlocks());
+
+            FortressGeneratorRunesManager.onNonStickyPistonEvent(p, t, pushed);
+        }
+    }
+
+    @EventHandler
+    public void onBlockPistonRetractEvent(BlockPistonRetractEvent event) {
+		if (!event.isSticky()) {
+			Point p = new Point(event.getBlock().getLocation());
+			FortressGeneratorRunesManager.onNonStickyPistonEvent(p, null, null);
+		}
     }
 }

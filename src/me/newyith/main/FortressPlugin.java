@@ -70,12 +70,11 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
-//TODO: test killing the server (ctrl+c not "stop") and make sure plugin is robust enough to handle it
-//TODO: work on fortress fuel (detecting it in chest and using it up and tracking how much fuel is currently burning)
-//	done except for making displayed remaining time include reserve fuel in chest
+//TODO: fix bug where creating a generator rune that already has power and fuel starts generator running instead of pausing it
 //TODO: allow piston events to break rune(s)
-//  TODO: work on handling fortress generator state (maybe time to look at FortressMod code?)
 //TODO: test adding particles
+//TODO: test killing the server (ctrl+c not "stop") and make sure plugin is robust enough to handle it
+//  TODO: work on handling fortress generator state (maybe time to look at FortressMod code?)
 
 /* New Feature:
 make pistons transmit generation when extended
