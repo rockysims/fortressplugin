@@ -5,7 +5,6 @@ import me.newyith.memory.Memorable;
 import me.newyith.memory.Memory;
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -120,33 +119,26 @@ public class FortressGeneratorRune implements Memorable {
 	private void tickFuel() {
 		if (fuelTicksRemaining > 0 && isRunning()) {
 			fuelTicksRemaining--;
-			updateFuelRemainingDisplay(fuelTicksRemaining * TickTimer.msPerTick);
 		}
 
-		if (fuelTicksRemaining <= 0 && !isPaused()) {
+		if (fuelTicksRemaining <= 0) {
 			tryReplenishFuel();
 			this.updateState();
 		}
+
+		//always update sign in case amount of fuel in chest has changed
+		updateFuelRemainingDisplay(fuelTicksRemaining * TickTimer.msPerTick);
 	}
 	private void tryReplenishFuel() {
-		Point chestPoint = this.pattern.chestPoint;
-		if (chestPoint != null) {
-			Block chestBlock = chestPoint.getBlock();
+		Chest chest = this.getChest();
+		if (chest != null) {
+			Inventory inv = chest.getInventory();
+			if (inv.contains(Material.GLOWSTONE_DUST)) {
+				inv.removeItem(new ItemStack(Material.GLOWSTONE_DUST, 1));
+				chest.update(true);
 
-			if (chestBlock.getState() instanceof Chest) {
-				Chest chest = (Chest)chestBlock.getState();
-
-				Inventory inv = chest.getInventory();
-				if (inv.contains(Material.GLOWSTONE_DUST)) {
-
-
-					inv.removeItem(new ItemStack(Material.GLOWSTONE_DUST, 1));
-					chest.update(true);
-
-
-					fuelTicksRemaining = msPerFuelItem / TickTimer.msPerTick;
-					updateFuelRemainingDisplay(fuelTicksRemaining * TickTimer.msPerTick);
-				}
+				fuelTicksRemaining = msPerFuelItem / TickTimer.msPerTick;
+				updateFuelRemainingDisplay(fuelTicksRemaining * TickTimer.msPerTick);
 			}
 		}
 	}
@@ -190,8 +182,37 @@ public class FortressGeneratorRune implements Memorable {
 
 	// - Utils -
 
+	public int countFuelItemsRemaining() {
+		int count = 0;
+		Chest chest = this.getChest();
+		if (chest != null) {
+			Inventory inv = chest.getInventory();
+			ItemStack[] items = inv.getContents();
+			for (ItemStack item : items) {
+				if (item != null && item.getType() == Material.GLOWSTONE_DUST) {
+					count += item.getAmount();
+				}
+			}
+		}
+		return count;
+	}
+
+	private Chest getChest() {
+		Point chestPoint = this.pattern.chestPoint;
+		if (chestPoint != null) {
+			Block chestBlock = chestPoint.getBlock();
+
+			if (chestBlock.getState() instanceof Chest) {
+				Chest chest = (Chest)chestBlock.getState();
+				return chest;
+			}
+		}
+		return null;
+	}
+
 	private void updateFuelRemainingDisplay(long ms) {
-		//TODO: ms += msPerFuelItem * glowstoneDustInChest;
+		int glowstoneDustInChest = this.countFuelItemsRemaining();
+		ms += msPerFuelItem * glowstoneDustInChest;
 
 		long s = ms / 1000;
 		long m = s / 60;
