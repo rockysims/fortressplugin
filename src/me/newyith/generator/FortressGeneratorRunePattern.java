@@ -130,7 +130,6 @@ public class FortressGeneratorRunePattern implements Memorable {
 					}
 				}
 
-				Bukkit.broadcastMessage("matches: " + matches);
 				this.matchedReadyPattern = matches;
 			} else {
 				this.matchedReadyPattern = false;

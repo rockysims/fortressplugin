@@ -151,6 +151,22 @@ public class FortressGeneratorRune implements Memorable {
 		}
 	}
 
+	private void updateState() {
+		if (fuelTicksRemaining == 0) {
+			tryReplenishFuel();
+		}
+
+		if (fuelTicksRemaining > 0) {
+			if (this.isPowered()) {
+				this.setState(FgState.PAUSED);
+			} else {
+				this.setState(FgState.RUNNING);
+			}
+		} else {
+			this.setState(FgState.NEEDS_FUEL);
+		}
+	}
+
 	private void setState(FgState state) {
 		if (this.state != state) {
 			switch (state) {
@@ -169,26 +185,6 @@ public class FortressGeneratorRune implements Memorable {
 			}
 
 			this.state = state;
-		}
-	}
-
-	private void updateState() {
-		if (fuelTicksRemaining == 0) {
-			tryReplenishFuel();
-		}
-
-		if (fuelTicksRemaining > 0) {
-			if (this.isPowered()) {
-				this.setState(FgState.PAUSED);
-			} else {
-				this.setState(FgState.RUNNING);
-			}
-		} else {
-			if (this.isPowered()) {
-				this.setState(FgState.PAUSED);
-			} else {
-				this.setState(FgState.NEEDS_FUEL);
-			}
 		}
 	}
 
