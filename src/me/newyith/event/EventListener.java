@@ -20,6 +20,10 @@ public class EventListener implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
+    public static void onEnable(FortressPlugin plugin) {
+        new EventListener(plugin);
+    }
+
     @EventHandler
     public void onPlayerRightClickBlock(PlayerInteractEvent event) {
         Player player = event.getPlayer();

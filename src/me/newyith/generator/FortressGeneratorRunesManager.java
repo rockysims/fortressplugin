@@ -63,11 +63,7 @@ public class FortressGeneratorRunesManager {
 	public static void onBlockRedstoneEvent(Block block, int signal) {
 		if (runeByPoint.containsKey(new Point(block.getLocation()))) {
 			FortressGeneratorRune rune = runeByPoint.get(new Point(block.getLocation()));
-			if (rune.isPowered() && signal <= 0) {
-				rune.setPowered(false);
-			} else if (!rune.isPowered() && signal > 0) {
-				rune.setPowered(true);
-			}
+			rune.setPowered(signal > 0);
 		}
 	}
 

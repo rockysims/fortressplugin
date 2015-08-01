@@ -1,7 +1,7 @@
 package me.newyith.main;
 
 import me.newyith.event.EventListener;
-import me.newyith.event.TickListener;
+import me.newyith.event.TickTimer;
 import me.newyith.memory.ConfigManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,10 +21,9 @@ public class FortressPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        new EventListener(this); //TODO: wrap this up in EventListener.onEnable(this)
-		TickListener.onEnable(this);
-        configManager = new ConfigManager(this);
-        configManager.onEnable();
+		TickTimer.onEnable(this);
+        EventListener.onEnable(this);
+        ConfigManager.onEnable(this);
 
         sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
         sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
@@ -34,7 +33,7 @@ public class FortressPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        configManager.onDisable();
+        ConfigManager.onDisable(this);
 
         sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
         sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);

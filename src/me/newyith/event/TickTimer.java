@@ -4,13 +4,15 @@ import me.newyith.generator.FortressGeneratorRunesManager;
 import me.newyith.main.FortressPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class TickListener extends BukkitRunnable {
-	public TickListener() {
+public class TickTimer extends BukkitRunnable {
+	public static int msPerTick = 250;
+
+	public TickTimer() {
 
 	}
 
 	public static void onEnable(FortressPlugin plugin) {
-		new TickListener().runTaskTimer(plugin, 0, 5); //run 20 times per second
+		new TickTimer().runTaskTimer(plugin, 0, msPerTick / 50);
 	}
 
 	@Override

@@ -18,6 +18,7 @@ public class FortressGeneratorRunePattern implements Memorable {
 	public Point runningPoint = null;
 	public Point fuelPoint = null;
 	public Point signPoint = null;
+	public Point chestPoint = null;
 
 	public void saveTo(Memory m) {
 		m.save("pointsInPattern", pointsInPattern);
@@ -27,6 +28,7 @@ public class FortressGeneratorRunePattern implements Memorable {
 		m.save("runningPoint", runningPoint);
 		m.save("fuelPoint", fuelPoint);
 		m.save("signPoint", signPoint);
+		m.save("chestPoint", chestPoint);
 	}
 
 	public static FortressGeneratorRunePattern loadFrom(Memory m) {
@@ -38,6 +40,7 @@ public class FortressGeneratorRunePattern implements Memorable {
 		instance.runningPoint = m.loadPoint("runningPoint");
 		instance.fuelPoint = m.loadPoint("fuelPoint");
 		instance.signPoint = m.loadPoint("signPoint");
+		instance.chestPoint = m.loadPoint("chestPoint");
 		return instance;
 	}
 
@@ -82,6 +85,7 @@ public class FortressGeneratorRunePattern implements Memorable {
 				this.fuelPoint = new Point(p);
 				matches = matches && p.matches(Material.IRON_BLOCK);
 				p.add(towardFront); //E
+				this.chestPoint = new Point(p);
 				matches = matches && p.matches(Material.CHEST);
 				p.add(towardFront); //SE
 				matches = matches && p.matches(Material.AIR);
