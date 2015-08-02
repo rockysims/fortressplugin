@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class FortressGeneratorRunesManager {
 	private static ArrayList<FortressGeneratorRune> runeInstances = new ArrayList<FortressGeneratorRune>();
@@ -97,35 +98,34 @@ public class FortressGeneratorRunesManager {
 		runeInstances.remove(rune);
 	}
 
-	public static void onNonStickyPistonEvent(Point piston, Point target, ArrayList<Block> pushed) {
-		if (target != null) { //extending
-			FortressGeneratorRune rune;
+	public static void onPistonEvent(boolean isSticky, Point piston, Point target, ArrayList<Block> movedBlocks) {
+		Bukkit.broadcastMessage("onPistonEvent. piston: " + piston + " " + ((target != null)?"extending":"retracting"));
 
-			while (true) {
-				//try to find matching rune
-				rune = null;
-				if (runeByPoint.containsKey(piston)) {
-					rune = runeByPoint.get(piston);
-				} else if (runeByPoint.containsKey(target)) {
-					rune = runeByPoint.get(target);
-				} else {
-					for (Block b : pushed) {
-						Point p = new Point(b.getLocation());
-						if (runeByPoint.containsKey(p)) {
-							rune = runeByPoint.get(p);
-							break;
-						}
-					}
-				}
-
-				if (rune != null) {
-					doBreakRune(rune);
-				} else {
-					break;
-				}
+		//build pointsAffected
+		HashSet<Point> pointsAffected = new HashSet<>();
+		pointsAffected.add(piston);
+		if (target != null) {
+			pointsAffected.add(target);
+		}
+		if (movedBlocks != null) {
+			Bukkit.broadcastMessage("onPistonEvent. movedBlocks.size(): " + movedBlocks.size());
+			for (Block b : movedBlocks) {
+				Point p = new Point(b.getLocation());
+				pointsAffected.add(p);
 			}
-		} else { //retracting
-			//ignore for now
+		}
+
+		//build runesAffected
+		HashSet<FortressGeneratorRune> runesAffected = new HashSet<>();
+		for (Point p : pointsAffected) {
+			FortressGeneratorRune rune = runeByPoint.get(p);
+			if (rune != null) {
+				runesAffected.add(rune);
+			}
+		}
+
+		for (FortressGeneratorRune rune : runesAffected) {
+			doBreakRune(rune);
 		}
 	}
 }

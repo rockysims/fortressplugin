@@ -57,26 +57,26 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onBlockPistonExtendEvent(BlockPistonExtendEvent event) {
-        if (!event.isSticky()) {
-            Point p = new Point(event.getBlock().getLocation());
+        Point p = new Point(event.getBlock().getLocation());
 
-			BlockFace d = event.getDirection();
-			int x = d.getModX();
-			int y = d.getModY();
-			int z = d.getModZ();
-			Point t = new Point(p.world, p.x + x, p.y + y, p.z + z);
+		BlockFace d = event.getDirection();
+		int x = d.getModX();
+		int y = d.getModY();
+		int z = d.getModZ();
+		Point t = new Point(p.world, p.x + x, p.y + y, p.z + z);
 
-			ArrayList<Block> pushed = new ArrayList<>(event.getBlocks());
+		ArrayList<Block> movedBlocks = new ArrayList<>(event.getBlocks());
 
-            FortressGeneratorRunesManager.onNonStickyPistonEvent(p, t, pushed);
-        }
+		boolean isSticky = event.isSticky();
+
+		FortressGeneratorRunesManager.onPistonEvent(isSticky, p, t, movedBlocks);
     }
 
     @EventHandler
     public void onBlockPistonRetractEvent(BlockPistonRetractEvent event) {
-		if (!event.isSticky()) {
-			Point p = new Point(event.getBlock().getLocation());
-			FortressGeneratorRunesManager.onNonStickyPistonEvent(p, null, null);
-		}
+		Point p = new Point(event.getBlock().getLocation());
+		boolean isSticky = event.isSticky();
+		ArrayList<Block> movedBlocks = new ArrayList<>(event.getBlocks());
+		FortressGeneratorRunesManager.onPistonEvent(isSticky, p, null, movedBlocks);
     }
 }
