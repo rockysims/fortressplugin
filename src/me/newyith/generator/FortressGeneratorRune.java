@@ -5,6 +5,7 @@ import me.newyith.memory.Memorable;
 import me.newyith.memory.Memory;
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -18,16 +19,17 @@ public class FortressGeneratorRune implements Memorable {
     private FortressGeneratorRunePattern pattern = null; //set by constructor
 	private boolean powered = false;
 	private int fuelTicksRemaining = 0;
-	private FgState state = FgState.PAUSED;
+	private FgState state = FgState.NULL;
 	private int msPerFuelItem = 15*1000;
 
 	enum FgState {
 		RUNNING,
 		PAUSED,
-		NEEDS_FUEL;
+		NEEDS_FUEL,
+		NULL;
 
 		public static FgState fromInt(int ordinal) {
-			FgState fgState = FgState.PAUSED;
+			FgState fgState = FgState.NULL;
 
 			if (FgState.RUNNING.ordinal() == ordinal) {
 				fgState = FgState.RUNNING;
@@ -98,6 +100,13 @@ public class FortressGeneratorRune implements Memorable {
 	public void onCreated() {
 		this.moveBlockTo(Material.GOLD_BLOCK, pattern.runningPoint);
 		this.moveBlockTo(Material.DIAMOND_BLOCK, pattern.anchorPoint);
+
+		//initialize this.powered
+		Point wirePoint = this.pattern.wirePoint;
+		if (wirePoint != null) {
+			this.powered = wirePoint.getBlock().getBlockPower() > 0;
+		}
+
 		this.updateState();
 	}
 
@@ -174,6 +183,8 @@ public class FortressGeneratorRune implements Memorable {
 					this.setSignText("Needs Fuel", "(glowstone dust)", "");
 					this.moveBlockTo(Material.GOLD_BLOCK, this.getPattern().fuelPoint);
 					break;
+				default:
+					Debug.msg("FortressGeneratorRune setState method couldn't find a case matching FgState: " + state);
 			}
 
 			this.state = state;
