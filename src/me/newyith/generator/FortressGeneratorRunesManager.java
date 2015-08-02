@@ -99,8 +99,6 @@ public class FortressGeneratorRunesManager {
 	}
 
 	public static void onPistonEvent(boolean isSticky, Point piston, Point target, ArrayList<Block> movedBlocks) {
-		Bukkit.broadcastMessage("onPistonEvent. piston: " + piston + " " + ((target != null)?"extending":"retracting"));
-
 		//build pointsAffected
 		HashSet<Point> pointsAffected = new HashSet<>();
 		pointsAffected.add(piston);
@@ -108,7 +106,6 @@ public class FortressGeneratorRunesManager {
 			pointsAffected.add(target);
 		}
 		if (movedBlocks != null) {
-			Bukkit.broadcastMessage("onPistonEvent. movedBlocks.size(): " + movedBlocks.size());
 			for (Block b : movedBlocks) {
 				Point p = new Point(b.getLocation());
 				pointsAffected.add(p);

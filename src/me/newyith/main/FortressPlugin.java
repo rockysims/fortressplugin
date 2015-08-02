@@ -5,6 +5,7 @@ import me.newyith.event.TickTimer;
 import me.newyith.memory.ConfigManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Effect;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -48,23 +49,15 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("test")) {
-
-
             long now = (new Date()).getTime();
             Bukkit.broadcastMessage("/test. now: " + now);
             Bukkit.broadcastMessage("/test. (new Date()): " + (new Date()));
-
-
-
             return true;
         }
         return false;
     }
-
-
 
 
 
