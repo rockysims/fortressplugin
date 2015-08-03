@@ -3,9 +3,11 @@ package me.newyith.generator;
 import me.newyith.event.TickTimer;
 import me.newyith.memory.Memorable;
 import me.newyith.memory.Memory;
+import me.newyith.particles.ParticleEffect;
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -14,6 +16,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class FortressGeneratorRune implements Memorable {
     private FortressGeneratorRunePattern pattern = null; //set by constructor
@@ -95,6 +98,7 @@ public class FortressGeneratorRune implements Memorable {
 
 	public void onTick() {
 		tickFuel();
+		tickParticles();
 	}
 
 	public void onCreated() {
@@ -124,6 +128,37 @@ public class FortressGeneratorRune implements Memorable {
 	}
 
 	// - Handlers -
+
+	private int waitTicks = 0;
+	private void tickParticles() {
+		if (isRunning()) {
+			if (waitTicks <= 0) {
+				long now = (new Date()).getTime();
+				waitTicks = (1000 + (int)(now % 5000)) / TickTimer.msPerTick;
+
+				Point point = new Point(this.pattern.anchorPoint);
+				point.add(0, 1, 0);
+				float speed = 0;
+				int amount = 1;
+				double range = 15;
+				Location loc = point.add(0.5, -0.4, 0.5);
+				ParticleEffect.PORTAL.display(0.2F, 0.0F, 0.2F, speed, amount, loc, range);
+
+
+
+
+
+
+
+
+
+
+
+				//Bukkit.broadcastMessage("display SUSPENDED_DEPTH at " + point);
+			}
+			waitTicks--;
+		}
+	}
 
 	private void tickFuel() {
 		if (fuelTicksRemaining > 0 && isRunning()) {
@@ -242,7 +277,9 @@ public class FortressGeneratorRune implements Memorable {
 		if (m > 0) {
 			str += m + "m ";
 		}
-		str += s + "s";
+		if (s > 0) {
+			str += s + "s";
+		}
 		this.setSignText(null, null, str);
 	}
 

@@ -3,12 +3,14 @@ package me.newyith.main;
 import me.newyith.event.EventListener;
 import me.newyith.event.TickTimer;
 import me.newyith.memory.ConfigManager;
+import me.newyith.particles.ParticleEffect;
+import me.newyith.util.Point;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Effect;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Date;
@@ -26,6 +28,26 @@ public class FortressPlugin extends JavaPlugin {
         EventListener.onEnable(this);
         ConfigManager.onEnable(this);
 
+
+
+
+//		int taskId = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> {
+//			for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+//				Point point = new Point(player.getLocation().add(0, 2, 0));
+//				float speed = 1;
+//				int amount = 1;
+//				double range = 10;
+//				ParticleEffect.PORTAL.display(0, 0, 0, speed, amount, point, range);
+//				Bukkit.broadcastMessage("display portal at " + point);
+//			}
+//		}, 0, 20); //20 ticks per second
+//		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, () -> {
+//			//
+//			Bukkit.getServer().getScheduler().cancelTask(taskId);
+//			Bukkit.broadcastMessage("canceling taskId: " + taskId);
+//		}, 20*120);
+
+
         sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
         sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
         sendToConsole("         >> ON <<           ", ChatColor.GREEN);
@@ -36,8 +58,8 @@ public class FortressPlugin extends JavaPlugin {
     public void onDisable() {
         ConfigManager.onDisable(this);
 
-        sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
-        sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
+		sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
+		sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
         sendToConsole("         >> OFF <<          ", ChatColor.RED);
         sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
     }
@@ -66,6 +88,7 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: test adding particles
 //TODO: test killing the server (ctrl+c not "stop") and make sure plugin is robust enough to handle it
 //  TODO: work on handling fortress generator state (maybe time to look at FortressMod code?)
+//TODO: make glowstone blocks work as fuel for 4x the fuel value of glowstone dust (silk touch works on glowstone block and fortune III does not)
 
 /* New Feature:
 make pistons transmit generation when extended

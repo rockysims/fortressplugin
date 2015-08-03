@@ -49,6 +49,10 @@ public class Point extends Location implements Memorable {
 		return this.getBlock().getType() == material;
 	}
 
+	public Location toLocation() {
+		return new Location(this.world, this.x, this.y, this.z);
+	}
+
 	@Override
 	public String toString() {
 		int x = (int)this.x;
