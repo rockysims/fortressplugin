@@ -3,50 +3,26 @@ package me.newyith.main;
 import me.newyith.event.EventListener;
 import me.newyith.event.TickTimer;
 import me.newyith.memory.ConfigManager;
-import me.newyith.particles.ParticleEffect;
-import me.newyith.util.Point;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Date;
 import java.util.logging.Logger;
 
 public class FortressPlugin extends JavaPlugin {
-    private static final Logger log = Logger.getLogger("FortressPluginLogger");
+    //Example Code:
+    //private static final Logger log = Logger.getLogger("FortressPluginLogger");
     //log.info("FortressPlugin onDisable called");
-
-    private ConfigManager configManager;
 
     @Override
     public void onEnable() {
 		TickTimer.onEnable(this);
         EventListener.onEnable(this);
         ConfigManager.onEnable(this);
-
-
-
-
-//		int taskId = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> {
-//			for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-//				Point point = new Point(player.getLocation().add(0, 2, 0));
-//				float speed = 1;
-//				int amount = 1;
-//				double range = 10;
-//				ParticleEffect.PORTAL.display(0, 0, 0, speed, amount, point, range);
-//				Bukkit.broadcastMessage("display portal at " + point);
-//			}
-//		}, 0, 20); //20 ticks per second
-//		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, () -> {
-//			//
-//			Bukkit.getServer().getScheduler().cancelTask(taskId);
-//			Bukkit.broadcastMessage("canceling taskId: " + taskId);
-//		}, 20*120);
-
 
         sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
         sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
@@ -96,3 +72,28 @@ make pistons transmit generation when extended
     pistons should have particles to indicate when the piston has been found by a fortress generator (onGeneratorStart searches)
     pistons should not be protected (breakable)
 //*/
+
+
+
+
+
+
+
+
+
+
+//		int taskId = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> {
+//			for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+//				Point point = new Point(player.getLocation().add(0, 2, 0));
+//				float speed = 1;
+//				int amount = 1;
+//				double range = 10;
+//				ParticleEffect.PORTAL.display(0, 0, 0, speed, amount, point, range);
+//				Bukkit.broadcastMessage("display portal at " + point);
+//			}
+//		}, 0, 20); //20 ticks per second
+//		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, () -> {
+//			//
+//			Bukkit.getServer().getScheduler().cancelTask(taskId);
+//			Bukkit.broadcastMessage("canceling taskId: " + taskId);
+//		}, 20*120);

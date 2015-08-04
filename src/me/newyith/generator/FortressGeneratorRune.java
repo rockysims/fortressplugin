@@ -6,7 +6,6 @@ import me.newyith.memory.Memory;
 import me.newyith.particles.ParticleEffect;
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -20,6 +19,7 @@ import java.util.Date;
 
 public class FortressGeneratorRune implements Memorable {
     private FortressGeneratorRunePattern pattern = null; //set by constructor
+	private FortressGeneratorParticlesManager particles = null; //set by constructor
 	private boolean powered = false;
 	private int fuelTicksRemaining = 0;
 	private FgState state = FgState.NULL;
@@ -68,12 +68,14 @@ public class FortressGeneratorRune implements Memorable {
 		this.powered = powered;
 		this.fuelTicksRemaining = fuelTicksRemaining;
 		this.state = state;
+		this.particles = new FortressGeneratorParticlesManager(this);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
 
 	public FortressGeneratorRune(FortressGeneratorRunePattern runePattern) {
 		this.pattern = runePattern;
+		this.particles = new FortressGeneratorParticlesManager(this);
 	}
 
 	// - Getters -
@@ -82,7 +84,7 @@ public class FortressGeneratorRune implements Memorable {
 		return this.pattern;
 	}
 
-	private boolean isRunning() {
+	public boolean isRunning() {
 		return this.state == FgState.RUNNING;
 	}
 
@@ -98,7 +100,7 @@ public class FortressGeneratorRune implements Memorable {
 
 	public void onTick() {
 		tickFuel();
-		tickParticles();
+		this.particles.tick();
 	}
 
 	public void onCreated() {
@@ -128,37 +130,6 @@ public class FortressGeneratorRune implements Memorable {
 	}
 
 	// - Handlers -
-
-	private int waitTicks = 0;
-	private void tickParticles() {
-		if (isRunning()) {
-			if (waitTicks <= 0) {
-				long now = (new Date()).getTime();
-				waitTicks = (1000 + (int)(now % 5000)) / TickTimer.msPerTick;
-
-				Point point = new Point(this.pattern.anchorPoint);
-				point.add(0, 1, 0);
-				float speed = 0;
-				int amount = 1;
-				double range = 15;
-				Location loc = point.add(0.5, -0.4, 0.5);
-				ParticleEffect.PORTAL.display(0.2F, 0.0F, 0.2F, speed, amount, loc, range);
-
-
-
-
-
-
-
-
-
-
-
-				//Bukkit.broadcastMessage("display SUSPENDED_DEPTH at " + point);
-			}
-			waitTicks--;
-		}
-	}
 
 	private void tickFuel() {
 		if (fuelTicksRemaining > 0 && isRunning()) {
