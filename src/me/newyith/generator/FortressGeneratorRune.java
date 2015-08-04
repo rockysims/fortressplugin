@@ -3,10 +3,8 @@ package me.newyith.generator;
 import me.newyith.event.TickTimer;
 import me.newyith.memory.Memorable;
 import me.newyith.memory.Memory;
-import me.newyith.particles.ParticleEffect;
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -15,11 +13,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 public class FortressGeneratorRune implements Memorable {
     private FortressGeneratorRunePattern pattern = null; //set by constructor
 	private FortressGeneratorParticlesManager particles = null; //set by constructor
+	private GeneratorCore core = null; //set by constructor
 	private boolean powered = false;
 	private int fuelTicksRemaining = 0;
 	private FgState state = FgState.NULL;
@@ -50,6 +48,7 @@ public class FortressGeneratorRune implements Memorable {
 
 	public void saveTo(Memory m) {
 		m.save("pattern", pattern);
+		m.save("core", core);
 		m.save("powered", powered);
 		m.save("fuelTicksRemaining", fuelTicksRemaining);
 		m.save("state", state.ordinal());
@@ -57,14 +56,16 @@ public class FortressGeneratorRune implements Memorable {
 
 	public static FortressGeneratorRune loadFrom(Memory m) {
 		FortressGeneratorRunePattern pattern = m.loadFortressGeneratorRunePattern("pattern");
+		GeneratorCore core = m.loadGeneratorCore("core", this);
 		boolean powered = m.loadBoolean("powered");
 		int fuelTicksRemaining= m.loadInt("fuelTicksRemaining");
 		FgState fgState = FgState.fromInt(m.loadInt("state"));
-		return new FortressGeneratorRune(pattern, powered, fuelTicksRemaining, fgState);
+		return new FortressGeneratorRune(pattern, core, powered, fuelTicksRemaining, fgState);
 	}
 
-	private FortressGeneratorRune(FortressGeneratorRunePattern runePattern, boolean powered, int fuelTicksRemaining, FgState state) {
+	private FortressGeneratorRune(FortressGeneratorRunePattern runePattern, GeneratorCore core, boolean powered, int fuelTicksRemaining, FgState state) {
 		this.pattern = runePattern;
+		this.core = core;
 		this.powered = powered;
 		this.fuelTicksRemaining = fuelTicksRemaining;
 		this.state = state;
@@ -76,6 +77,7 @@ public class FortressGeneratorRune implements Memorable {
 	public FortressGeneratorRune(FortressGeneratorRunePattern runePattern) {
 		this.pattern = runePattern;
 		this.particles = new FortressGeneratorParticlesManager(this);
+		this.core = new GeneratorCore(this);
 	}
 
 	// - Getters -
@@ -114,12 +116,17 @@ public class FortressGeneratorRune implements Memorable {
 		}
 
 		this.updateState();
+
+		String placingPlayerName = ""; //TODO: set this to actual placing player's name
+		this.core.onPlaced(placingPlayerName);
 	}
 
 	public void onBroken() {
 		this.moveBlockTo(Material.DIAMOND_BLOCK, pattern.runningPoint);
 		this.moveBlockTo(Material.GOLD_BLOCK, pattern.anchorPoint);
 		this.setSignText("Broken", "", "");
+
+		this.core.onBroken();
 	}
 
 	public void setPowered(boolean powered) {

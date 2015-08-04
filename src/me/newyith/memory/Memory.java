@@ -2,6 +2,7 @@ package me.newyith.memory;
 
 import me.newyith.generator.FortressGeneratorRune;
 import me.newyith.generator.FortressGeneratorRunePattern;
+import me.newyith.generator.GeneratorCore;
 import me.newyith.util.Point;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -39,6 +40,14 @@ public class Memory {
 	}
 	public int loadInt(String key) {
 		return config.getInt(key);
+	}
+
+	//long
+	public void save(String key, long value) {
+		config.set(key, value);
+	}
+	public long loadLong(String key) {
+		return config.getLong(key);
 	}
 
 	//String
@@ -135,16 +144,38 @@ public class Memory {
 		return value;
 	}
 
-	//ArrayList<FortressGeneratorRunePattern>
-	public ArrayList<FortressGeneratorRunePattern> loadFortressGeneratorRunePatterns(String key) {
+//	//ArrayList<FortressGeneratorRunePattern>
+//	public ArrayList<FortressGeneratorRunePattern> loadFortressGeneratorRunePatterns(String key) {
+//		Memory m = new Memory(section(key));
+//
+//		ArrayList<FortressGeneratorRunePattern> list = new ArrayList<FortressGeneratorRunePattern>();
+//		int count = m.loadInt("count");
+//		for (int i = 0; i < count; i++) {
+//			list.add(m.loadFortressGeneratorRunePattern(Integer.toString(i)));
+//		}
+//
+//		return list;
+//	}
+
+
+
+	//FortressGeneratorRunePattern
+	public GeneratorCore loadGeneratorCore(String key, FortressGeneratorRune rune) {
 		Memory m = new Memory(section(key));
 
-		ArrayList<FortressGeneratorRunePattern> list = new ArrayList<FortressGeneratorRunePattern>();
-		int count = m.loadInt("count");
-		for (int i = 0; i < count; i++) {
-			list.add(m.loadFortressGeneratorRunePattern(Integer.toString(i)));
+		GeneratorCore value = null;
+		if (m.loadBoolean("!=null")) {
+			value = GeneratorCore.loadFrom(m, rune);
 		}
 
-		return list;
+		return value;
 	}
+
+
+
+
+
+
+
+
 }
