@@ -160,12 +160,12 @@ public class Memory {
 
 
 	//FortressGeneratorRunePattern
-	public GeneratorCore loadGeneratorCore(String key, FortressGeneratorRune rune) {
+	public GeneratorCore loadGeneratorCore(String key) {
 		Memory m = new Memory(section(key));
 
 		GeneratorCore value = null;
 		if (m.loadBoolean("!=null")) {
-			value = GeneratorCore.loadFrom(m, rune);
+			value = GeneratorCore.loadFrom(m);
 		}
 
 		return value;

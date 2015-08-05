@@ -50,7 +50,7 @@ public class FortressGeneratorRunesManager {
 					runeByPoint.put(p, rune);
 				}
 
-				rune.onCreated();
+				rune.onCreated(player);
 			} else {
 				player.sendMessage("Failed to create rune because rune already created here.");
 			}

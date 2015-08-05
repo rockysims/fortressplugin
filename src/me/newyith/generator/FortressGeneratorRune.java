@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,29 +24,6 @@ public class FortressGeneratorRune implements Memorable {
 	private FgState state = FgState.NULL;
 	private int msPerFuelItem = 15*1000;
 
-	enum FgState {
-		RUNNING,
-		PAUSED,
-		NEEDS_FUEL,
-		NULL;
-
-		public static FgState fromInt(int ordinal) {
-			FgState fgState = FgState.NULL;
-
-			if (FgState.RUNNING.ordinal() == ordinal) {
-				fgState = FgState.RUNNING;
-			} else if (FgState.PAUSED.ordinal() == ordinal) {
-				fgState = FgState.PAUSED;
-			} else if (FgState.NEEDS_FUEL.ordinal() == ordinal) {
-				fgState = FgState.NEEDS_FUEL;
-			} else {
-				Debug.msg("ERROR: FgState.fromInt(" + ordinal + ") did not match any state.");
-			}
-
-			return fgState;
-		}
-	}
-
 	public void saveTo(Memory m) {
 		m.save("pattern", pattern);
 		m.save("core", core);
@@ -56,7 +34,7 @@ public class FortressGeneratorRune implements Memorable {
 
 	public static FortressGeneratorRune loadFrom(Memory m) {
 		FortressGeneratorRunePattern pattern = m.loadFortressGeneratorRunePattern("pattern");
-		GeneratorCore core = m.loadGeneratorCore("core", this);
+		GeneratorCore core = m.loadGeneratorCore("core");
 		boolean powered = m.loadBoolean("powered");
 		int fuelTicksRemaining= m.loadInt("fuelTicksRemaining");
 		FgState fgState = FgState.fromInt(m.loadInt("state"));
@@ -77,7 +55,7 @@ public class FortressGeneratorRune implements Memorable {
 	public FortressGeneratorRune(FortressGeneratorRunePattern runePattern) {
 		this.pattern = runePattern;
 		this.particles = new FortressGeneratorParticlesManager(this);
-		this.core = new GeneratorCore(this);
+		this.core = new GeneratorCore(this.pattern.anchorPoint);
 	}
 
 	// - Getters -
@@ -105,7 +83,7 @@ public class FortressGeneratorRune implements Memorable {
 		this.particles.tick();
 	}
 
-	public void onCreated() {
+	public void onCreated(Player player) {
 		this.moveBlockTo(Material.GOLD_BLOCK, pattern.runningPoint);
 		this.moveBlockTo(Material.DIAMOND_BLOCK, pattern.anchorPoint);
 
@@ -117,8 +95,7 @@ public class FortressGeneratorRune implements Memorable {
 
 		this.updateState();
 
-		String placingPlayerName = ""; //TODO: set this to actual placing player's name
-		this.core.onPlaced(placingPlayerName);
+		this.core.onPlaced(player);
 	}
 
 	public void onBroken() {
@@ -201,6 +178,7 @@ public class FortressGeneratorRune implements Memorable {
 			}
 
 			this.state = state;
+			this.core.onStateChanged(state);
 		}
 	}
 
