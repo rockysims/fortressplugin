@@ -5,6 +5,7 @@ import me.newyith.memory.Memory;
 import me.newyith.util.Point;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -12,13 +13,17 @@ import java.util.*;
 
 public class GeneratorCore implements Memorable {
 	//saved in NBT
-	private List<List<Point>> generatedLayers = new ArrayList<>();
+	private List<List<Point>> generatedLayers = new ArrayList<>(); //TODO: consider removing generatedLayer and using merge(alteredPoints, protectedPoints)
 	private List<List<Point>> animationWallLayers = new ArrayList<>();
 	private Set<Point> claimedPoints = new HashSet<>();
 	private Set<Point> claimedWallPoints = new HashSet<>();
 	private boolean isChangingGenerated;
 	private boolean isGeneratingWall;
 	private UUID placedByPlayerId = null; //set in onPlaced
+
+	//new
+	private HashMap<Point, Material> alteredPoints = new HashMap<>();
+	private Set<Point> protectedPoints = new HashSet<>();
 
 	private boolean animateGeneration = true;
 	private long lastFrameTimestamp = 0;
@@ -137,7 +142,7 @@ public class GeneratorCore implements Memorable {
 	}
 
 	private boolean updateToNextFrame() {
-		boolean layerUpdate = false;
+		boolean foundLayerToUpdate = false;
 
 		for (int i = 0; i < this.animationWallLayers.size(); i++) {
 			int layerIndex = i;
@@ -146,37 +151,34 @@ public class GeneratorCore implements Memorable {
 				layerIndex = (animationWallLayers.size()-1) - i;
 			}
 
-			List<Point> layer = new ArrayList<>(this.animationWallLayers.get(layerIndex)); //make copy to avoid concurrent modification errors
+			List<Point> layer = new ArrayList<>(this.animationWallLayers.get(layerIndex)); //make copy to avoid concurrent modification errors (recheck this is needed)
 
 			//set allOfLayerIsGenerated and anyOfLayerIsGenerated
 			boolean allOfLayerIsGenerated = true;
 			boolean anyOfLayerIsGenerated = false;
 			for (Point p : layer) {
-				Block b = p.getBlock();
-				boolean isWallBlock = Wall.getWallBlocks().contains(b);
-				if (isWallBlock) {
-					boolean isGeneratedBlock = Wall.getEnabledWallBlocks().contains(b);
-					isGeneratedBlock = isGeneratedBlock || this.protectedPoints.contains(p); //TODO: add List<Point> protectedPoints and keep it up to date
-					if (isGeneratedBlock) {
-						anyOfLayerIsGenerated = true;
-					} else {
-						allOfLayerIsGenerated = false;
-					}
+				//TODO: add List<Point> alteredPoints and keep it up to date
+				//TODO: add List<Point> protectedPoints and keep it up to date
+				boolean isGeneratedPoint = this.alteredPoints.containsKey(p) || this.protectedPoints.contains(p);
+				if (isGeneratedPoint) {
+					anyOfLayerIsGenerated = true;
+				} else {
+					allOfLayerIsGenerated = false;
 				}
 			}
 
-			//set layerUpdate
-			layerUpdate = false;
+			//set foundLayerToUpdate
+			foundLayerToUpdate = false;
 			if (this.isGeneratingWall && !allOfLayerIsGenerated) {
-				layerUpdate = true;
+				foundLayerToUpdate = true;
 			}
 			if (!this.isGeneratingWall && anyOfLayerIsGenerated) {
-				layerUpdate = true;
+				foundLayerToUpdate = true;
 			}
 
 			//update layer if needed
-			if (layerUpdate) {
-				updateLayer(layer, layerIndex);
+			if (foundLayerToUpdate) {
+				updateLayer(layer, layerIndex); //TODO: refactor this method to take advantage of the fact that updateLayer() now returns success/fail
 
 				//updated a layer so we're done with this frame
 				if (this.animateGeneration) {
@@ -185,54 +187,94 @@ public class GeneratorCore implements Memorable {
 			}
 		} // end for (List<Point> layer : this.wallPoints)
 
-		return layerUpdate;
+		return foundLayerToUpdate;
 	}
 
+	private boolean updateLayer(List<Point> layer, int layerIndex) {
+		boolean updatedLayer = false;
 
-
-	/////////////////////////////
-
-	private void updateLayer(List<Point> layer, int layerIndex) {
 		for (Point p : layer) {
-			Block wallBlock = p.getBlock();
-
 			if (this.isGeneratingWall) {
-				//generate wallBlock
-				int index = Wall.getDisabledWallBlocks().indexOf(wallBlock);
-				if (index != -1) {
+				//try to generate block at p
+				boolean pGenerated = alter(p) || protect(p);
+				updatedLayer = updatedLayer || pGenerated;
+
+				if (pGenerated) {
+					//add p to generatedLayers
 					while (layerIndex >= this.generatedLayers.size()) {
 						this.generatedLayers.add(new ArrayList<Point>());
 					}
 					this.generatedLayers.get(layerIndex).add(p);
-
-					if (wallBlock == Blocks.wooden_door || wallBlock == Blocks.iron_door) {
-						generateDoor(p, index);
-					} else if (wallBlock == Blocks.stone_stairs || wallBlock == Blocks.nether_brick_stairs) {
-						generateAndPreserveMeta(p, index);
-					} else {
-						world.setBlock(p.x, p.y, p.z, Wall.getEnabledWallBlocks().get(index));
-					}
 				}
 			} else {
-				//degenerate wallBlock
-				int index = Wall.getEnabledWallBlocks().indexOf(wallBlock);
-				if (index != -1) {
+				//try to degenerate block at p
+				boolean pDegenerated = unalter(p) || unprotect(p);
+				updatedLayer = updatedLayer || pDegenerated;
+
+				if (pDegenerated) {
+					//remove p from generatedLayers
 					if (layerIndex < this.generatedLayers.size()) {
 						this.generatedLayers.get(layerIndex).remove(p);
-					} //else we are degenerating another generators wall
-
-					if (wallBlock == FortressMod.fortressWoodenDoor || wallBlock == FortressMod.fortressIronDoor) {
-						degenerateDoor(p, index);
-					} else if (wallBlock == FortressMod.fortressCobblestoneStairs || wallBlock == FortressMod.fortressNetherBrickStairs) {
-						degenerateAndPreserveMeta(p, index);
-					} else {
-						world.setBlock(p.x, p.y, p.z, Wall.getDisabledWallBlocks().get(index));
-					}
+					} //else we would be degenerating another generators wall
 				}
 			}
 		} // end for (Point p : layer)
+
+		return updatedLayer;
 	}
 
+	private boolean alter(Point p) {
+		boolean altered = false;
+
+		Block b = p.getBlock();
+		if (Wall.isAlterableWallBlock(b)) {
+			this.alteredPoints.put(p, b.getType());
+			b.setType(Material.BEDROCK);
+			altered = true;
+		}
+
+		return altered;
+	}
+
+	private boolean unalter(Point p) {
+		boolean unaltered = false;
+
+		if (this.alteredPoints.containsKey(p)) {
+			Material material = this.alteredPoints.get(p);
+			p.getBlock().setType(material);
+			unaltered = true;
+		}
+
+		return unaltered;
+	}
+
+	private boolean protect(Point p) {
+		boolean pointProtected = false;
+
+		Block b = p.getBlock();
+		if (Wall.isProtectableWallBlock(b)) {
+			this.protectedPoints.add(p); //TODO: make FortressGeneratorParticlesManager show particles on protectedPoints
+			//TODO: make block at p unbreakable
+		}
+
+		return pointProtected;
+	}
+
+	private boolean unprotect(Point p) {
+		boolean unprotected = false;
+
+		if (this.protectedPoints.contains(p)) {
+			this.protectedPoints.remove(p);
+			//TODO: make block at p breakable again
+		}
+
+		return unprotected;
+	}
+
+
+
+
+	/////////////////////////////
 
 
 
@@ -461,7 +503,7 @@ public class GeneratorCore implements Memorable {
 		for (Point p : this.claimedWallPoints) {
 			Block claimedWallBlock = world.getBlock(p.x, p.y, p.z);
 			if (!Wall.getWallBlocks().contains(claimedWallBlock)) { //claimedWallBlock isn't a wall type block
-				this.unclaimDisconnect();
+				this.unclaimDisconnected();
 				break;
 			}
 		}
@@ -469,9 +511,9 @@ public class GeneratorCore implements Memorable {
 		return this.claimedPoints;
 	}
 
-	private void unclaimDisconnect() {
+	private void unclaimDisconnected() {
 		//fill pointsToUnclaim
-		Set<Point> pointsToUnclaim = new HashSet<Point>();
+		Set<Point> pointsToUnclaim = new HashSet<>();
 		Set<Point> connectedPoints = getPointsConnected(Wall.getWallBlocks(), Wall.getWallBlocks(), generationRangeLimit, null, this.claimedWallPoints);
 		for (Point claimedWallPoint : this.claimedWallPoints) {
 			if (!connectedPoints.contains(claimedWallPoint)) { //found claimed wall point that is now disconnected
@@ -494,10 +536,10 @@ public class GeneratorCore implements Memorable {
 		this.claimedPoints.addAll(layerAroundGenerator); //TODO: uncomment out this line
 
 		//degenerate overlap between pointsToUnclaim and this.generatedLayers
-		Set<Point> pointsToDegenerate = new HashSet<Point>(pointsToUnclaim);
+		Set<Point> pointsToDegenerate = new HashSet<>(pointsToUnclaim);
 		pointsToDegenerate.retainAll(Wall.flattenLayers(this.generatedLayers));
 		this.animationWallLayers.clear();
-		this.animationWallLayers.add(new ArrayList<Point>(pointsToDegenerate));
+		this.animationWallLayers.add(new ArrayList<>(pointsToDegenerate));
 		this.isGeneratingWall = false;
 		this.isChangingGenerated = true;
 		this.animateGeneration = false;
