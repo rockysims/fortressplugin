@@ -13,16 +13,20 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class FortressGeneratorRune implements Memorable {
-    private FortressGeneratorRunePattern pattern = null; //set by constructor
-	private FortressGeneratorParticlesManager particles = null; //set by constructor
+    //saved
+	private FortressGeneratorRunePattern pattern = null; //set by constructor
 	private GeneratorCore core = null; //set by constructor
 	private boolean powered = false;
 	private int fuelTicksRemaining = 0;
 	private FgState state = FgState.NULL;
+
+	//not saved
+	private FortressGeneratorParticlesManager particles = null; //set by constructor
 	private int msPerFuelItem = 15*1000;
+	private List<Long> powerToggleTimeStamps = new ArrayList<Long>();
 
 	public void saveTo(Memory m) {
 		m.save("pattern", pattern);
@@ -76,6 +80,14 @@ public class FortressGeneratorRune implements Memorable {
 		return this.powered;
 	}
 
+	public Set<Point> getPoints() {
+		return new HashSet<>(this.getPattern().getPoints());
+	}
+
+	public GeneratorCore getGeneratorCore() {
+		return this.core;
+	}
+
 	// - Events -
 
 	public void onTick() {
@@ -95,7 +107,10 @@ public class FortressGeneratorRune implements Memorable {
 
 		this.updateState();
 
-		this.core.onPlaced(player);
+		boolean placed = this.core.onPlaced(player);
+		if (!placed) {
+			onBroken();
+		}
 	}
 
 	public void onBroken() {
@@ -108,8 +123,13 @@ public class FortressGeneratorRune implements Memorable {
 
 	public void setPowered(boolean powered) {
 		if (this.powered != powered) {
-			this.powered = powered;
-			this.updateState();
+			if (countRecentPowerToggles() > 10) {
+				this.onBroken();
+			} else {
+				powerToggleTimeStamps.add(System.currentTimeMillis()); //used by countRecentPowerToggles()
+				this.powered = powered;
+				this.updateState();
+			}
 		}
 	}
 
@@ -287,5 +307,22 @@ public class FortressGeneratorRune implements Memorable {
 		Material bMat = b.getBlock().getType();
 		a.getBlock().setType(bMat);
 		b.getBlock().setType(aMat);
+	}
+
+	private int countRecentPowerToggles() {
+		//set count recent power toggles and remove expired stamps
+		long now = System.currentTimeMillis();
+		int stampLifetimeMs = 10*1000;
+		int count = 0;
+		for (Iterator<Long> itr = powerToggleTimeStamps.iterator(); itr.hasNext(); ) {
+			Long stamp = itr.next();
+			if (now - stamp < stampLifetimeMs) {
+				count++;
+			} else {
+				itr.remove();
+			}
+		}
+
+		return count;
 	}
 }

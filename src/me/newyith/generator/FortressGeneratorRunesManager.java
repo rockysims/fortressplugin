@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 public class FortressGeneratorRunesManager {
 	private static ArrayList<FortressGeneratorRune> runeInstances = new ArrayList<FortressGeneratorRune>();
@@ -30,6 +31,37 @@ public class FortressGeneratorRunesManager {
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
+
+	// - Getters -
+
+	public static FortressGeneratorRune getRune(Point p) {
+		return runeByPoint.get(p);
+	}
+
+	public static Set<FortressGeneratorRune> getOtherRunesInRange(Point center, int range) {
+		Set<FortressGeneratorRune> runesInRange = new HashSet<>();
+		int x = (int)center.x;
+		int y = (int)center.y;
+		int z = (int)center.z;
+
+		//fill runesInRange
+		for (FortressGeneratorRune rune : runeInstances) {
+			//set inRange
+			boolean inRange = true;
+			Point p = rune.getPattern().anchorPoint;
+			inRange = inRange && Math.abs(p.x - x) <= range;
+			inRange = inRange && Math.abs(p.y - y) <= range;
+			inRange = inRange && Math.abs(p.z - z) <= range;
+
+			if (inRange && p != center) {
+				runesInRange.add(rune);
+			}
+		}
+
+		return runesInRange;
+	}
+
+	// - Events -
 
 	public static void onTick() {
 		for (FortressGeneratorRune rune : runeInstances) {
@@ -88,16 +120,6 @@ public class FortressGeneratorRunesManager {
 		}
 	}
 
-	public static void doBreakRune(FortressGeneratorRune rune) {
-		rune.onBroken();
-
-		for (Point p : rune.getPattern().getPoints()) {
-			runeByPoint.remove(p);
-		}
-
-		runeInstances.remove(rune);
-	}
-
 	public static void onPistonEvent(boolean isSticky, Point piston, Point target, ArrayList<Block> movedBlocks) {
 		//build pointsAffected
 		HashSet<Point> pointsAffected = new HashSet<>();
@@ -124,5 +146,15 @@ public class FortressGeneratorRunesManager {
 		for (FortressGeneratorRune rune : runesAffected) {
 			doBreakRune(rune);
 		}
+	}
+
+	public static void doBreakRune(FortressGeneratorRune rune) {
+		rune.onBroken();
+
+		for (Point p : rune.getPattern().getPoints()) {
+			runeByPoint.remove(p);
+		}
+
+		runeInstances.remove(rune);
 	}
 }

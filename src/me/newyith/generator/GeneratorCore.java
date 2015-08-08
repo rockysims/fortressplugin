@@ -28,7 +28,6 @@ public class GeneratorCore implements Memorable {
 	private boolean animateGeneration = true;
 	private long lastFrameTimestamp = 0;
 	private long msPerFrame = 150;
-	private List<Long> generateWallTimeStamps = new ArrayList<Long>();
 
 	public static final int generationRangeLimit = 32;
 
@@ -81,18 +80,18 @@ public class GeneratorCore implements Memorable {
 
 	// - Events -
 
-	public void onPlaced(Player placingPlayer) { //<--------- called by rune
+	public boolean onPlaced(Player placingPlayer) { //<--------- called by rune
 		this.placedByPlayerId = placingPlayer.getUniqueId();
 
 		//set overlapWithClaimed = true if placed generator is connected (by faces) to another generator's claimed points
+		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(this.anchorPoint);
+		Set<Point> claimPoints = rune.getPoints();
+		claimPoints.addAll(getLayerAround(claimPoints));
 		Set<Point> alreadyClaimedPoints = this.getClaimedPointsOfNearbyGenerators();
-		Set<Point> layerAroundGenerator = this.getTouchingFaces(); //TODO: make this to get rune points and layer around them
-		boolean overlapWithClaimed = !Collections.disjoint(alreadyClaimedPoints, layerAroundGenerator); //disjoint means no points in common
+		boolean overlapWithClaimed = !Collections.disjoint(alreadyClaimedPoints, claimPoints); //disjoint means no points in common
 
-		if (overlapWithClaimed) {
-			this.sendMessage("Fortress generator is too close to another generator's wall.");
-			this.clog();
-		} else {
+		boolean canPlace = !overlapWithClaimed;
+		if (canPlace) {
 			//claim wall + 1 layer (and 1 layer around generator)
 			List<List<Point>> generatableWallLayers = this.getGeneratableWallLayers();
 			this.updateClaimedPoints(generatableWallLayers); //updateClaimedPoints() will add in layer around wall + generator and layer around it
@@ -100,7 +99,11 @@ public class GeneratorCore implements Memorable {
 			//tell player how many wall blocks were found
 			int foundWallPointsCount = Wall.flattenLayers(generatableWallLayers).size();
 			this.sendMessage("Fortress generator found " + String.valueOf(foundWallPointsCount) + " wall blocks.");
+		} else {
+			this.sendMessage("Fortress generator is too close to another generator's wall.");
 		}
+
+		return canPlace;
 	}
 
 	public void onBroken() { //<--------- called by rune
@@ -141,9 +144,14 @@ public class GeneratorCore implements Memorable {
 		}
 	}
 
+	// --------- Internal Methods ---------
+
+	//TODO: refactor animation handling to new class GeneratorCoreAnimation?
+
 	private boolean updateToNextFrame() {
 		boolean foundLayerToUpdate = false;
 
+		//TODO: consider saving i as animationLayerIndex for increased execution speed
 		for (int i = 0; i < this.animationWallLayers.size(); i++) {
 			int layerIndex = i;
 			//if (degenerating) start from the outer most layer
@@ -153,37 +161,12 @@ public class GeneratorCore implements Memorable {
 
 			List<Point> layer = new ArrayList<>(this.animationWallLayers.get(layerIndex)); //make copy to avoid concurrent modification errors (recheck this is needed)
 
-			//set allOfLayerIsGenerated and anyOfLayerIsGenerated
-			boolean allOfLayerIsGenerated = true;
-			boolean anyOfLayerIsGenerated = false;
-			for (Point p : layer) {
-				//TODO: add List<Point> alteredPoints and keep it up to date
-				//TODO: add List<Point> protectedPoints and keep it up to date
-				boolean isGeneratedPoint = this.alteredPoints.containsKey(p) || this.protectedPoints.contains(p);
-				if (isGeneratedPoint) {
-					anyOfLayerIsGenerated = true;
-				} else {
-					allOfLayerIsGenerated = false;
-				}
-			}
+			//try to update layer
+			foundLayerToUpdate = updateLayer(layer, layerIndex);
 
-			//set foundLayerToUpdate
-			foundLayerToUpdate = false;
-			if (this.isGeneratingWall && !allOfLayerIsGenerated) {
-				foundLayerToUpdate = true;
-			}
-			if (!this.isGeneratingWall && anyOfLayerIsGenerated) {
-				foundLayerToUpdate = true;
-			}
-
-			//update layer if needed
-			if (foundLayerToUpdate) {
-				updateLayer(layer, layerIndex); //TODO: refactor this method to take advantage of the fact that updateLayer() now returns success/fail
-
+			if (foundLayerToUpdate && this.animateGeneration) {
 				//updated a layer so we're done with this frame
-				if (this.animateGeneration) {
-					break;
-				}
+				break;
 			}
 		} // end for (List<Point> layer : this.wallPoints)
 
@@ -227,7 +210,7 @@ public class GeneratorCore implements Memorable {
 		boolean altered = false;
 
 		Block b = p.getBlock();
-		if (Wall.isAlterableWallBlock(b)) {
+		if (Wall.isAlterableWallMaterial(b.getType())) {
 			this.alteredPoints.put(p, b.getType());
 			b.setType(Material.BEDROCK);
 			altered = true;
@@ -240,7 +223,7 @@ public class GeneratorCore implements Memorable {
 		boolean unaltered = false;
 
 		if (this.alteredPoints.containsKey(p)) {
-			Material material = this.alteredPoints.get(p);
+			Material material = this.alteredPoints.remove(p);
 			p.getBlock().setType(material);
 			unaltered = true;
 		}
@@ -252,9 +235,10 @@ public class GeneratorCore implements Memorable {
 		boolean pointProtected = false;
 
 		Block b = p.getBlock();
-		if (Wall.isProtectableWallBlock(b)) {
+		if (Wall.isProtectableWallMaterial(b.getType())) {
 			this.protectedPoints.add(p); //TODO: make FortressGeneratorParticlesManager show particles on protectedPoints
 			//TODO: make block at p unbreakable
+			pointProtected = true;
 		}
 
 		return pointProtected;
@@ -271,117 +255,21 @@ public class GeneratorCore implements Memorable {
 		return unprotected;
 	}
 
+	/**
+	 * Degenerates (turns off) the wall being generated by this generator.
+	 */
+	private void degenerateWall(boolean animate) {
+		//Dbg.print("degenerateWall("+String.valueOf(animate)+")");
+		this.animationWallLayers.clear();
+		this.animationWallLayers.addAll(this.generatedLayers);
 
+		this.isGeneratingWall = false;
+		this.isChangingGenerated = true;
 
-
-	/////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	// --------- Internal Methods ---------
-
-	private void generateAndPreserveMeta(Point p, int index) {
-		int meta = world.getBlockMetadata(p.x, p.y, p.z);
-		world.setBlock(p.x, p.y, p.z, Wall.getEnabledWallBlocks().get(index));
-		world.setBlockMetadataWithNotify(p.x, p.y, p.z, meta, 2);
-	}
-
-	private void degenerateAndPreserveMeta(Point p, int index) {
-		int meta = world.getBlockMetadata(p.x, p.y, p.z);
-		world.setBlock(p.x, p.y, p.z, Wall.getDisabledWallBlocks().get(index));
-		world.setBlockMetadataWithNotify(p.x, p.y, p.z, meta, 2);
-	}
-
-	private void generateDoor(Point p, int index) {
-		//assumes p is a door block (2 block tall doors)
-		Point top = getDoorTop(p);
-		if (top != null) {
-			Point bottom = new Point(top.x, top.y - 1, top.z);
-			Block topBlock = world.getBlock(top.x, top.y, top.z);
-			Block bottomBlock = world.getBlock(bottom.x, bottom.y, bottom.z);
-
-			int topMeta = world.getBlockMetadata(top.x, top.y, top.z);
-			int bottomMeta = world.getBlockMetadata(bottom.x, bottom.y, bottom.z);
-
-			//remove old door
-			world.setBlockToAir(bottom.x, bottom.y, bottom.z);
-			world.setBlockToAir(top.x, top.y, top.z);
-
-			//create bottom of door
-			world.setBlock(bottom.x, bottom.y, bottom.z, Wall.getEnabledWallBlocks().get(index));
-			world.setBlockMetadataWithNotify(bottom.x, bottom.y, bottom.z, bottomMeta, 2);
-
-			//create top of door
-			world.setBlock(top.x, top.y, top.z, Wall.getEnabledWallBlocks().get(index));
-			world.setBlockMetadataWithNotify(top.x, top.y, top.z, topMeta, 2);
-		} else { //can't find a matching (door) block above or below (should never happen if door is working correctly)
-			int meta = world.getBlockMetadata(p.x, p.y, p.z);
-			world.setBlockToAir(p.x, p.y, p.z);
-			world.setBlock(p.x, p.y, p.z, Wall.getEnabledWallBlocks().get(index));
-			world.setBlockMetadataWithNotify(p.x, p.y, p.z, meta, 2);
-		}
-	}
-
-	private void degenerateDoor(Point p, int index) {
-		//assumes p is a door block
-		Point top = getDoorTop(p);
-		if (top != null) {
-			Point bottom = new Point(top.x, top.y - 1, top.z);
-			Block topBlock = world.getBlock(top.x, top.y, top.z);
-			Block bottomBlock = world.getBlock(bottom.x, bottom.y, bottom.z);
-
-			if (topBlock == bottomBlock) {
-				int topMeta = world.getBlockMetadata(top.x, top.y, top.z);
-				int bottomMeta = world.getBlockMetadata(bottom.x, bottom.y, bottom.z);
-
-				//remove old door
-				world.setBlockToAir(bottom.x, bottom.y, bottom.z);
-				world.setBlockToAir(top.x, top.y, top.z);
-
-				//create bottom of door
-				world.setBlock(bottom.x, bottom.y, bottom.z, Wall.getDisabledWallBlocks().get(index));
-				world.setBlockMetadataWithNotify(bottom.x, bottom.y, bottom.z, bottomMeta, 2);
-
-				//create top of door
-				world.setBlock(top.x, top.y, top.z, Wall.getDisabledWallBlocks().get(index));
-				world.setBlockMetadataWithNotify(top.x, top.y, top.z, topMeta, 2);
-			} //else the world is in an invalid state?
-		} else { //can't find a matching (door) block above or below (should never happen if door is working correctly)
-			int meta = world.getBlockMetadata(p.x, p.y, p.z);
-			world.setBlockToAir(p.x, p.y, p.z);
-			world.setBlock(p.x, p.y, p.z, Wall.getDisabledWallBlocks().get(index));
-			world.setBlockMetadataWithNotify(p.x, p.y, p.z, meta, 2);
-		}
-	}
-
-	private Point getDoorTop(Point p) {
-		//assumes p is a door block
-		Point a = new Point(p.x, p.y + 1, p.z);
-		Point b = new Point(p.x, p.y - 1, p.z);
-		Block above = world.getBlock(a.x, a.y, a.z);
-		Block below = world.getBlock(b.x, b.y, b.z);
-		Block middle = world.getBlock(p.x, p.y, p.z);
-
-		if (above == middle) {
-			return a;
-		} else if (below == middle) {
-			return p;
-		} else {
-			return null;
+		if (!animate) {
+			this.animateGeneration = false;
+			this.tick();
+			this.animateGeneration = true;
 		}
 	}
 
@@ -393,116 +281,67 @@ public class GeneratorCore implements Memorable {
 	private void generateWall() {
 		//Dbg.print("generateWall()");
 
-		//if generateWall is called too often, clog to prevent lag else generate wall
-		if (this.getRecentGenerateWallCallCount() > 10) {
-			this.clog();
-		} else {
-			generateWallTimeStamps.add(System.currentTimeMillis());
+		//set this.wallLayers = wall layers its allowed to generate
+		this.animationWallLayers = this.getGeneratableWallLayers();
+		//recalculate this.claimedPoints
+		this.updateClaimedPoints(Wall.merge(this.animationWallLayers, this.generatedLayers));
 
-			//generate wall
-
-			//set this.wallLayers = wall layers its allowed to generate
-			this.animationWallLayers = this.getGeneratableWallLayers();
-			//recalculate this.claimedPoints
-			this.updateClaimedPoints(merge(this.animationWallLayers, this.generatedLayers));
-
-			//start generating
-			this.isGeneratingWall = true;
-			this.isChangingGenerated = true;
-		}
-	}
-	private int getRecentGenerateWallCallCount() {
-		//set recentGenerateWallCalls and remove expired stamps
-		long now = System.currentTimeMillis();
-		int stampLifetimeMs = 10*1000;
-		int recentGenerateWallCalls = 0;
-		for (Iterator<Long> itr = generateWallTimeStamps.iterator(); itr.hasNext(); ) {
-			Long stamp = itr.next();
-			if (now - stamp < stampLifetimeMs) {
-				recentGenerateWallCalls++;
-			} else {
-				itr.remove();
-			}
-		}
-
-		return recentGenerateWallCalls;
+		//start generating
+		this.isGeneratingWall = true;
+		this.isChangingGenerated = true;
 	}
 
-	private void updateClaimedPoints(List<List<Point>> wallLayers) {
-		this.claimedPoints.clear();
-
-		this.claimedWallPoints = Wall.flattenLayers(wallLayers);
-		this.claimedPoints.addAll(this.claimedWallPoints);
-
-		//add layer around wall to claimed points
-		Set<Point> layerAroundWallPoints = getLayerAround(this.claimedWallPoints);
-		this.claimedPoints.addAll(layerAroundWallPoints);
-
-		//add layer around generator
-		Set<Point> layerAroundGenerator = getLayerAround(Wall.flattenLayers(this.getGeneratorPointAsLayers()));
-		this.claimedPoints.addAll(layerAroundGenerator);
-	}
-
-	private List<List<Point>> getDegeneratableWallLayers() {
-		return getAllowedWallLayers(Wall.getEnabledWallBlocks());
-	}
+	// --------- More Internal Methods ---------
 
 	private List<List<Point>> getGeneratableWallLayers() {
-		return getAllowedWallLayers(Wall.getDisabledWallBlocks());
-	}
-
-	private List<List<Point>> getAllowedWallLayers(List<Block> returnBlocks) {
 		Set<Point> claimedPoints = this.getClaimedPointsOfNearbyGenerators();
 
 		//return all connected wall points ignoring (and not traversing) claimedPoints (generationRangeLimit search range)
-		List<List<Point>> allowedWallLayers = getPointsConnectedAsLayers(Wall.getWallBlocks(), returnBlocks, generationRangeLimit, claimedPoints);
+		List<List<Point>> allowedWallLayers = getPointsConnectedAsLayers(Wall.getWallMaterials(), Wall.getGeneratableWallMaterials(), generationRangeLimit, claimedPoints);
 		return allowedWallLayers;
 	}
 
-	private Set<Point> getClaimedPointsOfNearbyGenerators() {
-		//claimedPoints = merge of claimedPoints of all nearby generators (nearbyCores)
-		Set<Point> claimedPoints = new HashSet();
-		Set<GeneratorCore> nearbyCores = this.getOtherCoresInRange(generationRangeLimit*2);
-		for (GeneratorCore core : nearbyCores) {
-			claimedPoints.addAll(core.getClaimedPoints());
+	private void updateClaimedPoints(List<List<Point>> wallLayers) {
+		this.updateClaimedPoints(Wall.flattenLayers(wallLayers));
+	}
+	private void updateClaimedPoints(Set<Point> wallPoints) {
+		this.claimedPoints.clear();
+
+		//claim wallLayers
+		this.claimedWallPoints = wallPoints;
+		this.claimedPoints.addAll(this.claimedWallPoints);
+
+		//claim layer around wall
+		Set<Point> layerAroundWallPoints = getLayerAround(this.claimedWallPoints);
+		this.claimedPoints.addAll(layerAroundWallPoints);
+
+		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(this.anchorPoint);
+		if (rune != null) {
+			//claim rune
+			Set<Point> runePoints = rune.getPoints();
+			this.claimedPoints.addAll(runePoints);
+			//claim layer around rune
+			Set<Point> layerAroundRune = getLayerAround(runePoints);
+			this.claimedPoints.addAll(layerAroundRune);
 		}
-		return claimedPoints;
 	}
 
-	private Set<GeneratorCore> getOtherCoresInRange(int rangeLimit) {
-		int x = this.x();
-		int y = this.y();
-		int z = this.z();
-		Set<Point> allCorePoints = new HashSet<Point>(ModWorldData.forWorld(this.world).getGeneratorCorePoints());
-		allCorePoints.remove(new Point(x, y, z)); //ignore this generator
+	private Set<Point> getClaimedPointsOfNearbyGenerators() {
+		Set<FortressGeneratorRune> nearbyRunes = FortressGeneratorRunesManager.getOtherRunesInRange(this.anchorPoint, generationRangeLimit * 2 + 1); //not sure if the + 1 is needed
 
-		//fill nearbyCores
-		Set<GeneratorCore> nearbyCores = new HashSet<GeneratorCore>();
-		for (Point p : allCorePoints) {
-			boolean inRange = true;
-			inRange = inRange && Math.abs(p.x - x) <= rangeLimit;
-			inRange = inRange && Math.abs(p.y - y) <= rangeLimit;
-			inRange = inRange && Math.abs(p.z - z) <= rangeLimit;
-			if (inRange) { //generator at p is in range
-				//add core to nearbyCores
-				TileEntity tile = this.world.getTileEntity(p.x, p.y, p.z);
-				if (tile instanceof FortressGeneratorRune) {
-					FortressGeneratorRune fg = (FortressGeneratorRune)tile;
-					nearbyCores.add(fg.getGeneratorCore());
-				} else { //ModWorldData's allGeneratorCorePoints list is wrong
-					ModWorldData.forWorld(this.world).removeGeneratorCorePoint(p);
-				}
-			}
+		Set<Point> claimedPoints = new HashSet<>();
+		for (FortressGeneratorRune rune : nearbyRunes) {
+			claimedPoints.addAll(rune.getGeneratorCore().getClaimedPoints());
 		}
 
-		return nearbyCores;
+		return claimedPoints;
 	}
 
 	private Set<Point> getClaimedPoints() {
 		//update claimedPoints if claimedWallPoints are not all wall type blocks
 		for (Point p : this.claimedWallPoints) {
-			Block claimedWallBlock = world.getBlock(p.x, p.y, p.z);
-			if (!Wall.getWallBlocks().contains(claimedWallBlock)) { //claimedWallBlock isn't a wall type block
+			Block claimedWallBlock = p.getBlock();
+			if (!Wall.getWallMaterials().contains(claimedWallBlock)) { //claimedWallBlock isn't a wall type block
 				this.unclaimDisconnected();
 				break;
 			}
@@ -514,26 +353,16 @@ public class GeneratorCore implements Memorable {
 	private void unclaimDisconnected() {
 		//fill pointsToUnclaim
 		Set<Point> pointsToUnclaim = new HashSet<>();
-		Set<Point> connectedPoints = getPointsConnected(Wall.getWallBlocks(), Wall.getWallBlocks(), generationRangeLimit, null, this.claimedWallPoints);
+		Set<Point> connectedPoints = getPointsConnected(Wall.getWallMaterials(), Wall.getWallMaterials(), generationRangeLimit, null, this.claimedWallPoints);
 		for (Point claimedWallPoint : this.claimedWallPoints) {
 			if (!connectedPoints.contains(claimedWallPoint)) { //found claimed wall point that is now disconnected
-				//add claimedWallPoint to poitnsToUnclaim
 				pointsToUnclaim.add(claimedWallPoint);
 			}
 		}
 
-		//remove pointsToUnclaim from this.claimedWallPoints
+		//unclaim pointsToUnclaim
 		this.claimedWallPoints.removeAll(pointsToUnclaim);
-
-		//update this.claimedPoints
-		this.claimedPoints.clear();
-		this.claimedPoints.addAll(this.claimedWallPoints);
-		//add layer around wall to claimed points
-		Set<Point> layerAroundWallPoints = getLayerAround(this.claimedWallPoints);
-		this.claimedPoints.addAll(layerAroundWallPoints);
-		//add layer around generator
-		Set<Point> layerAroundGenerator = getLayerAround(Wall.flattenLayers(this.getGeneratorPointAsLayers()));
-		this.claimedPoints.addAll(layerAroundGenerator); //TODO: uncomment out this line
+		this.updateClaimedPoints(this.claimedWallPoints);
 
 		//degenerate overlap between pointsToUnclaim and this.generatedLayers
 		Set<Point> pointsToDegenerate = new HashSet<>(pointsToUnclaim);
@@ -557,146 +386,42 @@ public class GeneratorCore implements Memorable {
 		this.isGeneratingWall = this.generatedLayers.size() > 0;
 	}
 
-	/**
-	 * Degenerates (turns off) the wall being generated by this generator.
-	 */
-	private void degenerateWall(boolean animate) {
-		//Dbg.print("degenerateWall("+String.valueOf(animate)+")");
-		this.animationWallLayers.clear();
-		this.animationWallLayers.addAll(this.generatedLayers);
-
-		this.isGeneratingWall = false;
-		this.isChangingGenerated = true;
-
-		if (!animate) {
-			this.animateGeneration = false;
-			this.tick();
-			this.animateGeneration = true;
-		}
-	}
-	private static List<List<Point>> merge(List<List<Point>> layers1, List<List<Point>> layers2) {
-		List<List<Point>> layers = new ArrayList<List<Point>>();
-
-		int biggestSize = Math.max(layers1.size(), layers2.size());
-		for (int i = 0; i < biggestSize; i++) {
-			//process layer i
-			layers.add(new ArrayList<Point>());
-			if (i < layers1.size()) {
-				layers.get(i).addAll(layers1.get(i));
-			}
-			if (i < layers2.size()) {
-				layers.get(i).addAll(layers2.get(i));
-			}
-		}
-
-		return layers;
+	private Set<Point> getPointsConnected(Set<Material> wallMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
+		return Wall.getPointsConnected(this.anchorPoint, wallMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
 	}
 
-	private List<FortressGeneratorRune> getConnectedFortressGeneratorsNotClogged() {
-		List<FortressGeneratorRune> matches = new ArrayList<FortressGeneratorRune>();
-
-		Set<Point> connectFgPoints = getPointsConnected(Wall.getWallBlocks(), Wall.getNotCloggedGeneratorBlocks());
-		for (Point p : connectFgPoints) {
-			FortressGeneratorRune fg = (FortressGeneratorRune) world.getTileEntity(p.x, p.y, p.z);
-			matches.add(fg);
-		}
-
-		return matches;
-	}
-
-	/**
-	 * Clogs the generator after degenerating walls.
-	 * Assumes checking for permission to clog generator and degenerate walls is already done.
-	 */
-	public void clog() {
-		this.degenerateWall(true);
-		this.claimedPoints.clear();
-		this.rune.setState(FortressGeneratorState.CLOGGED);
-	}
-
-	private Set<Point> getPointsConnected(ArrayList<Block> wallBlocks, ArrayList<Block> returnBlocks) {
-		return this.getPointsConnected(wallBlocks, returnBlocks, generationRangeLimit, null);
-	}
-
-	private Set<Point> getPointsConnected(ArrayList<Block> wallBlocks, ArrayList<Block> returnBlocks, int rangeLimit, Set<Point> ignorePoints) {
-		return Wall.getPointsConnected(this.world, this.point(), wallBlocks, returnBlocks, rangeLimit, ignorePoints);
-	}
-
-	private Set<Point> getPointsConnected(ArrayList<Block> wallBlocks, ArrayList<Block> returnBlocks, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
-		return Wall.getPointsConnected(this.world, this.point(), wallBlocks, returnBlocks, rangeLimit, ignorePoints, searchablePoints);
-	}
-
-	private List<List<Point>> getPointsConnectedAsLayers(ArrayList<Block> wallBlocks, ArrayList<Block> returnBlocks) {
-		return this.getPointsConnectedAsLayers(wallBlocks, returnBlocks, generationRangeLimit, null);
-	}
-
-	private List<List<Point>> getPointsConnectedAsLayers(List<Block> wallBlocks, List<Block> returnBlocks, int rangeLimit, Set<Point> ignorePoints) {
-		return Wall.getPointsConnectedAsLayers(this.world, this.point(), wallBlocks, returnBlocks, rangeLimit, ignorePoints);
+	private List<List<Point>> getPointsConnectedAsLayers(Set<Material> wallMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints) {
+		return Wall.getPointsConnectedAsLayers(this.anchorPoint, wallMaterials, returnMaterials, rangeLimit, ignorePoints);
 	}
 
 	private Set<Point> getLayerAround(Set<Point> wallPoints) {
-		List<Block> wallBlocks = new ArrayList<Block>(); //no wall blocks
-		List<Block> returnBlocks = null; //all blocks are return blocks
+		Set<Material> wallMaterials = new HashSet<>(); //no wall blocks
+		Set<Material> returnMaterials = null; //all blocks are return blocks
 		int rangeLimit = generationRangeLimit + 1;
 		Set<Point> ignorePoints = null; //no points ignored
-		return Wall.getPointsConnected(this.world, this.point(), wallPoints, wallBlocks, returnBlocks, rangeLimit, ignorePoints, Wall.ConnectedThreshold.POINTS);
+		return Wall.getPointsConnected(this.anchorPoint, wallPoints, wallMaterials, returnMaterials, rangeLimit, ignorePoints, Wall.ConnectedThreshold.POINTS);
 	}
 
-	/**
-	 * Gets the 6 points (blocks) touching the generator (connected by faces).
-	 *
-	 * @return The 6 points touching the generator.
-	 */
-	private Set<Point> getTouchingFaces() {
-		Point origin = this.point();
 
-		Set<Point> originLayer = new HashSet<Point>();
-		originLayer.add(origin);
-		List<Block> wallBlocks = new ArrayList<Block>(); //no wall blocks
-		List<Block> returnBlocks = null; //all blocks are return blocks
-		int rangeLimit = generationRangeLimit + 1;
-		Set<Point> ignorePoints = null; //no points ignored
-		return Wall.getPointsConnected(this.world, origin, originLayer, wallBlocks, returnBlocks, rangeLimit, ignorePoints, Wall.ConnectedThreshold.FACES);
-	}
 
-	public String getPlacedByPlayerId() {
-		return this.placedByPlayerId;
-	}
+//	will be used for emergency key
+//	public String getPlacedByPlayerId() {
+//		return this.placedByPlayerId;
+//	}
 
-	private List<List<Point>> getGeneratorPointAsLayers() {
-		List<List<Point>> generatorAsLayers = new ArrayList();
-		generatorAsLayers.add(this.getGeneratorPointAsLayer());
-		return generatorAsLayers;
-	}
-	private List<Point> getGeneratorPointAsLayer() {
-		Point generatorPoint = new Point(this.x(), this.y(), this.z());
-		List<Point> generatorAsLayer = new ArrayList();
-		generatorAsLayer.add(generatorPoint);
-		return generatorAsLayer;
-	}
+//	will be used for emergency key
+//	private List<FortressGeneratorRune> getConnectedFortressGenerators() {
+//		List<FortressGeneratorRune> matches = new ArrayList<>();
+//
+//		Set<Point> connectRunePoints = getPointsConnected(Wall.getWallMaterials(), Wall.getNotCloggedGeneratorBlocks());
+//		for (Point p : connectRunePoints) {
+//			FortressGeneratorRune fg = (FortressGeneratorRune) world.getTileEntity(p.x, p.y, p.z);
+//			matches.add(fg);
+//		}
+//
+//		return matches;
+//	}
 
-	private int x() {
-		return this.rune.xCoord;
-	}
-	private int y() {
-		return this.rune.yCoord;
-	}
-	private int z() {
-		return this.rune.zCoord;
-	}
-	private Point point() {
-		return new Point(this.x(), this.y(), this.z());
-	}
 
-	private boolean isActive() {
-		return this.rune.isActive();
-	}
-
-	public boolean isPaused() {
-		return this.rune.isPaused();
-	}
-
-	private boolean isClogged() {
-		return this.rune.isClogged();
-	}
+	
 }
