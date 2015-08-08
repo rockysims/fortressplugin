@@ -93,6 +93,7 @@ public class FortressGeneratorRune implements Memorable {
 	public void onTick() {
 		tickFuel();
 		this.particles.tick();
+		this.core.tick();
 	}
 
 	public void onCreated(Player player) {
@@ -198,7 +199,11 @@ public class FortressGeneratorRune implements Memorable {
 			}
 
 			this.state = state;
-			this.core.onStateChanged(state);
+			if (this.core != null) {
+				this.core.onStateChanged(state);
+			} else {
+				Debug.msg("FGRune setState() core == null");
+			}
 		}
 	}
 
