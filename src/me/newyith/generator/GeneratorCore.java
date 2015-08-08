@@ -166,7 +166,9 @@ public class GeneratorCore implements Memorable {
 
 			//try to update layer
 			foundLayerToUpdate = updateLayer(layer, layerIndex);
-			Debug.msg("updated layerIndex " + layerIndex + ": " + foundLayerToUpdate);
+			if (foundLayerToUpdate) {
+				Debug.msg("updated layerIndex " + layerIndex + ": " + foundLayerToUpdate);
+			}
 
 			if (foundLayerToUpdate && this.animateGeneration) {
 				//updated a layer so we're done with this frame
