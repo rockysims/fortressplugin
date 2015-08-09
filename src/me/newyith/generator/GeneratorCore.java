@@ -232,10 +232,7 @@ public class GeneratorCore implements Memorable {
 	private boolean updateToNextFrame() {
 		boolean foundLayerToUpdate = false;
 
-		Debug.msg("updateToNextFrame() called");
-
 		//TODO: consider saving i as animationLayerIndex for increased execution speed
-		Debug.msg("updateToNextFrame() this.animationWallLayers.size(): " + this.animationWallLayers.size());
 		for (int i = 0; i < this.animationWallLayers.size(); i++) {
 			int layerIndex = i;
 			//if (degenerating) start from the outer most layer
@@ -244,14 +241,9 @@ public class GeneratorCore implements Memorable {
 			}
 
 			List<Point> layer = new ArrayList<>(this.animationWallLayers.get(layerIndex)); //make copy to avoid concurrent modification errors (recheck this is needed)
-			//Debug.msg("layer " + layerIndex + " .size(): " + layer.size());
 
 			//try to update layer
 			foundLayerToUpdate = updateLayer(layer, layerIndex);
-			if (foundLayerToUpdate) {
-				//Debug.msg("updated layerIndex " + layerIndex + ": " + foundLayerToUpdate);
-			}
-
 			if (foundLayerToUpdate && this.animateGeneration) {
 				//updated a layer so we're done with this frame
 				break;

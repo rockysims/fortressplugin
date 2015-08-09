@@ -18,7 +18,7 @@ enum FgState {
 		} else if (FgState.NEEDS_FUEL.ordinal() == ordinal) {
 			fgState = FgState.NEEDS_FUEL;
 		} else {
-			Debug.msg("ERROR: FgState.fromInt(" + ordinal + ") did not match any state.");
+			Debug.error("ERROR: FgState.fromInt(" + ordinal + ") did not match any state.");
 		}
 
 		return fgState;

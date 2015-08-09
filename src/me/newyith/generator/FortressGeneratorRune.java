@@ -199,14 +199,14 @@ public class FortressGeneratorRune implements Memorable {
 					this.moveBlockTo(Material.GOLD_BLOCK, this.getPattern().fuelPoint);
 					break;
 				default:
-					Debug.msg("FortressGeneratorRune setState method couldn't find a case matching FgState: " + state);
+					Debug.error("FortressGeneratorRune setState method couldn't find a case matching FgState: " + state);
 			}
 
 			this.state = state;
 			if (this.core != null) {
 				this.core.onStateChanged(state);
 			} else {
-				Debug.msg("FGRune setState() core == null");
+				Debug.error("FGRune setState() core == null");
 			}
 		}
 	}

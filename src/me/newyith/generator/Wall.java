@@ -106,7 +106,7 @@ public class Wall {
 		int recursionLimit = (int)Math.pow(rangeLimit/2, 3);
 		while (!nextLayer.isEmpty()) {
 			if (recursionLimit-- <= 0) {
-				Debug.msg("Wall recursionLimit exhausted");
+				Debug.error("Wall recursionLimit exhausted");
 				break;
 			}
 
@@ -123,7 +123,7 @@ public class Wall {
 				//Debug.start("inner loop");
 
 				if (recursionLimit2-- <= 0) {
-					Debug.msg("Wall recursionLimit2 exhausted");
+					Debug.error("Wall recursionLimit2 exhausted");
 					break;
 				}
 

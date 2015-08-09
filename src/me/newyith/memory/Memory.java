@@ -80,7 +80,7 @@ public class Memory {
 				List subList = (List) item;
 				m.save(Integer.toString(i++), subList);
 			} else {
-				Debug.msg("Memory::save(String, List) failed to save item " + i + ".");
+				Debug.error("Memory::save(String, List) failed to save item " + i + ".");
 			}
 		}
 		m.save("count", i);
