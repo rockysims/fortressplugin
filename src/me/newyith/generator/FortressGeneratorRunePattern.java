@@ -3,7 +3,6 @@ package me.newyith.generator;
 import me.newyith.memory.Memorable;
 import me.newyith.memory.Memory;
 import me.newyith.util.Point;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -34,7 +33,7 @@ public class FortressGeneratorRunePattern implements Memorable {
 	}
 
 	public static FortressGeneratorRunePattern loadFrom(Memory m) {
-		ArrayList<Point> pointsInPattern = m.loadPoints("pointsInPattern");
+		ArrayList<Point> pointsInPattern = m.loadPointList("pointsInPattern");
 		boolean matchedReadyPattern = m.loadBoolean("matchedReadyPattern");
 		FortressGeneratorRunePattern instance = new FortressGeneratorRunePattern(pointsInPattern, matchedReadyPattern);
 		instance.anchorPoint = m.loadPoint("anchorPoint");

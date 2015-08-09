@@ -1,6 +1,7 @@
 package me.newyith.generator;
 
 import me.newyith.memory.Memory;
+import me.newyith.util.Debug;
 import me.newyith.util.Point;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
@@ -53,11 +54,12 @@ public class FortressGeneratorRunesManager {
 			inRange = inRange && Math.abs(p.y - y) <= range;
 			inRange = inRange && Math.abs(p.z - z) <= range;
 
-			if (inRange && p != center) {
+			if (inRange) {
 				runesInRange.add(rune);
 			}
 		}
 
+		runesInRange.remove(getRune(center));
 		return runesInRange;
 	}
 

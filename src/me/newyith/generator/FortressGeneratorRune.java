@@ -110,7 +110,7 @@ public class FortressGeneratorRune implements Memorable {
 
 		boolean placed = this.core.onPlaced(player);
 		if (!placed) {
-			onBroken();
+			this.onCoreBroken();
 		}
 	}
 
@@ -122,10 +122,14 @@ public class FortressGeneratorRune implements Memorable {
 		this.core.onBroken();
 	}
 
+	public void onCoreBroken() {
+		FortressGeneratorRunesManager.doBreakRune(this);
+	}
+
 	public void setPowered(boolean powered) {
 		if (this.powered != powered) {
 			if (countRecentPowerToggles() > 10) {
-				this.onBroken();
+				this.onCoreBroken();
 			} else {
 				powerToggleTimeStamps.add(System.currentTimeMillis()); //used by countRecentPowerToggles()
 				this.powered = powered;

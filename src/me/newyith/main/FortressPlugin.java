@@ -61,6 +61,7 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
+//TODO: consider making rune activation require an empty hand
 //TODO: test adding particles
 //TODO: test killing the server (ctrl+c not "stop") and make sure plugin is robust enough to handle it
 //  TODO: work on handling fortress generator state (maybe time to look at FortressMod code?)

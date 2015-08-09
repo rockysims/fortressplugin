@@ -3,11 +3,12 @@ package me.newyith.memory;
 import me.newyith.generator.FortressGeneratorRune;
 import me.newyith.generator.FortressGeneratorRunePattern;
 import me.newyith.generator.GeneratorCore;
+import me.newyith.util.Debug;
 import me.newyith.util.Point;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Memory {
 	private ConfigurationSection config;
@@ -67,7 +68,7 @@ public class Memory {
 		value.saveTo(m);
 	}
 
-	//ArrayList<Memorable>
+	//List<Memorable>
 	public void save(String key, List list) {
 		Memory m = new Memory(section(key));
 		int i = 0;
@@ -75,12 +76,69 @@ public class Memory {
 			if (item instanceof Memorable) {
 				Memorable mem = (Memorable) item;
 				m.save(Integer.toString(i++), mem);
+			} else if (item instanceof List) {
+				List subList = (List) item;
+				m.save(Integer.toString(i++), subList);
+			} else {
+				Debug.msg("Memory::save(String, List) failed to save item " + i + ".");
 			}
 		}
 		m.save("count", i);
 	}
 
+	//Set<Point>
+	public void save(String key, Set<Point> set) {
+		Memory m = new Memory(section(key));
+		Point[] ary = set.toArray(new Point[set.size()]);
+		ArrayList<Point> list = new ArrayList<>(Arrays.asList(ary));
+		m.save(key, list);
+	}
+
+	//HashMap<Point, Material>
+	public void save(String key, HashMap<Point, Material> map) {
+		Memory m = new Memory(section(key));
+
+		int i = 0;
+		Iterator it = map.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry pair = (Map.Entry)it.next();
+			Memorable itemKey = (Memorable) pair.getKey();
+			Enum itemValue = (Enum) pair.getValue();
+			m.save("itemKey" + i, itemKey);
+			m.save("itemValue" + i, itemValue.ordinal());
+			i++;
+		}
+		m.save("count", i);
+	}
+
 	// --- LOAD ---
+
+	//HashMap<Point, Material>
+	public HashMap<Point, Material> loadPointMaterialMap(String key) {
+		Memory m = new Memory(section(key));
+
+		HashMap<Point, Material> map = new HashMap<>();
+		int count = m.loadInt("count");
+		for (int i = 0; i < count; i++) {
+			Point p = m.loadPoint("itemKey" + i);
+			Material mat = Material.values()[m.loadInt("itemValue" + i)];
+			map.put(p, mat);
+		}
+
+		return map;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
 
 	//Point
 	public Point loadPoint(String key) {
@@ -95,7 +153,7 @@ public class Memory {
 	}
 
 	//ArrayList<Point>
-	public ArrayList<Point> loadPoints(String key) {
+	public ArrayList<Point> loadPointList(String key) {
 		Memory m = new Memory(section(key));
 
 		ArrayList<Point> list = new ArrayList<Point>();
@@ -106,6 +164,40 @@ public class Memory {
 
 		return list;
 	}
+
+	//List<List<Point>>
+	public List<List<Point>> loadLayers(String key) {
+		Memory m = new Memory(section(key));
+
+		List<List<Point>> layers = new ArrayList<>();
+		int count = m.loadInt("count");
+		for (int i = 0; i < count; i++) {
+			layers.add(m.loadPointList(Integer.toString(i)));
+		}
+
+		return layers;
+	}
+
+	//Set<Point>
+	public Set<Point> loadPointSet(String key) {
+		Memory m = new Memory(section(key));
+
+		List<Point> list = m.loadPointList(key);
+		Set<Point> set = new HashSet<>(list);
+
+		return set;
+	}
+
+
+
+
+
+	//HashMap<Point, Material>
+
+
+
+
+
 
 	//FortressGeneratorRune
 	public FortressGeneratorRune loadFortressGeneratorRune(String key) {
