@@ -5,7 +5,7 @@ import me.newyith.main.FortressPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class TickTimer extends BukkitRunnable {
-	public static int msPerTick = 250; //should be divisible by 50
+	public static int msPerTick = 150; //should be divisible by 50
 
 	public TickTimer() {
 

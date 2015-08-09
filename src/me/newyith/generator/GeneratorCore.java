@@ -208,7 +208,7 @@ public class GeneratorCore implements Memorable {
 		if (this.isChangingGenerated) {
 			long now = (new Date()).getTime();
 			//if (ready to update to next frame)
-			if (!this.animateGeneration  || now - this.lastFrameTimestamp > this.msPerFrame ) {
+			if (!this.animateGeneration  || now - this.lastFrameTimestamp >= this.msPerFrame ) {
 				this.lastFrameTimestamp  = now;
 
 				//update to next frame
