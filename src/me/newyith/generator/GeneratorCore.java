@@ -232,7 +232,6 @@ public class GeneratorCore implements Memorable {
 	private boolean updateToNextFrame() {
 		boolean foundLayerToUpdate = false;
 
-		//TODO: consider saving i as animationLayerIndex for increased execution speed
 		for (int i = 0; i < this.animationWallLayers.size(); i++) {
 			int layerIndex = i;
 			//if (degenerating) start from the outer most layer
@@ -248,7 +247,7 @@ public class GeneratorCore implements Memorable {
 				//updated a layer so we're done with this frame
 				break;
 			}
-		} // end for (List<Point> layer : this.wallPoints)
+		}
 
 
 		return foundLayerToUpdate;
@@ -488,7 +487,9 @@ public class GeneratorCore implements Memorable {
 	}
 
 	private List<List<Point>> getPointsConnectedAsLayers(Set<Material> wallMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints) {
-		return Wall.getPointsConnectedAsLayers(this.anchorPoint, wallMaterials, returnMaterials, rangeLimit, ignorePoints);
+		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(this.anchorPoint);
+		Set<Point> originLayer = rune.getPoints();
+		return Wall.getPointsConnectedAsLayers(this.anchorPoint, originLayer, wallMaterials, returnMaterials, rangeLimit, ignorePoints);
 	}
 
 	private Set<Point> getLayerAround(Set<Point> wallPoints) {

@@ -62,9 +62,11 @@ public class Wall {
 		return flattenLayers(layers);
 	}
 
-	public static List<List<Point>> getPointsConnectedAsLayers(Point origin, Set<Material> wallBlocks, Set<Material> returnBlocks, int rangeLimit, Set<Point> ignorePoints) {
-		Set<Point> originLayer = new HashSet<>();
-		originLayer.add(origin);
+	public static List<List<Point>> getPointsConnectedAsLayers(Point origin, Set<Point> originLayer, Set<Material> wallBlocks, Set<Material> returnBlocks, int rangeLimit, Set<Point> ignorePoints) {
+		if (originLayer == null) {
+			originLayer = new HashSet<>();
+			originLayer.add(origin);
+		}
 		return getPointsConnectedAsLayers(origin, originLayer, wallBlocks, returnBlocks, rangeLimit, ignorePoints, null, ConnectedThreshold.FACES);
 	}
 
