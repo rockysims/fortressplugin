@@ -7,60 +7,31 @@ import me.newyith.util.Point;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.*;
 
 public class GeneratorCore implements Memorable {
 	//saved
-	private HashMap<Point, Material> alteredPoints = new HashMap<>();
-	private Set<Point> protectedPoints = new HashSet<>();
+	private GeneratorCoreAnimator animator = new GeneratorCoreAnimator();
 	private Set<Point> claimedPoints = new HashSet<>();
 	private Set<Point> claimedWallPoints = new HashSet<>();
-	private List<List<Point>> generatedLayers = new ArrayList<>();
-	private List<List<Point>> animationWallLayers = new ArrayList<>();
-	private boolean animateGeneration = true;
-	private boolean isChangingGenerated = false;
-	private boolean isGeneratingWall = false;
 	private Point anchorPoint = null; //set by constructor
 	private UUID placedByPlayerId = null; //set by onPlaced
 
 	//not saved
-	private long lastFrameTimestamp = 0;
-	private final long msPerFrame = 150;
 	private final int generationRangeLimit = 32;
 
 	//------------------------------------------------------------------------------------------------------------------
 
 	public void saveTo(Memory m) {
-		Debug.msg("saving alteredPoints: " + alteredPoints.size());
-		m.save("alteredPoints", alteredPoints);
-		Debug.msg("saved alteredPoints: " + alteredPoints.size());
-
-		m.save("protectedPoints", protectedPoints);
-		Debug.msg("saved protectedPoints: " + protectedPoints.size());
+		m.save("animator", animator);
 
 		m.save("claimedPoints", claimedPoints);
 		Debug.msg("saved claimedPoints: " + claimedPoints.size());
 
 		m.save("claimedWallPoints", claimedWallPoints);
 		Debug.msg("saved claimedWallPoints: " + claimedWallPoints.size());
-
-		m.save("generatedLayers", generatedLayers);
-		Debug.msg("saved generatedLayers: " + generatedLayers.size());
-
-		m.save("animationWallLayers", animationWallLayers);
-		Debug.msg("saved animationWallLayers: " + animationWallLayers.size());
-
-		m.save("animateGeneration", animateGeneration);
-		Debug.msg("saved animateGeneration: " + animateGeneration);
-
-		m.save("isChangingGenerated", isChangingGenerated);
-		Debug.msg("saved isChangingGenerated: " + isChangingGenerated);
-
-		m.save("isGeneratingWall", isGeneratingWall);
-		Debug.msg("saved isGeneratingWall: " + isGeneratingWall);
 
 		m.save("anchorPoint", anchorPoint);
 		Debug.msg("saved anchorPoint: " + anchorPoint);
@@ -70,74 +41,37 @@ public class GeneratorCore implements Memorable {
 	}
 
 	public static GeneratorCore loadFrom(Memory m) {
-		HashMap<Point, Material> alteredPoints = m.loadPointMaterialMap("alteredPoints");
-		Debug.msg("loaded alteredPoints: " + alteredPoints.size());
-
-		Set<Point> protectedPoints = m.loadPointSet("protectedPoints");
-		Debug.msg("loaded protectedPoints: " + protectedPoints.size());
+		GeneratorCoreAnimator animator = m.loadGenerationAnimator("animator");
 
 		Set<Point> claimedPoints = m.loadPointSet("claimedPoints");
-//		claimedPoints = new HashSet<>(); //TODO: delete this line
 		Debug.msg("loaded claimedPoints: " + claimedPoints.size());
 
 		Set<Point> claimedWallPoints = m.loadPointSet("claimedWallPoints");
-//		claimedWallPoints = new HashSet<>(); //TODO: delete this line
 		Debug.msg("loaded claimedWallPoints: " + claimedWallPoints.size());
-
-		List<List<Point>> generatedLayers = m.loadLayers("generatedLayers");
-		Debug.msg("loaded generatedLayers: " + generatedLayers.size());
-
-		List<List<Point>> animationWallLayers = m.loadLayers("animationWallLayers");
-		Debug.msg("loaded animationWallLayers: " + animationWallLayers.size());
-
-		boolean animateGeneration = m.loadBoolean("animateGeneration");
-		Debug.msg("loaded animateGeneration: " + animateGeneration);
-
-		boolean isChangingGenerated = m.loadBoolean("isChangingGenerated");
-		Debug.msg("loaded isChangingGenerated: " + isChangingGenerated);
-
-		boolean isGeneratingWall = m.loadBoolean("isGeneratingWall");
-		Debug.msg("loaded isGeneratingWall: " + isGeneratingWall);
 
 		Point anchorPoint = m.loadPoint("anchorPoint");
 		Debug.msg("loaded anchorPoint: " + anchorPoint);
 
 		UUID placedByPlayerId = UUID.fromString(m.loadString("placedByPlayerIdString"));
 
-		GeneratorCore instance = new GeneratorCore(alteredPoints,
-				protectedPoints,
+		GeneratorCore instance = new GeneratorCore(
+				animator,
 				claimedPoints,
 				claimedWallPoints,
-				generatedLayers,
-				animationWallLayers,
-				animateGeneration,
-				isChangingGenerated,
-				isGeneratingWall,
 				anchorPoint,
 				placedByPlayerId);
 		return instance;
 	}
 
-	private GeneratorCore(HashMap<Point, Material> alteredPoints,
-						  Set<Point> protectedPoints,
-						  Set<Point> claimedPoints,
-						  Set<Point> claimedWallPoints,
-						  List<List<Point>> generatedLayers,
-						  List<List<Point>> animationWallLayers,
-						  boolean animateGeneration,
-						  boolean isChangingGenerated,
-						  boolean isGeneratingWall,
-						  Point anchorPoint,
-						  UUID placedByPlayerId) {
-		this.alteredPoints = alteredPoints;
-		this.protectedPoints = protectedPoints;
+	private GeneratorCore(
+			GeneratorCoreAnimator animator,
+			Set<Point> claimedPoints,
+			Set<Point> claimedWallPoints,
+			Point anchorPoint,
+			UUID placedByPlayerId) {
+		this.animator = animator;
 		this.claimedPoints = claimedPoints;
 		this.claimedWallPoints = claimedWallPoints;
-		this.generatedLayers = generatedLayers;
-		this.animationWallLayers = animationWallLayers;
-		this.animateGeneration = animateGeneration;
-		this.isChangingGenerated = isChangingGenerated;
-		this.isGeneratingWall = isGeneratingWall;
 		this.anchorPoint = anchorPoint;
 		this.placedByPlayerId = placedByPlayerId;
 	}
@@ -199,143 +133,15 @@ public class GeneratorCore implements Memorable {
 		}
 	}
 
-	public void sendMessage(String msg) {
-		msg = ChatColor.AQUA + msg;
-		Bukkit.getPlayer(this.placedByPlayerId).sendMessage(msg);
-	}
-
 	public void tick() {
-		if (this.isChangingGenerated) {
-			long now = (new Date()).getTime();
-			//if (ready to update to next frame)
-			if (!this.animateGeneration  || now - this.lastFrameTimestamp >= this.msPerFrame ) {
-				this.lastFrameTimestamp  = now;
-
-				//update to next frame
-				boolean noNextFrame = !this.updateToNextFrame();
-				if (noNextFrame) {
-					this.isChangingGenerated = false;
-				}
-
-				//if (not animating) we finished all at once
-				if (!this.animateGeneration) {
-					this.isChangingGenerated = false;
-				}
-			}
-		}
+		animator.tick();
 	}
 
 	// --------- Internal Methods ---------
 
-	//TODO: refactor animation handling to new class GeneratorCoreAnimation?
-
-	private boolean updateToNextFrame() {
-		boolean foundLayerToUpdate = false;
-
-		for (int i = 0; i < this.animationWallLayers.size(); i++) {
-			int layerIndex = i;
-			//if (degenerating) start from the outer most layer
-			if (!this.isGeneratingWall) {
-				layerIndex = (animationWallLayers.size()-1) - i;
-			}
-
-			List<Point> layer = new ArrayList<>(this.animationWallLayers.get(layerIndex)); //make copy to avoid concurrent modification errors (recheck this is needed)
-
-			//try to update layer
-			foundLayerToUpdate = updateLayer(layer, layerIndex);
-			if (foundLayerToUpdate && this.animateGeneration) {
-				//updated a layer so we're done with this frame
-				break;
-			}
-		}
-
-		return foundLayerToUpdate;
-	}
-
-	private boolean updateLayer(List<Point> layer, int layerIndex) {
-		boolean updatedLayer = false;
-
-		for (Point p : layer) {
-			if (this.isGeneratingWall) {
-				//try to generate block at p
-				boolean pGenerated = alter(p) || protect(p);
-				updatedLayer = updatedLayer || pGenerated;
-
-				if (pGenerated) {
-					//add p to generatedLayers
-					while (layerIndex >= this.generatedLayers.size()) {
-						this.generatedLayers.add(new ArrayList<>());
-					}
-					this.generatedLayers.get(layerIndex).add(p);
-				}
-			} else {
-				//try to degenerate block at p
-				boolean pDegenerated = unalter(p) || unprotect(p);
-				updatedLayer = updatedLayer || pDegenerated;
-
-				if (pDegenerated) {
-					//remove p from generatedLayers
-					if (layerIndex < this.generatedLayers.size()) {
-						this.generatedLayers.get(layerIndex).remove(p);
-					} //else we would be degenerating another generators wall
-				}
-			}
-		} // end for (Point p : layer)
-
-		return updatedLayer;
-	}
-
-	private boolean alter(Point p) {
-		boolean altered = false;
-
-		Block b = p.getBlock();
-		if (Wall.isAlterableWallMaterial(b.getType())) {
-			this.alteredPoints.put(p, b.getType());
-			b.setType(Material.BEDROCK);
-			altered = true;
-		}
-
-		return altered;
-	}
-
-	private boolean unalter(Point p) {
-		boolean unaltered = false;
-
-		if (this.alteredPoints.containsKey(p)) {
-			Material material = this.alteredPoints.remove(p);
-			if (p.getBlock().getType() == Material.BEDROCK) {
-				p.getBlock().setType(material);
-			}
-			unaltered = true;
-		}
-
-		return unaltered;
-	}
-
-	private boolean protect(Point p) {
-		boolean pointProtected = false;
-
-		Block b = p.getBlock();
-		if (!this.protectedPoints.contains(p) && Wall.isProtectableWallMaterial(b.getType())) {
-			this.protectedPoints.add(p);
-			//TODO: make FortressGeneratorParticlesManager show particles on protectedPoints
-			//TODO: make block at p unbreakable
-			pointProtected = true;
-		}
-
-		return pointProtected;
-	}
-
-	private boolean unprotect(Point p) {
-		boolean unprotected = false;
-
-		if (this.protectedPoints.contains(p)) {
-			this.protectedPoints.remove(p);
-			//TODO: make block at p breakable again
-			unprotected = true;
-		}
-
-		return unprotected;
+	private void sendMessage(String msg) {
+		msg = ChatColor.AQUA + msg;
+		Bukkit.getPlayer(this.placedByPlayerId).sendMessage(msg);
 	}
 
 	/**
@@ -343,18 +149,7 @@ public class GeneratorCore implements Memorable {
 	 */
 	private void degenerateWall(boolean animate) {
 		Debug.msg("degenerateWall("+String.valueOf(animate)+")");
-
-		this.animationWallLayers.clear();
-		this.animationWallLayers.addAll(this.generatedLayers);
-
-		this.isGeneratingWall = false;
-		this.isChangingGenerated = true;
-
-		if (!animate) {
-			this.animateGeneration = false;
-			this.tick();
-			this.animateGeneration = true;
-		}
+		animator.degenerate(animate);
 	}
 
 	/**
@@ -365,17 +160,11 @@ public class GeneratorCore implements Memorable {
 	private void generateWall() {
 		Debug.msg("generateWall()");
 
-		//set this.wallLayers = wall layers its allowed to generate
-		this.animationWallLayers = this.getGeneratableWallLayers();
-		//recalculate this.claimedPoints
-		this.updateClaimedPoints(Wall.merge(this.animationWallLayers, this.generatedLayers));
+		List<List<Point>> layers = this.getGeneratableWallLayers();
+		this.updateClaimedPoints(Wall.merge(layers, animator.getGeneratedLayers()));
 
-		//start generating
-		this.isGeneratingWall = true;
-		this.isChangingGenerated = true;
+		animator.generate(layers);
 	}
-
-	// --------- More Internal Methods ---------
 
 	private List<List<Point>> getGeneratableWallLayers() {
 		Set<Point> claimedPoints = this.getClaimedPointsOfNearbyGenerators();
@@ -449,27 +238,11 @@ public class GeneratorCore implements Memorable {
 		this.claimedWallPoints.removeAll(pointsToUnclaim);
 		this.updateClaimedPoints(this.claimedWallPoints);
 
-		//degenerate overlap between pointsToUnclaim and this.generatedLayers
+		//degenerate overlap between pointsToUnclaim and generatedLayers
 		Set<Point> pointsToDegenerate = new HashSet<>(pointsToUnclaim);
-		pointsToDegenerate.retainAll(Wall.flattenLayers(this.generatedLayers));
-		this.animationWallLayers.clear();
-		Debug.msg("unclaimDisconnected() this.animationWallLayers.clear()");
-		this.animationWallLayers.add(new ArrayList<>(pointsToDegenerate));
-		this.isGeneratingWall = false;
-		this.isChangingGenerated = true;
-		this.animateGeneration = false;
-		this.tick();
-		this.animateGeneration = true;
-
-		//remove pointsToDegenerate from this.generatedLayers
-		for (Iterator<List<Point>> itr = this.generatedLayers.iterator(); itr.hasNext(); ) {
-			List<Point> layer = itr.next();
-			layer.removeAll(pointsToDegenerate);
-			if (layer.size() == 0) {
-				itr.remove();
-			}
-		}
-		this.isGeneratingWall = this.generatedLayers.size() > 0;
+		pointsToDegenerate.retainAll(Wall.flattenLayers(animator.getGeneratedLayers())); //not sure this line is really needed
+		Debug.msg("unclaimDisconnected() pointsToDegenerate.size(): " + pointsToDegenerate.size());
+		animator.degenerate(pointsToDegenerate);
 	}
 
 	private Set<Point> getPointsConnected(Set<Material> wallMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {

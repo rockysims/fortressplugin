@@ -2,6 +2,7 @@ package me.newyith.memory;
 
 import me.newyith.generator.FortressGeneratorRune;
 import me.newyith.generator.FortressGeneratorRunePattern;
+import me.newyith.generator.GeneratorCoreAnimator;
 import me.newyith.generator.GeneratorCore;
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
@@ -113,33 +114,6 @@ public class Memory {
 
 	// --- LOAD ---
 
-	//HashMap<Point, Material>
-	public HashMap<Point, Material> loadPointMaterialMap(String key) {
-		Memory m = new Memory(section(key));
-
-		HashMap<Point, Material> map = new HashMap<>();
-		int count = m.loadInt("count");
-		for (int i = 0; i < count; i++) {
-			Point p = m.loadPoint("itemKey" + i);
-			Material mat = Material.values()[m.loadInt("itemValue" + i)];
-			map.put(p, mat);
-		}
-
-		return map;
-	}
-
-
-
-
-
-
-
-
-
-
-
-
-
 	//Point
 	public Point loadPoint(String key) {
 		Memory m = new Memory(section(key));
@@ -188,16 +162,20 @@ public class Memory {
 		return set;
 	}
 
-
-
-
-
 	//HashMap<Point, Material>
+	public HashMap<Point, Material> loadPointMaterialMap(String key) {
+		Memory m = new Memory(section(key));
 
+		HashMap<Point, Material> map = new HashMap<>();
+		int count = m.loadInt("count");
+		for (int i = 0; i < count; i++) {
+			Point p = m.loadPoint("itemKey" + i);
+			Material mat = Material.values()[m.loadInt("itemValue" + i)];
+			map.put(p, mat);
+		}
 
-
-
-
+		return map;
+	}
 
 	//FortressGeneratorRune
 	public FortressGeneratorRune loadFortressGeneratorRune(String key) {
@@ -236,22 +214,7 @@ public class Memory {
 		return value;
 	}
 
-//	//ArrayList<FortressGeneratorRunePattern>
-//	public ArrayList<FortressGeneratorRunePattern> loadFortressGeneratorRunePatterns(String key) {
-//		Memory m = new Memory(section(key));
-//
-//		ArrayList<FortressGeneratorRunePattern> list = new ArrayList<FortressGeneratorRunePattern>();
-//		int count = m.loadInt("count");
-//		for (int i = 0; i < count; i++) {
-//			list.add(m.loadFortressGeneratorRunePattern(Integer.toString(i)));
-//		}
-//
-//		return list;
-//	}
-
-
-
-	//FortressGeneratorRunePattern
+	//GeneratorCore
 	public GeneratorCore loadGeneratorCore(String key) {
 		Memory m = new Memory(section(key));
 
@@ -263,11 +226,15 @@ public class Memory {
 		return value;
 	}
 
+	//GeneratorCoreAnimator
+	public GeneratorCoreAnimator loadGenerationAnimator(String key) {
+		Memory m = new Memory(section(key));
 
+		GeneratorCoreAnimator value = null;
+		if (m.loadBoolean("!=null")) {
+			value = GeneratorCoreAnimator.loadFrom(m);
+		}
 
-
-
-
-
-
+		return value;
+	}
 }
