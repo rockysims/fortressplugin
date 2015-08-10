@@ -249,7 +249,6 @@ public class GeneratorCore implements Memorable {
 			}
 		}
 
-
 		return foundLayerToUpdate;
 	}
 
@@ -295,15 +294,6 @@ public class GeneratorCore implements Memorable {
 			b.setType(Material.BEDROCK);
 			altered = true;
 		}
-
-
-
-		//TODO: delete this block of code
-		if (!altered) {
-			//Debug.msg("failed to alter at " + p);
-		}
-
-
 
 		return altered;
 	}

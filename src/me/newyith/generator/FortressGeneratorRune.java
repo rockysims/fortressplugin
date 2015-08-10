@@ -295,7 +295,7 @@ public class FortressGeneratorRune implements Memorable {
 
 	private void moveBlockTo(Material material, Point targetPoint) {
 		Point materialPoint = null;
-		ArrayList<Point> points = new ArrayList<Point>();
+		ArrayList<Point> points = new ArrayList<>();
 		points.add(pattern.anchorPoint);
 		points.add(pattern.runningPoint);
 		points.add(pattern.pausePoint);
@@ -321,7 +321,7 @@ public class FortressGeneratorRune implements Memorable {
 	private int countRecentPowerToggles() {
 		//set count recent power toggles and remove expired stamps
 		long now = System.currentTimeMillis();
-		int stampLifetimeMs = 10*1000;
+		int stampLifetimeMs = 5*1000;
 		int count = 0;
 		for (Iterator<Long> itr = powerToggleTimeStamps.iterator(); itr.hasNext(); ) {
 			Long stamp = itr.next();
