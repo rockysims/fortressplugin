@@ -35,7 +35,7 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onBlockBreakEvent(BlockBreakEvent event) {
-        FortressGeneratorRunesManager.onBlockBreakEvent(event.getBlock());
+        FortressGeneratorRunesManager.onBlockBreakEvent(event);
     }
 
     @EventHandler

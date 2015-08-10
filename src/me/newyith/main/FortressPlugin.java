@@ -11,13 +11,8 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Date;
-import java.util.logging.Logger;
 
 public class FortressPlugin extends JavaPlugin {
-    //Example Code:
-    //private static final Logger log = Logger.getLogger("FortressPluginLogger");
-    //log.info("FortressPlugin onDisable called");
-
     @Override
     public void onEnable() {
 		TickTimer.onEnable(this);
@@ -61,6 +56,7 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
+//TODO: don't call updateProtectedPoints() every time the break block event is fired (runesManager)
 //TODO: consider making rune activation require an empty hand
 //TODO: test adding particles
 //TODO: test killing the server (ctrl+c not "stop") and make sure plugin is robust enough to handle it

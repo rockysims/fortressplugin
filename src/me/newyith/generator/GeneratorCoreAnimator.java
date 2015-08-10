@@ -167,6 +167,10 @@ public class GeneratorCoreAnimator implements Memorable {
 		}
 	}
 
+	public Set<Point> getProtectedPoints() {
+		return protectedPoints;
+	}
+
 	// --------- Internal Methods ---------
 
 	private boolean updateToNextFrame() {

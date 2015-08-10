@@ -3,9 +3,10 @@ package me.newyith.generator;
 import me.newyith.memory.Memory;
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
-import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,8 +14,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class FortressGeneratorRunesManager {
-	private static ArrayList<FortressGeneratorRune> runeInstances = new ArrayList<FortressGeneratorRune>();
+	private static ArrayList<FortressGeneratorRune> runeInstances = new ArrayList<>();
 	private static HashMap<Point, FortressGeneratorRune> runeByPoint = new HashMap<>();
+	private static Set<Point> protectedPoints = new HashSet<>();
 
 	public static void saveTo(Memory m) {
 		m.save("runeInstances", runeInstances);
@@ -32,6 +34,14 @@ public class FortressGeneratorRunesManager {
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
+
+	public static void updateProtectedPoints() {
+		Debug.msg("updateProtectedPoints()");
+		protectedPoints.clear();
+		for (FortressGeneratorRune rune : runeInstances) {
+			protectedPoints.addAll(rune.getGeneratorCore().getProtectedPoints());
+		}
+	}
 
 	// - Getters -
 
@@ -103,8 +113,16 @@ public class FortressGeneratorRunesManager {
 		}
 	}
 
-	public static void onBlockBreakEvent(Block brokenBlock) {
-		onRuneMightHaveBeenBrokenBy(brokenBlock);
+	public static void onBlockBreakEvent(BlockBreakEvent event) {
+		updateProtectedPoints(); //TODO: don't call this every time the event is fired
+		//instead have animator add/remove individual points as they are protected/unprotected (and reconstitute protectedPoints in loadFrom())
+		Block brokenBlock = event.getBlock();
+		Point p = new Point(brokenBlock.getLocation());
+		if (protectedPoints.contains(p) && event.getPlayer().getGameMode() != GameMode.CREATIVE) {
+			event.setCancelled(true);
+		} else {
+			onRuneMightHaveBeenBrokenBy(brokenBlock);
+		}
 	}
 	public static void onWaterBreaksRedstoneWireEvent(Block brokenBlock) {
 		onRuneMightHaveBeenBrokenBy(brokenBlock);

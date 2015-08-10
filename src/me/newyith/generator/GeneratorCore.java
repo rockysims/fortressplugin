@@ -224,6 +224,10 @@ public class GeneratorCore implements Memorable {
 		return this.claimedPoints;
 	}
 
+	public Set<Point> getProtectedPoints() {
+		return animator.getProtectedPoints();
+	}
+
 	private void unclaimDisconnected() {
 		//fill pointsToUnclaim
 		Set<Point> pointsToUnclaim = new HashSet<>();
@@ -257,8 +261,8 @@ public class GeneratorCore implements Memorable {
 	}
 
 	private Set<Point> getLayerAround(Set<Point> wallPoints) {
-		Set<Material> wallMaterials = new HashSet<>(); //no wall blocks
-		Set<Material> returnMaterials = null; //all blocks are return blocks
+		Set<Material> wallMaterials = new HashSet<>(); //no blocks are traversed
+		Set<Material> returnMaterials = null; //all blocks are returned
 		int rangeLimit = generationRangeLimit + 1;
 		Set<Point> ignorePoints = null; //no points ignored
 		return Wall.getPointsConnected(this.anchorPoint, wallPoints, wallMaterials, returnMaterials, rangeLimit, ignorePoints, Wall.ConnectedThreshold.POINTS);
