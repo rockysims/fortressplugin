@@ -50,9 +50,7 @@ public class Wall {
 		return layers;
 	}
 
-	public static Set<Point> getPointsConnected(Point origin, Set<Material> wallBlocks, Set<Material> returnBlocks, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
-		Set<Point> originLayer = new HashSet<>();
-		originLayer.add(origin);
+	public static Set<Point> getPointsConnected(Point origin, Set<Point> originLayer, Set<Material> wallBlocks, Set<Material> returnBlocks, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
 		List<List<Point>> layers = getPointsConnectedAsLayers(origin, originLayer, wallBlocks, returnBlocks, rangeLimit, ignorePoints, searchablePoints, ConnectedThreshold.FACES);
 		return flattenLayers(layers);
 	}

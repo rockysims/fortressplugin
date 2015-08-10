@@ -25,7 +25,7 @@ public class FortressGeneratorRune implements Memorable {
 
 	//not saved
 	private FortressGeneratorParticlesManager particles = null; //set by constructor
-	private int msPerFuelItem = 15*1000;
+	private int msPerFuelItem = 60*60*1000;
 	private List<Long> powerToggleTimeStamps = new ArrayList<Long>();
 
 	public void saveTo(Memory m) {

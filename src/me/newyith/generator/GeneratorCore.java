@@ -101,7 +101,6 @@ public class GeneratorCore implements Memorable {
 		//set overlapWithClaimed = true if placed generator is connected (by faces) to another generator's claimed points
 		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(this.anchorPoint);
 		Set<Point> claimPoints = rune.getPoints();
-		claimPoints.addAll(getLayerAround(claimPoints));
 		Set<Point> alreadyClaimedPoints = this.getClaimedPointsOfNearbyGenerators();
 		boolean overlapWithClaimed = !Collections.disjoint(alreadyClaimedPoints, claimPoints); //disjoint means no points in common
 
@@ -149,6 +148,7 @@ public class GeneratorCore implements Memorable {
 	 */
 	private void degenerateWall(boolean animate) {
 		Debug.msg("degenerateWall("+String.valueOf(animate)+")");
+		getClaimedPointsOfNearbyGenerators(); //make nearby generators look for and degenerate any claimed but unconnected blocks
 		animator.degenerate(animate);
 	}
 
@@ -241,12 +241,13 @@ public class GeneratorCore implements Memorable {
 		//degenerate overlap between pointsToUnclaim and generatedLayers
 		Set<Point> pointsToDegenerate = new HashSet<>(pointsToUnclaim);
 		pointsToDegenerate.retainAll(Wall.flattenLayers(animator.getGeneratedLayers())); //not sure this line is really needed
-		Debug.msg("unclaimDisconnected() pointsToDegenerate.size(): " + pointsToDegenerate.size());
 		animator.degenerate(pointsToDegenerate);
 	}
 
 	private Set<Point> getPointsConnected(Set<Material> wallMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
-		return Wall.getPointsConnected(this.anchorPoint, wallMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
+		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(this.anchorPoint);
+		Set<Point> originLayer = rune.getPoints();
+		return Wall.getPointsConnected(this.anchorPoint, originLayer, wallMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
 	}
 
 	private List<List<Point>> getPointsConnectedAsLayers(Set<Material> wallMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints) {
