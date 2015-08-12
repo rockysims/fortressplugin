@@ -56,7 +56,13 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
-//TODO: don't call updateProtectedPoints() every time the break block event is fired (runesManager)
+/*
+Particles:
+maybe protection particles can be displayed at layerOutsideFortress points after generator can build layerOutsideFortress
+
+TODO: refactor so that each rune calls tickProtectedParticles() and passes in the protected points as layers so particles can appear in layers like generation
+*/
+
 //TODO: consider making rune activation require an empty hand
 //TODO: test adding particles
 //TODO: test killing the server (ctrl+c not "stop") and make sure plugin is robust enough to handle it

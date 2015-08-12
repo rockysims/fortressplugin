@@ -84,6 +84,7 @@ public class FortressGeneratorRunesManager {
 		for (FortressGeneratorRune rune : runeInstances) {
 			rune.onTick();
 		}
+		FortressGeneratorParticlesManager.tickProtectionParticles(protectedPoints);
 	}
 
 	public static void onPlayerRightClickBlock(Player player, Block clickedBlock) {
