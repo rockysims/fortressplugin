@@ -261,9 +261,8 @@ public class GeneratorCoreAnimator implements Memorable {
 
 		Block b = p.getBlock();
 		if (!this.protectedPoints.contains(p) && Wall.isProtectableWallMaterial(b.getType())) {
-			this.protectedPoints.add(p);
+			addProtectedPoint(p);
 			//TODO: make FortressGeneratorParticlesManager show particles on protectedPoints
-			//TODO: make block at p unbreakable
 			pointProtected = true;
 		}
 
@@ -274,11 +273,20 @@ public class GeneratorCoreAnimator implements Memorable {
 		boolean unprotected = false;
 
 		if (this.protectedPoints.contains(p)) {
-			this.protectedPoints.remove(p);
-			//TODO: make block at p breakable again
+			removeProtectedPoint(p);
 			unprotected = true;
 		}
 
 		return unprotected;
+	}
+
+	private void addProtectedPoint(Point p) {
+		this.protectedPoints.add(p);
+		FortressGeneratorRunesManager.addProtectedPoint(p);
+	}
+
+	private void removeProtectedPoint(Point p) {
+		this.protectedPoints.remove(p);
+		FortressGeneratorRunesManager.removeProtectedPoint(p);
 	}
 }

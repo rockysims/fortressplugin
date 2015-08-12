@@ -31,19 +31,16 @@ public class FortressGeneratorRunesManager {
 				runeByPoint.put(p, rune);
 			}
 		}
-	}
 
-	//------------------------------------------------------------------------------------------------------------------
-
-	public static void updateProtectedPoints() {
-		Debug.msg("updateProtectedPoints()");
-		protectedPoints.clear();
+		//rebuild protectedPoints
 		for (FortressGeneratorRune rune : runeInstances) {
 			protectedPoints.addAll(rune.getGeneratorCore().getProtectedPoints());
 		}
 	}
 
-	// - Getters -
+	//------------------------------------------------------------------------------------------------------------------
+
+	// - Getters / Setters -
 
 	public static FortressGeneratorRune getRune(Point p) {
 		return runeByPoint.get(p);
@@ -71,6 +68,14 @@ public class FortressGeneratorRunesManager {
 
 		runesInRange.remove(getRune(center));
 		return runesInRange;
+	}
+
+	public static void addProtectedPoint(Point p) {
+		protectedPoints.add(p);
+	}
+
+	public static void removeProtectedPoint(Point p) {
+		protectedPoints.remove(p);
 	}
 
 	// - Events -
@@ -114,7 +119,6 @@ public class FortressGeneratorRunesManager {
 	}
 
 	public static void onBlockBreakEvent(BlockBreakEvent event) {
-		updateProtectedPoints(); //TODO: don't call this every time the event is fired
 		//instead have animator add/remove individual points as they are protected/unprotected (and reconstitute protectedPoints in loadFrom())
 		Block brokenBlock = event.getBlock();
 		Point p = new Point(brokenBlock.getLocation());
