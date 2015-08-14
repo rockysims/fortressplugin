@@ -2,6 +2,7 @@ package me.newyith.generator;
 
 import me.newyith.memory.Memorable;
 import me.newyith.memory.Memory;
+import me.newyith.particles.ParticleEffect;
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
 import org.bukkit.Bukkit;
@@ -196,30 +197,39 @@ public class GeneratorCore implements Memorable {
 			Set<Material> returnMaterials = null; //return all block types
 			int rangeLimit = 2 * generationRangeLimit + 2;
 			Set<Point> ignorePoints = wallPoints;
-			Set<Point> searchablePoints = layerAroundWall;
+			Set<Point> searchablePoints = new HashSet<>(layerAroundWall);
+			FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(anchorPoint);
+			searchablePoints.addAll(rune.getPoints());
 			layerOutsideFortress = Wall.getPointsConnected(origin, originLayer, wallMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
-			layerOutsideFortress.add(origin);
+			layerOutsideFortress.addAll(originLayer);
+			layerOutsideFortress.retainAll(layerAroundWall);
+			Debug.msg("layerOutsideFortress.size(): " + layerOutsideFortress.size());
 
 
-//			//get layerInsideFortress
-//			Set<Point> layerInsideFortress = new HashSet<>(layerAroundWall);
-//			layerInsideFortress.removeAll(layerOutsideFortress);
-//
-//			//fill pointsInsideFortress
-//			if (layerInsideFortress.size() > 0) {
-//				origin = layerInsideFortress.iterator().next();
-//				originLayer = layerInsideFortress;
-//				wallMaterials = null; //traverse all block types
-//				returnMaterials = null; //all block types
-//				rangeLimit = 2 * generationRangeLimit;
-//				ignorePoints = wallPoints;
-//				searchablePoints = null; //search all points
-//				pointsInsideFortress = Wall.getPointsConnected(origin, originLayer, wallMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
-//				pointsInsideFortress.addAll(originLayer);
-//			}
+			//get layerInsideFortress
+			Set<Point> layerInsideFortress = new HashSet<>(layerAroundWall);
+			layerInsideFortress.removeAll(layerOutsideFortress);
+
+			//fill pointsInsideFortress
+			if (layerInsideFortress.size() > 0) {
+				origin = layerInsideFortress.iterator().next();
+				originLayer = layerInsideFortress;
+				wallMaterials = null; //traverse all block types
+				returnMaterials = null; //all block types
+				rangeLimit = 2 * generationRangeLimit;
+				ignorePoints = wallPoints;
+				searchablePoints = null; //search all points
+				pointsInsideFortress = Wall.getPointsConnected(origin, originLayer, wallMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
+				pointsInsideFortress.addAll(originLayer);
+			}
+
+
 
 			for (Point p : layerOutsideFortress) {
-				Debug.particleAt(p);
+				Debug.particleAt(p, ParticleEffect.FLAME);
+			}
+			for (Point p : pointsInsideFortress) {
+				Debug.particleAt(p, ParticleEffect.HEART);
 			}
 
 

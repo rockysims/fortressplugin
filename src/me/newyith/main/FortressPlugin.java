@@ -58,12 +58,12 @@ public class FortressPlugin extends JavaPlugin {
 
 /*
 Particles:
-
-
-
-
-maybe protection particles can be displayed at layerOutsideFortress points after generator can build layerOutsideFortress
-
+TODO: tidy up from adding layerOutsideFortress
+TODO: display protection particles at all points in layerOutsideFortress (need to rename to generation particles)
+	will need to make layerOutsideFortress a Map<Point, Point> so particles can be displayed on surface of correct face?
+		no because of what to do if multiple surfaces should have particles
+		instead maybe do wallPoints.contains(each of the 6 points next to point in layerOutsideFortress)?
+			yes but not every time. Map<Point, Set<Point>>
 
 
 TODO: make generation display wave of particles to indicate generating protected blocks

@@ -14,11 +14,11 @@ public class Debug {
 		Bukkit.broadcastMessage(ChatColor.RED + s);
 	}
 
-	public static void particleAt(Point point) {
+	public static void particleAt(Point point, ParticleEffect particleEffect) {
 		float speed = 0;
 		int amount = 1;
 		double range = 25;
-		Location loc = point.add(0.5, -0.5, 0.5);
-		ParticleEffect.SNOWBALL.display(0.0F, 0.0F, 0.0F, speed, amount, loc, range);
+		Location loc = point.add(0.5, 0.5, 0.5);
+		particleEffect.display(0.0F, 0.0F, 0.0F, speed, amount, loc, range);
 	}
 }
