@@ -90,7 +90,7 @@ public class GeneratorCore implements Memorable {
 	//*/
 
 	public GeneratorCore(Point anchorPoint) {
-		anchorPoint = anchorPoint;
+		this.anchorPoint = anchorPoint;
 	}
 
 	// - Events -
@@ -106,12 +106,13 @@ public class GeneratorCore implements Memorable {
 
 		boolean canPlace = !overlapWithClaimed;
 		if (canPlace) {
+			Set<Point> generatableWallPoints = Wall.flattenLayers(getGeneratableWallLayers());
+			updateInsideOutside(generatableWallPoints);
 			//claim wall + 1 layer (and 1 layer around generator)
-			List<List<Point>> generatableWallLayers = getGeneratableWallLayers();
-			updateClaimedPoints(generatableWallLayers); //updateClaimedPoints() will add in layer around wall + generator and layer around it
+			updateClaimedPoints(generatableWallPoints); //updateClaimedPoints() will add in layer around wall + generator and layer around it
 
 			//tell player how many wall blocks were found
-			int foundWallPointsCount = Wall.flattenLayers(generatableWallLayers).size();
+			int foundWallPointsCount = generatableWallPoints.size();
 			sendMessage("Fortress generator found " + String.valueOf(foundWallPointsCount) + " wall blocks.");
 		} else {
 			sendMessage("Fortress generator is too close to another generator's wall.");
@@ -160,11 +161,77 @@ public class GeneratorCore implements Memorable {
 	private void generateWall() {
 		Debug.msg("generateWall()");
 
-		List<List<Point>> layers = getGeneratableWallLayers();
-		updateClaimedPoints(Wall.merge(layers, animator.getGeneratedLayers()));
+		List<List<Point>> generatableLayers = getGeneratableWallLayers();
+		List<List<Point>> wallLayers = Wall.merge(generatableLayers, animator.getGeneratedLayers());
+		Set<Point> wallPoints = Wall.flattenLayers(wallLayers);
+		updateClaimedPoints(wallPoints);
+		updateInsideOutside(wallPoints);
+
+		animator.generate(generatableLayers);
+	}
+
+	//TODO: reconstitute inside/outside on save/load
+	private Set<Point> layerOutsideFortress = new HashSet<>(); //TODO: move this line up with other member variables
+	private Set<Point> pointsInsideFortress = new HashSet<>(); //TODO: move this line up with other member variables
+	private void updateInsideOutside(Set<Point> wallPoints) {
+		layerOutsideFortress.clear();
+		pointsInsideFortress.clear();
+
+		if (wallPoints.size() > 0) {
+			Set<Point> layerAroundWall = getLayerAround(wallPoints);
+
+			//find a top block in layerAroundWall
+			Point top = layerAroundWall.iterator().next();
+			for (Point p : layerAroundWall) {
+				if (p.y > top.y) {
+					top = p;
+				}
+			}
+
+			//fill layerOutsideFortress
+			Point origin = top;
+			Set<Point> originLayer = new HashSet<>();
+			originLayer.add(origin);
+			Set<Material> wallMaterials = null; //traverse all block types
+			Set<Material> returnMaterials = null; //return all block types
+			int rangeLimit = 2 * generationRangeLimit + 2;
+			Set<Point> ignorePoints = wallPoints;
+			Set<Point> searchablePoints = layerAroundWall;
+			layerOutsideFortress = Wall.getPointsConnected(origin, originLayer, wallMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
+			layerOutsideFortress.add(origin);
 
 
-		animator.generate(layers);
+//			//get layerInsideFortress
+//			Set<Point> layerInsideFortress = new HashSet<>(layerAroundWall);
+//			layerInsideFortress.removeAll(layerOutsideFortress);
+//
+//			//fill pointsInsideFortress
+//			if (layerInsideFortress.size() > 0) {
+//				origin = layerInsideFortress.iterator().next();
+//				originLayer = layerInsideFortress;
+//				wallMaterials = null; //traverse all block types
+//				returnMaterials = null; //all block types
+//				rangeLimit = 2 * generationRangeLimit;
+//				ignorePoints = wallPoints;
+//				searchablePoints = null; //search all points
+//				pointsInsideFortress = Wall.getPointsConnected(origin, originLayer, wallMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
+//				pointsInsideFortress.addAll(originLayer);
+//			}
+
+			for (Point p : layerOutsideFortress) {
+				Debug.particleAt(p);
+			}
+
+
+
+
+
+
+
+
+
+
+		}
 	}
 
 	private List<List<Point>> getGeneratableWallLayers() {
@@ -176,9 +243,6 @@ public class GeneratorCore implements Memorable {
 		return allowedWallLayers;
 	}
 
-	private void updateClaimedPoints(List<List<Point>> wallLayers) {
-		updateClaimedPoints(Wall.flattenLayers(wallLayers));
-	}
 	private void updateClaimedPoints(Set<Point> wallPoints) {
 		claimedPoints.clear();
 
@@ -261,12 +325,12 @@ public class GeneratorCore implements Memorable {
 		return Wall.getPointsConnectedAsLayers(anchorPoint, originLayer, wallMaterials, returnMaterials, rangeLimit, ignorePoints);
 	}
 
-	private Set<Point> getLayerAround(Set<Point> wallPoints) {
+	private Set<Point> getLayerAround(Set<Point> layerPoints) {
 		Set<Material> wallMaterials = new HashSet<>(); //no blocks are traversed
 		Set<Material> returnMaterials = null; //all blocks are returned
 		int rangeLimit = generationRangeLimit + 1;
 		Set<Point> ignorePoints = null; //no points ignored
-		return Wall.getPointsConnected(anchorPoint, wallPoints, wallMaterials, returnMaterials, rangeLimit, ignorePoints, Wall.ConnectedThreshold.POINTS);
+		return Wall.getPointsConnected(anchorPoint, layerPoints, wallMaterials, returnMaterials, rangeLimit, ignorePoints, Wall.ConnectedThreshold.POINTS);
 	}
 
 

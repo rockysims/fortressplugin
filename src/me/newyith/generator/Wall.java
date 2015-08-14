@@ -73,7 +73,7 @@ public class Wall {
 	 *
 	 * @param origin The rangeLimit is calculated relative to this point.
 	 * @param originLayer The first point(s) to search outward from.
-	 * @param wallMaterials List of connecting block types.
+	 * @param wallMaterials List of connecting block types. If null, all materials traversable.
 	 * @param returnMaterials List of block types to look for and return when connected to the wall or null to return all block types.
 	 * @param rangeLimit The maximum distance away from origin to search.
 	 * @param ignorePoints When searching, these points will be ignored (not traversed or returned). If null, no points ignored.
@@ -192,7 +192,7 @@ public class Wall {
 						}
 
 						//consider adding point to nextLayer
-						if (wallMaterials.contains(m)) {
+						if (wallMaterials == null || wallMaterials.contains(m)) {
 							nextLayer.push(p);
 						}
 					}

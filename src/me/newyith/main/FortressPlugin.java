@@ -70,6 +70,7 @@ TODO: make generation display wave of particles to indicate generating protected
 
 */
 
+//TODO: in Wall class and other places its used: rename wallMaterials to traverseMaterials
 //TODO: consider making rune activation require an empty hand
 //TODO: test adding particles
 //TODO: test killing the server (ctrl+c not "stop") and make sure plugin is robust enough to handle it
