@@ -21,24 +21,14 @@ public class FortressGeneratorParticlesManager {
 	}
 
 	public void tick() {
-		if (rune.isRunning()) {
-			if (runeWaitTicks <= 0) {
-				long now = (new Date()).getTime();
-				runeWaitTicks = (1000 + (int)(now % 5000)) / TickTimer.msPerTick;
-
-				Point point = new Point(rune.getPattern().anchorPoint);
-				point.add(0, 1, 0);
-				float speed = 0;
-				int amount = 1;
-				double range = 15;
-				Location loc = point.add(0.5, -0.4, 0.5);
-				ParticleEffect.PORTAL.display(0.2F, 0.0F, 0.2F, speed, amount, loc, range);
-			}
-			runeWaitTicks--;
-		}
+		tickRuneAnchorParticles();
+		tickProtectionParticles(rune.getGeneratorCore().getProtectedPoints());
 	}
 
-	public static void tickProtectionParticles(Set<Point> protectedPoints) {
+	private static void tickProtectionParticles(Set<Point> protectedPoints) {
+
+		//TODO: rewrite this once generatorCore.layerOutsideFortress has been added
+
 		if (protectedPoints.size() > 0) {
 			if (wallWaitTicks <= 0) {
 				wallWaitTicks = (300) / TickTimer.msPerTick;
@@ -81,6 +71,24 @@ public class FortressGeneratorParticlesManager {
 				}
 			}
 			wallWaitTicks--;
+		}
+	}
+
+	private void tickRuneAnchorParticles() {
+		if (rune.isRunning()) {
+			if (runeWaitTicks <= 0) {
+				long now = (new Date()).getTime();
+				runeWaitTicks = (1000 + (int)(now % 5000)) / TickTimer.msPerTick;
+
+				Point point = new Point(rune.getPattern().anchorPoint);
+				point.add(0, 1, 0);
+				float speed = 0;
+				int amount = 1;
+				double range = 15;
+				Location loc = point.add(0.5, -0.4, 0.5);
+				ParticleEffect.PORTAL.display(0.2F, 0.0F, 0.2F, speed, amount, loc, range);
+			}
+			runeWaitTicks--;
 		}
 	}
 }

@@ -58,9 +58,16 @@ public class FortressPlugin extends JavaPlugin {
 
 /*
 Particles:
+
+
+
+
 maybe protection particles can be displayed at layerOutsideFortress points after generator can build layerOutsideFortress
 
-TODO: refactor so that each rune calls tickProtectedParticles() and passes in the protected points as layers so particles can appear in layers like generation
+
+
+TODO: make generation display wave of particles to indicate generating protected blocks
+
 */
 
 //TODO: consider making rune activation require an empty hand
