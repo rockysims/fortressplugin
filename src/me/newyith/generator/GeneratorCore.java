@@ -90,45 +90,45 @@ public class GeneratorCore implements Memorable {
 	//*/
 
 	public GeneratorCore(Point anchorPoint) {
-		this.anchorPoint = anchorPoint;
+		anchorPoint = anchorPoint;
 	}
 
 	// - Events -
 
 	public boolean onPlaced(Player placingPlayer) { //<--------- called by rune
-		this.placedByPlayerId = placingPlayer.getUniqueId();
+		placedByPlayerId = placingPlayer.getUniqueId();
 
 		//set overlapWithClaimed = true if placed generator is connected (by faces) to another generator's claimed points
-		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(this.anchorPoint);
+		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(anchorPoint);
 		Set<Point> claimPoints = rune.getPoints();
-		Set<Point> alreadyClaimedPoints = this.getClaimedPointsOfNearbyGenerators();
+		Set<Point> alreadyClaimedPoints = getClaimedPointsOfNearbyGenerators();
 		boolean overlapWithClaimed = !Collections.disjoint(alreadyClaimedPoints, claimPoints); //disjoint means no points in common
 
 		boolean canPlace = !overlapWithClaimed;
 		if (canPlace) {
 			//claim wall + 1 layer (and 1 layer around generator)
-			List<List<Point>> generatableWallLayers = this.getGeneratableWallLayers();
-			this.updateClaimedPoints(generatableWallLayers); //updateClaimedPoints() will add in layer around wall + generator and layer around it
+			List<List<Point>> generatableWallLayers = getGeneratableWallLayers();
+			updateClaimedPoints(generatableWallLayers); //updateClaimedPoints() will add in layer around wall + generator and layer around it
 
 			//tell player how many wall blocks were found
 			int foundWallPointsCount = Wall.flattenLayers(generatableWallLayers).size();
-			this.sendMessage("Fortress generator found " + String.valueOf(foundWallPointsCount) + " wall blocks.");
+			sendMessage("Fortress generator found " + String.valueOf(foundWallPointsCount) + " wall blocks.");
 		} else {
-			this.sendMessage("Fortress generator is too close to another generator's wall.");
+			sendMessage("Fortress generator is too close to another generator's wall.");
 		}
 
 		return canPlace;
 	}
 
 	public void onBroken() { //<--------- called by rune
-		this.degenerateWall(false);
+		degenerateWall(false);
 	}
 
 	public void onStateChanged(FgState newState) { //<--------- called by rune
 		if (newState == FgState.RUNNING) {
-			this.generateWall();
+			generateWall();
 		} else {
-			this.degenerateWall(true);
+			degenerateWall(true);
 		}
 	}
 
@@ -140,7 +140,7 @@ public class GeneratorCore implements Memorable {
 
 	private void sendMessage(String msg) {
 		msg = ChatColor.AQUA + msg;
-		Bukkit.getPlayer(this.placedByPlayerId).sendMessage(msg);
+		Bukkit.getPlayer(placedByPlayerId).sendMessage(msg);
 	}
 
 	/**
@@ -160,14 +160,15 @@ public class GeneratorCore implements Memorable {
 	private void generateWall() {
 		Debug.msg("generateWall()");
 
-		List<List<Point>> layers = this.getGeneratableWallLayers();
-		this.updateClaimedPoints(Wall.merge(layers, animator.getGeneratedLayers()));
+		List<List<Point>> layers = getGeneratableWallLayers();
+		updateClaimedPoints(Wall.merge(layers, animator.getGeneratedLayers()));
+
 
 		animator.generate(layers);
 	}
 
 	private List<List<Point>> getGeneratableWallLayers() {
-		Set<Point> claimedPoints = this.getClaimedPointsOfNearbyGenerators();
+		Set<Point> claimedPoints = getClaimedPointsOfNearbyGenerators();
 
 		//return all connected wall points ignoring (and not traversing) claimedPoints (generationRangeLimit search range)
 		List<List<Point>> allowedWallLayers = getPointsConnectedAsLayers(Wall.getWallMaterials(), Wall.getGeneratableWallMaterials(), generationRangeLimit, claimedPoints);
@@ -176,32 +177,32 @@ public class GeneratorCore implements Memorable {
 	}
 
 	private void updateClaimedPoints(List<List<Point>> wallLayers) {
-		this.updateClaimedPoints(Wall.flattenLayers(wallLayers));
+		updateClaimedPoints(Wall.flattenLayers(wallLayers));
 	}
 	private void updateClaimedPoints(Set<Point> wallPoints) {
-		this.claimedPoints.clear();
+		claimedPoints.clear();
 
 		//claim wallLayers
-		this.claimedWallPoints = wallPoints;
-		this.claimedPoints.addAll(this.claimedWallPoints);
+		claimedWallPoints = wallPoints;
+		claimedPoints.addAll(claimedWallPoints);
 
 		//claim layer around wall
-		Set<Point> layerAroundWallPoints = getLayerAround(this.claimedWallPoints);
-		this.claimedPoints.addAll(layerAroundWallPoints);
+		Set<Point> layerAroundWallPoints = getLayerAround(claimedWallPoints);
+		claimedPoints.addAll(layerAroundWallPoints);
 
-		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(this.anchorPoint);
+		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(anchorPoint);
 		if (rune != null) {
 			//claim rune
 			Set<Point> runePoints = rune.getPoints();
-			this.claimedPoints.addAll(runePoints);
+			claimedPoints.addAll(runePoints);
 			//claim layer around rune
 			Set<Point> layerAroundRune = getLayerAround(runePoints);
-			this.claimedPoints.addAll(layerAroundRune);
+			claimedPoints.addAll(layerAroundRune);
 		}
 	}
 
 	private Set<Point> getClaimedPointsOfNearbyGenerators() {
-		Set<FortressGeneratorRune> nearbyRunes = FortressGeneratorRunesManager.getOtherRunesInRange(this.anchorPoint, generationRangeLimit * 2 + 1); //not sure if the + 1 is needed
+		Set<FortressGeneratorRune> nearbyRunes = FortressGeneratorRunesManager.getOtherRunesInRange(anchorPoint, generationRangeLimit * 2 + 1); //not sure if the + 1 is needed
 
 		Set<Point> claimedPoints = new HashSet<>();
 		for (FortressGeneratorRune rune : nearbyRunes) {
@@ -213,15 +214,15 @@ public class GeneratorCore implements Memorable {
 
 	private Set<Point> getClaimedPoints() {
 		//update claimedPoints if claimedWallPoints are not all wall type blocks
-		for (Point p : this.claimedWallPoints) {
+		for (Point p : claimedWallPoints) {
 			Material claimedWallMaterial = p.getBlock().getType();
 			if (!Wall.getWallMaterials().contains(claimedWallMaterial)) { //claimedWallMaterial isn't a wall type block
-				this.unclaimDisconnected();
+				unclaimDisconnected();
 				break;
 			}
 		}
 
-		return this.claimedPoints;
+		return claimedPoints;
 	}
 
 	public Set<Point> getProtectedPoints() {
@@ -231,16 +232,16 @@ public class GeneratorCore implements Memorable {
 	private void unclaimDisconnected() {
 		//fill pointsToUnclaim
 		Set<Point> pointsToUnclaim = new HashSet<>();
-		Set<Point> connectedPoints = getPointsConnected(Wall.getWallMaterials(), Wall.getWallMaterials(), generationRangeLimit, null, this.claimedWallPoints);
-		for (Point claimedWallPoint : this.claimedWallPoints) {
+		Set<Point> connectedPoints = getPointsConnected(Wall.getWallMaterials(), Wall.getWallMaterials(), generationRangeLimit, null, claimedWallPoints);
+		for (Point claimedWallPoint : claimedWallPoints) {
 			if (!connectedPoints.contains(claimedWallPoint)) { //found claimed wall point that is now disconnected
 				pointsToUnclaim.add(claimedWallPoint);
 			}
 		}
 
 		//unclaim pointsToUnclaim
-		this.claimedWallPoints.removeAll(pointsToUnclaim);
-		this.updateClaimedPoints(this.claimedWallPoints);
+		claimedWallPoints.removeAll(pointsToUnclaim);
+		updateClaimedPoints(claimedWallPoints);
 
 		//degenerate overlap between pointsToUnclaim and generatedLayers
 		Set<Point> pointsToDegenerate = new HashSet<>(pointsToUnclaim);
@@ -249,15 +250,15 @@ public class GeneratorCore implements Memorable {
 	}
 
 	private Set<Point> getPointsConnected(Set<Material> wallMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
-		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(this.anchorPoint);
+		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(anchorPoint);
 		Set<Point> originLayer = rune.getPoints();
-		return Wall.getPointsConnected(this.anchorPoint, originLayer, wallMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
+		return Wall.getPointsConnected(anchorPoint, originLayer, wallMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
 	}
 
 	private List<List<Point>> getPointsConnectedAsLayers(Set<Material> wallMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints) {
-		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(this.anchorPoint);
+		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(anchorPoint);
 		Set<Point> originLayer = rune.getPoints();
-		return Wall.getPointsConnectedAsLayers(this.anchorPoint, originLayer, wallMaterials, returnMaterials, rangeLimit, ignorePoints);
+		return Wall.getPointsConnectedAsLayers(anchorPoint, originLayer, wallMaterials, returnMaterials, rangeLimit, ignorePoints);
 	}
 
 	private Set<Point> getLayerAround(Set<Point> wallPoints) {
@@ -265,14 +266,14 @@ public class GeneratorCore implements Memorable {
 		Set<Material> returnMaterials = null; //all blocks are returned
 		int rangeLimit = generationRangeLimit + 1;
 		Set<Point> ignorePoints = null; //no points ignored
-		return Wall.getPointsConnected(this.anchorPoint, wallPoints, wallMaterials, returnMaterials, rangeLimit, ignorePoints, Wall.ConnectedThreshold.POINTS);
+		return Wall.getPointsConnected(anchorPoint, wallPoints, wallMaterials, returnMaterials, rangeLimit, ignorePoints, Wall.ConnectedThreshold.POINTS);
 	}
 
 
 
 //	will be used for emergency key
 //	public String getPlacedByPlayerId() {
-//		return this.placedByPlayerId;
+//		return placedByPlayerId;
 //	}
 
 //	will be used for emergency key
