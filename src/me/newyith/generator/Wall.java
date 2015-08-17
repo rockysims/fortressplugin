@@ -50,6 +50,19 @@ public class Wall {
 		return layers;
 	}
 
+	public static Set<Point> getAdjacent6(Point p) {
+		Set<Point> points = new HashSet<>();
+
+		points.add(new Point(p.world, p.x + 1, p.y, p.z));
+		points.add(new Point(p.world, p.x - 1, p.y, p.z));
+		points.add(new Point(p.world, p.x, p.y + 1, p.z));
+		points.add(new Point(p.world, p.x, p.y - 1, p.z));
+		points.add(new Point(p.world, p.x, p.y, p.z + 1));
+		points.add(new Point(p.world, p.x, p.y, p.z - 1));
+
+		return points;
+	}
+
 	public static Set<Point> getPointsConnected(Point origin, Set<Point> originLayer, Set<Material> wallBlocks, Set<Material> returnBlocks, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
 		List<List<Point>> layers = getPointsConnectedAsLayers(origin, originLayer, wallBlocks, returnBlocks, rangeLimit, ignorePoints, searchablePoints, ConnectedThreshold.FACES);
 		return flattenLayers(layers);

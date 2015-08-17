@@ -62,6 +62,10 @@ public class Point extends Location implements Memorable {
 		return x + ", " + y + ", " + z;
 	}
 
+	public String toStringDoubles() {
+		return x + ", " + y + ", " + z;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (o == this) {

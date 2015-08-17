@@ -58,12 +58,16 @@ public class FortressPlugin extends JavaPlugin {
 
 /*
 Particles:
+TODO: refactor how particles work to make it more efficient
+
 TODO: tidy up from adding layerOutsideFortress
 TODO: display protection particles at all points in layerOutsideFortress (need to rename to generation particles)
 	will need to make layerOutsideFortress a Map<Point, Point> so particles can be displayed on surface of correct face?
 		no because of what to do if multiple surfaces should have particles
 		instead maybe do wallPoints.contains(each of the 6 points next to point in layerOutsideFortress)?
 			yes but not every time. Map<Point, Set<Point>>
+
+//TODO: refactor to use the listener pattern?
 
 
 TODO: make generation display wave of particles to indicate generating protected blocks
@@ -76,6 +80,7 @@ TODO: make generation display wave of particles to indicate generating protected
 //TODO: test killing the server (ctrl+c not "stop") and make sure plugin is robust enough to handle it
 //  TODO: work on handling fortress generator state (maybe time to look at FortressMod code?)
 //TODO: make glowstone blocks work as fuel for 4x the fuel value of glowstone dust (silk touch works on glowstone block and fortune III does not)
+//TODO: consider making creating rune require empty hand (again)
 
 /* New Feature:
 make pistons transmit generation when extended

@@ -171,6 +171,13 @@ public class GeneratorCoreAnimator implements Memorable {
 		return protectedPoints;
 	}
 
+	public Set<Point> getGeneratedPoints() {
+		Set<Point> generatedPoints = new HashSet<>();
+		generatedPoints.addAll(protectedPoints);
+		generatedPoints.addAll(alteredPoints.keySet());
+		return generatedPoints;
+	}
+
 	// --------- Internal Methods ---------
 
 	private boolean updateToNextFrame() {

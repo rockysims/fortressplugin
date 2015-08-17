@@ -88,6 +88,14 @@ public class FortressGeneratorRune implements Memorable {
 		return this.core;
 	}
 
+	public Set<Point> getLayerOutsideFortress() {
+		return this.core.getLayerOutsideFortress();
+	}
+
+	public Set<Point> getGeneratedPoints() {
+		return this.core.getGeneratedPoints();
+	}
+
 	// - Events -
 
 	public void onTick() {

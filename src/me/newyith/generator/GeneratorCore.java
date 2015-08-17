@@ -225,12 +225,12 @@ public class GeneratorCore implements Memorable {
 
 
 
-			for (Point p : layerOutsideFortress) {
-				Debug.particleAt(p, ParticleEffect.FLAME);
-			}
-			for (Point p : pointsInsideFortress) {
-				Debug.particleAt(p, ParticleEffect.HEART);
-			}
+//			for (Point p : layerOutsideFortress) {
+//				Debug.particleAt(p, ParticleEffect.FLAME);
+//			}
+//			for (Point p : pointsInsideFortress) {
+//				Debug.particleAt(p, ParticleEffect.HEART);
+//			}
 
 
 
@@ -301,6 +301,14 @@ public class GeneratorCore implements Memorable {
 
 	public Set<Point> getProtectedPoints() {
 		return animator.getProtectedPoints();
+	}
+
+	public Set<Point> getGeneratedPoints() {
+		return animator.getGeneratedPoints();
+	}
+
+	public Set<Point> getLayerOutsideFortress() {
+		return this.layerOutsideFortress;
 	}
 
 	private void unclaimDisconnected() {

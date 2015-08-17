@@ -2,19 +2,17 @@ package me.newyith.generator;
 
 import me.newyith.event.TickTimer;
 import me.newyith.particles.ParticleEffect;
-import me.newyith.util.Debug;
 import me.newyith.util.Point;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
 import java.util.Date;
-import java.util.Random;
 import java.util.Set;
 
 public class FortressGeneratorParticlesManager {
 	private FortressGeneratorRune rune;
 	private int runeWaitTicks = 0;
-	private static int wallWaitTicks = 0;
+	private int wallWaitTicks = 0;
 
 	public FortressGeneratorParticlesManager(FortressGeneratorRune rune) {
 		this.rune = rune;
@@ -22,56 +20,60 @@ public class FortressGeneratorParticlesManager {
 
 	public void tick() {
 		tickRuneAnchorParticles();
-		tickProtectionParticles(rune.getGeneratorCore().getProtectedPoints());
+		tickWallParticles();
 	}
 
-	private static void tickProtectionParticles(Set<Point> protectedPoints) {
+	private void tickWallParticles() {
+		if (wallWaitTicks <= 0) {
+			wallWaitTicks = (500) / TickTimer.msPerTick;
 
-		//TODO: rewrite this once generatorCore.layerOutsideFortress has been added
-
-		if (protectedPoints.size() > 0) {
-			if (wallWaitTicks <= 0) {
-				wallWaitTicks = (300) / TickTimer.msPerTick;
-
-				for (Point p : protectedPoints) {
-					if (p.getBlock().getType() != Material.AIR) {
-						Point point = new Point(p);
-						point.add(0, 0, 0);
-						float speed = 0;
-						int amount = 10;
-						double range = 15;
-
-
-						int xOffset;
-						int yOffset;
-						int zOffset;
-
-						if (Math.random() > 0.5) xOffset = 1;
-						else xOffset = -1;
-						if (Math.random() > 0.5) yOffset = 1;
-						else yOffset = -1;
-						if (Math.random() > 0.5) zOffset = 1;
-						else zOffset = -1;
-
-						if (Math.random() > 0.3) {
-							yOffset = 0;
-							zOffset = 0;
-						} else if (Math.random() > 0.3) {
-							xOffset = 0;
-							zOffset = 0;
-						} else {
-							xOffset = 0;
-							yOffset = 0;
+			Set<Point> layerOutsideFortress = rune.getLayerOutsideFortress();
+			Set<Point> generated = rune.getGeneratedPoints();
+			for (Point outsidePoint : layerOutsideFortress) {
+				Set<Point> adjacents = Wall.getAdjacent6(outsidePoint);
+				for (Point adj : adjacents) {
+					if (generated.contains(adj) && adj.getBlock().getType() != Material.AIR) {
+						if (Math.random() < 0.97) {
+							continue;
 						}
 
+						//display particles for adj (wall) face of outsidePoint
 
-						Location loc = point.add(0.5 + xOffset, 0.0 + yOffset, 0.5 + zOffset);
-						ParticleEffect.PORTAL.display(0.1F, 0.0F, 0.1F, speed, amount, loc, range);
+						Point towardAdj = new Point(adj.subtract(outsidePoint));
+						Point towardAdjAdjusted = new Point(towardAdj);
+						double mult = 0.3;
+						towardAdjAdjusted.x *= mult;
+						towardAdjAdjusted.y *= mult;
+						towardAdjAdjusted.z *= mult;
+
+						float xRand = 0.22F;
+						float yRand = 0.22F;
+						float zRand = 0.22F;
+						//don't randomize particle placement in the axis we moved in to go from wall point to adjacent point
+						if (towardAdjAdjusted.x != 0) {
+							xRand = 0;
+						}
+						if (towardAdjAdjusted.y != 0) {
+							yRand = 0;
+						}
+						if (towardAdjAdjusted.z != 0) {
+							zRand = 0;
+						}
+
+						Point p = new Point(outsidePoint);
+						p.setX(p.x + towardAdjAdjusted.x + 0.5);
+						p.setY(p.y + towardAdjAdjusted.y + 0.5);
+						p.setZ(p.z + towardAdjAdjusted.z + 0.5);
+						showParticle(p, xRand, yRand, zRand);
 					}
 				}
 			}
-			wallWaitTicks--;
 		}
+		wallWaitTicks--;
+	}
+
+	private void showParticle(Point p, float xRand, float yRand, float zRand) {
+		ParticleEffect.PORTAL.display(xRand, yRand, zRand, 0, 1, p, 15);
 	}
 
 	private void tickRuneAnchorParticles() {
