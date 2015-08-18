@@ -61,16 +61,9 @@ Particles:
 TODO: refactor how particles work to make it more efficient
 
 TODO: tidy up from adding layerOutsideFortress
-TODO: display protection particles at all points in layerOutsideFortress (need to rename to generation particles)
-	will need to make layerOutsideFortress a Map<Point, Point> so particles can be displayed on surface of correct face?
-		no because of what to do if multiple surfaces should have particles
-		instead maybe do wallPoints.contains(each of the 6 points next to point in layerOutsideFortress)?
-			yes but not every time. Map<Point, Set<Point>>
-
-//TODO: refactor to use the listener pattern?
-
-
 TODO: make generation display wave of particles to indicate generating protected blocks
+
+TODO: refactor to use the listener pattern?
 
 */
 
