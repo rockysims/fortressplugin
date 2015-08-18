@@ -6,8 +6,7 @@ import me.newyith.util.Point;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 
 public class FortressGeneratorParticlesManager {
 	private FortressGeneratorRune rune;
@@ -27,6 +26,8 @@ public class FortressGeneratorParticlesManager {
 		if (wallWaitTicks <= 0) {
 			wallWaitTicks = (500) / TickTimer.msPerTick;
 
+			//Debug.start("tickWallParticles()");
+
 			Set<Point> layerOutsideFortress = rune.getLayerOutsideFortress();
 			Set<Point> generated = rune.getGeneratedPoints();
 			for (Point outsidePoint : layerOutsideFortress) {
@@ -39,35 +40,39 @@ public class FortressGeneratorParticlesManager {
 
 						//display particles for adj (wall) face of outsidePoint
 
-						Point towardAdj = new Point(adj.subtract(outsidePoint));
-						Point towardAdjAdjusted = new Point(towardAdj);
+						Point towardWall = new Point(adj.subtract(outsidePoint));
+						Point towardWallAdjusted = new Point(towardWall);
 						double mult = 0.3;
-						towardAdjAdjusted.x *= mult;
-						towardAdjAdjusted.y *= mult;
-						towardAdjAdjusted.z *= mult;
+						towardWallAdjusted.x *= mult;
+						towardWallAdjusted.y *= mult;
+						towardWallAdjusted.z *= mult;
 
 						float xRand = 0.22F;
 						float yRand = 0.22F;
 						float zRand = 0.22F;
 						//don't randomize particle placement in the axis we moved in to go from wall point to adjacent point
-						if (towardAdjAdjusted.x != 0) {
+						if (towardWallAdjusted.x != 0) {
 							xRand = 0;
 						}
-						if (towardAdjAdjusted.y != 0) {
+						if (towardWallAdjusted.y != 0) {
 							yRand = 0;
 						}
-						if (towardAdjAdjusted.z != 0) {
+						if (towardWallAdjusted.z != 0) {
 							zRand = 0;
 						}
 
 						Point p = new Point(outsidePoint);
-						p.setX(p.x + towardAdjAdjusted.x + 0.5);
-						p.setY(p.y + towardAdjAdjusted.y + 0.5);
-						p.setZ(p.z + towardAdjAdjusted.z + 0.5);
+						p.setX(p.x + towardWallAdjusted.x + 0.5);
+						p.setY(p.y + towardWallAdjusted.y + 0.5);
+						p.setZ(p.z + towardWallAdjusted.z + 0.5);
 						showParticle(p, xRand, yRand, zRand);
 					}
 				}
 			}
+
+//			Debug.stop("tickWallParticles()", false);
+//			Debug.duration("tickWallParticles()");
+
 		}
 		wallWaitTicks--;
 	}

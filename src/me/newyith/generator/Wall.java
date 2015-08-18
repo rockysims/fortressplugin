@@ -95,7 +95,7 @@ public class Wall {
 	 * @return List of all points (blocks) connected to the originLayer by wallMaterials and matching a block type in returnMaterials.
 	 */
 	public static List<List<Point>> getPointsConnectedAsLayers(Point origin, Set<Point> originLayer, Set<Material> wallMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints, ConnectedThreshold connectedThreshold) {
-		//Debug.start("getPointsConnectedAsLayers() all");
+		Debug.start("getPointsConnectedAsLayers() all");
 
 		List<List<Point>> matchesAsLayers = new ArrayList<>();
 		Set<Point> connected = new HashSet<>();
@@ -221,10 +221,11 @@ public class Wall {
 
 		}
 
-		//Debug.msg("Wall.getPointsConnected visited " + String.valueOf(visited.size()));
+		Debug.msg("Wall.getPointsConnected visited " + String.valueOf(visited.size()));
 		//Debug.msg("Wall.getPointsConnected returning " + String.valueOf(matchesAsLayers.size()) + " matchesAsLayers");
 
-		//Debug.stop("getPointsConnectedAsLayers() all");
+		Debug.stop("getPointsConnectedAsLayers() all");
+		//Debug.clear("getPointsConnectedAsLayers() all");
 		//Debug.duration("getPointsConnectedAsLayers() all");
 
 		return matchesAsLayers;
