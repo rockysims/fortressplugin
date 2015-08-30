@@ -203,7 +203,7 @@ public class GeneratorCore implements Memorable {
 			layerOutsideFortress = Wall.getPointsConnected(origin, originLayer, wallMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
 			layerOutsideFortress.addAll(originLayer);
 			layerOutsideFortress.retainAll(layerAroundWall);
-			Debug.msg("layerOutsideFortress.size(): " + layerOutsideFortress.size());
+			//Debug.msg("layerOutsideFortress.size(): " + layerOutsideFortress.size());
 
 
 			//get layerInsideFortress

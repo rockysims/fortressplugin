@@ -1,7 +1,9 @@
 package me.newyith.generator;
 
+import javafx.util.Pair;
 import me.newyith.event.TickTimer;
 import me.newyith.particles.ParticleEffect;
+import me.newyith.util.Debug;
 import me.newyith.util.Point;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,56 +24,136 @@ public class FortressGeneratorParticlesManager {
 		tickWallParticles();
 	}
 
+	private List<Pair<Point, Point>> wallOutsidePairs = null;
+	private int wallOutsideIndex = 0;
 	private void tickWallParticles() {
 		if (wallWaitTicks <= 0) {
 			wallWaitTicks = (500) / TickTimer.msPerTick;
 
-			//Debug.start("tickWallParticles()");
+			Debug.start("tickWallParticles()");
 
-			Set<Point> layerOutsideFortress = rune.getLayerOutsideFortress();
-			Set<Point> generated = rune.getGeneratedPoints();
-			for (Point outsidePoint : layerOutsideFortress) {
-				Set<Point> adjacents = Wall.getAdjacent6(outsidePoint);
-				for (Point adj : adjacents) {
-					if (generated.contains(adj) && adj.getBlock().getType() != Material.AIR) {
-						if (Math.random() < 0.97) {
-							continue;
-						}
+				//fill wallOutsidePairs
+				if (wallOutsidePairs == null || wallOutsidePairs.isEmpty()) {
+					//Debug.start("tickWallParticles() shuffle");
 
-						//display particles for adj (wall) face of outsidePoint
+					wallOutsidePairs = new ArrayList<>();
+					Set<Point> generated = rune.getGeneratedPoints();
+					if (generated.size() > 0) {
+						Set<Point> layerOutsideFortress = rune.getLayerOutsideFortress();
 
-						Point towardWall = new Point(adj.subtract(outsidePoint));
-						Point towardWallAdjusted = new Point(towardWall);
-						double mult = 0.3;
-						towardWallAdjusted.x *= mult;
-						towardWallAdjusted.y *= mult;
-						towardWallAdjusted.z *= mult;
+						layerOutsideFortress.stream().forEach((outsidePoint) -> {
+							Set<Point> adjacents = Wall.getAdjacent6(outsidePoint);
+							adjacents.stream().forEach((adj) -> {
+								if (generated.contains(adj) && adj.getBlock().getType() != Material.AIR) {
+									wallOutsidePairs.add(new Pair<>(adj, outsidePoint));
+								}
+							});
+						});
 
-						float xRand = 0.22F;
-						float yRand = 0.22F;
-						float zRand = 0.22F;
-						//don't randomize particle placement in the axis we moved in to go from wall point to adjacent point
-						if (towardWallAdjusted.x != 0) {
-							xRand = 0;
-						}
-						if (towardWallAdjusted.y != 0) {
-							yRand = 0;
-						}
-						if (towardWallAdjusted.z != 0) {
-							zRand = 0;
-						}
-
-						Point p = new Point(outsidePoint);
-						p.setX(p.x + towardWallAdjusted.x + 0.5);
-						p.setY(p.y + towardWallAdjusted.y + 0.5);
-						p.setZ(p.z + towardWallAdjusted.z + 0.5);
-						showParticle(p, xRand, yRand, zRand);
+						Collections.shuffle(wallOutsidePairs);
 					}
-				}
-			}
 
-//			Debug.stop("tickWallParticles()", false);
-//			Debug.duration("tickWallParticles()");
+					Debug.msg("tickWallParticles() filled wallOutsidePairs: " + wallOutsidePairs.size());
+					//Debug.stop("tickWallParticles() shuffle", false);
+					//Debug.duration("tickWallParticles() shuffle");
+					//Debug.clear("tickWallParticles() shuffle");
+				}
+				//Debug.msg("tickWallParticles() wallOutsidePairs.size(): " + wallOutsidePairs.size() + ", index: " + wallOutsideIndex);
+
+				int limit = (int)((double)wallOutsidePairs.size() * 0.02);
+				//Debug.msg("tickWallParticles() limit: " + limit);
+				while (limit-- > 0) {
+					wallOutsideIndex++;
+					if (wallOutsideIndex >= wallOutsidePairs.size()) {
+						wallOutsidePairs = null; //refresh
+						wallOutsideIndex = 0;
+						break;
+					}
+					Pair<Point, Point> wallOutside = wallOutsidePairs.get(wallOutsideIndex);
+
+					//display particles for wall face of outsidePoint
+					Point wall = wallOutside.getKey();
+					Point outsidePoint = wallOutside.getValue();
+					Point towardWall = new Point(wall.subtract(outsidePoint));
+					Point towardWallAdjusted = new Point(towardWall);
+					double mult = 0.3;
+					towardWallAdjusted.x *= mult;
+					towardWallAdjusted.y *= mult;
+					towardWallAdjusted.z *= mult;
+
+					float xRand = 0.22F;
+					float yRand = 0.22F;
+					float zRand = 0.22F;
+					//don't randomize particle placement in the axis we moved in to go from wall point to adjacent point
+					if (towardWallAdjusted.x != 0) {
+						xRand = 0;
+					}
+					if (towardWallAdjusted.y != 0) {
+						yRand = 0;
+					}
+					if (towardWallAdjusted.z != 0) {
+						zRand = 0;
+					}
+
+					Point p = new Point(outsidePoint);
+					p.setX(p.x + towardWallAdjusted.x + 0.5);
+					p.setY(p.y + towardWallAdjusted.y + 0.5);
+					p.setZ(p.z + towardWallAdjusted.z + 0.5);
+					showParticle(p, xRand, yRand, zRand);
+				}
+
+
+
+
+
+//			Set<Point> generated = rune.getGeneratedPoints();
+//			if (generated.size() > 0) {
+//				Set<Point> layerOutsideFortress = rune.getLayerOutsideFortress();
+//
+//				layerOutsideFortress.parallelStream().forEach((outsidePoint) -> {
+//					Set<Point> adjacents = Wall.getAdjacent6(outsidePoint);
+//					adjacents.parallelStream().forEach((adj) -> {
+//						if (generated.contains(adj) && adj.getBlock().getType() != Material.AIR) {
+//							if (Math.random() >= 0.95) {
+//								//display particles for adj (wall) face of outsidePoint
+//
+//								Point towardWall = new Point(adj.subtract(outsidePoint));
+//								Point towardWallAdjusted = new Point(towardWall);
+//								double mult = 0.3;
+//								towardWallAdjusted.x *= mult;
+//								towardWallAdjusted.y *= mult;
+//								towardWallAdjusted.z *= mult;
+//
+//								float xRand = 0.22F;
+//								float yRand = 0.22F;
+//								float zRand = 0.22F;
+//								//don't randomize particle placement in the axis we moved in to go from wall point to adjacent point
+//								if (towardWallAdjusted.x != 0) {
+//									xRand = 0;
+//								}
+//								if (towardWallAdjusted.y != 0) {
+//									yRand = 0;
+//								}
+//								if (towardWallAdjusted.z != 0) {
+//									zRand = 0;
+//								}
+//
+//								Point p = new Point(outsidePoint);
+//								p.setX(p.x + towardWallAdjusted.x + 0.5);
+//								p.setY(p.y + towardWallAdjusted.y + 0.5);
+//								p.setZ(p.z + towardWallAdjusted.z + 0.5);
+//								showParticle(p, xRand, yRand, zRand);
+//							}
+//						}
+//					});
+//				});
+//			}
+
+
+
+			Debug.stop("tickWallParticles()", false);
+			Debug.duration("tickWallParticles()");
+			Debug.clear("tickWallParticles()");
 
 		}
 		wallWaitTicks--;
