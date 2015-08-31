@@ -79,6 +79,8 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: refactor to use the listener pattern?
 
+//TODO: consider making it so cycling generator always degenerates all generated points that are now disconnected
+//TODO: consider making mossy cobblestone be generated but not transmit generation to anything except mossy
 //TODO: get door generation working and door white lists
 //TODO: in Wall class and other places its used: rename wallMaterials to traverseMaterials
 //TODO: test killing the server (ctrl+c not "stop") and make sure plugin is robust enough to handle it
