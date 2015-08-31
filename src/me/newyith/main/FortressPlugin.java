@@ -3,14 +3,15 @@ package me.newyith.main;
 import me.newyith.event.EventListener;
 import me.newyith.event.TickTimer;
 import me.newyith.memory.ConfigManager;
-import org.bukkit.Bukkit;
+import me.newyith.util.Debug;
+import me.newyith.util.Point;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.Date;
 
 public class FortressPlugin extends JavaPlugin {
     @Override
@@ -41,12 +42,30 @@ public class FortressPlugin extends JavaPlugin {
     }
 
 
-
+	//TODO: remove this command
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("test")) {
-            long now = (new Date()).getTime();
-            Bukkit.broadcastMessage("/test. now: " + now);
-            Bukkit.broadcastMessage("/test. (new Date()): " + (new Date()));
+			if (sender instanceof Player) {
+				Debug.msg("executing test command...");
+
+				int distance = 20;
+				Player player = (Player)sender;
+				Point center = new Point(player.getLocation());
+
+				for (int xOffset = -1 * distance; xOffset <= distance; xOffset++) {
+					for (int yOffset = -1 * distance; yOffset <= distance; yOffset++) {
+						for (int zOffset = -1 * distance; zOffset <= distance; zOffset++) {
+							Point p = new Point(center.world, center.x + xOffset, center.y + yOffset, center.z + zOffset);
+							if (p.y > 5) {
+								if (p.getBlock().getType() == Material.BEDROCK) {
+									p.getBlock().setType(Material.COBBLESTONE);
+								}
+							}
+						}
+					}
+				}
+			}
+
             return true;
         }
         return false;
