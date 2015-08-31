@@ -92,13 +92,22 @@ public class FortressGeneratorParticlesManager {
 
 					//Debug.msg("wallOutsideIndex: " + wallOutsideIndex);
 
+					//* //TODO: delete alternate block (or decide its efficient enough)
 					showParticleForWallOutsidePair(wallOutsidePairs.get(wallOutsideIndex));
+					/*/
+					//this version doesn't display particles for blocks broken in creative mode
+					Pair<Point, Point> wallOutsidePair = wallOutsidePairs.get(wallOutsideIndex);
+					Point wall = wallOutsidePair.getKey();
+					if (wall.getBlock().getType() != Material.AIR) {
+						showParticleForWallOutsidePair(wallOutsidePair);
+					}
+					//*/
 				}
 			}
 
 			Debug.stop("tickWallParticles()", false);
-			//Debug.duration("tickWallParticles()");
-			//Debug.clear("tickWallParticles()");
+//			Debug.duration("tickWallParticles()");
+//			Debug.clear("tickWallParticles()");
 		}
 	}
 
