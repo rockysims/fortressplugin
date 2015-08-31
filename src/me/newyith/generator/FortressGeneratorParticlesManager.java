@@ -29,7 +29,6 @@ public class FortressGeneratorParticlesManager {
 
 	public void onGeneratedChanges() {
 		wallOutsidePairs = null; //mark wallOutSidePairs as needing refresh
-		Debug.msg("mark wallOutsidePairs as needing refresh");
 	}
 
 	private void tickWallParticles() {
@@ -60,22 +59,16 @@ public class FortressGeneratorParticlesManager {
 					Collections.shuffle(wallOutsidePairs);
 				}
 
-				Debug.msg("tickWallParticles() filled wallOutsidePairs: " + wallOutsidePairs.size());
+				//Debug.msg("tickWallParticles() filled wallOutsidePairs: " + wallOutsidePairs.size());
+
 				//Debug.stop("tickWallParticles() shuffle", false);
 				//Debug.duration("tickWallParticles() shuffle");
 				//Debug.clear("tickWallParticles() shuffle");
 			}
-			//Debug.msg("tickWallParticles() wallOutsidePairs.size(): " + wallOutsidePairs.size() + ", index: " + wallOutsideIndex);
 
 			if (!wallOutsidePairs.isEmpty()) {
 				int runeCount = FortressGeneratorRunesManager.getRuneCount();
 				if (runeCount == 0) runeCount++;
-
-
-
-				//runeCount *= 100; //TODO: delete this line
-
-
 
 				long timeAllottedNs = maxTimeNsPerParticleTick / runeCount;
 				long startNs = System.nanoTime();
@@ -83,11 +76,11 @@ public class FortressGeneratorParticlesManager {
 				int limit = 1 + (int)((double)wallOutsidePairs.size() * 0.02);
 				while (true) {
 					if (limit-- <= 0) {
-						//Debug.msg("particle limit break");
+						//Debug.msg("particle LIMIT break");
 						break;
 					}
 					if (System.nanoTime() - startNs > timeAllottedNs) {
-						//Debug.msg("particle time break");
+						//Debug.msg("particle TIME break");
 						break;
 					}
 
@@ -104,9 +97,8 @@ public class FortressGeneratorParticlesManager {
 			}
 
 			Debug.stop("tickWallParticles()", false);
-			Debug.duration("tickWallParticles()");
-			Debug.clear("tickWallParticles()");
-
+			//Debug.duration("tickWallParticles()");
+			//Debug.clear("tickWallParticles()");
 		}
 	}
 
@@ -140,7 +132,7 @@ public class FortressGeneratorParticlesManager {
 		p.setY(p.y + towardWallAdjusted.y + 0.5);
 		p.setZ(p.z + towardWallAdjusted.z + 0.5);
 
-		ParticleEffect.PORTAL.display(xRand, yRand, zRand, 0, 1, p, 15);
+		ParticleEffect.PORTAL.display(xRand, yRand, zRand, 0, 1, p, 20);
 	}
 
 	private void tickRuneAnchorParticles() {
