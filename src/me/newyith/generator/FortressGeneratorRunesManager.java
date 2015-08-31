@@ -78,6 +78,10 @@ public class FortressGeneratorRunesManager {
 		protectedPoints.remove(p);
 	}
 
+	public static int getRuneCount() {
+		return runeInstances.size();
+	}
+
 	// - Events -
 
 	public static void onTick() {

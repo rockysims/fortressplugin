@@ -146,6 +146,10 @@ public class FortressGeneratorRune implements Memorable {
 		}
 	}
 
+	public void onGeneratedChanged() { //called by GeneratorCoreAnimator
+		particles.onGeneratedChanges();
+	}
+
 	// - Handlers -
 
 	private void tickFuel() {

@@ -11,6 +11,7 @@ import java.util.*;
 
 public class GeneratorCoreAnimator implements Memorable {
 	//saved
+	private Point anchorPoint = null;
 	private HashMap<Point, Material> alteredPoints = new HashMap<>();
 	private Set<Point> protectedPoints = new HashSet<>();
 	private List<List<Point>> generatedLayers = new ArrayList<>();
@@ -26,6 +27,9 @@ public class GeneratorCoreAnimator implements Memorable {
 	//------------------------------------------------------------------------------------------------------------------
 
 	public void saveTo(Memory m) {
+		m.save("anchorPoint", anchorPoint);
+		Debug.msg("saved anchorPoint: " + anchorPoint);
+
 		Debug.msg("saving alteredPoints: " + alteredPoints.size());
 		m.save("alteredPoints", alteredPoints);
 		Debug.msg("saved alteredPoints: " + alteredPoints.size());
@@ -51,6 +55,9 @@ public class GeneratorCoreAnimator implements Memorable {
 	}
 
 	public static GeneratorCoreAnimator loadFrom(Memory m) {
+		Point anchorPoint = m.loadPoint("anchorPoint");
+		Debug.msg("loaded anchorPoint: " + anchorPoint);
+
 		HashMap<Point, Material> alteredPoints = m.loadPointMaterialMap("alteredPoints");
 		Debug.msg("loaded alteredPoints: " + alteredPoints.size());
 
@@ -72,12 +79,12 @@ public class GeneratorCoreAnimator implements Memorable {
 		boolean isGeneratingWall = m.loadBoolean("isGeneratingWall");
 		Debug.msg("loaded isGeneratingWall: " + isGeneratingWall);
 
-
-		GeneratorCoreAnimator instance = new GeneratorCoreAnimator(alteredPoints, protectedPoints, generatedLayers, animationLayers, animate, isChangingGenerated, isGeneratingWall);
+		GeneratorCoreAnimator instance = new GeneratorCoreAnimator(anchorPoint, alteredPoints, protectedPoints, generatedLayers, animationLayers, animate, isChangingGenerated, isGeneratingWall);
 		return instance;
 	}
 
 	private GeneratorCoreAnimator(
+			Point anchorPoint,
 			HashMap<Point, Material> alteredPoints,
 			Set<Point> protectedPoints,
 			List<List<Point>> generatedLayers,
@@ -85,6 +92,7 @@ public class GeneratorCoreAnimator implements Memorable {
 			boolean animate,
 			boolean isChangingGenerated,
 			boolean isGeneratingWall) {
+		this.anchorPoint = anchorPoint;
 		this.alteredPoints = alteredPoints;
 		this.protectedPoints = protectedPoints;
 		this.generatedLayers = generatedLayers;
@@ -92,11 +100,15 @@ public class GeneratorCoreAnimator implements Memorable {
 		this.animate = animate;
 		this.isChangingGenerated = isChangingGenerated;
 		this.isGeneratingWall = isGeneratingWall;
+
+		onGeneratedChanged();
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
 
-	public GeneratorCoreAnimator() { }
+	public GeneratorCoreAnimator(Point anchorPoint) {
+		this.anchorPoint = anchorPoint;
+	}
 
 	public List<List<Point>> getGeneratedLayers() {
 		return this.generatedLayers;
@@ -142,6 +154,7 @@ public class GeneratorCoreAnimator implements Memorable {
 				itr.remove();
 			}
 		}
+		onGeneratedChanged();
 
 		isGeneratingWall = generatedLayers.size() > 0;
 	}
@@ -180,6 +193,15 @@ public class GeneratorCoreAnimator implements Memorable {
 
 	// --------- Internal Methods ---------
 
+	private void onGeneratedChanged() {
+		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(anchorPoint);
+		if (rune != null) {
+			rune.onGeneratedChanged();
+		} else {
+			Debug.msg("null rune at " + anchorPoint);
+		}
+	}
+
 	private boolean updateToNextFrame() {
 		boolean foundLayerToUpdate = false;
 
@@ -194,6 +216,9 @@ public class GeneratorCoreAnimator implements Memorable {
 
 			//try to update layer
 			foundLayerToUpdate = updateLayer(layer, layerIndex);
+			if (foundLayerToUpdate) {
+				onGeneratedChanged();
+			}
 			if (foundLayerToUpdate && this.animate) {
 				//updated a layer so we're done with this frame
 				break;

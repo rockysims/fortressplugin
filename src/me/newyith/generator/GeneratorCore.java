@@ -2,7 +2,6 @@ package me.newyith.generator;
 
 import me.newyith.memory.Memorable;
 import me.newyith.memory.Memory;
-import me.newyith.particles.ParticleEffect;
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
 import org.bukkit.Bukkit;
@@ -14,10 +13,10 @@ import java.util.*;
 
 public class GeneratorCore implements Memorable {
 	//saved
-	private GeneratorCoreAnimator animator = new GeneratorCoreAnimator();
 	private Set<Point> claimedPoints = new HashSet<>();
 	private Set<Point> claimedWallPoints = new HashSet<>();
 	private Point anchorPoint = null; //set by constructor
+	private GeneratorCoreAnimator animator = null; //set by constructor
 	private UUID placedByPlayerId = null; //set by onPlaced
 
 	//not saved
@@ -26,8 +25,6 @@ public class GeneratorCore implements Memorable {
 	//------------------------------------------------------------------------------------------------------------------
 
 	public void saveTo(Memory m) {
-		m.save("animator", animator);
-
 		m.save("claimedPoints", claimedPoints);
 		Debug.msg("saved claimedPoints: " + claimedPoints.size());
 
@@ -37,13 +34,13 @@ public class GeneratorCore implements Memorable {
 		m.save("anchorPoint", anchorPoint);
 		Debug.msg("saved anchorPoint: " + anchorPoint);
 
+		m.save("animator", animator);
+
 		m.save("placedByPlayerIdString", placedByPlayerId.toString());
 		//Debug.msg("saved placedByPlayerId: " + placedByPlayerId);
 	}
 
 	public static GeneratorCore loadFrom(Memory m) {
-		GeneratorCoreAnimator animator = m.loadGenerationAnimator("animator");
-
 		Set<Point> claimedPoints = m.loadPointSet("claimedPoints");
 		Debug.msg("loaded claimedPoints: " + claimedPoints.size());
 
@@ -52,6 +49,8 @@ public class GeneratorCore implements Memorable {
 
 		Point anchorPoint = m.loadPoint("anchorPoint");
 		Debug.msg("loaded anchorPoint: " + anchorPoint);
+
+		GeneratorCoreAnimator animator = m.loadGenerationAnimator("animator");
 
 		UUID placedByPlayerId = UUID.fromString(m.loadString("placedByPlayerIdString"));
 
@@ -92,6 +91,7 @@ public class GeneratorCore implements Memorable {
 
 	public GeneratorCore(Point anchorPoint) {
 		this.anchorPoint = anchorPoint;
+		this.animator = new GeneratorCoreAnimator(anchorPoint);
 	}
 
 	// - Events -
