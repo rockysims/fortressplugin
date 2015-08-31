@@ -36,6 +36,13 @@ public class FortressGeneratorRunesManager {
 		for (FortressGeneratorRune rune : runeInstances) {
 			protectedPoints.addAll(rune.getGeneratorCore().getProtectedPoints());
 		}
+
+		//second stage loading
+		for (FortressGeneratorRune rune : runeInstances) {
+			//updateInsideOutside() needs to be called before onGeneratedChanged() so layerOutside is full
+			rune.getGeneratorCore().updateInsideOutside();
+			rune.onGeneratedChanged(); //update which particles should be displayed
+		}
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

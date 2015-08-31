@@ -18,6 +18,8 @@ public class GeneratorCore implements Memorable {
 	private Point anchorPoint = null; //set by constructor
 	private GeneratorCoreAnimator animator = null; //set by constructor
 	private UUID placedByPlayerId = null; //set by onPlaced
+	private Set<Point> layerOutsideFortress = new HashSet<>();
+	private Set<Point> pointsInsideFortress = new HashSet<>();
 
 	//not saved
 	private final int generationRangeLimit = 32;
@@ -53,6 +55,8 @@ public class GeneratorCore implements Memorable {
 		GeneratorCoreAnimator animator = m.loadGenerationAnimator("animator");
 
 		UUID placedByPlayerId = UUID.fromString(m.loadString("placedByPlayerIdString"));
+
+		//updateInsideOutside() called by runes manager (second stage loading)
 
 		GeneratorCore instance = new GeneratorCore(
 				animator,
@@ -171,9 +175,10 @@ public class GeneratorCore implements Memorable {
 		animator.generate(generatableLayers);
 	}
 
-	//TODO: reconstitute inside/outside on save/load
-	private Set<Point> layerOutsideFortress = new HashSet<>(); //TODO: move this line up with other member variables
-	private Set<Point> pointsInsideFortress = new HashSet<>(); //TODO: move this line up with other member variables
+	public void updateInsideOutside() {
+		updateInsideOutside(claimedWallPoints);
+	}
+
 	private void updateInsideOutside(Set<Point> wallPoints) {
 		layerOutsideFortress.clear();
 		pointsInsideFortress.clear();

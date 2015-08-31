@@ -101,7 +101,7 @@ public class GeneratorCoreAnimator implements Memorable {
 		this.isChangingGenerated = isChangingGenerated;
 		this.isGeneratingWall = isGeneratingWall;
 
-		onGeneratedChanged();
+		//onGeneratedChanged() called by runes manager (second stage loading)
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -197,8 +197,9 @@ public class GeneratorCoreAnimator implements Memorable {
 		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(anchorPoint);
 		if (rune != null) {
 			rune.onGeneratedChanged();
-		} else {
-			Debug.msg("null rune at " + anchorPoint);
+		} //rune can be null during init sometimes?
+		else { //TODO: remove the else part
+			Debug.msg("NULL RUNE AT " + anchorPoint);
 		}
 	}
 
