@@ -75,23 +75,15 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
-/*
-Particles:
-TODO: refactor how particles work to make it more efficient
+//TODO: make generation display wave of particles to indicate generating wall blocks?
 
-TODO: tidy up from adding layerOutsideFortress
-TODO: make generation display wave of particles to indicate generating protected blocks
+//TODO: refactor to use the listener pattern?
 
-TODO: refactor to use the listener pattern?
-
-*/
-
+//TODO: get door generation working and door white lists
 //TODO: in Wall class and other places its used: rename wallMaterials to traverseMaterials
-//TODO: consider making rune activation require an empty hand
-//TODO: test adding particles
 //TODO: test killing the server (ctrl+c not "stop") and make sure plugin is robust enough to handle it
-//  TODO: work on handling fortress generator state (maybe time to look at FortressMod code?)
 //TODO: make glowstone blocks work as fuel for 4x the fuel value of glowstone dust (silk touch works on glowstone block and fortune III does not)
+//TODO: consider making rune activation require an empty hand
 //TODO: consider making creating rune require empty hand (again)
 
 /* New Feature:
