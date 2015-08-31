@@ -16,7 +16,7 @@ public class FortressGeneratorParticlesManager {
 	private int wallWaitTicks = 0;
 	private List<Pair<Point, Point>> wallOutsidePairs = null;
 	private int wallOutsideIndex = 0;
-	private long maxTimeNsPerParticleTick = 10 * 1000000; //10ms
+	private long maxTimeNsPerParticleTick = 1000000 * 25; //25ms
 
 	public FortressGeneratorParticlesManager(FortressGeneratorRune rune) {
 		this.rune = rune;
@@ -73,7 +73,7 @@ public class FortressGeneratorParticlesManager {
 
 
 
-				runeCount *= 100; //TODO: delete this line
+				//runeCount *= 100; //TODO: delete this line
 
 
 
@@ -83,11 +83,11 @@ public class FortressGeneratorParticlesManager {
 				int limit = 1 + (int)((double)wallOutsidePairs.size() * 0.02);
 				while (true) {
 					if (limit-- <= 0) {
-						Debug.msg("particle limit break");
+						//Debug.msg("particle limit break");
 						break;
 					}
 					if (System.nanoTime() - startNs > timeAllottedNs) {
-						Debug.msg("particle time break");
+						//Debug.msg("particle time break");
 						break;
 					}
 
@@ -96,6 +96,8 @@ public class FortressGeneratorParticlesManager {
 						Collections.shuffle(wallOutsidePairs);
 						wallOutsideIndex = 0;
 					}
+
+					//Debug.msg("wallOutsideIndex: " + wallOutsideIndex);
 
 					showParticleForWallOutsidePair(wallOutsidePairs.get(wallOutsideIndex));
 				}
@@ -112,7 +114,7 @@ public class FortressGeneratorParticlesManager {
 		//display particles for wall face of outsidePoint
 		Point wall = wallOutside.getKey();
 		Point outsidePoint = wallOutside.getValue();
-		Point towardWall = new Point(wall.subtract(outsidePoint));
+		Point towardWall = wall.difference(outsidePoint);
 		Point towardWallAdjusted = new Point(towardWall);
 		double mult = 0.3;
 		towardWallAdjusted.x *= mult;

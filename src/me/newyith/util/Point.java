@@ -29,6 +29,14 @@ public class Point extends Location implements Memorable {
 
 	//------------------------------------------------------------------------------------------------------------------
 
+	public Point(Point p) {
+		super(p.world, p.x, p.y, p.z);
+		this.world = p.world;
+		this.x = p.x;
+		this.y = p.y;
+		this.z = p.z;
+	}
+
 	public Point(Location loc) {
 		super(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ());
 		this.world = loc.getWorld();
@@ -51,6 +59,14 @@ public class Point extends Location implements Memorable {
 
 	public Location toLocation() {
 		return new Location(this.world, this.x, this.y, this.z);
+	}
+
+	public Point difference(Point p) {
+		Point d = new Point(this);
+		d.x -= p.x;
+		d.y -= p.y;
+		d.z -= p.z;
+		return d;
 	}
 
 	@Override
