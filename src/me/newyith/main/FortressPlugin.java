@@ -75,18 +75,29 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
-//TODO: make generation display wave of particles to indicate generating wall blocks?
+//TODO: FIX BUG: TNT can currently destroy protected blocks
+
+//TODO: make blocks put in fuel chest also get protected
+//TODO: do door white lists next and then pistons?
+
+
+
 
 //TODO: refactor to use the listener pattern?
 
-//TODO: consider making it so cycling generator always degenerates all generated points that are now disconnected
-//TODO: consider making mossy cobblestone be generated but not transmit generation to anything except mossy
+
 //TODO: get door generation working and door white lists
+//TODO: make it so cycling generator always degenerates (instantly) all generated points that are now disconnected
 //TODO: in Wall class and other places its used: rename wallMaterials to traverseMaterials
-//TODO: test killing the server (ctrl+c not "stop") and make sure plugin is robust enough to handle it
 //TODO: make glowstone blocks work as fuel for 4x the fuel value of glowstone dust (silk touch works on glowstone block and fortune III does not)
+//TODO: add manual book (obsidian + book)
+
+//low priority:
+//TODO: test killing the server (ctrl+c not "stop") and make sure plugin is robust enough to handle it
+//TODO: consider making mossy cobblestone be generated but not transmit generation to anything except mossy
 //TODO: consider making rune activation require an empty hand
 //TODO: consider making creating rune require empty hand (again)
+//TODO: make generation display wave of particles to indicate generating wall blocks?
 
 /* New Feature:
 make pistons transmit generation when extended

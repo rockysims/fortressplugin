@@ -267,7 +267,18 @@ public class Wall {
 		if (!blockTypesCreated) {
 			//fill protectableWallMaterials
 			protectableWallMaterials.add(Material.GLASS);
-			protectableWallMaterials.add(Material.IRON_DOOR);
+			//iron door
+			protectableWallMaterials.add(Material.IRON_DOOR_BLOCK);
+			//wooden doors
+			protectableWallMaterials.add(Material.WOODEN_DOOR);
+			protectableWallMaterials.add(Material.ACACIA_DOOR);
+			protectableWallMaterials.add(Material.BIRCH_DOOR);
+			protectableWallMaterials.add(Material.DARK_OAK_DOOR);
+			protectableWallMaterials.add(Material.JUNGLE_DOOR);
+			protectableWallMaterials.add(Material.SPRUCE_DOOR);
+			//trap doors
+			protectableWallMaterials.add(Material.TRAP_DOOR);
+			protectableWallMaterials.add(Material.IRON_TRAPDOOR);
 
 			//fill alterableWallMaterials
 			alterableWallMaterials.add(Material.COBBLESTONE);

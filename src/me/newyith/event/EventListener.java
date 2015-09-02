@@ -26,9 +26,9 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onPlayerRightClickBlock(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
-        Block clickedBlock = event.getClickedBlock();
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+			Player player = event.getPlayer();
+			Block clickedBlock = event.getClickedBlock();
             FortressGeneratorRunesManager.onPlayerRightClickBlock(player, clickedBlock);
         }
     }
