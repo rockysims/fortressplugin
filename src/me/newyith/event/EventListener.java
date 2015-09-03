@@ -2,6 +2,7 @@ package me.newyith.event;
 
 import me.newyith.generator.FortressGeneratorRunesManager;
 import me.newyith.main.FortressPlugin;
+import me.newyith.util.Debug;
 import me.newyith.util.Point;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -10,9 +11,11 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class EventListener implements Listener {
 
@@ -24,7 +27,7 @@ public class EventListener implements Listener {
         new EventListener(plugin);
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true) //ignoreCancelled adds a virtual "if (event.isCancelled()) { return; }" to the method
     public void onPlayerRightClickBlock(PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			Player player = event.getPlayer();
@@ -33,29 +36,29 @@ public class EventListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onBlockBreakEvent(BlockBreakEvent event) {
         FortressGeneratorRunesManager.onBlockBreakEvent(event);
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onWaterBreaksRedstoneWireEvent(BlockFromToEvent event) {
         if(event.getToBlock().getType() == Material.REDSTONE_WIRE) {
             FortressGeneratorRunesManager.onWaterBreaksRedstoneWireEvent(event.getToBlock());
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onBlockPlaceEvent(BlockPlaceEvent event) {
         FortressGeneratorRunesManager.onBlockPlaceEvent(event.getBlock());
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onBlockRedstoneEvent(BlockRedstoneEvent event) {
         FortressGeneratorRunesManager.onBlockRedstoneEvent(event.getBlock(), event.getNewCurrent());
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onBlockPistonExtendEvent(BlockPistonExtendEvent event) {
         Point p = new Point(event.getBlock().getLocation());
 
@@ -72,11 +75,16 @@ public class EventListener implements Listener {
 		FortressGeneratorRunesManager.onPistonEvent(isSticky, p, t, movedBlocks);
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onBlockPistonRetractEvent(BlockPistonRetractEvent event) {
 		Point p = new Point(event.getBlock().getLocation());
 		boolean isSticky = event.isSticky();
 		ArrayList<Block> movedBlocks = new ArrayList<>(event.getBlocks());
 		FortressGeneratorRunesManager.onPistonEvent(isSticky, p, null, movedBlocks);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onExplode(EntityExplodeEvent event) {
+		FortressGeneratorRunesManager.onExplode(event.blockList());
     }
 }

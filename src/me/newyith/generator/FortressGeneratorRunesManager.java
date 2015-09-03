@@ -8,10 +8,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class FortressGeneratorRunesManager {
 	private static ArrayList<FortressGeneratorRune> runeInstances = new ArrayList<>();
@@ -128,6 +125,25 @@ public class FortressGeneratorRunesManager {
 			rune.setPowered(signal > 0);
 		}
 	}
+
+
+
+
+
+	public static void onExplode(List<Block> explodeBlocks) {
+		Iterator<Block> it = explodeBlocks.iterator();
+		while (it.hasNext()) {
+
+			Block b = it.next();
+			Debug.msg("explode " + b.getType() + " at " + b.getLocation());
+			it.remove();
+		}
+	}
+
+
+
+
+
 
 	public static void onBlockBreakEvent(BlockBreakEvent event) {
 		//instead have animator add/remove individual points as they are protected/unprotected (and reconstitute protectedPoints in loadFrom())
