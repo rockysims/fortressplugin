@@ -75,8 +75,6 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
-//TODO: FIX BUG: TNT can currently destroy protected blocks
-
 //TODO: make blocks put in fuel chest also get protected
 //TODO: do door white lists next and then pistons?
 
