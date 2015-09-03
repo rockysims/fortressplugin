@@ -133,10 +133,11 @@ public class FortressGeneratorRunesManager {
 	public static void onExplode(List<Block> explodeBlocks) {
 		Iterator<Block> it = explodeBlocks.iterator();
 		while (it.hasNext()) {
-
-			Block b = it.next();
-			Debug.msg("explode " + b.getType() + " at " + b.getLocation());
-			it.remove();
+			Point p = new Point(it.next().getLocation());
+			if (protectedPoints.contains(p)) {
+				Debug.msg("explode removed at " + p);
+				it.remove();
+			}
 		}
 	}
 
