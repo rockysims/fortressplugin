@@ -77,7 +77,7 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //TODO: figure out why plugin takes so long to /reload and fix it (probably because we're saving/loading lots of data?)
-
+//TODO: fix bug where /reload during generation causes generation to stop (cycling generator fixes it)
 
 //TODO: make blocks put in fuel chest also get protected
 

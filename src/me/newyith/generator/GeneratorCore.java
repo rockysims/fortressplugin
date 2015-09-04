@@ -80,6 +80,11 @@ public class GeneratorCore implements Memorable {
 		this.placedByPlayerId = placedByPlayerId;
 	}
 
+	public void secondStageLoad() {
+		//this is needed in case of /reload during generation
+		animator.wallMats.refresh(); //needs to be in second stage because refresh uses runeByPoint lookup
+	}
+
 	//------------------------------------------------------------------------------------------------------------------
 
 	/*

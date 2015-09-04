@@ -54,6 +54,14 @@ public class FortressGeneratorRune implements Memorable {
 		this.particles = new FortressGeneratorParticlesManager(this);
 	}
 
+	public void secondStageLoad() {
+		core.secondStageLoad();
+
+		//updateInsideOutside() needs to be called before onGeneratedChanged() so layerOutside is full
+		core.updateInsideOutside();
+		onGeneratedChanged(); //update which particles should be displayed
+	}
+
 	//------------------------------------------------------------------------------------------------------------------
 
 	public FortressGeneratorRune(FortressGeneratorRunePattern runePattern) {

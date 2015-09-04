@@ -12,19 +12,41 @@ public class Point extends Location implements Memorable {
 	public double x, y, z;
 
 	public void saveTo(Memory m) {
+		//*
+		String s = "";
+		s += world.getName();
+		s += ",";
+		s += (int) x;
+		s += ",";
+		s += (int) y;
+		s += ",";
+		s += (int) z;
+		m.save("s", s);
+		/*/
 		m.save("worldName", world.getName());
 		m.save("x", (int) x);
 		m.save("y", (int) y);
 		m.save("z", (int) z);
+		//*/
 	}
 
 	public static Point loadFrom(Memory m) {
+		//*
+		String s = m.loadString("s");
+		String[] data = s.split(",");
+		World world = Bukkit.getWorld(data[0]);
+		int x = Integer.valueOf(data[1]);
+		int y = Integer.valueOf(data[2]);
+		int z = Integer.valueOf(data[3]);
+		return new Point(world, x, y, z);
+		/*/
 		String worldName = m.loadString("worldName");
 		World world = Bukkit.getWorld(worldName);
 		int x = m.loadInt("x");
 		int y = m.loadInt("y");
 		int z = m.loadInt("z");
 		return new Point(world, x, y, z);
+		//*/
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

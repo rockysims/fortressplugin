@@ -8,7 +8,6 @@ import org.bukkit.block.Chest;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,7 +17,6 @@ public class WallMaterials {
 	private Set<Material> generatableWallMaterials = new HashSet<>();
 	private Set<Material> protectableWallMaterials = new HashSet<>();
 	private Set<Material> alterableWallMaterials = new HashSet<>();
-//	private long lastRefreshStamp = 0;
 
 	public WallMaterials(Point anchorPoint) {
 		this.anchorPoint = anchorPoint;
@@ -27,17 +25,14 @@ public class WallMaterials {
 	// - Getters -
 
 	public Set<Material> getWallMaterials() {
-//		considerRefresh();
 		return wallMaterials;
 	}
 
 	public Set<Material> getGeneratableWallMaterials() {
-//		considerRefresh();
 		return generatableWallMaterials;
 	}
 
 	public boolean isProtectableWallMaterial(Material m) {
-//		considerRefresh();
 		return protectableWallMaterials.contains(m);
 	}
 
@@ -46,15 +41,6 @@ public class WallMaterials {
 	}
 
 	// - Refreshing -
-
-//	private void considerRefresh() {
-//		long now = (new Date()).getTime();
-//		//Debug.msg("now - lastRefreshStamp: " + (now - lastRefreshStamp));
-//		if (now - lastRefreshStamp > 1000) { //ms
-//			lastRefreshStamp = now;
-//			refresh();
-//		}
-//	}
 
 	public void refresh() {
 		Debug.msg("WallMaterials refresh()ed. anchor: " + anchorPoint);
