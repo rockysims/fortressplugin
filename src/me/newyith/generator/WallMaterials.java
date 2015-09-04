@@ -74,6 +74,28 @@ public class WallMaterials {
 					case SAND:
 					case BEDROCK:
 						break;
+					//special protectable
+					case IRON_DOOR:
+						addProtectable(Material.IRON_DOOR_BLOCK);
+						break;
+					case WOOD_DOOR:
+						addProtectable(Material.WOODEN_DOOR);
+						break;
+					case ACACIA_DOOR_ITEM:
+						addProtectable(Material.ACACIA_DOOR);
+						break;
+					case BIRCH_DOOR_ITEM:
+						addProtectable(Material.BIRCH_DOOR);
+						break;
+					case DARK_OAK_DOOR_ITEM:
+						addProtectable(Material.DARK_OAK_DOOR);
+						break;
+					case JUNGLE_DOOR_ITEM:
+						addProtectable(Material.JUNGLE_DOOR);
+						break;
+					case SPRUCE_DOOR_ITEM:
+						addProtectable(Material.SPRUCE_DOOR);
+						break;
 					default:
 						if (mat.isBlock()) {
 							addProtectable(item.getType());
@@ -111,20 +133,20 @@ public class WallMaterials {
 		generatableWallMaterials.clear();
 		wallMaterials.clear();
 
-		//fill protectableWallMaterials
-		protectableWallMaterials.add(Material.GLASS);
-		//iron door
-		protectableWallMaterials.add(Material.IRON_DOOR_BLOCK);
-		//wooden doors
-		protectableWallMaterials.add(Material.WOODEN_DOOR);
-		protectableWallMaterials.add(Material.ACACIA_DOOR);
-		protectableWallMaterials.add(Material.BIRCH_DOOR);
-		protectableWallMaterials.add(Material.DARK_OAK_DOOR);
-		protectableWallMaterials.add(Material.JUNGLE_DOOR);
-		protectableWallMaterials.add(Material.SPRUCE_DOOR);
-		//trap doors
-		protectableWallMaterials.add(Material.TRAP_DOOR);
-		protectableWallMaterials.add(Material.IRON_TRAPDOOR);
+//		//fill protectableWallMaterials
+//		protectableWallMaterials.add(Material.GLASS);
+//		//iron door
+//		protectableWallMaterials.add(Material.IRON_DOOR_BLOCK);
+//		//wooden doors
+//		protectableWallMaterials.add(Material.WOODEN_DOOR);
+//		protectableWallMaterials.add(Material.ACACIA_DOOR);
+//		protectableWallMaterials.add(Material.BIRCH_DOOR);
+//		protectableWallMaterials.add(Material.DARK_OAK_DOOR);
+//		protectableWallMaterials.add(Material.JUNGLE_DOOR);
+//		protectableWallMaterials.add(Material.SPRUCE_DOOR);
+//		//trap doors
+//		protectableWallMaterials.add(Material.TRAP_DOOR);
+//		protectableWallMaterials.add(Material.IRON_TRAPDOOR);
 
 		//fill alterableWallMaterials
 		alterableWallMaterials.add(Material.COBBLESTONE);
