@@ -100,8 +100,8 @@ public class FortressGeneratorRune implements Memorable {
 
 	public void onTick() {
 		tickFuel();
-		this.particles.tick();
-		this.core.tick();
+		particles.tick();
+		core.tick();
 	}
 
 	public void onCreated(Player player) {

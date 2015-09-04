@@ -75,7 +75,13 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
+
+
+
 //TODO: make blocks put in fuel chest also get protected
+
+
+
 //TODO: do door white lists next and then pistons?
 
 
@@ -89,6 +95,7 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: in Wall class and other places its used: rename wallMaterials to traverseMaterials
 //TODO: make glowstone blocks work as fuel for 4x the fuel value of glowstone dust (silk touch works on glowstone block and fortune III does not)
 //TODO: add manual book (obsidian + book)
+//TODO: make sure generators continue to burn fuel when no player is nearby
 
 //low priority:
 //TODO: test killing the server (ctrl+c not "stop") and make sure plugin is robust enough to handle it
