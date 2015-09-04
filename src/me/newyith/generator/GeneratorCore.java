@@ -293,6 +293,10 @@ public class GeneratorCore implements Memorable {
 	}
 
 	private Set<Point> getClaimedPoints() {
+		//commented out because now that protectable blocks can be changed by user
+		//we don't want a generator to be able to degenerate another generator's generated points
+		//even though the other generator's points are no longer connected to the generator
+		/*
 		//update claimedPoints if claimedWallPoints are not all wall type blocks
 		for (Point p : claimedWallPoints) {
 			Material claimedWallMaterial = p.getBlock().getType();
@@ -301,6 +305,7 @@ public class GeneratorCore implements Memorable {
 				break;
 			}
 		}
+		//*/
 
 		return claimedPoints;
 	}
