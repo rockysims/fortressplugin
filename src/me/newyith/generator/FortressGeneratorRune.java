@@ -225,7 +225,7 @@ public class FortressGeneratorRune implements Memorable {
 
 	// - Utils -
 
-	public int countFuelItemsRemaining() {
+	public int countFuelItemsRemaining() { //TODO: time this and make sure its very fast (called several times a second)
 		int count = 0;
 		Chest chest = this.getChest();
 		if (chest != null) {
