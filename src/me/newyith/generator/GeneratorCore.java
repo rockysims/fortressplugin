@@ -165,6 +165,7 @@ public class GeneratorCore implements Memorable {
 	 */
 	private void generateWall() {
 		Debug.msg("generateWall()");
+		animator.wallMats.refresh(); //refresh protectable blocks list based on chest contents
 
 		List<List<Point>> generatableLayers = getGeneratableWallLayers();
 		List<List<Point>> wallLayers = Wall.merge(generatableLayers, animator.getGeneratedLayers());
@@ -253,7 +254,7 @@ public class GeneratorCore implements Memorable {
 		Set<Point> claimedPoints = getClaimedPointsOfNearbyGenerators();
 
 		//return all connected wall points ignoring (and not traversing) claimedPoints (generationRangeLimit search range)
-		List<List<Point>> allowedWallLayers = getPointsConnectedAsLayers(Wall.getWallMaterials(), Wall.getGeneratableWallMaterials(), generationRangeLimit, claimedPoints);
+		List<List<Point>> allowedWallLayers = getPointsConnectedAsLayers(animator.wallMats.getWallMaterials(), animator.wallMats.getGeneratableWallMaterials(), generationRangeLimit, claimedPoints);
 
 		return allowedWallLayers;
 	}
@@ -295,7 +296,7 @@ public class GeneratorCore implements Memorable {
 		//update claimedPoints if claimedWallPoints are not all wall type blocks
 		for (Point p : claimedWallPoints) {
 			Material claimedWallMaterial = p.getBlock().getType();
-			if (!Wall.getWallMaterials().contains(claimedWallMaterial)) { //claimedWallMaterial isn't a wall type block
+			if (!animator.wallMats.getWallMaterials().contains(claimedWallMaterial)) { //claimedWallMaterial isn't a wall type block
 				unclaimDisconnected();
 				break;
 			}
@@ -319,7 +320,7 @@ public class GeneratorCore implements Memorable {
 	private void unclaimDisconnected() {
 		//fill pointsToUnclaim
 		Set<Point> pointsToUnclaim = new HashSet<>();
-		Set<Point> connectedPoints = getPointsConnected(Wall.getWallMaterials(), Wall.getWallMaterials(), generationRangeLimit, null, claimedWallPoints);
+		Set<Point> connectedPoints = getPointsConnected(animator.wallMats.getWallMaterials(), animator.wallMats.getWallMaterials(), generationRangeLimit, null, claimedWallPoints);
 		for (Point claimedWallPoint : claimedWallPoints) {
 			if (!connectedPoints.contains(claimedWallPoint)) { //found claimed wall point that is now disconnected
 				pointsToUnclaim.add(claimedWallPoint);
@@ -367,7 +368,7 @@ public class GeneratorCore implements Memorable {
 //	private List<FortressGeneratorRune> getConnectedFortressGenerators() {
 //		List<FortressGeneratorRune> matches = new ArrayList<>();
 //
-//		Set<Point> connectRunePoints = getPointsConnected(Wall.getWallMaterials(), Wall.getNotCloggedGeneratorBlocks());
+//		Set<Point> connectRunePoints = getPointsConnected(animator.wallMats.getWallMaterials(), animator.wallMats.getNotCloggedGeneratorBlocks());
 //		for (Point p : connectRunePoints) {
 //			FortressGeneratorRune fg = (FortressGeneratorRune) world.getTileEntity(p.x, p.y, p.z);
 //			matches.add(fg);

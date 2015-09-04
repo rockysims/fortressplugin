@@ -19,6 +19,7 @@ public class GeneratorCoreAnimator implements Memorable {
 	public boolean animate = true;
 	public boolean isChangingGenerated = false;
 	public boolean isGeneratingWall = false;
+	public WallMaterials wallMats;
 
 	//not saved
 	private long lastFrameTimestamp = 0;
@@ -100,6 +101,7 @@ public class GeneratorCoreAnimator implements Memorable {
 		this.animate = animate;
 		this.isChangingGenerated = isChangingGenerated;
 		this.isGeneratingWall = isGeneratingWall;
+		this.wallMats = new WallMaterials(anchorPoint);
 
 		//onGeneratedChanged() called by runes manager (second stage loading)
 	}
@@ -108,6 +110,7 @@ public class GeneratorCoreAnimator implements Memorable {
 
 	public GeneratorCoreAnimator(Point anchorPoint) {
 		this.anchorPoint = anchorPoint;
+		this.wallMats = new WallMaterials(anchorPoint);
 	}
 
 	public List<List<Point>> getGeneratedLayers() {
@@ -266,7 +269,7 @@ public class GeneratorCoreAnimator implements Memorable {
 		boolean altered = false;
 
 		Block b = p.getBlock();
-		if (Wall.isAlterableWallMaterial(b.getType())) {
+		if (wallMats.isAlterableWallMaterial(b.getType())) {
 			this.alteredPoints.put(p, b.getType());
 			b.setType(Material.BEDROCK);
 			altered = true;
@@ -293,7 +296,7 @@ public class GeneratorCoreAnimator implements Memorable {
 		boolean pointProtected = false;
 
 		Block b = p.getBlock();
-		if (!this.protectedPoints.contains(p) && Wall.isProtectableWallMaterial(b.getType())) {
+		if (!this.protectedPoints.contains(p) && wallMats.isProtectableWallMaterial(b.getType())) {
 			addProtectedPoint(p);
 			//TODO: make FortressGeneratorParticlesManager show particles on protectedPoints
 			pointProtected = true;

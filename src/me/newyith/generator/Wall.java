@@ -221,12 +221,12 @@ public class Wall {
 
 		}
 
-		Debug.msg("Wall.getPointsConnected visited " + String.valueOf(visited.size()));
+		//Debug.msg("Wall.getPointsConnected visited " + String.valueOf(visited.size()));
 		//Debug.msg("Wall.getPointsConnected returning " + String.valueOf(matchesAsLayers.size()) + " matchesAsLayers");
 
 		Debug.stop("getPointsConnectedAsLayers() all", false);
 		//Debug.clear("getPointsConnectedAsLayers() all");
-		Debug.duration("getPointsConnectedAsLayers() all");
+		//Debug.duration("getPointsConnectedAsLayers() all");
 
 		return matchesAsLayers;
 	}
@@ -239,63 +239,5 @@ public class Wall {
 		inRange = inRange && (Math.abs(p.z - origin.z)) <= rangeLimit;
 
 		return inRange;
-	}
-
-	//-------------------
-
-	public static Set<Material> getWallMaterials() {
-		ensureBlockTypeConstantsExist();
-		return wallMaterials;
-	}
-
-	public static Set<Material> getGeneratableWallMaterials() {
-		ensureBlockTypeConstantsExist();
-		return generatableWallMaterials;
-	}
-
-	public static boolean isProtectableWallMaterial(Material m) {
-		ensureBlockTypeConstantsExist();
-		return protectableWallMaterials.contains(m);
-	}
-
-	public static boolean isAlterableWallMaterial(Material m) {
-		ensureBlockTypeConstantsExist();
-		return alterableWallMaterials.contains(m);
-	}
-
-	private static void ensureBlockTypeConstantsExist() {
-		if (!blockTypesCreated) {
-			//fill protectableWallMaterials
-			protectableWallMaterials.add(Material.GLASS);
-			//iron door
-			protectableWallMaterials.add(Material.IRON_DOOR_BLOCK);
-			//wooden doors
-			protectableWallMaterials.add(Material.WOODEN_DOOR);
-			protectableWallMaterials.add(Material.ACACIA_DOOR);
-			protectableWallMaterials.add(Material.BIRCH_DOOR);
-			protectableWallMaterials.add(Material.DARK_OAK_DOOR);
-			protectableWallMaterials.add(Material.JUNGLE_DOOR);
-			protectableWallMaterials.add(Material.SPRUCE_DOOR);
-			//trap doors
-			protectableWallMaterials.add(Material.TRAP_DOOR);
-			protectableWallMaterials.add(Material.IRON_TRAPDOOR);
-
-			//fill alterableWallMaterials
-			alterableWallMaterials.add(Material.COBBLESTONE);
-			alterableWallMaterials.add(Material.OBSIDIAN);
-
-			//fill generatableWallMaterials
-			for (Material m : protectableWallMaterials)
-				generatableWallMaterials.add(m);
-			for (Material m : alterableWallMaterials)
-				generatableWallMaterials.add(m);
-
-			//fill wallMaterials
-			for (Material m : generatableWallMaterials)
-				wallMaterials.add(m);
-			wallMaterials.add(Material.BEDROCK);
-
-			blockTypesCreated = true;
-		}
 	}
 }
