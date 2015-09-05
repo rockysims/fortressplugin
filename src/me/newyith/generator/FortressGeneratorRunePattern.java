@@ -21,7 +21,7 @@ public class FortressGeneratorRunePattern implements Memorable {
 	public Point wirePoint = null;
 
 	public void saveTo(Memory m) {
-		m.save("pointsInPattern", pointsInPattern);
+		m.savePointListCompact("pointsInPattern", pointsInPattern);
 		m.save("matchedReadyPattern", matchedReadyPattern);
 		m.save("anchorPoint", anchorPoint);
 		m.save("pausePoint", pausePoint);
@@ -33,7 +33,7 @@ public class FortressGeneratorRunePattern implements Memorable {
 	}
 
 	public static FortressGeneratorRunePattern loadFrom(Memory m) {
-		ArrayList<Point> pointsInPattern = m.loadPointList("pointsInPattern");
+		ArrayList<Point> pointsInPattern = m.loadPointListCompact("pointsInPattern");
 		boolean matchedReadyPattern = m.loadBoolean("matchedReadyPattern");
 		FortressGeneratorRunePattern instance = new FortressGeneratorRunePattern(pointsInPattern, matchedReadyPattern);
 		instance.anchorPoint = m.loadPoint("anchorPoint");

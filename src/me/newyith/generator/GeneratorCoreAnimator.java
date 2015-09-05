@@ -35,13 +35,13 @@ public class GeneratorCoreAnimator implements Memorable {
 		m.save("alteredPoints", alteredPoints);
 		Debug.msg("saved alteredPoints: " + alteredPoints.size());
 
-		m.save("protectedPoints", protectedPoints);
+		m.savePointSetCompact("protectedPoints", protectedPoints);
 		Debug.msg("saved protectedPoints: " + protectedPoints.size());
 
-		m.save("generatedLayers", generatedLayers);
+		m.saveLayersCompact("generatedLayers", generatedLayers);
 		Debug.msg("saved generatedLayers: " + generatedLayers.size());
 
-		m.save("animationLayers", animationLayers);
+		m.saveLayersCompact("animationLayers", animationLayers);
 		Debug.msg("saved animationLayers: " + animationLayers.size());
 
 		m.save("animate", animate);
@@ -62,13 +62,13 @@ public class GeneratorCoreAnimator implements Memorable {
 		HashMap<Point, Material> alteredPoints = m.loadPointMaterialMap("alteredPoints");
 		Debug.msg("loaded alteredPoints: " + alteredPoints.size());
 
-		Set<Point> protectedPoints = m.loadPointSet("protectedPoints");
+		Set<Point> protectedPoints = m.loadPointSetCompact("protectedPoints");
 		Debug.msg("loaded protectedPoints: " + protectedPoints.size());
 
-		List<List<Point>> generatedLayers = m.loadLayers("generatedLayers");
+		List<List<Point>> generatedLayers = m.loadLayersCompact("generatedLayers");
 		Debug.msg("loaded generatedLayers: " + generatedLayers.size());
 
-		List<List<Point>> animationLayers = m.loadLayers("animationLayers");
+		List<List<Point>> animationLayers = m.loadLayersCompact("animationLayers");
 		Debug.msg("loaded animationLayers: " + animationLayers.size());
 
 		boolean animate = m.loadBoolean("animate");

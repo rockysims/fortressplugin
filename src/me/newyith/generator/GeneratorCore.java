@@ -27,10 +27,10 @@ public class GeneratorCore implements Memorable {
 	//------------------------------------------------------------------------------------------------------------------
 
 	public void saveTo(Memory m) {
-		m.save("claimedPoints", claimedPoints);
+		m.savePointSetCompact("claimedPoints", claimedPoints);
 		Debug.msg("saved claimedPoints: " + claimedPoints.size());
 
-		m.save("claimedWallPoints", claimedWallPoints);
+		m.savePointSetCompact("claimedWallPoints", claimedWallPoints);
 		Debug.msg("saved claimedWallPoints: " + claimedWallPoints.size());
 
 		m.save("anchorPoint", anchorPoint);
@@ -43,10 +43,10 @@ public class GeneratorCore implements Memorable {
 	}
 
 	public static GeneratorCore loadFrom(Memory m) {
-		Set<Point> claimedPoints = m.loadPointSet("claimedPoints");
+		Set<Point> claimedPoints = m.loadPointSetCompact("claimedPoints");
 		Debug.msg("loaded claimedPoints: " + claimedPoints.size());
 
-		Set<Point> claimedWallPoints = m.loadPointSet("claimedWallPoints");
+		Set<Point> claimedWallPoints = m.loadPointSetCompact("claimedWallPoints");
 		Debug.msg("loaded claimedWallPoints: " + claimedWallPoints.size());
 
 		Point anchorPoint = m.loadPoint("anchorPoint");

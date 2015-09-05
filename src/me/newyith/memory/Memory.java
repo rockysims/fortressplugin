@@ -6,7 +6,9 @@ import me.newyith.generator.GeneratorCoreAnimator;
 import me.newyith.generator.GeneratorCore;
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.*;
@@ -58,6 +60,87 @@ public class Memory {
 	}
 	public String loadString(String key) {
 		return config.getString(key);
+	}
+
+	// --- SAVE/LOAD COMPACT ---
+
+	//Set<Point> (compact)
+	public void savePointSetCompact(String key, Set<Point> set) {
+		Memory m = new Memory(section(key));
+		Point[] ary = set.toArray(new Point[set.size()]);
+		ArrayList<Point> list = new ArrayList<>(Arrays.asList(ary));
+		m.savePointListCompact(key, list);
+	}
+	public Set<Point> loadPointSetCompact(String key) {
+		Memory m = new Memory(section(key));
+
+		List<Point> list = m.loadPointListCompact(key);
+		Set<Point> set = new HashSet<>(list);
+
+		return set;
+	}
+
+	//List<Point> (compact)
+	public void savePointListCompact(String key, List<Point> list) {
+		Memory m = new Memory(section(key));
+
+		String blob = "";
+		if (list.size() > 0) {
+			m.save("world", list.get(0).world.getName());
+
+			for (Point p : list) {
+				String pointBlob = "";
+				pointBlob += (int) p.x;
+				pointBlob += ",";
+				pointBlob += (int) p.y;
+				pointBlob += ",";
+				pointBlob += (int) p.z;
+				blob += pointBlob + "~";
+			}
+			blob = blob.substring(0, blob.length() - 1); //remove last "~"
+		}
+		m.save("blob", blob);
+	}
+	public ArrayList<Point> loadPointListCompact(String key) {
+		Memory m = new Memory(section(key));
+
+		ArrayList<Point> list = new ArrayList<>();
+		String blob = m.loadString("blob");
+		if (blob.length() > 0) {
+			World world = Bukkit.getWorld(m.loadString("world"));
+			String[] pointBlobs = blob.split("~");
+			for (String pointBlob : pointBlobs) {
+				String[] data = pointBlob.split(",");
+				int x = Integer.valueOf(data[0]);
+				int y = Integer.valueOf(data[1]);
+				int z = Integer.valueOf(data[2]);
+				list.add(new Point(world, x, y, z));
+			}
+		}
+
+		return list;
+	}
+
+	//List<List<Point>>
+	public void saveLayersCompact(String key, List<List<Point>> layers) {
+		Memory m = new Memory(section(key));
+
+		int i = 0;
+		for (List<Point> layer : layers) {
+			m.savePointListCompact(Integer.toString(i++), layer);
+		}
+		m.save("count", i);
+	}
+	public List<List<Point>> loadLayersCompact(String key) {
+		Memory m = new Memory(section(key));
+
+		List<List<Point>> layers = new ArrayList<>();
+		int count = m.loadInt("count");
+		for (int i = 0; i < count; i++) {
+			layers.add(m.loadPointListCompact(Integer.toString(i)));
+		}
+
+		return layers;
 	}
 
 	// --- SAVE ---
