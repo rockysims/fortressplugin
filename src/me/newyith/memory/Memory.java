@@ -65,7 +65,6 @@ public class Memory {
 	//Memorable
 	public void save(String key, Memorable value) {
 		Memory m = new Memory(section(key));
-		m.save("!=null", value != null);
 		value.saveTo(m);
 	}
 
@@ -117,13 +116,7 @@ public class Memory {
 	//Point
 	public Point loadPoint(String key) {
 		Memory m = new Memory(section(key));
-
-		Point value = null;
-		if (m.loadBoolean("!=null")) {
-			value = Point.loadFrom(m);
-		}
-
-		return value;
+		return Point.loadFrom(m);
 	}
 
 	//ArrayList<Point>
@@ -180,13 +173,7 @@ public class Memory {
 	//FortressGeneratorRune
 	public FortressGeneratorRune loadFortressGeneratorRune(String key) {
 		Memory m = new Memory(section(key));
-
-		FortressGeneratorRune value = null;
-		if (m.loadBoolean("!=null")) {
-			value = FortressGeneratorRune.loadFrom(m);
-		}
-
-		return value;
+		return FortressGeneratorRune.loadFrom(m);
 	}
 
 	//ArrayList<FortressGeneratorRune>
@@ -205,36 +192,18 @@ public class Memory {
 	//FortressGeneratorRunePattern
 	public FortressGeneratorRunePattern loadFortressGeneratorRunePattern(String key) {
 		Memory m = new Memory(section(key));
-
-		FortressGeneratorRunePattern value = null;
-		if (m.loadBoolean("!=null")) {
-			value = FortressGeneratorRunePattern.loadFrom(m);
-		}
-
-		return value;
+		return FortressGeneratorRunePattern.loadFrom(m);
 	}
 
 	//GeneratorCore
 	public GeneratorCore loadGeneratorCore(String key) {
 		Memory m = new Memory(section(key));
-
-		GeneratorCore value = null;
-		if (m.loadBoolean("!=null")) {
-			value = GeneratorCore.loadFrom(m);
-		}
-
-		return value;
+		return GeneratorCore.loadFrom(m);
 	}
 
 	//GeneratorCoreAnimator
 	public GeneratorCoreAnimator loadGenerationAnimator(String key) {
 		Memory m = new Memory(section(key));
-
-		GeneratorCoreAnimator value = null;
-		if (m.loadBoolean("!=null")) {
-			value = GeneratorCoreAnimator.loadFrom(m);
-		}
-
-		return value;
+		return GeneratorCoreAnimator.loadFrom(m);
 	}
 }

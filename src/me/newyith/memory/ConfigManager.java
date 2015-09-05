@@ -12,6 +12,11 @@ public class ConfigManager {
 	}
 
 	public static void onDisable(FortressPlugin plugin) {
+		//clear config
+		for(String key : plugin.getConfig().getKeys(false)){
+			plugin.getConfig().set(key, null);
+		}
+
 		Memory memory = new Memory(plugin.getConfig());
 		Memory m = new Memory(memory.section("RunesManager"));
 
