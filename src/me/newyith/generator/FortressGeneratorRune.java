@@ -295,7 +295,7 @@ public class FortressGeneratorRune implements Memorable {
 			if (signBlock != null) {
 				Sign sign = (Sign)signBlock.getState();
 				if (sign != null) {
-					sign.setLine(0, "Fortress:");
+					sign.setLine(0, "Generator:");
 					if (line1 != null) {
 						sign.setLine(1, line1);
 					}
