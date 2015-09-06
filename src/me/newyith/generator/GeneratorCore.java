@@ -152,7 +152,7 @@ public class GeneratorCore implements Memorable {
 	 */
 	private void degenerateWall(boolean animate) {
 		Debug.msg("degenerateWall(" + String.valueOf(animate) + ")");
-		getClaimedPointsOfNearbyGenerators(); //make nearby generators look for and degenerate any claimed but unconnected blocks
+		//getClaimedPointsOfNearbyGenerators(); //make nearby generators look for and degenerate any claimed but unconnected blocks
 		animator.degenerate(animate);
 	}
 
@@ -226,25 +226,6 @@ public class GeneratorCore implements Memorable {
 				pointsInsideFortress = Wall.getPointsConnected(origin, originLayer, wallMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
 				pointsInsideFortress.addAll(originLayer);
 			}
-
-
-
-//			for (Point p : layerOutsideFortress) {
-//				Debug.particleAt(p, ParticleEffect.FLAME);
-//			}
-//			for (Point p : pointsInsideFortress) {
-//				Debug.particleAt(p, ParticleEffect.HEART);
-//			}
-
-
-
-
-
-
-
-
-
-
 		}
 	}
 

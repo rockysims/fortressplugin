@@ -81,6 +81,14 @@ public class WallMaterials {
 					case SPRUCE_DOOR_ITEM:
 						addProtectable(Material.SPRUCE_DOOR);
 						break;
+//					case PISTON_BASE:
+//						addProtectable(Material.PISTON_BASE);
+//						addProtectable(Material.PISTON_EXTENSION);
+//						break;
+//					case PISTON_STICKY_BASE:
+//						addProtectable(Material.PISTON_STICKY_BASE);
+//						addProtectable(Material.PISTON_MOVING_PIECE);
+//						break;
 					default:
 						if (mat.isBlock()) {
 							addProtectable(item.getType());
@@ -118,21 +126,6 @@ public class WallMaterials {
 		generatableWallMaterials.clear();
 		wallMaterials.clear();
 
-//		//fill protectableWallMaterials
-//		protectableWallMaterials.add(Material.GLASS);
-//		//iron door
-//		protectableWallMaterials.add(Material.IRON_DOOR_BLOCK);
-//		//wooden doors
-//		protectableWallMaterials.add(Material.WOODEN_DOOR);
-//		protectableWallMaterials.add(Material.ACACIA_DOOR);
-//		protectableWallMaterials.add(Material.BIRCH_DOOR);
-//		protectableWallMaterials.add(Material.DARK_OAK_DOOR);
-//		protectableWallMaterials.add(Material.JUNGLE_DOOR);
-//		protectableWallMaterials.add(Material.SPRUCE_DOOR);
-//		//trap doors
-//		protectableWallMaterials.add(Material.TRAP_DOOR);
-//		protectableWallMaterials.add(Material.IRON_TRAPDOOR);
-
 		//fill alterableWallMaterials
 		alterableWallMaterials.add(Material.COBBLESTONE);
 
@@ -146,8 +139,6 @@ public class WallMaterials {
 		for (Material m : generatableWallMaterials)
 			wallMaterials.add(m);
 		wallMaterials.add(Material.BEDROCK);
-		wallMaterials.add(Material.PISTON_BASE);
-		wallMaterials.add(Material.PISTON_EXTENSION);
 	}
 
 }

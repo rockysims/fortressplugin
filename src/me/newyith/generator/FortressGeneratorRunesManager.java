@@ -196,6 +196,22 @@ public class FortressGeneratorRunesManager {
 		for (FortressGeneratorRune rune : runesAffected) {
 			doBreakRune(rune);
 		}
+
+
+
+
+		Debug.msg("piston: " + piston);
+		Debug.msg("target: " + target);
+		//Debug.msg("target type: " + target.getBlock().getType());
+		Debug.msg("movedBlocks.size(): " + movedBlocks.size());
+
+
+
+
+
+
+
+
 	}
 
 	public static void doBreakRune(FortressGeneratorRune rune) {

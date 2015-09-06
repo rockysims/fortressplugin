@@ -76,6 +76,45 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
+
+
+
+
+
+/*
+pistonCores should respect even its parent generator's claims
+pistonCores should respect other pistonCores' claims
+	other generatorCores' claimed points including their pistonCores' claims and also any other pistonCores belonging to parent generator
+pistonCore's wallMaterials should be based on parent generator's wallMaterials
+
+on piston added to claimedWallPoints:
+	create new PistonCore
+on piston removed from claimedWallPoints:
+	break pistonCore
+on generator broken:
+	break all its pistonCores
+
+pistonCore:
+	onExtend:
+		if (piston protected && parent generator is running) tell pistonCore to generate
+	onRetract:
+		tell pistonCore to degenerate
+
+generatorCore:
+	onProtectPiston:
+		set pistonCore.layerIndex
+		if (extended) tell pistonCore to generate
+	onGenerate:
+		for each pistonCore
+			if (pistonCore is protected)
+				tell pistonCore to generate
+	onDegenerate:
+		include child pistonCores' generated
+			use pistonCore.layerIndex to merge piston's generated with generator's generated
+*/
+
+//TODO: onDegenerate instantly degenerate all points now disconnected
+
 //TODO: do door white lists next and then pistons?
 
 
