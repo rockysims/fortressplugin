@@ -27,6 +27,17 @@ public class GeneratorCore implements Memorable {
 	//not saved
 	private final int generationRangeLimit = 32;
 
+	/*
+	altered:
+		blocks changed to bedrock
+	protected:
+		blocks made unbreakable
+	generated:
+		blocks made unbreakable and blocks changed to bedrock
+	claimed:
+		points the generate thinks it owns
+	//*/
+
 	//------------------------------------------------------------------------------------------------------------------
 
 	public void saveTo(Memory m) {
@@ -78,21 +89,10 @@ public class GeneratorCore implements Memorable {
 		//this is needed in case of /reload during generation
 		animator.wallMats.refresh(); //needs to be in second stage because refresh uses runeByPoint lookup
 
-		updateClaimedPoints(claimedWallPoints); //needs to be in second stage because refresh uses runeByPoint lookup
+		updateClaimedPoints(claimedWallPoints); //needs to be in second stage because uses runeByPoint lookup
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
-
-	/*
-	altered:
-		blocks changed to bedrock
-	protected:
-		blocks made unbreakable
-	generated:
-		blocks made unbreakable and blocks changed to bedrock
-	claimed:
-		points the generate thinks it owns
-	//*/
 
 	public GeneratorCore(Point anchorPoint) {
 		this.anchorPoint = anchorPoint;
@@ -156,14 +156,8 @@ public class GeneratorCore implements Memorable {
 			}
 		}
 
-		Debug.msg("getNamesFromSign returning " + names.toString());
 		return names;
 	}
-
-
-
-
-
 
 	// - Events -
 
