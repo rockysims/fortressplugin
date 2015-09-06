@@ -6,8 +6,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 
-public class Point extends Location implements Memorable {
+public class Point implements Memorable {
 	public World world;
 	public double x, y, z;
 
@@ -52,7 +53,6 @@ public class Point extends Location implements Memorable {
 	//------------------------------------------------------------------------------------------------------------------
 
 	public Point(Point p) {
-		super(p.world, p.x, p.y, p.z);
 		this.world = p.world;
 		this.x = p.x;
 		this.y = p.y;
@@ -60,7 +60,6 @@ public class Point extends Location implements Memorable {
 	}
 
 	public Point(Location loc) {
-		super(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ());
 		this.world = loc.getWorld();
 		this.x = loc.getBlockX();
 		this.y = loc.getBlockY();
@@ -68,11 +67,18 @@ public class Point extends Location implements Memorable {
 	}
 
 	public Point(World world, double x, double y, double z) {
-		super(world, x, y, z);
 		this.world = world;
 		this.x = x;
 		this.y = y;
 		this.z = z;
+	}
+
+	public World getWorld() {
+		return world;
+	}
+
+	public Block getBlock() {
+		return world.getBlockAt((int)x, (int)y, (int)z);
 	}
 
 	public boolean matches(Material material) {
@@ -96,12 +102,15 @@ public class Point extends Location implements Memorable {
 			this.x += p.x;
 			this.y += p.y;
 			this.z += p.z;
-			this.setX(this.x);
-			this.setY(this.y);
-			this.setZ(this.z);
 		} else {
 			throw new IllegalArgumentException("Cannot add Locations of differing worlds");
 		}
+	}
+
+	public void add(double x, double y, double z) {
+		this.x += x;
+		this.y += y;
+		this.z += z;
 	}
 
 	@Override

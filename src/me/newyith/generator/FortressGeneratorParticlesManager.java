@@ -137,11 +137,11 @@ public class FortressGeneratorParticlesManager {
 		}
 
 		Point p = new Point(outsidePoint);
-		p.setX(p.x + towardWallAdjusted.x + 0.5);
-		p.setY(p.y + towardWallAdjusted.y + 0.5);
-		p.setZ(p.z + towardWallAdjusted.z + 0.5);
+		p.x += towardWallAdjusted.x + 0.5;
+		p.y += towardWallAdjusted.y + 0.5;
+		p.z += towardWallAdjusted.z + 0.5;
 
-		ParticleEffect.PORTAL.display(xRand, yRand, zRand, 0, 1, p, 20);
+		ParticleEffect.PORTAL.display(xRand, yRand, zRand, 0, 1, p.toLocation(), 20);
 	}
 
 	private void tickRuneAnchorParticles() {
@@ -155,8 +155,8 @@ public class FortressGeneratorParticlesManager {
 				float speed = 0;
 				int amount = 1;
 				double range = 15;
-				Location loc = point.add(0.5, -0.4, 0.5);
-				ParticleEffect.PORTAL.display(0.2F, 0.0F, 0.2F, speed, amount, loc, range);
+				point.add(0.5, -0.4, 0.5);
+				ParticleEffect.PORTAL.display(0.2F, 0.0F, 0.2F, speed, amount, point.toLocation(), range);
 			}
 			runeWaitTicks--;
 		}

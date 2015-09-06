@@ -22,8 +22,8 @@ public class Debug {
 		float speed = 0;
 		int amount = 1;
 		double range = 25;
-		Location loc = point.add(0.5, 0.5, 0.5);
-		particleEffect.display(0.0F, 0.0F, 0.0F, speed, amount, loc, range);
+		point.add(0.5, 0.5, 0.5);
+		particleEffect.display(0.0F, 0.0F, 0.0F, speed, amount, point.toLocation(), range);
 	}
 
 	public static void print(String s) {

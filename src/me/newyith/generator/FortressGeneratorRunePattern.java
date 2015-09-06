@@ -64,7 +64,7 @@ public class FortressGeneratorRunePattern implements Memorable {
 			Point a = new Point(anchorBlock.getLocation());
 
 			//set towardFront, towardBack, towardLeft, towardRight
-			Point signPoint = this.findSignPoint(world);
+			Point signPoint = this.findSignPoint();
 			if (signPoint != null) {
 				Point towardFront = new Point(signPoint.difference(a));
 				Point towardLeft = new Point(world, towardFront.z, 0, towardFront.x);
@@ -141,10 +141,10 @@ public class FortressGeneratorRunePattern implements Memorable {
 			this.matchedReadyPattern = false;
 		}
 	}
-	private Point findSignPoint(World world) {
+	private Point findSignPoint() {
 		Point a = this.anchorPoint;
 
-		ArrayList<Point> points = new ArrayList<Point>();
+		ArrayList<Point> points = new ArrayList<>();
 		points.add(new Point(a.world, a.x + 1, a.y, a.z));
 		points.add(new Point(a.world, a.x - 1, a.y, a.z));
 		points.add(new Point(a.world, a.x, a.y, a.z + 1));
@@ -152,7 +152,7 @@ public class FortressGeneratorRunePattern implements Memorable {
 
 		Point signPoint = null;
 		for (Point p : points) {
-			Block block = world.getBlockAt(p);
+			Block block = p.getBlock();
 			if (block.getType() == Material.WALL_SIGN) {
 				signPoint = p;
 			}
