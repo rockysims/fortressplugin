@@ -75,22 +75,8 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
-//TODO: fix /reload taking so long (we're saving/loading lots of data)
-	//TODO: consider rebuilding claimedPoints and only saving claimedWallPoints to reduce /reload lag
-	//TODO: consider not saving block type of altered points since only cobblestone is alterable (to reduce /reload lag)
-	//TODO: consider adding a special case for saving a list of points (to make data more compact in config.yml and avoid saving world multiple times)
-
-
-
-//TODO: fix bug where /reload during generation causes generation to stop (cycling generator fixes it)
-
-//DONE: make blocks put in fuel chest also get protected
-
-
 
 //TODO: do door white lists next and then pistons?
-
-
 
 
 //TODO: refactor to use the listener pattern?
