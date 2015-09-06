@@ -75,6 +75,7 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
+//TODO: consider making Point not extend Location (to avoid bugs where coordinators don't match)
 
 //TODO: fix /reload taking so long (we're saving/loading lots of data)
 	//TODO: consider rebuilding claimedPoints and only saving claimedWallPoints to reduce /reload lag

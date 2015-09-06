@@ -143,6 +143,57 @@ public class Memory {
 		return layers;
 	}
 
+	//HashMap<Point, Material>
+	public void savePointMaterialMapCompact(String key, HashMap<Point, Material> map) {
+		Memory m = new Memory(section(key));
+
+		String blob = "";
+		if (map.size() > 0) {
+			Point firstKey = map.keySet().iterator().next();
+			m.save("world", firstKey.world.getName());
+
+			Iterator it = map.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry pair = (Map.Entry)it.next();
+				Point p = (Point) pair.getKey();
+				Material mat = (Material) pair.getValue();
+
+				String pairBlob = "";
+				pairBlob += (int) p.x;
+				pairBlob += ",";
+				pairBlob += (int) p.y;
+				pairBlob += ",";
+				pairBlob += (int) p.z;
+				pairBlob += ",";
+				pairBlob += mat.ordinal();
+				blob += pairBlob + "~";
+			}
+			blob = blob.substring(0, blob.length() - 1); //remove last "~"
+		}
+		m.save("blob", blob);
+	}
+	public HashMap<Point, Material> loadPointMaterialMapCompact(String key) {
+		Memory m = new Memory(section(key));
+
+		HashMap<Point, Material> map = new HashMap<>();
+		String blob = m.loadString("blob");
+		if (blob.length() > 0) {
+			World world = Bukkit.getWorld(m.loadString("world"));
+			String[] pairBlobs = blob.split("~");
+			for (String pairBlob : pairBlobs) {
+				String[] data = pairBlob.split(",");
+				int x = Integer.valueOf(data[0]);
+				int y = Integer.valueOf(data[1]);
+				int z = Integer.valueOf(data[2]);
+				Material mat = Material.values()[Integer.valueOf(data[3])];
+				Point p = new Point(world, x, y, z);
+				map.put(p, mat);
+			}
+		}
+
+		return map;
+	}
+
 	// --- SAVE ---
 
 	//Memorable

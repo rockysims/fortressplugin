@@ -32,7 +32,7 @@ public class GeneratorCoreAnimator implements Memorable {
 		Debug.msg("saved anchorPoint: " + anchorPoint);
 
 		Debug.msg("saving alteredPoints: " + alteredPoints.size());
-		m.save("alteredPoints", alteredPoints);
+		m.savePointMaterialMapCompact("alteredPoints", alteredPoints);
 		Debug.msg("saved alteredPoints: " + alteredPoints.size());
 
 		m.savePointSetCompact("protectedPoints", protectedPoints);
@@ -59,7 +59,7 @@ public class GeneratorCoreAnimator implements Memorable {
 		Point anchorPoint = m.loadPoint("anchorPoint");
 		Debug.msg("loaded anchorPoint: " + anchorPoint);
 
-		HashMap<Point, Material> alteredPoints = m.loadPointMaterialMap("alteredPoints");
+		HashMap<Point, Material> alteredPoints = m.loadPointMaterialMapCompact("alteredPoints");
 		Debug.msg("loaded alteredPoints: " + alteredPoints.size());
 
 		Set<Point> protectedPoints = m.loadPointSetCompact("protectedPoints");

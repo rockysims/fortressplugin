@@ -27,9 +27,6 @@ public class GeneratorCore implements Memorable {
 	//------------------------------------------------------------------------------------------------------------------
 
 	public void saveTo(Memory m) {
-		m.savePointSetCompact("claimedPoints", claimedPoints);
-		Debug.msg("saved claimedPoints: " + claimedPoints.size());
-
 		m.savePointSetCompact("claimedWallPoints", claimedWallPoints);
 		Debug.msg("saved claimedWallPoints: " + claimedWallPoints.size());
 
@@ -43,9 +40,6 @@ public class GeneratorCore implements Memorable {
 	}
 
 	public static GeneratorCore loadFrom(Memory m) {
-		Set<Point> claimedPoints = m.loadPointSetCompact("claimedPoints");
-		Debug.msg("loaded claimedPoints: " + claimedPoints.size());
-
 		Set<Point> claimedWallPoints = m.loadPointSetCompact("claimedWallPoints");
 		Debug.msg("loaded claimedWallPoints: " + claimedWallPoints.size());
 
@@ -60,7 +54,6 @@ public class GeneratorCore implements Memorable {
 
 		GeneratorCore instance = new GeneratorCore(
 				animator,
-				claimedPoints,
 				claimedWallPoints,
 				anchorPoint,
 				placedByPlayerId);
@@ -69,15 +62,14 @@ public class GeneratorCore implements Memorable {
 
 	private GeneratorCore(
 			GeneratorCoreAnimator animator,
-			Set<Point> claimedPoints,
 			Set<Point> claimedWallPoints,
 			Point anchorPoint,
 			UUID placedByPlayerId) {
 		this.animator = animator;
-		this.claimedPoints = claimedPoints;
 		this.claimedWallPoints = claimedWallPoints;
 		this.anchorPoint = anchorPoint;
 		this.placedByPlayerId = placedByPlayerId;
+		updateClaimedPoints(claimedWallPoints);
 	}
 
 	public void secondStageLoad() {
