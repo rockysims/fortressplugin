@@ -66,7 +66,7 @@ public class FortressGeneratorRunePattern implements Memorable {
 			//set towardFront, towardBack, towardLeft, towardRight
 			Point signPoint = this.findSignPoint(world);
 			if (signPoint != null) {
-				Point towardFront = new Point(signPoint.subtract(a));
+				Point towardFront = new Point(signPoint.difference(a));
 				Point towardLeft = new Point(world, towardFront.z, 0, towardFront.x);
 				if (towardFront.x == 0) {
 					towardLeft = new Point(world, -1 * towardLeft.x, 0, -1 * towardLeft.z);

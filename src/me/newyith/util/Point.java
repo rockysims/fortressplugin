@@ -91,6 +91,19 @@ public class Point extends Location implements Memorable {
 		return d;
 	}
 
+	public void add(Point p) {
+		if(p != null && p.getWorld() == this.getWorld()) {
+			this.x += p.x;
+			this.y += p.y;
+			this.z += p.z;
+			this.setX(this.x);
+			this.setY(this.y);
+			this.setZ(this.z);
+		} else {
+			throw new IllegalArgumentException("Cannot add Locations of differing worlds");
+		}
+	}
+
 	@Override
 	public String toString() {
 		int x = (int)this.x;
