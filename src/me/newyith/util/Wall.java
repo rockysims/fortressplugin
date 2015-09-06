@@ -1,4 +1,4 @@
-package me.newyith.generator;
+package me.newyith.util;
 
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
@@ -61,6 +61,33 @@ public class Wall {
 		points.add(new Point(p.world, p.x, p.y, p.z - 1));
 
 		return points;
+	}
+
+	public static boolean isDoor(Material mat) {
+		boolean isDoor = false;
+		switch (mat) {
+			case IRON_DOOR_BLOCK:
+			case WOODEN_DOOR:
+			case ACACIA_DOOR:
+			case BIRCH_DOOR:
+			case DARK_OAK_DOOR:
+			case JUNGLE_DOOR:
+			case SPRUCE_DOOR:
+			case TRAP_DOOR:
+			case IRON_TRAPDOOR:
+				isDoor = true;
+		}
+		return isDoor;
+	}
+
+	public static boolean isSign(Material mat) {
+		boolean isSign = false;
+		switch (mat) {
+			case WALL_SIGN:
+			case SIGN_POST:
+				isSign = true;
+		}
+		return isSign;
 	}
 
 	public static Set<Point> getPointsConnected(Point origin, Set<Point> originLayer, Set<Material> wallBlocks, Set<Material> returnBlocks, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {

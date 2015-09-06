@@ -7,12 +7,14 @@ import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.*;
 
 public class FortressGeneratorRunesManager {
 	private static ArrayList<FortressGeneratorRune> runeInstances = new ArrayList<>();
 	private static HashMap<Point, FortressGeneratorRune> runeByPoint = new HashMap<>();
+	private static HashMap<Point, FortressGeneratorRune> runeByProtectedPoint = new HashMap<>();
 	private static Set<Point> protectedPoints = new HashSet<>();
 
 	public static void saveTo(Memory m) {
@@ -22,16 +24,21 @@ public class FortressGeneratorRunesManager {
 	public static void loadFrom(Memory m) {
 		runeInstances = m.loadFortressGeneratorRunes("runeInstances");
 
-		//rebuild runeByPoint map
 		for (FortressGeneratorRune rune : runeInstances) {
+			//rebuild runeByPoint map
 			for (Point p : rune.getPattern().getPoints()) {
 				runeByPoint.put(p, rune);
 			}
-		}
 
-		//rebuild protectedPoints
-		for (FortressGeneratorRune rune : runeInstances) {
-			protectedPoints.addAll(rune.getGeneratorCore().getProtectedPoints());
+			Set<Point> protecteds = rune.getGeneratorCore().getProtectedPoints();
+
+			//rebuild protectedPoints
+			protectedPoints.addAll(protecteds);
+
+			//rebuild runeByProtectedPoint
+			for (Point p : protecteds) {
+				runeByProtectedPoint.put(p, rune);
+			}
 		}
 
 		//second stage loading
@@ -72,12 +79,14 @@ public class FortressGeneratorRunesManager {
 		return runesInRange;
 	}
 
-	public static void addProtectedPoint(Point p) {
+	public static void addProtectedPoint(Point p, Point anchor) {
 		protectedPoints.add(p);
+		runeByProtectedPoint.put(p, runeByPoint.get(anchor));
 	}
 
 	public static void removeProtectedPoint(Point p) {
 		protectedPoints.remove(p);
+		runeByProtectedPoint.remove(p);
 	}
 
 	public static int getRuneCount() {
@@ -124,10 +133,6 @@ public class FortressGeneratorRunesManager {
 		}
 	}
 
-
-
-
-
 	public static void onExplode(List<Block> explodeBlocks) {
 		Iterator<Block> it = explodeBlocks.iterator();
 		while (it.hasNext()) {
@@ -139,10 +144,30 @@ public class FortressGeneratorRunesManager {
 		}
 	}
 
+	public static void onPlayerOpenCloseDoor(PlayerInteractEvent event) {
+		Player player = event.getPlayer();
+		Point doorPoint = new Point(event.getClickedBlock().getLocation());
 
-
-
-
+		FortressGeneratorRune rune = runeByProtectedPoint.get(doorPoint);
+		if (rune != null) {
+			Point aboveDoorPoint = new Point(doorPoint).add(0, 1, 0);
+			switch (aboveDoorPoint.getBlock().getType()) {
+				case IRON_DOOR_BLOCK:
+				case WOODEN_DOOR:
+				case ACACIA_DOOR:
+				case BIRCH_DOOR:
+				case DARK_OAK_DOOR:
+				case JUNGLE_DOOR:
+				case SPRUCE_DOOR:
+					//ignore trap doors since they're only 1 high
+					doorPoint = aboveDoorPoint;
+			}
+			boolean canOpen = rune.getGeneratorCore().playerCanOpenDoor(player, doorPoint);
+			if (!canOpen) {
+				event.setCancelled(true);
+			}
+		}
+	}
 
 	public static void onBlockBreakEvent(BlockBreakEvent event) {
 		//instead have animator add/remove individual points as they are protected/unprotected (and reconstitute protectedPoints in loadFrom())
@@ -215,9 +240,11 @@ public class FortressGeneratorRunesManager {
 	}
 
 	public static void doBreakRune(FortressGeneratorRune rune) {
+		ArrayList<Point> patternPoints = rune.getPattern().getPoints();
+
 		rune.onBroken();
 
-		for (Point p : rune.getPattern().getPoints()) {
+		for (Point p : patternPoints) {
 			runeByPoint.remove(p);
 		}
 

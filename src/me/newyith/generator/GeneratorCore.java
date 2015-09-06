@@ -4,9 +4,12 @@ import me.newyith.memory.Memorable;
 import me.newyith.memory.Memory;
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
+import me.newyith.util.Wall;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -19,7 +22,7 @@ public class GeneratorCore implements Memorable {
 	private GeneratorCoreAnimator animator = null; //set by constructor
 	private UUID placedByPlayerId = null; //set by onPlaced
 	private Set<Point> layerOutsideFortress = new HashSet<>();
-	private Set<Point> pointsInsideFortress = new HashSet<>(); //TODO: decide if I can remove pointsInsideFortress entirely
+	private Set<Point> pointsInsideFortress = new HashSet<>(); //TODO: consider changing to layerInsideFortress
 
 	//not saved
 	private final int generationRangeLimit = 32;
@@ -95,6 +98,72 @@ public class GeneratorCore implements Memorable {
 		this.anchorPoint = anchorPoint;
 		this.animator = new GeneratorCoreAnimator(anchorPoint);
 	}
+
+	public boolean playerCanOpenDoor(Player player, Point doorPoint) {
+		String playerName = player.getName();
+		Point aboveDoorPoint = new Point(doorPoint).add(0, 1, 0);
+		Set<Point> points = Wall.getAdjacent6(aboveDoorPoint);
+		points.remove(doorPoint);
+		points.add(aboveDoorPoint);
+
+		boolean signMustBeInside = false;
+		for (Point p : points) {
+			if (pointsInsideFortress.contains(p)) {
+				signMustBeInside = true;
+				break;
+			}
+		}
+
+		if (signMustBeInside) {
+			points.retainAll(pointsInsideFortress);
+		}
+
+		Set<String> names = new HashSet<>();
+		for (Point p : points) {
+			if (Wall.isSign(p.getBlock().getType())) {
+				Block signBlock = p.getBlock();
+				Sign sign = (Sign)signBlock.getState();
+				names.addAll(getNamesFromSign(sign));
+			}
+		}
+
+		return names.contains(playerName);
+	}
+
+	private Set<String> getNamesFromSign(Sign sign) {
+		Set<String> names = new HashSet<>();
+
+		if (sign != null) {
+			String s = "";
+			s += sign.getLine(0);
+			s += "\n";
+			s += sign.getLine(1);
+			s += "\n";
+			s += sign.getLine(2);
+			s += "\n";
+			s += sign.getLine(3);
+			s = s.replaceAll(" ", "");
+
+			if (s.contains(",")) {
+				s = s.replaceAll("\n", "");
+				for (String name : s.split(",")) {
+					names.add(name);
+				}
+			} else {
+				for (String name : s.split("\n")) {
+					names.add(name);
+				}
+			}
+		}
+
+		Debug.msg("getNamesFromSign returning " + names.toString());
+		return names;
+	}
+
+
+
+
+
 
 	// - Events -
 

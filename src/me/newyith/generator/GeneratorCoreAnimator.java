@@ -318,7 +318,7 @@ public class GeneratorCoreAnimator implements Memorable {
 
 	private void addProtectedPoint(Point p) {
 		this.protectedPoints.add(p);
-		FortressGeneratorRunesManager.addProtectedPoint(p);
+		FortressGeneratorRunesManager.addProtectedPoint(p, anchorPoint);
 	}
 
 	private void removeProtectedPoint(Point p) {

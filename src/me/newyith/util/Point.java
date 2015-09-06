@@ -107,10 +107,11 @@ public class Point implements Memorable {
 		}
 	}
 
-	public void add(double x, double y, double z) {
+	public Point add(double x, double y, double z) {
 		this.x += x;
 		this.y += y;
 		this.z += z;
+		return this;
 	}
 
 	@Override

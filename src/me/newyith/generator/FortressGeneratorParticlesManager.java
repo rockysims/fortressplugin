@@ -5,7 +5,7 @@ import me.newyith.event.TickTimer;
 import me.newyith.particles.ParticleEffect;
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
-import org.bukkit.Location;
+import me.newyith.util.Wall;
 import org.bukkit.Material;
 
 import java.util.*;

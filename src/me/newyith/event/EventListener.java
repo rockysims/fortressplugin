@@ -1,8 +1,8 @@
 package me.newyith.event;
 
 import me.newyith.generator.FortressGeneratorRunesManager;
+import me.newyith.util.Wall;
 import me.newyith.main.FortressPlugin;
-import me.newyith.util.Debug;
 import me.newyith.util.Point;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -15,7 +15,6 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class EventListener implements Listener {
 
@@ -86,5 +85,17 @@ public class EventListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onExplode(EntityExplodeEvent event) {
 		FortressGeneratorRunesManager.onExplode(event.blockList());
+    }
+
+    @EventHandler
+    public void onPlayerOpenCloseDoor(PlayerInteractEvent event) {
+        Action action = event.getAction();
+        Block clicked = event.getClickedBlock();
+
+        if (action == Action.RIGHT_CLICK_BLOCK) {
+			if (Wall.isDoor(clicked.getType())) {
+				FortressGeneratorRunesManager.onPlayerOpenCloseDoor(event);
+			}
+        }
     }
 }
