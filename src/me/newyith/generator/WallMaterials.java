@@ -146,6 +146,8 @@ public class WallMaterials {
 		for (Material m : generatableWallMaterials)
 			wallMaterials.add(m);
 		wallMaterials.add(Material.BEDROCK);
+		wallMaterials.add(Material.PISTON_BASE);
+		wallMaterials.add(Material.PISTON_EXTENSION);
 	}
 
 }
