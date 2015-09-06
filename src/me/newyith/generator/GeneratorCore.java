@@ -69,12 +69,13 @@ public class GeneratorCore implements Memorable {
 		this.claimedWallPoints = claimedWallPoints;
 		this.anchorPoint = anchorPoint;
 		this.placedByPlayerId = placedByPlayerId;
-		updateClaimedPoints(claimedWallPoints);
 	}
 
 	public void secondStageLoad() {
 		//this is needed in case of /reload during generation
 		animator.wallMats.refresh(); //needs to be in second stage because refresh uses runeByPoint lookup
+
+		updateClaimedPoints(claimedWallPoints); //needs to be in second stage because refresh uses runeByPoint lookup
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

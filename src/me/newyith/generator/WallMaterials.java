@@ -43,8 +43,7 @@ public class WallMaterials {
 	// - Refreshing -
 
 	public void refresh() {
-		Debug.msg("WallMaterials refresh()ed. anchor: " + anchorPoint);
-
+		//Debug.msg("WallMaterials refresh()ed. anchor: " + anchorPoint);
 		resetToBaseBlockTypes();
 
 		ItemStack[] items = getChestContents();
