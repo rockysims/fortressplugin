@@ -3,11 +3,14 @@ package me.newyith.generator;
 import me.newyith.memory.Memory;
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
+import me.newyith.util.Wall;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.material.Openable;
 
 import java.util.*;
 
@@ -126,10 +129,25 @@ public class FortressGeneratorRunesManager {
 		}
 	}
 
-	public static void onBlockRedstoneEvent(Block block, int signal) {
+	public static void onBlockRedstoneEvent(BlockRedstoneEvent event) {
+		int signal = event.getNewCurrent();
+		Block block = event.getBlock();
+		Point p = new Point(block.getLocation());
+
+		//if the redstone that changed is part of the rune, update rune state
 		if (runeByPoint.containsKey(new Point(block.getLocation()))) {
 			FortressGeneratorRune rune = runeByPoint.get(new Point(block.getLocation()));
 			rune.setPowered(signal > 0);
+		}
+
+		//if door is protected, ignore redstone event
+		if (Wall.isDoor(block.getType()) && protectedPoints.contains(p)) {
+			Openable openableDoor = (Openable)block.getState().getData();
+			if (openableDoor.isOpen()) {
+				event.setNewCurrent(1);
+			} else {
+				event.setNewCurrent(0);
+			}
 		}
 	}
 

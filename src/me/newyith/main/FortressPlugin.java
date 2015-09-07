@@ -78,13 +78,14 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-//TODO: make protected doors not open for redstone
 //TODO: make right clicking protected iron door cause door to open (if player is on white list)
 //TODO: make it so signMustBeInside only if door is touching point inside fortress
 
 
-
-
+//TODO: stop ignoring rune points when generating (now that obsidian isn't altered anymore but can be protected)
+//TODO: make redstone dust a protectable block type
+//TODO: fix bug where generator says it found 0 wall blocks if it has no fuel when created
+//TODO: onPistonExtensionBroken if it would result in breaking protected piston, cancel event
 
 /*
 pistonCores should respect even its parent generator's claims

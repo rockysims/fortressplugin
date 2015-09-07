@@ -41,7 +41,7 @@ public class EventListener implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onWaterBreaksRedstoneWireEvent(BlockFromToEvent event) {
+    public void onEnvironmentBreaksRedstoneWireEvent(BlockFromToEvent event) {
         if(event.getToBlock().getType() == Material.REDSTONE_WIRE) {
             FortressGeneratorRunesManager.onWaterBreaksRedstoneWireEvent(event.getToBlock());
         }
@@ -54,7 +54,7 @@ public class EventListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockRedstoneEvent(BlockRedstoneEvent event) {
-        FortressGeneratorRunesManager.onBlockRedstoneEvent(event.getBlock(), event.getNewCurrent());
+        FortressGeneratorRunesManager.onBlockRedstoneEvent(event);
     }
 
     @EventHandler(ignoreCancelled = true)
