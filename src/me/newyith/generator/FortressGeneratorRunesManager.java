@@ -5,12 +5,17 @@ import me.newyith.util.Debug;
 import me.newyith.util.Point;
 import me.newyith.util.Wall;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.material.Door;
 import org.bukkit.material.Openable;
+import org.bukkit.material.TrapDoor;
 
 import java.util.*;
 
@@ -163,11 +168,12 @@ public class FortressGeneratorRunesManager {
 	}
 
 	public static void onPlayerOpenCloseDoor(PlayerInteractEvent event) {
-		Player player = event.getPlayer();
-		Point doorPoint = new Point(event.getClickedBlock().getLocation());
+		Block doorBlock = event.getClickedBlock();
+		Point doorPoint = new Point(doorBlock.getLocation());
 
 		FortressGeneratorRune rune = runeByProtectedPoint.get(doorPoint);
 		if (rune != null) {
+			Player player = event.getPlayer();
 			Point aboveDoorPoint = new Point(doorPoint).add(0, 1, 0);
 			switch (aboveDoorPoint.getBlock().getType()) {
 				case IRON_DOOR_BLOCK:
@@ -183,6 +189,35 @@ public class FortressGeneratorRunesManager {
 			boolean canOpen = rune.getGeneratorCore().playerCanOpenDoor(player, doorPoint);
 			if (!canOpen) {
 				event.setCancelled(true);
+			} else {
+				//if iron door, open for player
+				Material doorType = doorPoint.getBlock().getType();
+				boolean isIronDoor = doorType == Material.IRON_DOOR_BLOCK;
+				boolean isIronTrap = doorType == Material.IRON_TRAPDOOR;
+				if (isIronDoor || isIronTrap) {
+					BlockState state = doorBlock.getState();
+					boolean nowOpen;
+					if (isIronDoor) {
+						Door door = (Door) state.getData();
+						if (door.isTopHalf()) {
+							Block bottomDoorBlock = (new Point(doorPoint).add(0, -1, 0)).getBlock();
+							state = bottomDoorBlock.getState();
+							door = (Door) state.getData();
+						}
+						door.setOpen(!door.isOpen());
+						state.update();
+						nowOpen = door.isOpen();
+					} else {
+						TrapDoor door = (TrapDoor) state.getData();
+						door.setOpen(!door.isOpen());
+						state.update();
+						nowOpen = door.isOpen();
+					}
+					if (nowOpen) {
+						player.playSound(doorPoint.toLocation(), Sound.DOOR_OPEN, 1.0F, 1.0F);
+					} else {
+						player.playSound(doorPoint.toLocation(), Sound.DOOR_CLOSE, 1.0F, 1.0F);
+					}				}
 			}
 		}
 	}

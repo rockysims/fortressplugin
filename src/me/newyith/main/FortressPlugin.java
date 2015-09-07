@@ -78,7 +78,6 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-//TODO: make right clicking protected iron door cause door to open (if player is on white list)
 //TODO: make it so signMustBeInside only if door is touching point inside fortress
 
 
