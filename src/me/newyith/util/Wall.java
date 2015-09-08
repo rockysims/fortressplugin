@@ -80,6 +80,16 @@ public class Wall {
 		return isDoor;
 	}
 
+	public static boolean isTrapDoor(Material mat) {
+		boolean isTrapDoor = false;
+		switch (mat) {
+			case TRAP_DOOR:
+			case IRON_TRAPDOOR:
+				isTrapDoor = true;
+		}
+		return isTrapDoor;
+	}
+
 	public static boolean isSign(Material mat) {
 		boolean isSign = false;
 		switch (mat) {

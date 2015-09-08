@@ -101,38 +101,49 @@ public class GeneratorCore implements Memorable {
 
 	public boolean playerCanOpenDoor(Player player, Point doorPoint) {
 		String playerName = player.getName();
-		Set<Point> points = new HashSet<>();
+		Set<Point> potentialSigns = new HashSet<>();
+		boolean isTrapDoor = Wall.isTrapDoor(doorPoint.getBlock().getType());
 
-		//points.addAll(point above door and points adjacent to it)
-		Point aboveDoorPoint = new Point(doorPoint).add(0, 1, 0);
-		points.addAll(Wall.getAdjacent6(aboveDoorPoint));
-		points.add(aboveDoorPoint);
+		if (isTrapDoor) {
+			potentialSigns.addAll(Wall.getAdjacent6(doorPoint));
+		} else {
+			//potentialSigns.addAll(point above door and points adjacent to it)
+			Point aboveDoorPoint = new Point(doorPoint).add(0, 1, 0);
+			potentialSigns.addAll(Wall.getAdjacent6(aboveDoorPoint));
+			potentialSigns.add(aboveDoorPoint);
 
-		//points.addAll(point below door and points adjacent to it)
-		Point belowDoorPoint = new Point(doorPoint).add(0, -1, 0);
-		if (belowDoorPoint.getBlock().getType() == doorPoint.getBlock().getType()) {
-			belowDoorPoint.y--;
+			//potentialSigns.addAll(point below door and points adjacent to it)
+			Point belowDoorPoint = new Point(doorPoint).add(0, -2, 0);
+			potentialSigns.addAll(Wall.getAdjacent6(belowDoorPoint));
+			potentialSigns.add(belowDoorPoint);
 		}
-		points.addAll(Wall.getAdjacent6(belowDoorPoint));
-		points.add(belowDoorPoint);
 
 		if (signMustBeInside(doorPoint)) {
-			points.retainAll(pointsInsideFortress);
+			potentialSigns.retainAll(pointsInsideFortress);
 		}
 
-		//points.addAll(connected signs)
-		Point origin = points.iterator().next();
-		Set<Point> originLayer = points;
+		//filter potentialSigns for actual signs
+		Iterator<Point> it = potentialSigns.iterator();
+		while (it.hasNext()) {
+			Point potentialSign = it.next();
+			if (!Wall.isSign(potentialSign.getBlock().getType())) {
+				it.remove();
+			}
+		}
+
+		//potentialSigns.addAll(connected signs)
+		Point origin = doorPoint;
+		Set<Point> originLayer = potentialSigns;
 		Set<Material> wallMaterials = Wall.getSignMaterials();
 		Set<Material> returnMaterials = Wall.getSignMaterials();
 		int rangeLimit = generationRangeLimit * 2;
 		Set<Point> ignorePoints = null;
 		Set<Point> searchablePoints = null;
 		Set<Point> connectedSigns = Wall.getPointsConnected(origin, originLayer, wallMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
-		points.addAll(connectedSigns);
+		potentialSigns.addAll(connectedSigns);
 
 		Set<String> names = new HashSet<>();
-		for (Point p : points) {
+		for (Point p : potentialSigns) {
 			if (Wall.isSign(p.getBlock().getType())) {
 				Block signBlock = p.getBlock();
 				Sign sign = (Sign)signBlock.getState();
@@ -151,7 +162,7 @@ public class GeneratorCore implements Memorable {
 		Set<Point> doorPoints = new HashSet<>();
 		doorPoints.add(doorPoint);
 		Point belowDoorPoint = new Point(doorPoint).add(0, -1, 0);
-		if (belowDoorPoint.getBlock().getType() == doorPoint.getBlock().getType()) {
+		if (!Wall.isTrapDoor(doorPoint.getBlock().getType())) {
 			doorPoints.add(belowDoorPoint);
 		}
 		for (Point p : doorPoints) {
