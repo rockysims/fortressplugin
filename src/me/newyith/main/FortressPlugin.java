@@ -115,15 +115,11 @@ generatorCore:
 			use pistonCore.layerIndex to merge piston's generated with generator's generated
 */
 
-//TODO: onDegenerate instantly degenerate all points now disconnected
-
-//TODO: do door white lists next and then pistons?
 
 
 
-//TODO: get door white lists working
-//TODO: make it so cycling generator always degenerates (instantly) all generated points that are now disconnected
 //TODO: make glowstone blocks work as fuel for 4x the fuel value of glowstone dust (silk touch works on glowstone block and fortune III does not)
+
 //TODO: add manual book (obsidian + book)
 //TODO: make sure generators continue to burn fuel when no player is nearby
 //TODO: add /stuck command
