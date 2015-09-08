@@ -114,6 +114,10 @@ public class Point implements Memorable {
 		return this;
 	}
 
+	public boolean is(Material mat) {
+		return getBlock().getType() == mat;
+	}
+
 	@Override
 	public String toString() {
 		int x = (int)this.x;

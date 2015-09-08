@@ -79,9 +79,8 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-//TODO: onPistonExtensionBroken if it would result in breaking protected piston, cancel event
 
-//TODO: consider making degeneration instantly degenerate any generated points that are now air
+
 
 /*
 pistonCores should respect even its parent generator's claims

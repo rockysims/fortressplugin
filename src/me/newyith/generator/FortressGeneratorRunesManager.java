@@ -8,14 +8,13 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.material.Door;
-import org.bukkit.material.Openable;
-import org.bukkit.material.TrapDoor;
+import org.bukkit.material.*;
 
 import java.util.*;
 
@@ -222,10 +221,31 @@ public class FortressGeneratorRunesManager {
 	}
 
 	public static void onBlockBreakEvent(BlockBreakEvent event) {
-		//instead have animator add/remove individual points as they are protected/unprotected (and reconstitute protectedPoints in loadFrom())
 		Block brokenBlock = event.getBlock();
-		Point p = new Point(brokenBlock.getLocation());
-		if (protectedPoints.contains(p) && event.getPlayer().getGameMode() != GameMode.CREATIVE) {
+		Point brokenPoint = new Point(brokenBlock.getLocation());
+
+		boolean isProtected = protectedPoints.contains(brokenPoint);
+		boolean inCreative = event.getPlayer().getGameMode() == GameMode.CREATIVE;
+		boolean cancel = false;
+		if (isProtected && !inCreative) {
+			cancel = true;
+		} else {
+			if (brokenPoint.is(Material.PISTON_EXTENSION) || brokenPoint.is(Material.PISTON_MOVING_PIECE)) {
+				MaterialData matData = brokenBlock.getState().getData();
+				if (matData instanceof PistonExtensionMaterial) {
+					PistonExtensionMaterial pem = (PistonExtensionMaterial) matData;
+					BlockFace face = pem.getFacing().getOppositeFace();
+					Point pistonPoint = new Point(brokenBlock.getRelative(face, 1).getLocation());
+					if (protectedPoints.contains(pistonPoint)) {
+						cancel = true;
+					}
+				} else {
+					Debug.error("matData not instanceof PistonExtensionMaterial");
+				}
+			}
+		}
+
+		if (cancel) {
 			event.setCancelled(true);
 		} else {
 			onRuneMightHaveBeenBrokenBy(brokenBlock);
