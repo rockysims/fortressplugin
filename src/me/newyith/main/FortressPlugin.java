@@ -78,13 +78,7 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-//TODO: make white list signs search for other signs connected to first sign(s)
-	//TODO: consider making traps door look for signs in adjacent 6 (leave 2 high door logic as is?)
 
-
-//TODO: stop ignoring rune points when generating (now that obsidian isn't altered anymore but can be protected)
-//TODO: make redstone dust a protectable block type
-//TODO: fix bug where generator says it found 0 wall blocks if it has no fuel when created
 //TODO: onPistonExtensionBroken if it would result in breaking protected piston, cancel event
 
 //TODO: consider making degeneration instantly degenerate any generated points that are now air
@@ -104,12 +98,13 @@ on generator broken:
 
 pistonCore:
 	onExtend:
-		if (piston protected && parent generator is running) tell pistonCore to generate
+		if (parent generator is running)
+			if (piston protected || piston extended to touch protected) tell pistonCore to generate
 	onRetract:
 		tell pistonCore to degenerate
 
 generatorCore:
-	onProtectPiston:
+	onProtectPiston, onProtectPistonExtensionTouchPoint:
 		set pistonCore.layerIndex
 		if (extended) tell pistonCore to generate
 	onGenerate:

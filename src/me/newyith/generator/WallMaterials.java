@@ -89,6 +89,10 @@ public class WallMaterials {
 //						addProtectable(Material.PISTON_STICKY_BASE);
 //						addProtectable(Material.PISTON_MOVING_PIECE);
 //						break;
+					//commenting this out because redstone wire breaks repeatedly very fast if you hold left click on it
+//					case REDSTONE:
+//						addProtectable(Material.REDSTONE_WIRE);
+//						break;
 					default:
 						if (mat.isBlock()) {
 							addProtectable(item.getType());

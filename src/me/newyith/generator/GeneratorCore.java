@@ -222,6 +222,7 @@ public class GeneratorCore implements Memorable {
 
 		boolean canPlace = !overlapWithClaimed;
 		if (canPlace) {
+			animator.wallMats.refresh(); //refresh protectable blocks list based on chest contents
 			Set<Point> generatableWallPoints = Wall.flattenLayers(getGeneratableWallLayers());
 			updateInsideOutside(generatableWallPoints);
 			//claim wall + 1 layer (and 1 layer around generator)
