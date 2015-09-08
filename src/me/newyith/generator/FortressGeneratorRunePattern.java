@@ -8,9 +8,10 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FortressGeneratorRunePattern implements Memorable {
-	private ArrayList<Point> pointsInPattern = new ArrayList<Point>();
+	private List<Point> pointsInPattern = new ArrayList<>();
 	private boolean matchedReadyPattern = false;
 	public Point anchorPoint = null;
 	public Point pausePoint = null;
@@ -33,7 +34,7 @@ public class FortressGeneratorRunePattern implements Memorable {
 	}
 
 	public static FortressGeneratorRunePattern loadFrom(Memory m) {
-		ArrayList<Point> pointsInPattern = m.loadPointListCompact("pointsInPattern");
+		List<Point> pointsInPattern = m.loadPointListCompact("pointsInPattern");
 		boolean matchedReadyPattern = m.loadBoolean("matchedReadyPattern");
 		FortressGeneratorRunePattern instance = new FortressGeneratorRunePattern(pointsInPattern, matchedReadyPattern);
 		instance.anchorPoint = m.loadPoint("anchorPoint");
@@ -46,7 +47,7 @@ public class FortressGeneratorRunePattern implements Memorable {
 		return instance;
 	}
 
-	private FortressGeneratorRunePattern(ArrayList<Point> pointsInPattern, boolean matchedReadyPattern) {
+	private FortressGeneratorRunePattern(List<Point> pointsInPattern, boolean matchedReadyPattern) {
 		this.pointsInPattern = pointsInPattern;
 		this.matchedReadyPattern = matchedReadyPattern;
 	}
@@ -169,7 +170,7 @@ public class FortressGeneratorRunePattern implements Memorable {
 		return this.pointsInPattern.contains(new Point(block.getLocation()));
 	}
 
-	public ArrayList<Point> getPoints() {
+	public List<Point> getPoints() {
 		return this.pointsInPattern;
 	}
 }

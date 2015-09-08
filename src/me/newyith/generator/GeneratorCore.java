@@ -101,22 +101,35 @@ public class GeneratorCore implements Memorable {
 
 	public boolean playerCanOpenDoor(Player player, Point doorPoint) {
 		String playerName = player.getName();
+		Set<Point> points = new HashSet<>();
+
+		//points.addAll(point above door and points adjacent to it)
 		Point aboveDoorPoint = new Point(doorPoint).add(0, 1, 0);
-		Set<Point> points = Wall.getAdjacent6(aboveDoorPoint);
-		points.remove(doorPoint);
+		points.addAll(Wall.getAdjacent6(aboveDoorPoint));
 		points.add(aboveDoorPoint);
 
-		boolean signMustBeInside = false;
-		for (Point p : points) {
-			if (pointsInsideFortress.contains(p)) {
-				signMustBeInside = true;
-				break;
-			}
+		//points.addAll(point below door and points adjacent to it)
+		Point belowDoorPoint = new Point(doorPoint).add(0, -1, 0);
+		if (belowDoorPoint.getBlock().getType() == doorPoint.getBlock().getType()) {
+			belowDoorPoint.y--;
 		}
+		points.addAll(Wall.getAdjacent6(belowDoorPoint));
+		points.add(belowDoorPoint);
 
-		if (signMustBeInside) {
+		if (signMustBeInside(doorPoint)) {
 			points.retainAll(pointsInsideFortress);
 		}
+
+		//points.addAll(connected signs)
+		Point origin = points.iterator().next();
+		Set<Point> originLayer = points;
+		Set<Material> wallMaterials = Wall.getSignMaterials();
+		Set<Material> returnMaterials = Wall.getSignMaterials();
+		int rangeLimit = generationRangeLimit * 2;
+		Set<Point> ignorePoints = null;
+		Set<Point> searchablePoints = null;
+		Set<Point> connectedSigns = Wall.getPointsConnected(origin, originLayer, wallMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
+		points.addAll(connectedSigns);
 
 		Set<String> names = new HashSet<>();
 		for (Point p : points) {
@@ -128,6 +141,32 @@ public class GeneratorCore implements Memorable {
 		}
 
 		return names.contains(playerName);
+	}
+
+	private boolean signMustBeInside(Point doorPoint) {
+		boolean signMustBeInside = false;
+
+		//fill adjacentToDoor
+		Set<Point> adjacentToDoor = new HashSet<>();
+		Set<Point> doorPoints = new HashSet<>();
+		doorPoints.add(doorPoint);
+		Point belowDoorPoint = new Point(doorPoint).add(0, -1, 0);
+		if (belowDoorPoint.getBlock().getType() == doorPoint.getBlock().getType()) {
+			doorPoints.add(belowDoorPoint);
+		}
+		for (Point p : doorPoints) {
+			adjacentToDoor.addAll(Wall.getAdjacent6(p));
+		}
+
+		//if any of the blocks adjacent to door point(s) are pointsInsideFortress, signMustBeInside = true
+		for (Point p : adjacentToDoor) {
+			if (pointsInsideFortress.contains(p)) {
+				signMustBeInside = true;
+				break;
+			}
+		}
+
+		return signMustBeInside;
 	}
 
 	private Set<String> getNamesFromSign(Sign sign) {

@@ -104,9 +104,7 @@ public class FortressGeneratorRunesManager {
 	// - Events -
 
 	public static void onTick() {
-		for (FortressGeneratorRune rune : runeInstances) {
-			rune.onTick();
-		}
+		runeInstances.forEach(FortressGeneratorRune::onTick);
 	}
 
 	public static void onPlayerRightClickBlock(Player player, Block clickedBlock) {
@@ -217,7 +215,8 @@ public class FortressGeneratorRunesManager {
 						player.playSound(doorPoint.toLocation(), Sound.DOOR_OPEN, 1.0F, 1.0F);
 					} else {
 						player.playSound(doorPoint.toLocation(), Sound.DOOR_CLOSE, 1.0F, 1.0F);
-					}				}
+					}
+				}
 			}
 		}
 	}
@@ -293,7 +292,7 @@ public class FortressGeneratorRunesManager {
 	}
 
 	public static void doBreakRune(FortressGeneratorRune rune) {
-		ArrayList<Point> patternPoints = rune.getPattern().getPoints();
+		List<Point> patternPoints = rune.getPattern().getPoints();
 
 		rune.onBroken();
 

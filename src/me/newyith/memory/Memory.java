@@ -101,7 +101,7 @@ public class Memory {
 		}
 		m.save("blob", blob);
 	}
-	public ArrayList<Point> loadPointListCompact(String key) {
+	public List<Point> loadPointListCompact(String key) {
 		Memory m = new Memory(section(key));
 
 		ArrayList<Point> list = new ArrayList<>();

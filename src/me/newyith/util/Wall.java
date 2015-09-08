@@ -90,6 +90,13 @@ public class Wall {
 		return isSign;
 	}
 
+	public static Set<Material> getSignMaterials() {
+		Set<Material> mats = new HashSet<>();
+		mats.add(Material.SIGN_POST);
+		mats.add(Material.WALL_SIGN);
+		return mats;
+	}
+
 	public static Set<Point> getPointsConnected(Point origin, Set<Point> originLayer, Set<Material> wallBlocks, Set<Material> returnBlocks, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
 		List<List<Point>> layers = getPointsConnectedAsLayers(origin, originLayer, wallBlocks, returnBlocks, rangeLimit, ignorePoints, searchablePoints, ConnectedThreshold.FACES);
 		return flattenLayers(layers);

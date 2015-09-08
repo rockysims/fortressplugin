@@ -78,13 +78,16 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-//TODO: make it so signMustBeInside only if door is touching point inside fortress
+//TODO: make white list signs search for other signs connected to first sign(s)
+	//TODO: consider making traps door look for signs in adjacent 6 (leave 2 high door logic as is?)
 
 
 //TODO: stop ignoring rune points when generating (now that obsidian isn't altered anymore but can be protected)
 //TODO: make redstone dust a protectable block type
 //TODO: fix bug where generator says it found 0 wall blocks if it has no fuel when created
 //TODO: onPistonExtensionBroken if it would result in breaking protected piston, cancel event
+
+//TODO: consider making degeneration instantly degenerate any generated points that are now air
 
 /*
 pistonCores should respect even its parent generator's claims
@@ -132,6 +135,7 @@ generatorCore:
 //TODO: add /stuck command
 
 //low priority:
+//TODO: consider making Point immutable (final)
 //TODO: refactor to use the listener pattern?
 //TODO: in Wall class and other places its used: rename wallMaterials to traverseMaterials
 //TODO: test killing the server (ctrl+c not "stop") and make sure plugin is robust enough to handle it
