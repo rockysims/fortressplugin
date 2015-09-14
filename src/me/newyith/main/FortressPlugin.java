@@ -2,6 +2,7 @@ package me.newyith.main;
 
 import me.newyith.event.EventListener;
 import me.newyith.event.TickTimer;
+import me.newyith.craft.CraftManager;
 import me.newyith.memory.ConfigManager;
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
@@ -19,6 +20,7 @@ public class FortressPlugin extends JavaPlugin {
 		TickTimer.onEnable(this);
         EventListener.onEnable(this);
         ConfigManager.onEnable(this);
+		CraftManager.onEnable(this);
 
         sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
         sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
@@ -80,7 +82,30 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
+//TODO: make sure pistons can't move protected blocks
+//TODO: make sure generators continue to burn fuel when no player is nearby
+//TODO: add /stuck command
+//TODO: write manual book
+//TODO: add potentialAlteredPoints and update + re-save it before generation (to make it robust enough to handle server crashes)
+//then onEnable look through potentialAlteredPoints and unalter where point not found among generated points
 
+//low priority:
+//TODO: consider making Point immutable (final)
+//TODO: refactor to use the listener pattern?
+//TODO: in Wall class and other places its used: rename wallMaterials to traverseMaterials
+//TODO: test killing the server (ctrl+c not "stop") and make sure plugin is robust enough to handle it
+//TODO: consider making mossy cobblestone be generated but not transmit generation to anything except mossy
+//TODO: consider making rune activation require an empty hand
+//TODO: consider making creating rune require empty hand (again)
+//TODO: make generation display wave of particles to indicate generating wall blocks?
+//TODO: make glowstone blocks work as fuel for 4x the fuel value of glowstone dust (silk touch works on glowstone block and fortune III does not)
+
+/* New Feature:
+make pistons transmit generation when extended
+    this will serve as a switch to allow nearby buildings to connect/disconnect from fortress generation
+    pistons should have particles to indicate when the piston has been found by a fortress generator (onGeneratorStart searches)
+    pistons should not be protected (breakable)
+//*/
 
 /*
 pistonCores should respect even its parent generator's claims
@@ -113,34 +138,10 @@ generatorCore:
 	onDegenerate:
 		include child pistonCores' generated
 			use pistonCore.layerIndex to merge piston's generated with generator's generated
+
+maybe instead of requiring piston be protected before it can work as a mini generator just require that a pistonCore has been created
+	also create pistonCore if block piston is extended to touch is generated
 */
-
-
-
-
-//TODO: make glowstone blocks work as fuel for 4x the fuel value of glowstone dust (silk touch works on glowstone block and fortune III does not)
-
-//TODO: add manual book (obsidian + book)
-//TODO: make sure generators continue to burn fuel when no player is nearby
-//TODO: add /stuck command
-
-//low priority:
-//TODO: consider making Point immutable (final)
-//TODO: refactor to use the listener pattern?
-//TODO: in Wall class and other places its used: rename wallMaterials to traverseMaterials
-//TODO: test killing the server (ctrl+c not "stop") and make sure plugin is robust enough to handle it
-//TODO: consider making mossy cobblestone be generated but not transmit generation to anything except mossy
-//TODO: consider making rune activation require an empty hand
-//TODO: consider making creating rune require empty hand (again)
-//TODO: make generation display wave of particles to indicate generating wall blocks?
-
-/* New Feature:
-make pistons transmit generation when extended
-    this will serve as a switch to allow nearby buildings to connect/disconnect from fortress generation
-    pistons should have particles to indicate when the piston has been found by a fortress generator (onGeneratorStart searches)
-    pistons should not be protected (breakable)
-//*/
-
 
 
 
