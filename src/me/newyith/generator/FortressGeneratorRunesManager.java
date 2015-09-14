@@ -267,48 +267,53 @@ public class FortressGeneratorRunesManager {
 		}
 	}
 
-	public static void onPistonEvent(boolean isSticky, Point piston, Point target, ArrayList<Block> movedBlocks) {
-		//build pointsAffected
-		HashSet<Point> pointsAffected = new HashSet<>();
-		pointsAffected.add(piston);
-		if (target != null) {
-			pointsAffected.add(target);
-		}
+	public static boolean onPistonEvent(boolean isSticky, Point piston, Point target, ArrayList<Block> movedBlocks) {
+		boolean cancel = false;
+
 		if (movedBlocks != null) {
-			for (Block b : movedBlocks) {
-				Point p = new Point(b.getLocation());
-				pointsAffected.add(p);
+			for (Block movedBlock : movedBlocks) {
+				Point movedPoint = new Point(movedBlock.getLocation());
+				if (protectedPoints.contains(movedPoint)) {
+					cancel = true;
+				}
 			}
 		}
 
-		//build runesAffected
-		HashSet<FortressGeneratorRune> runesAffected = new HashSet<>();
-		for (Point p : pointsAffected) {
-			FortressGeneratorRune rune = runeByPoint.get(p);
-			if (rune != null) {
-				runesAffected.add(rune);
+		if (!cancel) {
+			//build pointsAffected
+			HashSet<Point> pointsAffected = new HashSet<>();
+			pointsAffected.add(piston);
+			if (target != null) {
+				pointsAffected.add(target);
 			}
+			if (movedBlocks != null) {
+				for (Block b : movedBlocks) {
+					Point p = new Point(b.getLocation());
+					pointsAffected.add(p);
+				}
+			}
+
+			//build runesAffected
+			HashSet<FortressGeneratorRune> runesAffected = new HashSet<>();
+			for (Point p : pointsAffected) {
+				FortressGeneratorRune rune = runeByPoint.get(p);
+				if (rune != null) {
+					runesAffected.add(rune);
+				}
+			}
+
+			//break affected runes
+			for (FortressGeneratorRune rune : runesAffected) {
+				doBreakRune(rune);
+			}
+
+			//Debug.msg("piston: " + piston);
+			//Debug.msg("target: " + target);
+			//Debug.msg("target type: " + target.getBlock().getType());
+			Debug.msg("movedBlocks.size(): " + movedBlocks.size());
 		}
 
-		for (FortressGeneratorRune rune : runesAffected) {
-			doBreakRune(rune);
-		}
-
-
-
-
-		Debug.msg("piston: " + piston);
-		Debug.msg("target: " + target);
-		//Debug.msg("target type: " + target.getBlock().getType());
-		Debug.msg("movedBlocks.size(): " + movedBlocks.size());
-
-
-
-
-
-
-
-
+		return cancel;
 	}
 
 	public static void doBreakRune(FortressGeneratorRune rune) {

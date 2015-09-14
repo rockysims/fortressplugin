@@ -82,12 +82,11 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-//TODO: make sure pistons can't move protected blocks
 //TODO: make sure generators continue to burn fuel when no player is nearby
 //TODO: add /stuck command
 //TODO: write manual book
 //TODO: add potentialAlteredPoints and update + re-save it before generation (to make it robust enough to handle server crashes)
-//then onEnable look through potentialAlteredPoints and unalter where point not found among generated points
+//	then onEnable look through potentialAlteredPoints and unalter where point not found among generated points
 
 //low priority:
 //TODO: consider making Point immutable (final)

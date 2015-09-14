@@ -71,7 +71,10 @@ public class EventListener implements Listener {
 
 		boolean isSticky = event.isSticky();
 
-		FortressGeneratorRunesManager.onPistonEvent(isSticky, p, t, movedBlocks);
+		boolean cancel = FortressGeneratorRunesManager.onPistonEvent(isSticky, p, t, movedBlocks);
+        if (cancel) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -79,7 +82,11 @@ public class EventListener implements Listener {
 		Point p = new Point(event.getBlock().getLocation());
 		boolean isSticky = event.isSticky();
 		ArrayList<Block> movedBlocks = new ArrayList<>(event.getBlocks());
-		FortressGeneratorRunesManager.onPistonEvent(isSticky, p, null, movedBlocks);
+
+        boolean cancel = FortressGeneratorRunesManager.onPistonEvent(isSticky, p, null, movedBlocks);
+        if (cancel) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
