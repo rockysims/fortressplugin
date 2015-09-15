@@ -1,5 +1,6 @@
 package me.newyith.main;
 
+import me.newyith.commands.Commands;
 import me.newyith.event.EventListener;
 import me.newyith.event.TickTimer;
 import me.newyith.craft.CraftManager;
@@ -44,9 +45,22 @@ public class FortressPlugin extends JavaPlugin {
     }
 
 
-	//TODO: remove this command
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (cmd.getName().equalsIgnoreCase("test")) {
+		String commandName = cmd.getName();
+		boolean commandHandled = false;
+
+		// /stuck
+		if (commandName.equalsIgnoreCase("stuck")) {
+			if (sender instanceof Player) {
+				Player player = (Player)sender;
+				Commands.onStuckCommand(player);
+			}
+			commandHandled = true;
+		}
+
+		//TODO: remove this command
+		// /test
+		if (cmd.getName().equalsIgnoreCase("test")) {
 			if (sender instanceof Player) {
 				Debug.msg("executing test command...");
 
@@ -67,10 +81,10 @@ public class FortressPlugin extends JavaPlugin {
 					}
 				}
 			}
+			commandHandled = true;
+		}
 
-            return true;
-        }
-        return false;
+        return commandHandled;
     }
 
 
@@ -78,15 +92,16 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
+//TODO: make /stuck only work within generation range of a generator
 
 
 
-
-//TODO: make sure generators continue to burn fuel when no player is nearby
 //TODO: add /stuck command
 //TODO: write manual book
 //TODO: add potentialAlteredPoints and update + re-save it before generation (to make it robust enough to handle server crashes)
 //	then onEnable look through potentialAlteredPoints and unalter where point not found among generated points
+//TODO: add emergency key rune
+
 
 //low priority:
 //TODO: consider making Point immutable (final)
@@ -96,13 +111,13 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: consider making mossy cobblestone be generated but not transmit generation to anything except mossy
 //TODO: consider making rune activation require an empty hand
 //TODO: consider making creating rune require empty hand (again)
-//TODO: make generation display wave of particles to indicate generating wall blocks?
+//TODO: make generation display wave of particle to indicate generating wall blocks?
 //TODO: make glowstone blocks work as fuel for 4x the fuel value of glowstone dust (silk touch works on glowstone block and fortune III does not)
 
 /* New Feature:
 make pistons transmit generation when extended
     this will serve as a switch to allow nearby buildings to connect/disconnect from fortress generation
-    pistons should have particles to indicate when the piston has been found by a fortress generator (onGeneratorStart searches)
+    pistons should have particle to indicate when the piston has been found by a fortress generator (onGeneratorStart searches)
     pistons should not be protected (breakable)
 //*/
 

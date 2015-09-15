@@ -4,6 +4,9 @@ version: 0.1
 author: NewYith
 
 commands:
+    stuck:
+        description: Teleports you away after a delay.
+        usage: /<command>
     test:
         description: Test command for debugging
         usage: /<command>

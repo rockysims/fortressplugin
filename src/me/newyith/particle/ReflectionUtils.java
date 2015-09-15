@@ -1,4 +1,4 @@
-package me.newyith.particles;
+package me.newyith.particle;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

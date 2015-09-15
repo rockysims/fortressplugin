@@ -2,7 +2,7 @@ package me.newyith.generator;
 
 import javafx.util.Pair;
 import me.newyith.event.TickTimer;
-import me.newyith.particles.ParticleEffect;
+import me.newyith.particle.ParticleEffect;
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
 import me.newyith.util.Wall;

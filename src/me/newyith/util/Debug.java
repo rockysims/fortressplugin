@@ -1,11 +1,9 @@
 package me.newyith.util;
 
-import me.newyith.particles.ParticleEffect;
+import me.newyith.particle.ParticleEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 

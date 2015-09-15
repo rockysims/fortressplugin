@@ -1,6 +1,6 @@
-package me.newyith.particles;
+package me.newyith.particle;
 
-import me.newyith.particles.ReflectionUtils.PackageType;
+import me.newyith.particle.ReflectionUtils.PackageType;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -548,11 +548,11 @@ public enum ParticleEffect {
 	/**
 	 * Displays a particle effect which is only visible for all players within a certain range in the world of @param center
 	 *
-	 * @param offsetX Maximum distance particles can fly away from the center on the x-axis
-	 * @param offsetY Maximum distance particles can fly away from the center on the y-axis
-	 * @param offsetZ Maximum distance particles can fly away from the center on the z-axis
-	 * @param speed Display speed of the particles
-	 * @param amount Amount of particles
+	 * @param offsetX Maximum distance particle can fly away from the center on the x-axis
+	 * @param offsetY Maximum distance particle can fly away from the center on the y-axis
+	 * @param offsetZ Maximum distance particle can fly away from the center on the z-axis
+	 * @param speed Display speed of the particle
+	 * @param amount Amount of particle
 	 * @param center Center location of the effect
 	 * @param range Range of the visibility
 	 * @throws ParticleVersionException If the particle effect is not supported by the server version
@@ -577,11 +577,11 @@ public enum ParticleEffect {
 	/**
 	 * Displays a particle effect which is only visible for the specified players
 	 *
-	 * @param offsetX Maximum distance particles can fly away from the center on the x-axis
-	 * @param offsetY Maximum distance particles can fly away from the center on the y-axis
-	 * @param offsetZ Maximum distance particles can fly away from the center on the z-axis
-	 * @param speed Display speed of the particles
-	 * @param amount Amount of particles
+	 * @param offsetX Maximum distance particle can fly away from the center on the x-axis
+	 * @param offsetY Maximum distance particle can fly away from the center on the y-axis
+	 * @param offsetZ Maximum distance particle can fly away from the center on the z-axis
+	 * @param speed Display speed of the particle
+	 * @param amount Amount of particle
 	 * @param center Center location of the effect
 	 * @param players Receivers of the effect
 	 * @throws ParticleVersionException If the particle effect is not supported by the server version
@@ -606,11 +606,11 @@ public enum ParticleEffect {
 	/**
 	 * Displays a particle effect which is only visible for the specified players
 	 *
-	 * @param offsetX Maximum distance particles can fly away from the center on the x-axis
-	 * @param offsetY Maximum distance particles can fly away from the center on the y-axis
-	 * @param offsetZ Maximum distance particles can fly away from the center on the z-axis
-	 * @param speed Display speed of the particles
-	 * @param amount Amount of particles
+	 * @param offsetX Maximum distance particle can fly away from the center on the x-axis
+	 * @param offsetY Maximum distance particle can fly away from the center on the y-axis
+	 * @param offsetZ Maximum distance particle can fly away from the center on the z-axis
+	 * @param speed Display speed of the particle
+	 * @param amount Amount of particle
 	 * @param center Center location of the effect
 	 * @param players Receivers of the effect
 	 * @throws ParticleVersionException If the particle effect is not supported by the server version
@@ -762,11 +762,11 @@ public enum ParticleEffect {
 	 * Displays a particle effect which requires additional data and is only visible for all players within a certain range in the world of @param center
 	 *
 	 * @param data Data of the effect
-	 * @param offsetX Maximum distance particles can fly away from the center on the x-axis
-	 * @param offsetY Maximum distance particles can fly away from the center on the y-axis
-	 * @param offsetZ Maximum distance particles can fly away from the center on the z-axis
-	 * @param speed Display speed of the particles
-	 * @param amount Amount of particles
+	 * @param offsetX Maximum distance particle can fly away from the center on the x-axis
+	 * @param offsetY Maximum distance particle can fly away from the center on the y-axis
+	 * @param offsetZ Maximum distance particle can fly away from the center on the z-axis
+	 * @param speed Display speed of the particle
+	 * @param amount Amount of particle
 	 * @param center Center location of the effect
 	 * @param range Range of the visibility
 	 * @throws ParticleVersionException If the particle effect is not supported by the server version
@@ -791,11 +791,11 @@ public enum ParticleEffect {
 	 * Displays a particle effect which requires additional data and is only visible for the specified players
 	 *
 	 * @param data Data of the effect
-	 * @param offsetX Maximum distance particles can fly away from the center on the x-axis
-	 * @param offsetY Maximum distance particles can fly away from the center on the y-axis
-	 * @param offsetZ Maximum distance particles can fly away from the center on the z-axis
-	 * @param speed Display speed of the particles
-	 * @param amount Amount of particles
+	 * @param offsetX Maximum distance particle can fly away from the center on the x-axis
+	 * @param offsetY Maximum distance particle can fly away from the center on the y-axis
+	 * @param offsetZ Maximum distance particle can fly away from the center on the z-axis
+	 * @param speed Display speed of the particle
+	 * @param amount Amount of particle
 	 * @param center Center location of the effect
 	 * @param players Receivers of the effect
 	 * @throws ParticleVersionException If the particle effect is not supported by the server version
@@ -820,11 +820,11 @@ public enum ParticleEffect {
 	 * Displays a particle effect which requires additional data and is only visible for the specified players
 	 *
 	 * @param data Data of the effect
-	 * @param offsetX Maximum distance particles can fly away from the center on the x-axis
-	 * @param offsetY Maximum distance particles can fly away from the center on the y-axis
-	 * @param offsetZ Maximum distance particles can fly away from the center on the z-axis
-	 * @param speed Display speed of the particles
-	 * @param amount Amount of particles
+	 * @param offsetX Maximum distance particle can fly away from the center on the x-axis
+	 * @param offsetY Maximum distance particle can fly away from the center on the y-axis
+	 * @param offsetZ Maximum distance particle can fly away from the center on the z-axis
+	 * @param speed Display speed of the particle
+	 * @param amount Amount of particle
 	 * @param center Center location of the effect
 	 * @param players Receivers of the effect
 	 * @throws ParticleVersionException If the particle effect is not supported by the server version
@@ -840,7 +840,7 @@ public enum ParticleEffect {
 	 *
 	 * @param data Data of the effect
 	 * @param direction Direction of the particle
-	 * @param speed Display speed of the particles
+	 * @param speed Display speed of the particle
 	 * @param center Center location of the effect
 	 * @param range Range of the visibility
 	 * @throws ParticleVersionException If the particle effect is not supported by the server version
@@ -866,7 +866,7 @@ public enum ParticleEffect {
 	 *
 	 * @param data Data of the effect
 	 * @param direction Direction of the particle
-	 * @param speed Display speed of the particles
+	 * @param speed Display speed of the particle
 	 * @param center Center location of the effect
 	 * @param players Receivers of the effect
 	 * @throws ParticleVersionException If the particle effect is not supported by the server version
@@ -892,7 +892,7 @@ public enum ParticleEffect {
 	 *
 	 * @param data Data of the effect
 	 * @param direction Direction of the particle
-	 * @param speed Display speed of the particles
+	 * @param speed Display speed of the particle
 	 * @param center Center location of the effect
 	 * @param players Receivers of the effect
 	 * @throws ParticleVersionException If the particle effect is not supported by the server version
@@ -1334,11 +1334,11 @@ public enum ParticleEffect {
 		 * Construct a new particle packet
 		 *
 		 * @param effect Particle effect
-		 * @param offsetX Maximum distance particles can fly away from the center on the x-axis
-		 * @param offsetY Maximum distance particles can fly away from the center on the y-axis
-		 * @param offsetZ Maximum distance particles can fly away from the center on the z-axis
-		 * @param speed Display speed of the particles
-		 * @param amount Amount of particles
+		 * @param offsetX Maximum distance particle can fly away from the center on the x-axis
+		 * @param offsetY Maximum distance particle can fly away from the center on the y-axis
+		 * @param offsetZ Maximum distance particle can fly away from the center on the z-axis
+		 * @param speed Display speed of the particle
+		 * @param amount Amount of particle
 		 * @param longDistance Indicates whether the maximum distance is increased from 256 to 65536
 		 * @param data Data of the effect
 		 * @throws IllegalArgumentException If the speed or amount is lower than 0
@@ -1519,7 +1519,7 @@ public enum ParticleEffect {
 		 * Sends the packet to all players in a certain range
 		 *
 		 * @param center Center location of the effect
-		 * @param range Range in which players will receive the packet (Maximum range for particles is usually 16, but it can differ for some types)
+		 * @param range Range in which players will receive the packet (Maximum range for particle is usually 16, but it can differ for some types)
 		 * @throws IllegalArgumentException If the range is lower than 1
 		 * @see #sendTo(Location center, Player player)
 		 */

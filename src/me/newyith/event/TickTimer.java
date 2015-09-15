@@ -1,5 +1,6 @@
 package me.newyith.event;
 
+import me.newyith.commands.Commands;
 import me.newyith.generator.FortressGeneratorRunesManager;
 import me.newyith.main.FortressPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -18,5 +19,6 @@ public class TickTimer extends BukkitRunnable {
 	@Override
 	public void run() {
 		FortressGeneratorRunesManager.onTick();
+		Commands.onTick();
 	}
 }
