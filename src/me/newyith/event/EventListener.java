@@ -1,11 +1,13 @@
 package me.newyith.event;
 
 import me.newyith.generator.FortressGeneratorRunesManager;
+import me.newyith.util.Debug;
 import me.newyith.util.Wall;
 import me.newyith.main.FortressPlugin;
 import me.newyith.util.Point;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.event.EventHandler;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -49,7 +51,13 @@ public class EventListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockPlaceEvent(BlockPlaceEvent event) {
-        FortressGeneratorRunesManager.onBlockPlaceEvent(event.getBlock());
+        Player player = event.getPlayer();
+        Block placedBlock = event.getBlockPlaced();
+        Material replacedMaterial = event.getBlockReplacedState().getType();
+        boolean cancel = FortressGeneratorRunesManager.onBlockPlaceEvent(player, placedBlock, replacedMaterial);
+        if (cancel) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
