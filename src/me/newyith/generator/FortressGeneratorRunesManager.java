@@ -254,8 +254,25 @@ public class FortressGeneratorRunesManager {
 	public static void onWaterBreaksRedstoneWireEvent(Block brokenBlock) {
 		onRuneMightHaveBeenBrokenBy(brokenBlock);
 	}
-	public static void onBlockPlaceEvent(Block placedBlock) {
-		onRuneMightHaveBeenBrokenBy(placedBlock);
+	public static boolean onBlockPlaceEvent(Player player, Block placedBlock, Material replacedMaterial) {
+		boolean cancel = false;
+
+		switch (replacedMaterial) {
+			case STATIONARY_WATER:
+			case STATIONARY_LAVA:
+				Point placedPoint = new Point(placedBlock.getLocation());
+				boolean isProtected = protectedPoints.contains(placedPoint);
+				boolean inCreative = player.getGameMode() == GameMode.CREATIVE;
+				if (isProtected && !inCreative) {
+					cancel = true;
+				}
+		}
+
+		if (!cancel) {
+			onRuneMightHaveBeenBrokenBy(placedBlock);
+		}
+
+		return cancel;
 	}
 	private static void onRuneMightHaveBeenBrokenBy(Block block) {
 		if (runeByPoint.containsKey(new Point(block.getLocation()))) {

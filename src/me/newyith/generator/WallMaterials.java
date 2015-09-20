@@ -81,6 +81,12 @@ public class WallMaterials {
 					case SPRUCE_DOOR_ITEM:
 						addProtectable(Material.SPRUCE_DOOR);
 						break;
+					case WATER_BUCKET:
+						addProtectable(Material.STATIONARY_WATER);
+						break;
+					case LAVA_BUCKET:
+						addProtectable(Material.STATIONARY_LAVA);
+						break;
 //					case PISTON_BASE:
 //						addProtectable(Material.PISTON_BASE);
 //						addProtectable(Material.PISTON_EXTENSION);
