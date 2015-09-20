@@ -2,11 +2,16 @@ package me.newyith.generator;
 
 import javafx.util.Pair;
 import me.newyith.event.TickTimer;
+import me.newyith.particle.ColoredParticle;
 import me.newyith.particle.ParticleEffect;
+import me.newyith.particle.ThreeBitColor;
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
 import me.newyith.util.Wall;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
@@ -157,6 +162,25 @@ public class FortressGeneratorParticlesManager {
 				double range = 15;
 				point.add(0.5, -0.4, 0.5);
 				ParticleEffect.PORTAL.display(0.2F, 0.0F, 0.2F, speed, amount, point.toLocation(), range);
+
+
+
+
+
+				//TODO: use this code for team particles once I keep track of who belongs to what team
+				Player player = rune.getGeneratorCore().getOwner();
+				ItemStack handItemStack = player.getItemInHand();
+				if (handItemStack != null && handItemStack.getType() == Material.INK_SACK) {
+					ThreeBitColor c = ThreeBitColor.fromDyeItem(handItemStack);
+					Location loc = player.getLocation();
+					//loc.add(0, 2, 0);
+
+					ColoredParticle.SPELL_MOB.display(loc, 15, c.r(), c.g(), c.b());
+				}
+
+
+
+
 			}
 			runeWaitTicks--;
 		}

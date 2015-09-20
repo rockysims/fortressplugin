@@ -99,6 +99,10 @@ public class GeneratorCore implements Memorable {
 		this.animator = new GeneratorCoreAnimator(anchorPoint);
 	}
 
+	public Player getOwner() {
+		return Bukkit.getPlayer(placedByPlayerId);
+	}
+
 	public boolean playerCanOpenDoor(Player player, Point doorPoint) {
 		String playerName = player.getName();
 		Set<Point> potentialSigns = new HashSet<>();
