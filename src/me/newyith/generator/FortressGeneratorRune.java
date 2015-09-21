@@ -1,6 +1,7 @@
 package me.newyith.generator;
 
 import me.newyith.event.TickTimer;
+import me.newyith.main.FortressPlugin;
 import me.newyith.memory.Memorable;
 import me.newyith.memory.Memory;
 import me.newyith.util.Debug;
@@ -25,7 +26,6 @@ public class FortressGeneratorRune implements Memorable {
 
 	//not saved
 	private FortressGeneratorParticlesManager particles = null; //set by constructor
-	private int msPerFuelItem = 60*60*1000;
 	private List<Long> powerToggleTimeStamps = new ArrayList<Long>();
 
 	public void saveTo(Memory m) {
@@ -181,7 +181,7 @@ public class FortressGeneratorRune implements Memorable {
 				inv.removeItem(new ItemStack(Material.GLOWSTONE_DUST, 1));
 				chest.update(true);
 
-				fuelTicksRemaining = msPerFuelItem / TickTimer.msPerTick;
+				fuelTicksRemaining = FortressPlugin.config_glowstoneDustBurnTimeMs / TickTimer.msPerTick;
 				updateFuelRemainingDisplay(fuelTicksRemaining * TickTimer.msPerTick);
 			}
 		}
@@ -263,7 +263,7 @@ public class FortressGeneratorRune implements Memorable {
 
 	private void updateFuelRemainingDisplay(long ms) {
 		int glowstoneDustInChest = this.countFuelItemsRemaining();
-		ms += msPerFuelItem * glowstoneDustInChest;
+		ms += FortressPlugin.config_glowstoneDustBurnTimeMs * glowstoneDustInChest;
 
 		long s = ms / 1000;
 		long m = s / 60;

@@ -3,7 +3,7 @@ package me.newyith.main;
 import me.newyith.commands.Commands;
 import me.newyith.event.EventListener;
 import me.newyith.event.TickTimer;
-import me.newyith.craft.CraftManager;
+import me.newyith.manual.ManualCraftManager;
 import me.newyith.memory.ConfigManager;
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
@@ -16,12 +16,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class FortressPlugin extends JavaPlugin {
+	public static int config_glowstoneDustBurnTimeMs = 1000*60*60; //TODO: add this to config and make other places in code use this value
+	//TODO: add more config_whatever values
+
     @Override
     public void onEnable() {
 		TickTimer.onEnable(this);
-        EventListener.onEnable(this);
-        ConfigManager.onEnable(this);
-		CraftManager.onEnable(this);
+		EventListener.onEnable(this);
+		ConfigManager.onEnable(this);
+		ManualCraftManager.onEnable(this);
 
         sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
         sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
@@ -95,7 +98,6 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-//DONE: make water/lava buckets cause water/lava source blocks to be protected (probably doesn't already work. need to check)
 
 
 
@@ -116,7 +118,7 @@ public class FortressPlugin extends JavaPlugin {
 //first dye: selects team color
 //	allow multiple teams to be same color (differentiate teams by number of dye items in stack)
 //	if someone else has already claimed that team color, tell player team color is taken
-//		after 24 hours of being turned off, generator's team color is unclaimed
+//		after 24 hours of not being on, generator's team color is unclaimed
 //	if no valid team color indicated, team particles are both white and black (interspersed)
 //	replace generator's running indicator particles with team particles
 //other dyes: allies you with other team(s) if alliance is mutual

@@ -169,13 +169,15 @@ public class FortressGeneratorParticlesManager {
 
 				//TODO: use this code for team particles once I keep track of who belongs to what team
 				Player player = rune.getGeneratorCore().getOwner();
-				ItemStack handItemStack = player.getItemInHand();
-				if (handItemStack != null && handItemStack.getType() == Material.INK_SACK) {
-					ThreeBitColor c = ThreeBitColor.fromDyeItem(handItemStack);
-					Location loc = player.getLocation();
-					//loc.add(0, 2, 0);
+				if (player != null) {
+					ItemStack handItemStack = player.getItemInHand();
+					if (handItemStack != null && handItemStack.getType() == Material.INK_SACK) {
+						ThreeBitColor c = ThreeBitColor.fromDyeItem(handItemStack);
+						Location loc = player.getLocation();
+						//loc.add(0, 2, 0);
 
-					ColoredParticle.SPELL_MOB.display(loc, 15, c.r(), c.g(), c.b());
+						ColoredParticle.SPELL_MOB.display(loc, 15, c.r(), c.g(), c.b());
+					}
 				}
 
 
