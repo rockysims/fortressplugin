@@ -94,14 +94,26 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
+// --- MVP ---
+
+//TODO: change to new rune pattern
+//TODO: make signs on generator's base a global white list
+//TODO: make placing sign be the way to activate rune
+//TODO: make swapping redstone/chest positions still work
+//TODO: change '/stuck' to '/fort stuck' and make delay configurable
+//TODO: increase generation range (64? at least some). make range configurable
+
+//TODO: save data into a file instead of config (so config won't get too big to open)
+//TODO: add potentialAlteredPoints and update + re-save it before generation (to make it robust enough to handle server crashes)
+
+//MAYBE MVP?: make generation display wave of particle to indicate generating wall blocks
+//	onGenerateBlock, show particles appearing for a few seconds at random points on all faces not touching solid block
+//		maybe use nether particle but make the nether particle be drawn toward block (like the particles are drawn to nether portal)
+
+// --- --- ---
 
 
 
-
-
-
-
-//TODO: figure out how to save data into a file instead of config (so config won't get too big to open)
 
 
 //teams:
@@ -123,6 +135,9 @@ public class FortressPlugin extends JavaPlugin {
 //	replace generator's running indicator particles with team particles
 //other dyes: allies you with other team(s) if alliance is mutual
 //	while allied, enchant dye item with Protection I (remove enchant if removed from chest)
+//quartz item: ignore white listed names not also on generator's base.
+//	that way removing someone from base white list signs is an effective way to kick from team
+//		make doors with white list sign(s) but no valid names fall back to base white list signs
 
 //commands:
 /*
@@ -139,10 +154,6 @@ public class FortressPlugin extends JavaPlugin {
 Note: To kick, remove name from base sign
 TODO: remove home and key runes
 */
-
-//TODO: consider making white list signs on door be limited to names on base white list signs
-//	that way removing someone from base white list signs is an effective way to kick from team
-//		make doors with white list sign(s) but no valid names fall back to base white list signs
 
 
 

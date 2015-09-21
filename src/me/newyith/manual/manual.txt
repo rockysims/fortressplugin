@@ -13,7 +13,7 @@ The generator rune
 is a 3x2x1 pattern of
 blocks that can burn
 glowstone to make any
-touched structure
+adjacent structure
 unbreakable.
 
 Structure must be
@@ -23,8 +23,8 @@ fuel chest.
 =======
 Rune Pattern
 
-Layer 1: III
-Layer 2: RDC
+Top layer:    RDC
+Bottom layer: III
 I: iron block
 R: redstone dust
 D: diamond block
