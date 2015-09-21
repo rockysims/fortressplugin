@@ -110,6 +110,8 @@ public class FortressPlugin extends JavaPlugin {
 //	onGenerateBlock, show particles appearing for a few seconds at random points on all faces not touching solid block
 //		maybe use nether particle but make the nether particle be drawn toward block (like the particles are drawn to nether portal)
 
+//maybe finish writing version of manual that includes all planned features before actually releasing MVP
+
 // --- --- ---
 
 
