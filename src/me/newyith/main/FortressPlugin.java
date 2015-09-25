@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class FortressPlugin extends JavaPlugin {
-	public static int config_glowstoneDustBurnTimeMs = 1000*60*60; //TODO: add this to config and make other places in code use this value
+	public static int config_glowstoneDustBurnTimeMs = 1000*60*60; //TODO: add this to config (once main data store is moved out?)
 	//TODO: add more config_whatever values
 
     @Override
@@ -104,6 +104,7 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: change '/stuck' to '/fort stuck' (done) and make delay configurable (not done)
 //TODO: increase generation range (64? at least some). make range configurable
+//	maybe change to block limit instead? probably a better solution
 //TODO: change to new rune pattern
 	//TODO: make placing sign be the way to activate rune
 	//TODO: make swapping redstone/chest positions still work
