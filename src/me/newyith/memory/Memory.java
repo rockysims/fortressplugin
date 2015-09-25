@@ -121,7 +121,7 @@ public class Memory {
 		return list;
 	}
 
-	//List<List<Point>>
+	//List<List<Point>> (compact)
 	public void saveLayersCompact(String key, List<List<Point>> layers) {
 		Memory m = new Memory(section(key));
 
@@ -143,7 +143,7 @@ public class Memory {
 		return layers;
 	}
 
-	//HashMap<Point, Material>
+	//HashMap<Point, Material> (compact)
 	public void savePointMaterialMapCompact(String key, HashMap<Point, Material> map) {
 		Memory m = new Memory(section(key));
 

@@ -52,13 +52,16 @@ public class FortressPlugin extends JavaPlugin {
 		String commandName = cmd.getName();
 		boolean commandHandled = false;
 
-		// /stuck
-		if (commandName.equalsIgnoreCase("stuck")) {
-			if (sender instanceof Player) {
+		// /fort [subCommand]
+		if (commandName.equalsIgnoreCase("fort") && args.length > 0 && sender instanceof Player) {
+			String subCommand = args[0];
+
+			// /fort stuck
+			if (subCommand.equalsIgnoreCase("stuck")) {
 				Player player = (Player)sender;
 				Commands.onStuckCommand(player);
+				commandHandled = true;
 			}
-			commandHandled = true;
 		}
 
 		//TODO: remove this command
@@ -94,23 +97,28 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
+//use jackson to save/load instead of config.yml
+//http://www.mkyong.com/java/how-to-convert-java-object-to-from-json-jackson/
+
 // --- MVP ---
 
-//TODO: change to new rune pattern
-//TODO: make signs on generator's base a global white list
-//TODO: make placing sign be the way to activate rune
-//TODO: make swapping redstone/chest positions still work
-//TODO: change '/stuck' to '/fort stuck' and make delay configurable
+//TODO: change '/stuck' to '/fort stuck' (done) and make delay configurable (not done)
 //TODO: increase generation range (64? at least some). make range configurable
+//TODO: change to new rune pattern
+	//TODO: make placing sign be the way to activate rune
+	//TODO: make swapping redstone/chest positions still work
+//TODO: make signs on generator's base a global white list
 
-//TODO: save data into a file instead of config (so config won't get too big to open)
+//TODO: save data using jackson instead of config (so config won't get too big to open)
 //TODO: add potentialAlteredPoints and update + re-save it before generation (to make it robust enough to handle server crashes)
 
+//TODO: onProtect, if (block is solid || glass) change block to bedrock for a second then back to original material
+//do above idea with bedrock instead of below idea with particles
 //MAYBE MVP?: make generation display wave of particle to indicate generating wall blocks
 //	onGenerateBlock, show particles appearing for a few seconds at random points on all faces not touching solid block
 //		maybe use nether particle but make the nether particle be drawn toward block (like the particles are drawn to nether portal)
 
-//maybe finish writing version of manual that includes all planned features before actually releasing MVP
+//maybe finish writing version of manual that includes all planned features before actually releasing MVP (just so I've thought it all out)
 
 // --- --- ---
 

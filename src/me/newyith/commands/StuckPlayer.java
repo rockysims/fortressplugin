@@ -18,7 +18,7 @@ public class StuckPlayer {
 	Random random = new Random();
 	private int quadrantSize = 32;
 	private final int stuckDelayMs = 30 * 1000;
-	private final int cancelDistance = 8; //8 blocks
+	private final int cancelDistance = 4; //4 blocks
 
 	public StuckPlayer(Player player) {
 		this.player = player;
@@ -107,7 +107,7 @@ public class StuckPlayer {
 	}
 
 	public void sendStartMessage() {
-		String msgLine1 = "/stuck will cancel if you move 8+ blocks away or take damage.";
+		String msgLine1 = "/stuck will cancel if you move " + cancelDistance + "+ blocks away or take damage.";
 
 		String msgLine2 = "";
 		int ms = this.stuckDelayMs;
