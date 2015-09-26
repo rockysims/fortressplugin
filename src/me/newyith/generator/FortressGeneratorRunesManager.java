@@ -106,10 +106,10 @@ public class FortressGeneratorRunesManager {
 		runeInstances.forEach(FortressGeneratorRune::onTick);
 	}
 
-	public static void onPlayerRightClickBlock(Player player, Block clickedBlock) {
-		FortressGeneratorRunePattern runePattern = new FortressGeneratorRunePattern(clickedBlock);
-		if (runePattern.matchedReadyPattern()) {
-			boolean runeAlreadyCreated = runeByPoint.containsKey(new Point(clickedBlock.getLocation()));
+	public static void onSignChange(Player player, Block placedBlock) {
+		FortressGeneratorRunePattern runePattern = FortressGeneratorRunePattern.tryPatternAt(placedBlock);
+		if (runePattern != null) {
+			boolean runeAlreadyCreated = runeByPoint.containsKey(new Point(placedBlock.getLocation()));
 			if (!runeAlreadyCreated) {
 				FortressGeneratorRune rune = new FortressGeneratorRune(runePattern);
 				runeInstances.add(rune);
@@ -121,13 +121,9 @@ public class FortressGeneratorRunesManager {
 
 				rune.onCreated(player);
 			} else {
+				//TODO: consider coloring this message or better yet abstracting sendMsg among all classes
 				player.sendMessage("Failed to create rune because rune already created here.");
 			}
-
-//			player.getInventory().addItem(new ItemStack(Material.GLOWING_REDSTONE_ORE));
-//			player.getInventory().addItem(new ItemStack(Material.SPONGE));
-			//player.getInventory().addItem(new ItemStack(Material.BURNING_FURNACE));
-//			player.getInventory().addItem(new ItemStack(Material.FARMLAND));
 		}
 	}
 

@@ -97,6 +97,11 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
+//change to new rune pattern
+
+
+
+
 //use jackson to save/load instead of config.yml
 //http://www.mkyong.com/java/how-to-convert-java-object-to-from-json-jackson/
 

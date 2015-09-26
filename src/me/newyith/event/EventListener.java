@@ -29,17 +29,15 @@ public class EventListener implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true) //ignoreCancelled adds a virtual "if (event.isCancelled()) { return; }" to the method
-    public void onPlayerRightClickBlock(PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-			Player player = event.getPlayer();
-			Block clickedBlock = event.getClickedBlock();
-            FortressGeneratorRunesManager.onPlayerRightClickBlock(player, clickedBlock);
-        }
+    public void onBlockBreakEvent(BlockBreakEvent event) {
+        FortressGeneratorRunesManager.onBlockBreakEvent(event);
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onBlockBreakEvent(BlockBreakEvent event) {
-        FortressGeneratorRunesManager.onBlockBreakEvent(event);
+    public void onSignChange(SignChangeEvent event) {
+        Player player = event.getPlayer();
+        Block block = event.getBlock();
+        FortressGeneratorRunesManager.onSignChange(player, block);
     }
 
     @EventHandler(ignoreCancelled = true)

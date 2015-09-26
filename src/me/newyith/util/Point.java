@@ -97,21 +97,23 @@ public class Point implements Memorable {
 		return d;
 	}
 
-	public void add(Point p) {
+	public Point add(Point p) {
 		if(p != null && p.getWorld() == this.getWorld()) {
-			this.x += p.x;
-			this.y += p.y;
-			this.z += p.z;
+			double x = this.x + p.x;
+			double y = this.y + p.y;
+			double z = this.z + p.z;
+			return new Point(p.world, x, y, z);
 		} else {
 			throw new IllegalArgumentException("Cannot add Locations of differing worlds");
 		}
 	}
 
 	public Point add(double x, double y, double z) {
-		this.x += x;
-		this.y += y;
-		this.z += z;
-		return this;
+		Point p = new Point(this);
+		p.x += x;
+		p.y += y;
+		p.z += z;
+		return p;
 	}
 
 	public boolean is(Material mat) {

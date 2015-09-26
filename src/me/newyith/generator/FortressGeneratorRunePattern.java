@@ -6,6 +6,8 @@ import me.newyith.util.Point;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.material.Sign;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,20 +56,30 @@ public class FortressGeneratorRunePattern implements Memorable {
 
 	//------------------------------------------------------------------------------------------------------------------
 
-	public FortressGeneratorRunePattern(Block anchorBlock) {
-		this.anchorPoint = new Point(anchorBlock.getLocation());
-		this.runPatternMatch(anchorBlock);
+	public static Point getPointSignAttachedTo(Block signBlock) {
+		Point s = new Point(signBlock.getLocation());
+		Sign sign = (Sign) signBlock.getState().getData();
+		BlockFace af = sign.getAttachedFace();
+		int x = af.getModX();
+		int y = af.getModY();
+		int z = af.getModZ();
+		return new Point(s.world, s.x + x, s.y + y, s.z + z);
 	}
 
-	public void runPatternMatch(Block anchorBlock) {
-		if (anchorBlock != null && anchorBlock.getType() == Material.GOLD_BLOCK) {
-			World world = anchorBlock.getWorld();
-			Point a = new Point(anchorBlock.getLocation());
+	public static FortressGeneratorRunePattern tryPatternAt(Block signBlock) {
+		FortressGeneratorRunePattern pattern = null;
 
-			//set towardFront, towardBack, towardLeft, towardRight
-			Point signPoint = this.findSignPoint();
-			if (signPoint != null) {
-				Point towardFront = new Point(signPoint.difference(a));
+		//if (found sign)
+		if (signBlock.getType() == Material.WALL_SIGN) {
+			Point s = new Point(signBlock.getLocation());
+			Point a = getPointSignAttachedTo(signBlock);
+
+			//if (found diamond)
+			if (a.is(Material.DIAMOND_BLOCK)) {
+				World world = a.world;
+
+				//set towardFront, towardBack, towardLeft, towardRight
+				Point towardFront = s.difference(a);
 				Point towardLeft = new Point(world, towardFront.z, 0, towardFront.x);
 				if (towardFront.x == 0) {
 					towardLeft = new Point(world, -1 * towardLeft.x, 0, -1 * towardLeft.z);
@@ -75,95 +87,58 @@ public class FortressGeneratorRunePattern implements Memorable {
 				Point towardBack = new Point(world, -1 * towardFront.x, 0, -1 * towardFront.z);
 				Point towardRight = new Point(world, -1 * towardLeft.x, 0, -1 * towardLeft.z);
 
-				boolean matches = true;
-				Point p;
-
-				//Layer 2 (top)
-				p = new Point(a);
-				matches = matches && p.matches(Material.GOLD_BLOCK);
-				p.add(towardBack); //N
-				this.runningPoint = new Point(p);
-				matches = matches && p.matches(Material.DIAMOND_BLOCK);
-				p.add(towardRight); //NE
-				this.fuelPoint = new Point(p);
-				matches = matches && p.matches(Material.IRON_BLOCK);
-				p.add(towardFront); //E
-				this.chestPoint = new Point(p);
-				matches = matches && p.matches(Material.CHEST);
-				p.add(towardFront); //SE
-				matches = matches && p.matches(Material.AIR);
-				p.add(towardLeft); //S
-				this.signPoint = new Point(p);
-				matches = matches && p.matches(Material.WALL_SIGN);
-				p.add(towardLeft); //SW
-				matches = matches && p.matches(Material.AIR);
-				p.add(towardBack); //W
-				this.wirePoint = new Point(p);
-				matches = matches && p.matches(Material.REDSTONE_WIRE);
-				p.add(towardBack); //NW
-				this.pausePoint = new Point(p);
-				matches = matches && p.matches(Material.IRON_BLOCK);
-
-
-				//Layer 1 (bottom)
-				p = new Point(world, a.x, a.y - 1, a.z);
-				matches = matches && p.matches(Material.OBSIDIAN);
-				p.add(towardBack); //N
-				matches = matches && p.matches(Material.OBSIDIAN);
-				p.add(towardRight); //NE
-				matches = matches && p.matches(Material.OBSIDIAN);
-				p.add(towardFront); //E
-				matches = matches && p.matches(Material.OBSIDIAN);
-				p.add(towardFront); //SE
-				matches = matches && p.matches(Material.OBSIDIAN);
-				p.add(towardLeft); //S
-				matches = matches && p.matches(Material.OBSIDIAN);
-				p.add(towardLeft); //SW
-				matches = matches && p.matches(Material.OBSIDIAN);
-				p.add(towardBack); //W
-				matches = matches && p.matches(Material.OBSIDIAN);
-				p.add(towardBack); //NW
-				matches = matches && p.matches(Material.OBSIDIAN);
-
-				//fill pointsInPattern
-				for (int y = -1; y <= 0; y++) {
-					for (int x = -1; x <= 1; x++) {
-						for (int z = -1; z <= 1; z++) {
-							this.pointsInPattern.add(new Point(a.world, a.x + x, a.y + y, a.z + z));
-						}
-					}
+				//find remaining points
+				Point w = a.add(towardLeft);
+				Point c = a.add(towardRight);
+				Point p = a.add(0, -1, 0).add(towardLeft);
+				Point r = a.add(0, -1, 0);
+				Point f = a.add(0, -1, 0).add(towardRight);
+				if (c.is(Material.REDSTONE_WIRE) && w.is(Material.CHEST)) {
+					Point t;
+					//reverse wire / chest
+					t = w;
+					w = c;
+					c = t;
+					//reverse pause / fuel
+					t = p;
+					p = f;
+					f = t;
 				}
 
-				this.matchedReadyPattern = matches;
-			} else {
-				this.matchedReadyPattern = false;
-			}
-		} else {
-			this.matchedReadyPattern = false;
-		}
-	}
-	private Point findSignPoint() {
-		Point a = this.anchorPoint;
+				//check other blocks match pattern
+				boolean valid = true;
+				valid = valid && w.is(Material.REDSTONE_WIRE);
+				valid = valid && c.is(Material.CHEST);
+				valid = valid && p.is(Material.IRON_BLOCK);
+				valid = valid && r.is(Material.IRON_BLOCK);
+				valid = valid && f.is(Material.IRON_BLOCK);
 
-		ArrayList<Point> points = new ArrayList<>();
-		points.add(new Point(a.world, a.x + 1, a.y, a.z));
-		points.add(new Point(a.world, a.x - 1, a.y, a.z));
-		points.add(new Point(a.world, a.x, a.y, a.z + 1));
-		points.add(new Point(a.world, a.x, a.y, a.z - 1));
-
-		Point signPoint = null;
-		for (Point p : points) {
-			Block block = p.getBlock();
-			if (block.getType() == Material.WALL_SIGN) {
-				signPoint = p;
+				if (valid) {
+					pattern = new FortressGeneratorRunePattern(s, w, a, c, p, r, f);
+				}
 			}
 		}
 
-		return signPoint;
+		return pattern;
 	}
 
-	public boolean matchedReadyPattern() {
-		return this.matchedReadyPattern;
+	private FortressGeneratorRunePattern(Point s, Point w, Point a, Point c, Point p, Point r, Point f) {
+		signPoint = s;
+		wirePoint = w;
+		anchorPoint = a;
+		chestPoint = c;
+		pausePoint = p;
+		runningPoint = r;
+		fuelPoint = f;
+
+		//fill pointsInPattern
+		this.pointsInPattern.add(s);
+		this.pointsInPattern.add(w);
+		this.pointsInPattern.add(a);
+		this.pointsInPattern.add(c);
+		this.pointsInPattern.add(p);
+		this.pointsInPattern.add(r);
+		this.pointsInPattern.add(f);
 	}
 
 	public boolean contains(Block block) {
