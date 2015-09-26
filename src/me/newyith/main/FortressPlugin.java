@@ -104,7 +104,8 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: change '/stuck' to '/fort stuck' (done) and make delay configurable (not done)
 //TODO: increase generation range (64? at least some). make range configurable
-//	maybe change to block limit instead? probably a better solution
+//	maybe change to block limit instead? feels like a better solution... however:
+//		issue is /fort stuck can't tell if your close enough to pay attention to and same with getNearbyRunes for claim checking
 //TODO: change to new rune pattern
 	//TODO: make placing sign be the way to activate rune
 	//TODO: make swapping redstone/chest positions still work
@@ -149,6 +150,10 @@ public class FortressPlugin extends JavaPlugin {
 //quartz item: ignore white listed names not also on generator's base.
 //	that way removing someone from base white list signs is an effective way to kick from team
 //		make doors with white list sign(s) but no valid names fall back to base white list signs
+
+//TODO: maybe: if player carries compass then instead of team color particles they see green/yellow/red for team/ally/other
+//maybe if player carries clock show team particles even if players are not moving (except self)
+//i think ParticleEffects already handles player specific particles but not certain
 
 //commands:
 /*
