@@ -23,17 +23,17 @@ fuel chest.
 =======
 Rune Pattern
 
-I: iron block
 R: redstone dust
-D: diamond block
+G: gold block
 C: chest
+D: diamond block
+I: iron block
 
-Top layer:    RDC
-Bottom layer: III
+Top layer:    RGC
+Bottom layer: IDI
 
-Place a sign on either
-side of diamond block
-to activate generator.
+Place a sign on side of
+gold block to activate.
 =======
 Doors
 
@@ -46,8 +46,8 @@ above door to white
 list player(s).
 
 If door has no white
-list, it looks for signs
-on rune's iron base.
+list signs, it looks for
+signs on rune's base.
 =======
 Redstone
 

@@ -97,10 +97,6 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
-//change to new rune pattern
-//update manual to match new rune pattern
-
-
 
 
 //use jackson to save/load instead of config.yml
@@ -112,9 +108,6 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: increase generation range (64? at least some). make range configurable
 //	maybe change to block limit instead? feels like a better solution... however:
 //		issue is /fort stuck can't tell if your close enough to pay attention to and same with getNearbyRunes for claim checking
-//TODO: change to new rune pattern
-	//TODO: make placing sign be the way to activate rune
-	//TODO: make swapping redstone/chest positions still work
 //TODO: make signs on generator's base a global white list
 
 //TODO: save data using jackson instead of config (so config won't get too big to open)
