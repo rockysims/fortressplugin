@@ -98,6 +98,7 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 //change to new rune pattern
+//update manual to match new rune pattern
 
 
 

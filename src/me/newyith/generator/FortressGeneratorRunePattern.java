@@ -74,8 +74,8 @@ public class FortressGeneratorRunePattern implements Memorable {
 			Point s = new Point(signBlock.getLocation());
 			Point a = getPointSignAttachedTo(signBlock);
 
-			//if (found diamond)
-			if (a.is(Material.DIAMOND_BLOCK)) {
+			//if (found anchor)
+			if (a.is(Material.GOLD_BLOCK)) {
 				World world = a.world;
 
 				//set towardFront, towardBack, towardLeft, towardRight
@@ -110,7 +110,7 @@ public class FortressGeneratorRunePattern implements Memorable {
 				valid = valid && w.is(Material.REDSTONE_WIRE);
 				valid = valid && c.is(Material.CHEST);
 				valid = valid && p.is(Material.IRON_BLOCK);
-				valid = valid && r.is(Material.IRON_BLOCK);
+				valid = valid && r.is(Material.DIAMOND_BLOCK);
 				valid = valid && f.is(Material.IRON_BLOCK);
 
 				if (valid) {
