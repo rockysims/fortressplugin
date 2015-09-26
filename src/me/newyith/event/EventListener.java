@@ -37,7 +37,10 @@ public class EventListener implements Listener {
     public void onSignChange(SignChangeEvent event) {
         Player player = event.getPlayer();
         Block block = event.getBlock();
-        FortressGeneratorRunesManager.onSignChange(player, block);
+        boolean cancel = FortressGeneratorRunesManager.onSignChange(player, block);
+        if (cancel) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(ignoreCancelled = true)

@@ -106,7 +106,9 @@ public class FortressGeneratorRunesManager {
 		runeInstances.forEach(FortressGeneratorRune::onTick);
 	}
 
-	public static void onSignChange(Player player, Block placedBlock) {
+	public static boolean onSignChange(Player player, Block placedBlock) {
+		boolean cancel = false;
+
 		FortressGeneratorRunePattern runePattern = FortressGeneratorRunePattern.tryPatternAt(placedBlock);
 		if (runePattern != null) {
 			boolean runeAlreadyCreated = runeByPoint.containsKey(new Point(placedBlock.getLocation()));
@@ -120,11 +122,14 @@ public class FortressGeneratorRunesManager {
 				}
 
 				rune.onCreated(player);
+				cancel = true; //otherwise initial text on sign is replaced by what user wrote
 			} else {
 				//TODO: consider coloring this message or better yet abstracting sendMsg among all classes
 				player.sendMessage("Failed to create rune because rune already created here.");
 			}
 		}
+
+		return cancel;
 	}
 
 	public static void onBlockRedstoneEvent(BlockRedstoneEvent event) {
