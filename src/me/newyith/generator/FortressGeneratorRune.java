@@ -371,4 +371,21 @@ public class FortressGeneratorRune implements Memorable {
 
 		return count;
 	}
+
+	@Override
+	public boolean equals(Object ob) {
+		boolean match = false;
+
+		if (ob instanceof FortressGeneratorRune) {
+			FortressGeneratorRune rune = (FortressGeneratorRune) ob;
+			match = this.pattern.anchorPoint == rune.pattern.anchorPoint;
+		}
+
+		return match;
+	}
+
+	@Override
+	public int hashCode() {
+		return this.pattern.anchorPoint.hashCode();
+	}
 }

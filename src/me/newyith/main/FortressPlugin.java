@@ -116,6 +116,8 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
+//TODO: keep generation range limit and make it big but also put a block limit
+
 //TODO: change back to /stuck (still use '/fort whatever' later but /stuck should be an exception... maybe need to think more
 
 //TODO: make /fort stuck logic make more sense
