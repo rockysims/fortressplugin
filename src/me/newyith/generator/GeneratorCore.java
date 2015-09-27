@@ -1,5 +1,6 @@
 package me.newyith.generator;
 
+import me.newyith.main.FortressPlugin;
 import me.newyith.memory.Memorable;
 import me.newyith.memory.Memory;
 import me.newyith.util.Debug;
@@ -25,7 +26,7 @@ public class GeneratorCore implements Memorable {
 	private Set<Point> pointsInsideFortress = new HashSet<>(); //TODO: consider changing to layerInsideFortress
 
 	//not saved
-	private final int generationRangeLimit = 32;
+	private final int generationRangeLimit = FortressPlugin.config_generationRange;
 
 	/*
 	altered:

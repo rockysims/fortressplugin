@@ -1,6 +1,9 @@
 package me.newyith.commands;
 
+import me.newyith.generator.FortressGeneratorRune;
+import me.newyith.generator.FortressGeneratorRunesManager;
 import me.newyith.main.FortressPlugin;
+import me.newyith.util.Debug;
 import me.newyith.util.Point;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -20,6 +23,7 @@ public class StuckPlayer {
 	private int quadrantSize = 32;
 	private final int stuckDelayMs = FortressPlugin.config_stuckDelayMs;
 	private final int cancelDistance = FortressPlugin.config_stuckCancelDistance;
+	private Set<FortressGeneratorRune> nearbyRunes;
 
 	public StuckPlayer(Player player) {
 		this.player = player;
@@ -59,6 +63,8 @@ public class StuckPlayer {
 				this.messages.remove(displayTime);
 			}
 		}
+
+		nearbyRunes = FortressGeneratorRunesManager.getOtherRunesInRange(startPoint, FortressPlugin.config_generationRange);
 	}
 
 	public void considerSendingMessage() {
@@ -86,19 +92,23 @@ public class StuckPlayer {
 		double changeInY = Math.abs(p.y - startPoint.y);
 		double changeInZ = Math.abs(p.z - startPoint.z);
 
+		if (nearbyRunes.size() == 0) {
+			//player is too far from any fortress
+			cancel = true;
+			sendMessage("/stuck failed because you are too far from any fortress.");
+		}
+
 		if (changeInX > cancelDistance || changeInY > cancelDistance || changeInZ > cancelDistance) {
 			//player moved too far away
 			cancel = true;
-			String msg = "/stuck cancelled because you moved too far away.";
-			sendMessage(msg);
+			sendMessage("/stuck cancelled because you moved too far away.");
 		}
 
 		double health = this.player.getHealth();
 		if (health < this.maxHealthOnRecord) {
 			//player took damage
 			cancel = true;
-			String msg = "/stuck cancelled because you took damage.";
-			sendMessage(msg);
+			sendMessage("/stuck cancelled because you took damage.");
 		} else if (health > this.maxHealthOnRecord) {
 			//player healed
 			this.maxHealthOnRecord = this.player.getHealth();
@@ -200,6 +210,20 @@ public class StuckPlayer {
 	}
 
 	private Point getRandomNearbyPoint(Point p) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		//TODO: consider rewriting this in a way that makes more sense to read (still not sure it works correctly)
 
 		int dist = quadrantSize  + quadrantSize / 2 + (int)(random.nextFloat() * quadrantSize);

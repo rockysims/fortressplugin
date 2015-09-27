@@ -44,8 +44,11 @@ public class Commands {
 
 		if (alreadyStuckPlayer == null) {
 			StuckPlayer stuckPlayer = new StuckPlayer(player);
-			stuckPlayer.sendStartMessage();
-			stuckList.add(stuckPlayer);
+			boolean cancelStuck = stuckPlayer.considerCancelling();
+			if (!cancelStuck) {
+				stuckPlayer.sendStartMessage();
+				stuckList.add(stuckPlayer);
+			}
 		} else {
 			alreadyStuckPlayer.sendBePatientMessage();
 		}

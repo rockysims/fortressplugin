@@ -20,12 +20,14 @@ public class FortressPlugin extends JavaPlugin {
 	public static int config_glowstoneDustBurnTimeMs = 1000*60*60; //1 hour
 	public static int config_stuckDelayMs = 30 * 1000; //30 seconds
 	public static int config_stuckCancelDistance = 4; //4 blocks
+	public static int config_generationRange = 32; //32 blocks
 
 	private void readConfig() {
 		FileConfiguration config = getConfig();
 		config_glowstoneDustBurnTimeMs = getConfigInt(config, "glowstoneDustBurnTimeMs", config_glowstoneDustBurnTimeMs);
 		config_stuckDelayMs = getConfigInt(config, "stuckDelayMs", config_stuckDelayMs);
 		config_stuckCancelDistance = getConfigInt(config, "stuckCancelDistance", config_stuckCancelDistance);
+		config_generationRange = getConfigInt(config, "generationRange", config_generationRange);
 		saveConfig();
 	}
 	private int getConfigInt(FileConfiguration config, String key, int defaultValue) {
@@ -114,7 +116,10 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
+//TODO: change back to /stuck (still use '/fort whatever' later but /stuck should be an exception... maybe need to think more
+
 //TODO: make /fort stuck logic make more sense
+//	maybe it teleports you to random point in rough fortress box but block you land on has to be solid
 //	maybe it should try to send you straight forward/left/right/back to 1+ blocks beyond furthest claimed point in same direction
 //		something like that but make it more random
 
