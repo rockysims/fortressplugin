@@ -3,7 +3,7 @@ package me.newyith.commands;
 import me.newyith.generator.FortressGeneratorRune;
 import me.newyith.generator.FortressGeneratorRunesManager;
 import me.newyith.main.FortressPlugin;
-import me.newyith.util.Debug;
+import me.newyith.util.Cuboid;
 import me.newyith.util.Point;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -19,8 +19,7 @@ public class StuckPlayer {
 
 	private Map<Integer, String> messages;
 
-	Random random = new Random();
-	private int quadrantSize = 32;
+	private final int nearbyRange = 10;
 	private final int stuckDelayMs = FortressPlugin.config_stuckDelayMs;
 	private final int cancelDistance = FortressPlugin.config_stuckCancelDistance;
 	private Set<FortressGeneratorRune> nearbyRunes;
@@ -186,23 +185,24 @@ public class StuckPlayer {
 		}
 	}
 
-	private Point getValidTeleportDest(Point center) {
+	private Point getValidTeleportDest(Point p) {
 		Point validDest = null;
 
-		int maxHeight = center.world.getMaxHeight();
-		Point p = new Point(center);
-		for (int y = maxHeight-2; y >= 0; y--) {
-			p.y = y;
-			if (!p.is(Material.AIR)) {
-				//first non air block
+		if (p != null) {
+			int maxHeight = p.world.getMaxHeight();
+			for (int y = maxHeight-2; y >= 0; y--) {
+				p.y = y;
+				if (!p.is(Material.AIR)) {
+					//first non air block
 
-				//check if valid teleport destination
-				if (p.getBlock().getType().isSolid()) {
-					p.y++;
-					validDest = p;
+					//check if valid teleport destination
+					if (p.getBlock().getType().isSolid()) {
+						p.y++;
+						validDest = p;
+					}
+
+					break;
 				}
-
-				break;
 			}
 		}
 
@@ -210,60 +210,37 @@ public class StuckPlayer {
 	}
 
 	private Point getRandomNearbyPoint(Point p) {
+		Point nearbyPoint = null;
 
+		if (nearbyRunes.size() > 0) {
+			//set combinedCuboid
+			List<Cuboid> runeCuboids = new ArrayList<>();
+			nearbyRunes.stream().forEach(nearbyRune -> {
+				runeCuboids.add(nearbyRune.getFortressCuboid());
+			});
+			Cuboid combinedCuboid = Cuboid.fromCuboids(runeCuboids, p.world);
 
+			//set outerCuboid
+			Point outerMin = combinedCuboid.getMin().add(-1 * nearbyRange, -1 * nearbyRange, -1 * nearbyRange);
+			Point outerMax = combinedCuboid.getMax().add(nearbyRange, nearbyRange, nearbyRange);
+			Cuboid outerCuboid = new Cuboid(outerMin, outerMax);
 
+			//set combinedSheet and outerSheet
+			double y = combinedCuboid.getMax().y;
+			Set<Point> combinedSheet = combinedCuboid.getPointsAtHeight(y);
+			Set<Point> outerSheet = outerCuboid.getPointsAtHeight(y);
 
+			//set nearbyPoints
+			List<Point> nearbyPoints = new ArrayList<>();
+			nearbyPoints.addAll(outerSheet);
+			nearbyPoints.removeAll(combinedSheet);
 
-
-
-
-
-
-
-
-
-
-		//TODO: consider rewriting this in a way that makes more sense to read (still not sure it works correctly)
-
-		int dist = quadrantSize  + quadrantSize / 2 + (int)(random.nextFloat() * quadrantSize);
-		double x = p.x;
-		double y = p.y;
-		double z = p.z;
-
-
-		//pick a quadrant
-		//move left, right, forward, or backward by dist
-		float f = random.nextFloat() * 100;
-		if (f < 25) {
-			x += dist;
-		} else if (f < 50) {
-			x -= dist;
-		} else if (f < 75) {
-			z += dist;
-		} else {
-			z -= dist;
-		}
-		//move left or right OR forward or backward by quadrantSize
-		if (f < 50) { //x changed
-			if (random.nextFloat() * 100 < 50) {
-				z += quadrantSize;
-			} else {
-				z -= quadrantSize;
-			}
-		} else {// z changed
-			if (random.nextFloat() * 100 < 50) {
-				x += quadrantSize;
-			} else {
-				x -= quadrantSize;
+			if (nearbyPoints.size() > 0) {
+				Collections.shuffle(nearbyPoints);
+				nearbyPoint = nearbyPoints.get(0);
 			}
 		}
 
-		//move to random point in quadrant
-		x += (int)(random.nextFloat() * quadrantSize) - (quadrantSize/2);
-		z += (int)(random.nextFloat() * quadrantSize) - (quadrantSize/2);
-
-		return new Point(p.world, x, y, z);
+		return nearbyPoint;
 	}
-
 }

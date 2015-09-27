@@ -4,6 +4,7 @@ import me.newyith.event.TickTimer;
 import me.newyith.main.FortressPlugin;
 import me.newyith.memory.Memorable;
 import me.newyith.memory.Memory;
+import me.newyith.util.Cuboid;
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
 import org.bukkit.Material;
@@ -102,6 +103,22 @@ public class FortressGeneratorRune implements Memorable {
 
 	public Set<Point> getGeneratedPoints() {
 		return this.core.getGeneratedPoints();
+	}
+
+	public Cuboid getFortressCuboid() {
+		Point min = new Point(pattern.anchorPoint);
+		Point max = new Point(pattern.anchorPoint);
+
+		getGeneratedPoints().stream().forEach(p -> {
+			min.x = Math.min(min.x, p.x);
+			min.y = Math.min(min.y, p.y);
+			min.z = Math.min(min.z, p.z);
+			max.x = Math.max(max.x, p.x);
+			max.y = Math.max(max.y, p.y);
+			max.z = Math.max(max.z, p.z);
+		});
+
+		return new Cuboid(min, max);
 	}
 
 	// - Events -

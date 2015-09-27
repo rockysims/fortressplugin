@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.util.Vector;
 
 public class Point implements Memorable {
 	public World world;
@@ -64,6 +65,13 @@ public class Point implements Memorable {
 		this.x = loc.getBlockX();
 		this.y = loc.getBlockY();
 		this.z = loc.getBlockZ();
+	}
+
+	public Point(Vector vec, World world) {
+		this.world = world;
+		this.x = vec.getX();
+		this.y = vec.getY();
+		this.z = vec.getZ();
 	}
 
 	public Point(World world, double x, double y, double z) {
