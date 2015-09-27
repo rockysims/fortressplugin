@@ -4,7 +4,7 @@ import me.newyith.commands.Commands;
 import me.newyith.event.EventListener;
 import me.newyith.event.TickTimer;
 import me.newyith.manual.ManualCraftManager;
-import me.newyith.memory.ConfigManager;
+import me.newyith.memory.SaveLoadMemoryManager;
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
 import org.bukkit.ChatColor;
@@ -12,18 +12,38 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class FortressPlugin extends JavaPlugin {
-	public static int config_glowstoneDustBurnTimeMs = 1000*60*60; //TODO: add this to config (once main data store is moved out?)
+	public static int config_glowstoneDustBurnTimeMs = 1000*60*60;
 	//TODO: add more config_whatever values
+
+	private void readConfig() {
+		FileConfiguration config = getConfig();
+		String key;
+		boolean changed = false;
+
+		key = "glowstoneDustBurnTimeMs";
+		if (config.isInt(key)) {
+			config_glowstoneDustBurnTimeMs = config.getInt(key);
+		} else {
+			config.set(key, config_glowstoneDustBurnTimeMs);
+			changed = true;
+		}
+
+		if (changed) {
+			saveConfig();
+		}
+	}
 
     @Override
     public void onEnable() {
+		readConfig();
 		TickTimer.onEnable(this);
 		EventListener.onEnable(this);
-		ConfigManager.onEnable(this);
+		SaveLoadMemoryManager.onEnable(this);
 		ManualCraftManager.onEnable(this);
 
         sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
@@ -34,7 +54,7 @@ public class FortressPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        ConfigManager.onDisable(this);
+        SaveLoadMemoryManager.onDisable(this);
 
 		sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
 		sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
@@ -97,18 +117,17 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
-
-
-//use jackson to save/load instead of config.yml
-//http://www.mkyong.com/java/how-to-convert-java-object-to-from-json-jackson/
+//DONE: save data in data.yml instead of config.yml until I'm ready to do jackson
 
 // --- MVP ---
 
+//TODO: make signs on generator's base a global white list
+//TODO: make 'fort stuck' only work in range of generator
 //TODO: change '/stuck' to '/fort stuck' (done) and make delay configurable (not done)
 //TODO: increase generation range (64? at least some). make range configurable
 //	maybe change to block limit instead? feels like a better solution... however:
 //		issue is /fort stuck can't tell if your close enough to pay attention to and same with getNearbyRunes for claim checking
-//TODO: make signs on generator's base a global white list
+//			maybe each generator knows its x,y,z min/max and so we still use a box but don't need absolute range limit
 
 //TODO: save data using jackson instead of config (so config won't get too big to open)
 //TODO: add potentialAlteredPoints and update + re-save it before generation (to make it robust enough to handle server crashes)
@@ -125,6 +144,8 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: consider adding flag block/item to make generate/degenerate animation run faster
 
+//use jackson to save/load instead of data.yml
+//http://www.mkyong.com/java/how-to-convert-java-object-to-from-json-jackson/
 
 
 

@@ -2,10 +2,46 @@ package me.newyith.memory;
 
 import me.newyith.generator.FortressGeneratorRunesManager;
 import me.newyith.main.FortressPlugin;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
-public class ConfigManager {
+import java.io.File;
+import java.io.IOException;
+
+public class SaveLoadMemoryManager {
+
+
+
+
+
+
+
+
+//	public static void onEnable(FortressPlugin plugin) {
+//		newConfig = new File(getDataFolder(), "newconfig.yml");
+//		newConfigz = YamlConfiguration.loadConfiguration(newConfig);
+//	}
+//
+//	public void saveConfig() {
+//		try {
+//			newConfigz.save(newConfig);
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
+//
+//	public void onDisable(){
+//		saveConfig()
+//	}
+
+
+	private static File dataFile;
+	private static FileConfiguration dataFileConfig;
+
 	public static void onEnable(FortressPlugin plugin) {
-		Memory memory = new Memory(plugin.getConfig());
+		dataFile = new File(plugin.getDataFolder(), "data.yml");
+		dataFileConfig = YamlConfiguration.loadConfiguration(dataFile);
+		Memory memory = new Memory(dataFileConfig);
 		Memory m = new Memory(memory.section("RunesManager"));
 
 		FortressGeneratorRunesManager.loadFrom(m);
@@ -13,17 +49,49 @@ public class ConfigManager {
 
 	public static void onDisable(FortressPlugin plugin) {
 		//clear config
-		for(String key : plugin.getConfig().getKeys(false)){
-			plugin.getConfig().set(key, null);
+		for(String key : dataFileConfig.getKeys(false)){
+			dataFileConfig.set(key, null);
 		}
 
-		Memory memory = new Memory(plugin.getConfig());
+		Memory memory = new Memory(dataFileConfig);
 		Memory m = new Memory(memory.section("RunesManager"));
 
 		FortressGeneratorRunesManager.saveTo(m);
 
-		plugin.saveConfig();
+		//save data.yml
+		try {
+			dataFileConfig.save(dataFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
+
+
+
+
+
+
+	//TODO: reuse this for actual config file in FortressPlugin
+//	public static void onEnable_old(FortressPlugin plugin) {
+//		Memory memory = new Memory(plugin.getConfig());
+//		Memory m = new Memory(memory.section("RunesManager"));
+//
+//		FortressGeneratorRunesManager.loadFrom(m);
+//	}
+//
+//	public static void onDisable_old(FortressPlugin plugin) {
+//		//clear config
+//		for(String key : plugin.getConfig().getKeys(false)){
+//			plugin.getConfig().set(key, null);
+//		}
+//
+//		Memory memory = new Memory(plugin.getConfig());
+//		Memory m = new Memory(memory.section("RunesManager"));
+//
+//		FortressGeneratorRunesManager.saveTo(m);
+//
+//		plugin.saveConfig();
+//	}
 }
 
 

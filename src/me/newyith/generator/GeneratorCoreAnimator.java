@@ -30,56 +30,56 @@ public class GeneratorCoreAnimator implements Memorable {
 
 	public void saveTo(Memory m) {
 		m.save("anchorPoint", anchorPoint);
-		Debug.msg("saved anchorPoint: " + anchorPoint);
+//		Debug.msg("saved anchorPoint: " + anchorPoint);
 
 		Debug.msg("saving alteredPoints: " + alteredPoints.size());
 		m.savePointMaterialMapCompact("alteredPoints", alteredPoints);
-		Debug.msg("saved alteredPoints: " + alteredPoints.size());
+//		Debug.msg("saved alteredPoints: " + alteredPoints.size());
 
 		m.savePointSetCompact("protectedPoints", protectedPoints);
-		Debug.msg("saved protectedPoints: " + protectedPoints.size());
+//		Debug.msg("saved protectedPoints: " + protectedPoints.size());
 
 		m.saveLayersCompact("generatedLayers", generatedLayers);
-		Debug.msg("saved generatedLayers: " + generatedLayers.size());
+//		Debug.msg("saved generatedLayers: " + generatedLayers.size());
 
 		m.saveLayersCompact("animationLayers", animationLayers);
-		Debug.msg("saved animationLayers: " + animationLayers.size());
+//		Debug.msg("saved animationLayers: " + animationLayers.size());
 
 		m.save("animate", animate);
-		Debug.msg("saved animate: " + animate);
+//		Debug.msg("saved animate: " + animate);
 
 		m.save("isChangingGenerated", isChangingGenerated);
-		Debug.msg("saved isChangingGenerated: " + isChangingGenerated);
+//		Debug.msg("saved isChangingGenerated: " + isChangingGenerated);
 
 		m.save("isGeneratingWall", isGeneratingWall);
-		Debug.msg("saved isGeneratingWall: " + isGeneratingWall);
+//		Debug.msg("saved isGeneratingWall: " + isGeneratingWall);
 
 	}
 
 	public static GeneratorCoreAnimator loadFrom(Memory m) {
 		Point anchorPoint = m.loadPoint("anchorPoint");
-		Debug.msg("loaded anchorPoint: " + anchorPoint);
+//		Debug.msg("loaded anchorPoint: " + anchorPoint);
 
 		HashMap<Point, Material> alteredPoints = m.loadPointMaterialMapCompact("alteredPoints");
-		Debug.msg("loaded alteredPoints: " + alteredPoints.size());
+//		Debug.msg("loaded alteredPoints: " + alteredPoints.size());
 
 		Set<Point> protectedPoints = m.loadPointSetCompact("protectedPoints");
-		Debug.msg("loaded protectedPoints: " + protectedPoints.size());
+//		Debug.msg("loaded protectedPoints: " + protectedPoints.size());
 
 		List<List<Point>> generatedLayers = m.loadLayersCompact("generatedLayers");
-		Debug.msg("loaded generatedLayers: " + generatedLayers.size());
+//		Debug.msg("loaded generatedLayers: " + generatedLayers.size());
 
 		List<List<Point>> animationLayers = m.loadLayersCompact("animationLayers");
-		Debug.msg("loaded animationLayers: " + animationLayers.size());
+//		Debug.msg("loaded animationLayers: " + animationLayers.size());
 
 		boolean animate = m.loadBoolean("animate");
-		Debug.msg("loaded animate: " + animate);
+//		Debug.msg("loaded animate: " + animate);
 
 		boolean isChangingGenerated = m.loadBoolean("isChangingGenerated");
-		Debug.msg("loaded isChangingGenerated: " + isChangingGenerated);
+//		Debug.msg("loaded isChangingGenerated: " + isChangingGenerated);
 
 		boolean isGeneratingWall = m.loadBoolean("isGeneratingWall");
-		Debug.msg("loaded isGeneratingWall: " + isGeneratingWall);
+//		Debug.msg("loaded isGeneratingWall: " + isGeneratingWall);
 
 		GeneratorCoreAnimator instance = new GeneratorCoreAnimator(anchorPoint, alteredPoints, protectedPoints, generatedLayers, animationLayers, animate, isChangingGenerated, isGeneratingWall);
 		return instance;
