@@ -1,10 +1,13 @@
 package me.newyith.generator;
 
 import me.newyith.event.TickTimer;
+import me.newyith.main.FortressPlugin;
 import me.newyith.memory.Memorable;
 import me.newyith.memory.Memory;
+import me.newyith.util.Chat;
 import me.newyith.util.Debug;
 import me.newyith.util.Point;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
@@ -208,29 +211,37 @@ public class GeneratorCoreAnimator implements Memorable {
 	}
 
 	private boolean updateToNextFrame() {
-		boolean foundLayerToUpdate = false;
+		boolean updatedToNextFrame = false;
 
-		for (int i = 0; i < this.animationLayers.size(); i++) {
-			int layerIndex = i;
-			//if (degenerating) start from the outer most layer
-			if (!this.isGeneratingWall) {
-				layerIndex = (animationLayers.size()-1) - i;
-			}
+		//check we haven't hit block limit
+		int generatedCount = alteredPoints.size() + protectedPoints.size();
+		if (!isGeneratingWall || generatedCount < FortressPlugin.config_generatorBlockLimit) {
+			for (int i = 0; i < this.animationLayers.size(); i++) {
+				int layerIndex = i;
+				//if (degenerating) start from the outer most layer
+				if (!this.isGeneratingWall) {
+					layerIndex = (animationLayers.size()-1) - i;
+				}
 
-			List<Point> layer = new ArrayList<>(this.animationLayers.get(layerIndex)); //make copy to avoid concurrent modification errors (recheck this is needed)
+				List<Point> layer = new ArrayList<>(this.animationLayers.get(layerIndex)); //make copy to avoid concurrent modification errors (recheck this is needed)
 
-			//try to update layer
-			foundLayerToUpdate = updateLayer(layer, layerIndex);
-			if (foundLayerToUpdate) {
-				onGeneratedChanged();
+				//try to update layer
+				updatedToNextFrame = updateLayer(layer, layerIndex);
+				if (updatedToNextFrame) {
+					onGeneratedChanged();
+				}
+				if (updatedToNextFrame && this.animate) {
+					//updated a layer so we're done with this frame
+					break;
+				}
 			}
-			if (foundLayerToUpdate && this.animate) {
-				//updated a layer so we're done with this frame
-				break;
-			}
+		} else {
+			String msg = "Fortress generator reached limit of " + String.valueOf(FortressPlugin.config_generatorBlockLimit) + " blocks.";
+			msg = ChatColor.AQUA + msg;
+			Chat.ranged(msg, anchorPoint, 16);
 		}
 
-		return foundLayerToUpdate;
+		return updatedToNextFrame;
 	}
 
 	private boolean updateLayer(List<Point> layer, int layerIndex) {
@@ -239,7 +250,7 @@ public class GeneratorCoreAnimator implements Memorable {
 		for (Point p : layer) {
 			if (this.isGeneratingWall) {
 				//try to generate block at p
-				boolean pGenerated = alter(p) || protect(p);
+				boolean pGenerated = generate(p);
 				updatedLayer = updatedLayer || pGenerated;
 
 				if (pGenerated) {
@@ -264,6 +275,17 @@ public class GeneratorCoreAnimator implements Memorable {
 		} // end for (Point p : layer)
 
 		return updatedLayer;
+	}
+
+	private boolean generate(Point p) {
+		boolean generated = false;
+
+		int generatedCount = alteredPoints.size() + protectedPoints.size();
+		if (generatedCount < FortressPlugin.config_generatorBlockLimit) {
+			generated = alter(p) || protect(p);
+		}
+
+		return generated;
 	}
 
 	private boolean alter(Point p) {

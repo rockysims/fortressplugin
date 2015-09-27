@@ -17,17 +17,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class FortressPlugin extends JavaPlugin {
-	public static int config_glowstoneDustBurnTimeMs = 1000*60*60; //1 hour
-	public static int config_stuckDelayMs = 30 * 1000; //30 seconds
-	public static int config_stuckCancelDistance = 4; //4 blocks
-	public static int config_generationRange = 32; //32 blocks
+	public static int config_glowstoneDustBurnTimeMs = 1000 * 60 * 60;
+	public static int config_stuckDelayMs = 30 * 1000;
+	public static int config_stuckCancelDistance = 4;
+	public static int config_generationRange = 128;
+	public static int config_generatorBlockLimit = 30000; //roughly 32x32x32
 
 	private void readConfig() {
 		FileConfiguration config = getConfig();
+		//TODO: uncomment out following block
+		/*
 		config_glowstoneDustBurnTimeMs = getConfigInt(config, "glowstoneDustBurnTimeMs", config_glowstoneDustBurnTimeMs);
 		config_stuckDelayMs = getConfigInt(config, "stuckDelayMs", config_stuckDelayMs);
 		config_stuckCancelDistance = getConfigInt(config, "stuckCancelDistance", config_stuckCancelDistance);
 		config_generationRange = getConfigInt(config, "generationRange", config_generationRange);
+		config_generatorBlockLimit = getConfigInt(config, "generatorBlockLimit", config_generatorBlockLimit);
+		//*/
 		saveConfig();
 	}
 	private int getConfigInt(FileConfiguration config, String key, int defaultValue) {

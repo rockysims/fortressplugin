@@ -1,19 +1,10 @@
 package me.newyith.util;
 
-import me.newyith.util.Debug;
-import me.newyith.util.Point;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 
 import java.util.*;
 
 public class Wall {
-	private static boolean blockTypesCreated = false;
-	private static Set<Material> wallMaterials = new HashSet<>();
-	private static Set<Material> generatableWallMaterials = new HashSet<>();
-	private static Set<Material> protectableWallMaterials = new HashSet<>();
-	private static Set<Material> alterableWallMaterials = new HashSet<>();
-
 	public enum ConnectedThreshold {
 		POINTS,
 		//LINES,
@@ -33,12 +24,12 @@ public class Wall {
 	}
 
 	public static List<List<Point>> merge(List<List<Point>> layers1, List<List<Point>> layers2) {
-		List<List<Point>> layers = new ArrayList<List<Point>>();
+		List<List<Point>> layers = new ArrayList<>();
 
 		int biggestSize = Math.max(layers1.size(), layers2.size());
 		for (int i = 0; i < biggestSize; i++) {
 			//process layer i
-			layers.add(new ArrayList<Point>());
+			layers.add(new ArrayList<>());
 			if (i < layers1.size()) {
 				layers.get(i).addAll(layers1.get(i));
 			}
