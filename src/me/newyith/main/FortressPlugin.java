@@ -121,14 +121,10 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
-//TODO: keep generation range limit and make it big but also put a block limit
-
+//DONE: keep generation range limit and make it big but also put a block limit
+//DONE: make /fort stuck teleport point finding logic make more sense
+//TODO: make /fort stuck range be based on combinedCuboid instead of generation range
 //TODO: change back to /stuck (still use '/fort whatever' later but /stuck should be an exception... maybe need to think more
-
-//TODO: make /fort stuck logic make more sense
-//	maybe it teleports you to random point in rough fortress box but block you land on has to be solid
-//	maybe it should try to send you straight forward/left/right/back to 1+ blocks beyond furthest claimed point in same direction
-//		something like that but make it more random
 
 // --- MVP ---
 
@@ -139,14 +135,14 @@ public class FortressPlugin extends JavaPlugin {
 //		issue is /fort stuck can't tell if your close enough to pay attention to and same with getNearbyRunes for claim checking
 //			maybe each generator knows its x,y,z min/max and so we still use a box but don't need absolute range limit
 
-//TODO: save data using jackson instead of config (so config won't get too big to open)
-//TODO: add potentialAlteredPoints and update + re-save it before generation (to make it robust enough to handle server crashes)
-
 //TODO: onProtect, if (block is solid || glass) change block to bedrock for a second then back to original material
 //do above idea with bedrock instead of below idea with particles
 //MAYBE MVP?: make generation display wave of particle to indicate generating wall blocks
 //	onGenerateBlock, show particles appearing for a few seconds at random points on all faces not touching solid block
 //		maybe use nether particle but make the nether particle be drawn toward block (like the particles are drawn to nether portal)
+
+//TODO: save data using jackson instead of config (so config won't get too big to open)
+//TODO: add potentialAlteredPoints and update + re-save it before generation (to make it robust enough to handle server crashes)
 
 //maybe finish writing version of manual that includes all planned features before actually releasing MVP (just so I've thought it all out)
 
