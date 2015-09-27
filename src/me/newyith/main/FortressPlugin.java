@@ -123,6 +123,7 @@ public class FortressPlugin extends JavaPlugin {
 
 // --- --- ---
 
+//TODO: consider adding flag block/item to make generate/degenerate animation run faster
 
 
 

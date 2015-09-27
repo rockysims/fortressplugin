@@ -1,5 +1,6 @@
 package me.newyith.generator;
 
+import me.newyith.event.TickTimer;
 import me.newyith.memory.Memorable;
 import me.newyith.memory.Memory;
 import me.newyith.util.Debug;
@@ -22,8 +23,8 @@ public class GeneratorCoreAnimator implements Memorable {
 	public WallMaterials wallMats;
 
 	//not saved
-	private long lastFrameTimestamp = 0;
-	private final long msPerFrame = 150;
+	private final int ticksPerFrame = 150 / TickTimer.msPerTick; // msPerFrame / msPerTick
+	private int waitTicks = 0;
 
 	//------------------------------------------------------------------------------------------------------------------
 
@@ -163,22 +164,22 @@ public class GeneratorCoreAnimator implements Memorable {
 	}
 
 	public void tick() {
-		if (this.isChangingGenerated) {
-			long now = (new Date()).getTime();
-			//if (ready to update to next frame)
-			if (!this.animate  || now - this.lastFrameTimestamp >= this.msPerFrame ) {
-				this.lastFrameTimestamp  = now;
+		if (isChangingGenerated) {
+			waitTicks++;
+			if (waitTicks >= ticksPerFrame) {
+				waitTicks = 0;
 
 				//update to next frame
-				boolean noNextFrame = !this.updateToNextFrame();
+				boolean noNextFrame = !updateToNextFrame();
 				if (noNextFrame) {
-					this.isChangingGenerated = false;
+					isChangingGenerated = false;
 				}
 
-				//if (not animating) we finished all at once
-				if (!this.animate) {
-					this.isChangingGenerated = false;
-				}
+				//TODO: delete next 4 lines if leaving them commented out for a while doesn't seem to break anything
+//				//if (not animating) we finished all at once
+//				if (!animate) {
+//					isChangingGenerated = false;
+//				}
 			}
 		}
 	}
