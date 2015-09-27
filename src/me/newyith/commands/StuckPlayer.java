@@ -1,5 +1,6 @@
 package me.newyith.commands;
 
+import me.newyith.main.FortressPlugin;
 import me.newyith.util.Point;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -17,8 +18,8 @@ public class StuckPlayer {
 
 	Random random = new Random();
 	private int quadrantSize = 32;
-	private final int stuckDelayMs = 30 * 1000;
-	private final int cancelDistance = 4; //4 blocks
+	private final int stuckDelayMs = FortressPlugin.config_stuckDelayMs;
+	private final int cancelDistance = FortressPlugin.config_stuckCancelDistance;
 
 	public StuckPlayer(Player player) {
 		this.player = player;

@@ -17,25 +17,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class FortressPlugin extends JavaPlugin {
-	public static int config_glowstoneDustBurnTimeMs = 1000*60*60;
-	//TODO: add more config_whatever values
+	public static int config_glowstoneDustBurnTimeMs = 1000*60*60; //1 hour
+	public static int config_stuckDelayMs = 30 * 1000; //30 seconds
+	public static int config_stuckCancelDistance = 4; //4 blocks
 
 	private void readConfig() {
 		FileConfiguration config = getConfig();
-		String key;
-		boolean changed = false;
-
-		key = "glowstoneDustBurnTimeMs";
-		if (config.isInt(key)) {
-			config_glowstoneDustBurnTimeMs = config.getInt(key);
-		} else {
-			config.set(key, config_glowstoneDustBurnTimeMs);
-			changed = true;
+		config_glowstoneDustBurnTimeMs = getConfigInt(config, "glowstoneDustBurnTimeMs", config_glowstoneDustBurnTimeMs);
+		config_stuckDelayMs = getConfigInt(config, "stuckDelayMs", config_stuckDelayMs);
+		config_stuckCancelDistance = getConfigInt(config, "stuckCancelDistance", config_stuckCancelDistance);
+		saveConfig();
+	}
+	private int getConfigInt(FileConfiguration config, String key, int defaultValue) {
+		if (!config.isInt(key)) {
+			config.set(key, defaultValue);
 		}
-
-		if (changed) {
-			saveConfig();
-		}
+		return config.getInt(key);
 	}
 
     @Override
@@ -117,13 +114,14 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
-//DONE: save data in data.yml instead of config.yml until I'm ready to do jackson
+//TODO: make /fort stuck logic make more sense
+//	maybe it should try to send you straight forward/left/right/back to 1+ blocks beyond furthest claimed point in same direction
+//		something like that but make it more random
 
 // --- MVP ---
 
 //TODO: make signs on generator's base a global white list
 //TODO: make 'fort stuck' only work in range of generator
-//TODO: change '/stuck' to '/fort stuck' (done) and make delay configurable (not done)
 //TODO: increase generation range (64? at least some). make range configurable
 //	maybe change to block limit instead? feels like a better solution... however:
 //		issue is /fort stuck can't tell if your close enough to pay attention to and same with getNearbyRunes for claim checking
@@ -140,12 +138,12 @@ public class FortressPlugin extends JavaPlugin {
 
 //maybe finish writing version of manual that includes all planned features before actually releasing MVP (just so I've thought it all out)
 
+//use jackson to save/load instead of data.yml
+//http://www.mkyong.com/java/how-to-convert-java-object-to-from-json-jackson/
+
 // --- --- ---
 
 //TODO: consider adding flag block/item to make generate/degenerate animation run faster
-
-//use jackson to save/load instead of data.yml
-//http://www.mkyong.com/java/how-to-convert-java-object-to-from-json-jackson/
 
 
 
