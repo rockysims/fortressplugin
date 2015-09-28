@@ -121,35 +121,31 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
-//DONE: keep generation range limit and make it big but also put a block limit
-//DONE: make /fort stuck teleport point finding logic make more sense
-//TODO: make /fort stuck range be based on combinedCuboid instead of generation range
-//TODO: change back to /stuck (still use '/fort whatever' later but /stuck should be an exception... maybe need to think more
+
+
+
+
+
 
 // --- MVP ---
 
+//TODO: make 'fort stuck' only work in range of generator (almost done but need to make it based on cuboid instead of range)
 //TODO: make signs on generator's base a global white list
-//TODO: make 'fort stuck' only work in range of generator
-//TODO: increase generation range (64? at least some). make range configurable
-//	maybe change to block limit instead? feels like a better solution... however:
-//		issue is /fort stuck can't tell if your close enough to pay attention to and same with getNearbyRunes for claim checking
-//			maybe each generator knows its x,y,z min/max and so we still use a box but don't need absolute range limit
 
 //TODO: onProtect, if (block is solid || glass) change block to bedrock for a second then back to original material
-//do above idea with bedrock instead of below idea with particles
+//first try idea above with bedrock else try idea below with particles
 //MAYBE MVP?: make generation display wave of particle to indicate generating wall blocks
 //	onGenerateBlock, show particles appearing for a few seconds at random points on all faces not touching solid block
 //		maybe use nether particle but make the nether particle be drawn toward block (like the particles are drawn to nether portal)
 
-//TODO: save data using jackson instead of config (so config won't get too big to open)
 //TODO: add potentialAlteredPoints and update + re-save it before generation (to make it robust enough to handle server crashes)
-
-//maybe finish writing version of manual that includes all planned features before actually releasing MVP (just so I've thought it all out)
-
-//use jackson to save/load instead of data.yml
-//http://www.mkyong.com/java/how-to-convert-java-object-to-from-json-jackson/
+//TODO: finish writing version of manual that includes all planned features before actually releasing MVP (just so I've thought it all out)
 
 // --- --- ---
+
+//TODO: save data using jackson instead of config?
+//use jackson to save/load instead of data.yml
+//http://www.mkyong.com/java/how-to-convert-java-object-to-from-json-jackson/
 
 //TODO: consider adding flag block/item to make generate/degenerate animation run faster
 
