@@ -125,7 +125,9 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-
+//TODO: think of a way to protect stuff inside fortress from explosions on the outside
+//TODO: make door white list have to be above door (leave trap door as is)
+//TODO: allow wall particles to be disabled via config
 
 // --- MVP ---
 

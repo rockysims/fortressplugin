@@ -23,7 +23,7 @@ public class GeneratorCore implements Memorable {
 	private GeneratorCoreAnimator animator = null; //set by constructor
 	private UUID placedByPlayerId = null; //set by onPlaced
 	private Set<Point> layerOutsideFortress = new HashSet<>();
-	private Set<Point> pointsInsideFortress = new HashSet<>(); //TODO: consider changing to layerInsideFortress
+	private Set<Point> pointsInsideFortress = new HashSet<>(); //TODO: consider changing to layerInsideFortress (need it so we can cancel explosions)
 
 	//not saved
 	private final int generationRangeLimit = FortressPlugin.config_generationRange;
@@ -65,7 +65,7 @@ public class GeneratorCore implements Memorable {
 
 		UUID placedByPlayerId = UUID.fromString(m.loadString("placedByPlayerIdString"));
 
-		//updateInsideOutside() called by runes manager (second stage loading)
+		//updateInsideOutside() called by rune (second stage loading)
 
 		GeneratorCore instance = new GeneratorCore(
 				animator,
