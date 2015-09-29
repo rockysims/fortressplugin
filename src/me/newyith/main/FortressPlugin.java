@@ -122,7 +122,7 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
-
+//TODO: make common blocks protectable and test tick speed for large fortress de/generate
 
 
 //TODO: think of a way to protect stuff inside fortress from explosions on the outside

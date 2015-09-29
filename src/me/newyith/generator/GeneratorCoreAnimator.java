@@ -35,7 +35,7 @@ public class GeneratorCoreAnimator implements Memorable {
 		m.save("anchorPoint", anchorPoint);
 //		Debug.msg("saved anchorPoint: " + anchorPoint);
 
-		Debug.msg("saving alteredPoints: " + alteredPoints.size());
+//		Debug.msg("saving alteredPoints: " + alteredPoints.size());
 		m.savePointMaterialMapCompact("alteredPoints", alteredPoints);
 //		Debug.msg("saved alteredPoints: " + alteredPoints.size());
 

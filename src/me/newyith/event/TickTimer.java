@@ -18,7 +18,13 @@ public class TickTimer extends BukkitRunnable {
 
 	@Override
 	public void run() {
+//		Debug.start("tick");
+
 		FortressGeneratorRunesManager.onTick();
 		Commands.onTick();
+
+//		Debug.stop("tick", false);
+//		Debug.duration("tick");
+//		Debug.clear("tick");
 	}
 }
