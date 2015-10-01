@@ -9,6 +9,8 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
+import java.text.DecimalFormat;
+
 public class Point implements Memorable {
 	public World world;
 	public double x, y, z;
@@ -62,9 +64,9 @@ public class Point implements Memorable {
 
 	public Point(Location loc) {
 		this.world = loc.getWorld();
-		this.x = loc.getBlockX();
-		this.y = loc.getBlockY();
-		this.z = loc.getBlockZ();
+		this.x = loc.getX();
+		this.y = loc.getY();
+		this.z = loc.getZ();
 	}
 
 	public Point(Vector vec, World world) {
@@ -138,7 +140,14 @@ public class Point implements Memorable {
 	}
 
 	public String toStringDoubles() {
-		return x + ", " + y + ", " + z;
+		String format = "#0.00";
+		String s = "";
+		s += new DecimalFormat(format).format(x);
+		s += ", ";
+		s += new DecimalFormat(format).format(y);
+		s += ", ";
+		s += new DecimalFormat(format).format(z);
+		return s;
 	}
 
 	@Override
