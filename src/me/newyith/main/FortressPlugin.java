@@ -121,9 +121,30 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
+//TODO: make sure enderpearl doesn't work to go through doors/glass/etc (factions does fix it)
+//	see EventListener
+//	current fix seems to work for doors/glass/etc but not for pearling through floor
+//		need to make current fix only enforce 0.3 minimum from edge if there is a solid block in that direction
+//	for floor glitch, maybe if the block above the target is solid then
+//		if aboveTarget solid && belowTarget !solid then target.y--
+//		else cancel teleport
+//DONE: try pearling against a wall again and make sure target point is never actually the wall
 
-//TODO: make common blocks protectable and test tick speed for large fortress de/generate
+//TODO: save everything instead of reconstructing? (to reduce /reload time)
 
+//see https://github.com/shelajev/promises/blob/master/src/main/java/org/shelajev/examples/Examples.java
+//TODO: think about making getPointsConnected() execute over time (to prevent lag) and after done collect results and start generating
+//	while waiting for getPointsConnected(), leave wall as is (if generating. degenerating should still be allowed)
+//	maybe make a class to represent a fortress wall update (onGenerate)
+//
+//	maybe make getPointsConnected send stream of layers to animator?
+//		problem: without foreknowledge of blocks that will be generated, how can we make it crash tolerant
+
+//TODO: make generationBlockLimit limit search not just generation
+//TODO: try to track down why getPointsConnected is being called 4 times during generation (especially the 2 heavier calls)
+
+//DONE: make common blocks protectable and test tick speed for large fortress de/generate
+//	about 30ms per tick for large fortress (about 1ms per tick for small)
 
 //TODO: think of a way to protect stuff inside fortress from explosions on the outside
 //TODO: make door white list have to be above door (leave trap door as is)
