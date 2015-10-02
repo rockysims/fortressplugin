@@ -123,14 +123,15 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
+
 //TODO: make sure enderpearl doesn't work to go through doors/glass/etc (factions does fix it)
-//	see EventListener
 //	current fix seems to work for doors/glass/etc but not for pearling through floor
-//		need to make current fix only enforce 0.3 minimum from edge if there is a solid block in that direction
-//	for floor glitch, maybe if the block above the target is solid then
-//		if aboveTarget solid && belowTarget !solid then target.y--
-//		else cancel teleport
+//		TODO: consider fixing bug where if door is on far side of block you can pearl through it (check if factions fixes this case)
+//			could fix by centering pearl teleport target (instead of 0.3 min edge dist)
+//	for floor glitch, maybe
+//		if above target is solid and origin is near target, cancel teleport
 //DONE: try pearling against a wall again and make sure target point is never actually the wall
+//TODO: test if you can pearl through a door before open event cancelled happens
 
 //TODO: save everything instead of reconstructing? (to reduce /reload time)
 

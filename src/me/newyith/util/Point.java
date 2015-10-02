@@ -130,6 +130,14 @@ public class Point implements Memorable {
 		return getBlock().getType() == mat;
 	}
 
+	public Point roundDown() {
+		Point p = new Point(this);
+		p.x = (int)p.x;
+		p.y = (int)p.y;
+		p.z = (int)p.z;
+		return p;
+	}
+
 	@Override
 	public String toString() {
 		int x = (int)this.x;
