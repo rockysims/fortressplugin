@@ -1,6 +1,6 @@
 package me.newyith.event;
 
-import me.newyith.commands.Commands;
+import me.newyith.command.Commands;
 import me.newyith.generator.FortressGeneratorRunesManager;
 import me.newyith.main.FortressPlugin;
 import org.bukkit.scheduler.BukkitRunnable;

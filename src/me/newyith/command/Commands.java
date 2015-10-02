@@ -1,6 +1,5 @@
-package me.newyith.commands;
+package me.newyith.command;
 
-import me.newyith.event.TickTimer;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;

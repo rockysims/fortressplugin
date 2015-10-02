@@ -1,8 +1,9 @@
 package me.newyith.main;
 
-import me.newyith.commands.Commands;
+import me.newyith.command.Commands;
 import me.newyith.event.EventListener;
 import me.newyith.event.TickTimer;
+import me.newyith.fix.PearlGlitchFix;
 import me.newyith.manual.ManualCraftManager;
 import me.newyith.memory.SaveLoadMemoryManager;
 import me.newyith.util.Debug;
@@ -49,6 +50,7 @@ public class FortressPlugin extends JavaPlugin {
 		EventListener.onEnable(this);
 		SaveLoadMemoryManager.onEnable(this);
 		ManualCraftManager.onEnable(this);
+		PearlGlitchFix.onEnable(this);
 
         sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
         sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);

@@ -1,4 +1,4 @@
-package me.newyith.commands;
+package me.newyith.command;
 
 import me.newyith.generator.FortressGeneratorRune;
 import me.newyith.generator.FortressGeneratorRunesManager;
