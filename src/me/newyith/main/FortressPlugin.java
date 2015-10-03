@@ -133,7 +133,7 @@ public class FortressPlugin extends JavaPlugin {
 //DONE: try pearling against a wall again and make sure target point is never actually the wall
 //TODO: test if you can pearl through a door before open event cancelled happens
 
-//TODO: save everything instead of reconstructing? (to reduce /reload time)
+//TODO: save everything with jackson instead of reconstructing (to reduce /reload time)
 
 //see https://github.com/shelajev/promises/blob/master/src/main/java/org/shelajev/examples/Examples.java
 //TODO: think about making getPointsConnected() execute over time (to prevent lag) and after done collect results and start generating
@@ -143,17 +143,29 @@ public class FortressPlugin extends JavaPlugin {
 //	maybe make getPointsConnected send stream of layers to animator?
 //		problem: without foreknowledge of blocks that will be generated, how can we make it crash tolerant
 
-//TODO: make generationBlockLimit limit search not just generation
-//TODO: try to track down why getPointsConnected is being called 4 times during generation (especially the 2 heavier calls)
 
 //DONE: make common blocks protectable and test tick speed for large fortress de/generate
-//	about 30ms per tick for large fortress (about 1ms per tick for small)
+//	during generation? (not sure): about 30ms per tick for large fortress (about 1ms per tick for small)
+//	TODO: consider making animator keep track of current layer instead of searching all layers until generatable block found
+//		reset current layer on de/generate
 
-//TODO: think of a way to protect stuff inside fortress from explosions on the outside
+//Major:
+//TODO: make generationBlockLimit limit search not generation
+
+
+//Minor:
 //TODO: make door white list have to be above door (leave trap door as is)
-//TODO: allow wall particles to be disabled via config
+//TODO: think of a way to protect stuff inside fortress from explosions on the outside (maybe already done?)
+//TODO: try to track down why getPointsConnected is being called 4 times during generation (especially the 2 heavier calls)
 
 // --- MVP ---
+
+//Reducing lag:
+	//learn mvn so I can use jackson
+	//jackson saving/loading
+	//animator should remember current layer
+	//getConnected calculation over time (need to learn promises in java)
+//protect inside from explosions
 
 //TODO: make 'fort stuck' only work in range of generator (almost done but need to make it based on cuboid instead of range)
 //TODO: make signs on generator's base a global white list
@@ -167,6 +179,8 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: add potentialAlteredPoints and update + re-save it before generation (to make it robust enough to handle server crashes)
 //TODO: finish writing version of manual that includes all planned features before actually releasing MVP (just so I've thought it all out)
 
+//TODO: add mcStats: http://mcstats.org/learn-more/
+
 // --- --- ---
 
 //TODO: save data using jackson instead of config?
@@ -174,6 +188,11 @@ public class FortressPlugin extends JavaPlugin {
 //http://www.mkyong.com/java/how-to-convert-java-object-to-from-json-jackson/
 
 //TODO: consider adding flag block/item to make generate/degenerate animation run faster
+
+
+//TODO: allow wall particles to be disabled via config
+
+
 
 
 
