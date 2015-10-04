@@ -128,29 +128,27 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-//TODO: consider fixing boat/minecart/etc glitch for getting into fortress
+//TODO: consider fixing boat/minecart/etc glitch for getting into fortress (factions does not fix minecart and probably not boat)
 //	Entity vehicle = player.getVehicle(); //null if player is not riding anything
+//	try to reproduce boat glitch to get in via side of fortress (see https://www.youtube.com/watch?v=3qBGaqJ0yHc)
+//	think of a way to fix minecart glitch for getting in through the floor
+//	think of a way to fix boat glitch for getting in through the floor/side
+//	check if making floor/side double think prevents this glitch from working
+//	maybe:
+//		on enter vehicle, add player to ridingPlayers
+//		on leave vehicle, remove player from ridingPlayers
+//		every half second:
+// 			for each ridingPlayers
+//				if player is in a generated point, break vehicle
 
-//TODO: consider fixing bug where if door is on far side of block you can pearl through it (check if factions fixes this case)
-//	could fix by centering pearl teleport target (instead of 0.3 min edge dist)
-//		but only when some points connected to target (by points) are generated points
-//			consider just keeping global track of claimedPoints and using that
-//TODO: make sure enderpearl doesn't work to go through doors/glass/etc (factions does fix it)
-//	current fix seems to work for doors/glass/etc and for pearling through floor
-//	for floor glitch, maybe
-//		if above target is solid and origin is near target, cancel teleport
-//DONE: try pearling against a wall again and make sure target point is never actually the wall
-//TODO: test if you can pearl through a door before open event cancelled happens
 
 //TODO: save everything with jackson instead of reconstructing (to reduce /reload time)
 
-//in java a promise is called CompletableFuture
 //TODO: think about making getPointsConnected() execute over time (to prevent lag) and after done collect results and start generating
 //	while waiting for getPointsConnected(), leave wall as is (if generating. degenerating should still be allowed)
-//	maybe make a class to represent a fortress wall update (onGenerate)
-//
-//	maybe make getPointsConnected send stream of layers to animator?
-//		problem: without foreknowledge of blocks that will be generated, how can we make it crash tolerant
+//	maybe make a class (FortressWall?) to represent a fortress wall update (onGenerate)
+//	in java a promise is called CompletableFuture
+
 
 
 //DONE: make common blocks protectable and test tick speed for large fortress de/generate
@@ -158,7 +156,6 @@ public class FortressPlugin extends JavaPlugin {
 //	TODO: consider making animator keep track of current layer instead of searching all layers until generatable block found
 //		reset current layer on de/generate
 
-//TODO: consider protecting against the boat glitch (see https://www.youtube.com/watch?v=3qBGaqJ0yHc)
 
 
 //Major:
@@ -203,6 +200,8 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: allow wall particles to be disabled via config
 
+//	maybe make getPointsConnected send stream of layers to animator?
+//		problem: without foreknowledge of blocks that will be generated, how can we make it crash tolerant
 
 
 
