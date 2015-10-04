@@ -135,12 +135,15 @@ public class FortressPlugin extends JavaPlugin {
 //	think of a way to fix boat glitch for getting in through the floor/side
 //	check if making floor/side double think prevents this glitch from working
 //	maybe:
-//		on enter vehicle, add player to ridingPlayers
+//		on enter vehicle,
+// 			add player to ridingPlayers
+//			cancel if player would be in a generated point
 //		on leave vehicle, remove player from ridingPlayers
 //		every half second:
 // 			for each ridingPlayers
 //				if player is in a generated point, break vehicle
 
+//TODO: think about making water/lava mote create impassible wall above it
 
 //TODO: save everything with jackson instead of reconstructing (to reduce /reload time)
 
