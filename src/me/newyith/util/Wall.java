@@ -256,12 +256,10 @@ public class Wall {
 
 		}
 
-		Debug.msg("Wall.getPointsConnected visited " + String.valueOf(visited.size()));
+//		Debug.msg("Wall.getPointsConnected visited " + String.valueOf(visited.size()));
 		//Debug.msg("Wall.getPointsConnected returning " + String.valueOf(matchesAsLayers.size()) + " matchesAsLayers");
 
-		Debug.stop("getPointsConnectedAsLayers() all", false);
-		Debug.duration("getPointsConnectedAsLayers() all");
-		Debug.clear("getPointsConnectedAsLayers() all");
+//		Debug.end("getPointsConnectedAsLayers() all");
 
 		return matchesAsLayers;
 	}

@@ -174,9 +174,9 @@ public class Point implements Memorable {
 			Point p = (Point)o;
 
 			boolean equal = true;
-			equal = equal && (int)this.x == (int)p.x;
-			equal = equal && (int)this.y == (int)p.y;
-			equal = equal && (int)this.z == (int)p.z;
+			equal = equal && Math.floor(this.x) == Math.floor(p.x);
+			equal = equal && Math.floor(this.y) == Math.floor(p.y);
+			equal = equal && Math.floor(this.z) == Math.floor(p.z);
 
 			return equal;
 		} else {
@@ -186,9 +186,9 @@ public class Point implements Memorable {
 
 	@Override
 	public int hashCode() {
-		int hash = (int)x;
-		hash = 49999 * hash + (int)y;
-		hash = 49999 * hash + (int)z;
+		int hash = (int)Math.floor(x);
+		hash = 49999 * hash + (int)Math.floor(y);
+		hash = 49999 * hash + (int)Math.floor(z);
 		return hash;
 	}
 }
