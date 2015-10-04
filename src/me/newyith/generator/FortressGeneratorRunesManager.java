@@ -23,6 +23,8 @@ public class FortressGeneratorRunesManager {
 	private static HashMap<Point, FortressGeneratorRune> runeByPoint = new HashMap<>();
 	private static HashMap<Point, FortressGeneratorRune> runeByProtectedPoint = new HashMap<>();
 	private static Set<Point> protectedPoints = new HashSet<>();
+	private static Set<Point> insidePoints = new HashSet<>();
+	private static boolean insidePointsStale = true;
 
 	public static void saveTo(Memory m) {
 		m.save("runeInstances", runeInstances);
@@ -101,6 +103,25 @@ public class FortressGeneratorRunesManager {
 
 	public static int getRuneCount() {
 		return runeInstances.size();
+	}
+
+	public static void onUpdatedInsideOutside() {
+		insidePointsStale = true;
+	}
+	public static boolean isInsideFortress(Point p) {
+		if (insidePointsStale) {
+			//refresh insidePoints
+			insidePoints.clear();
+			Iterator<FortressGeneratorRune> it = runeInstances.iterator();
+			while (it.hasNext()) {
+				FortressGeneratorRune rune = it.next();
+				insidePoints.addAll(rune.getGeneratorCore().getPointsInsideFortress());
+			}
+
+			insidePointsStale = false;
+		}
+
+		return insidePoints.contains(p);
 	}
 
 	// - Events -

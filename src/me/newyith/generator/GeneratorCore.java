@@ -346,6 +346,8 @@ public class GeneratorCore implements Memorable {
 				pointsInsideFortress.addAll(originLayer);
 			}
 		}
+
+		FortressGeneratorRunesManager.onUpdatedInsideOutside();
 	}
 
 	private List<List<Point>> getGeneratableWallLayers() {
@@ -418,6 +420,10 @@ public class GeneratorCore implements Memorable {
 
 	public Set<Point> getLayerOutsideFortress() {
 		return this.layerOutsideFortress;
+	}
+
+	public Set<Point> getPointsInsideFortress() {
+		return this.pointsInsideFortress;
 	}
 
 	private void unclaimDisconnected() {

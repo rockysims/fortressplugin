@@ -1,9 +1,9 @@
 package me.newyith.fix;
 
+import me.newyith.generator.FortressGeneratorRunesManager;
 import me.newyith.main.FortressPlugin;
-import me.newyith.particle.ParticleEffect;
-import me.newyith.util.Debug;
 import me.newyith.util.Point;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,36 +23,20 @@ public class PearlGlitchFix implements Listener {
 	public void onEnderPearlThrown(PlayerTeleportEvent event) {
 		if (event.getCause() == PlayerTeleportEvent.TeleportCause.ENDER_PEARL) {
 			Location loc = event.getTo();
+
+			//enforce 0.3 minimum distance from edge of block at loc
 			loc = enforceMinEdgeDist(loc);
 
-			//maybe if above target is solid and origin is near target, cancel teleport
-
-//			Point origin = new Point(event.getFrom());
-//			Point aboveOrigin = new Point(origin).add(0, 1, 0);
-//			Debug.msg("aboveOrigin: " + aboveOrigin.getBlock().getType() + ", solid: " + origin.getBlock().getType().isSolid());
-
-//			//y-- if block above is solid
-//			Point target = new Point(event.getTo());
-//			Point above = target.add(0, 1, 0);
-//			Debug.particleAt(target, ParticleEffect.CRIT_MAGIC);
-//			Debug.particleAt(above, ParticleEffect.FLAME);
-//			boolean aboveSolid = above.getBlock().getType().isSolid();
-//			boolean targetSolid = target.getBlock().getType().isSolid();
-//			Debug.msg("aboveSolid: " + aboveSolid);
-//			Debug.msg("targetSolid: " + targetSolid);
-//			Debug.msg("---");
-//			if (aboveSolid || targetSolid) {
-//				loc.setY(loc.getY() - 1);
-////				Debug.msg("isSolid");
-//			} else {
-////				Debug.msg("notSolid");
-//			}
-
-			//for floor glitch, maybe
-			//	if aboveTarget solid then
-			// 		target.y--
-			//		try to find valid teleport dest in first layer (by points) around target
-			//	else cancel teleport
+			//cancel pearl if pearling from outside to inside fortress
+			Point origin = new Point(event.getFrom());
+			Point target = new Point(loc);
+			boolean originInside = FortressGeneratorRunesManager.isInsideFortress(origin);
+			boolean targetInside = FortressGeneratorRunesManager.isInsideFortress(target);
+			if (targetInside && !originInside) {
+				String msg = ChatColor.AQUA + "Pearling into a fortress is not allowed.";
+				event.getPlayer().sendMessage(msg);
+				event.setCancelled(true);
+			}
 
 			event.setTo(loc);
 		}
