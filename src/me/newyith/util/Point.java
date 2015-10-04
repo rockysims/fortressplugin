@@ -138,6 +138,12 @@ public class Point implements Memorable {
 		return p;
 	}
 
+	public double distance(Point p) {
+		Location loc1 = this.toLocation();
+		Location loc2 = p.toLocation();
+		return loc1.distance(loc2);
+	}
+
 	@Override
 	public String toString() {
 		int x = (int)this.x;

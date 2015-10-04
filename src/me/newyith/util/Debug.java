@@ -45,6 +45,12 @@ public class Debug {
 		}
 	}
 
+	public static void end(String key) {
+		stop(key, false);
+		duration(key);
+		clear(key);
+	}
+
 	public static void stop(String key) {
 		stop(key, true);
 	}
