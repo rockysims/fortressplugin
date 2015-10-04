@@ -27,13 +27,12 @@ public class PearlGlitchFix implements Listener {
 			//enforce 0.3 minimum distance from edge of block at loc
 			loc = enforceMinEdgeDist(loc);
 
-			//cancel pearl if pearling from outside to inside fortress
-			Point origin = new Point(event.getFrom());
+			//cancel pearl if target or above is generated
 			Point target = new Point(loc);
-			boolean originInside = FortressGeneratorRunesManager.isInsideFortress(origin);
-			boolean targetInside = FortressGeneratorRunesManager.isInsideFortress(target);
-			if (targetInside && !originInside) {
-				String msg = ChatColor.AQUA + "Pearling into a fortress is not allowed.";
+			boolean targetGenerated = FortressGeneratorRunesManager.isGenerated(target);
+			boolean aboveGenerated = FortressGeneratorRunesManager.isGenerated(target.add(0, 1, 0));
+			if (targetGenerated || aboveGenerated) {
+				String msg = ChatColor.AQUA + "Pearling into a fortress wall is not allowed.";
 				event.getPlayer().sendMessage(msg);
 				event.setCancelled(true);
 			}

@@ -23,8 +23,7 @@ public class FortressGeneratorRunesManager {
 	private static HashMap<Point, FortressGeneratorRune> runeByPoint = new HashMap<>();
 	private static HashMap<Point, FortressGeneratorRune> runeByProtectedPoint = new HashMap<>();
 	private static Set<Point> protectedPoints = new HashSet<>();
-	private static Set<Point> insidePoints = new HashSet<>();
-	private static boolean insidePointsStale = true;
+	private static Set<Point> alteredPoints = new HashSet<>();
 
 	public static void saveTo(Memory m) {
 		m.save("runeInstances", runeInstances);
@@ -39,9 +38,12 @@ public class FortressGeneratorRunesManager {
 				runeByPoint.put(p, rune);
 			}
 
-			Set<Point> protecteds = rune.getGeneratorCore().getProtectedPoints();
+			//rebuild alteredPoints
+			Set<Point> altereds = rune.getGeneratorCore().getAlteredPoints();
+			alteredPoints.addAll(altereds);
 
 			//rebuild protectedPoints
+			Set<Point> protecteds = rune.getGeneratorCore().getProtectedPoints();
 			protectedPoints.addAll(protecteds);
 
 			//rebuild runeByProtectedPoint
@@ -101,27 +103,20 @@ public class FortressGeneratorRunesManager {
 		runeByProtectedPoint.remove(p);
 	}
 
+	public static void addAlteredPoint(Point p) {
+		alteredPoints.add(p);
+	}
+
+	public static void removeAlteredPoint(Point p) {
+		alteredPoints.remove(p);
+	}
+
+	public static boolean isGenerated(Point p) {
+		return protectedPoints.contains(p) || alteredPoints.contains(p);
+	}
+
 	public static int getRuneCount() {
 		return runeInstances.size();
-	}
-
-	public static void onUpdatedInsideOutside() {
-		insidePointsStale = true;
-	}
-	public static boolean isInsideFortress(Point p) {
-		if (insidePointsStale) {
-			//refresh insidePoints
-			insidePoints.clear();
-			Iterator<FortressGeneratorRune> it = runeInstances.iterator();
-			while (it.hasNext()) {
-				FortressGeneratorRune rune = it.next();
-				insidePoints.addAll(rune.getGeneratorCore().getPointsInsideFortress());
-			}
-
-			insidePointsStale = false;
-		}
-
-		return insidePoints.contains(p);
 	}
 
 	// - Events -

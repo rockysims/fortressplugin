@@ -123,11 +123,13 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
+//TODO: consider making pearl cancel give back pearl
 
+//TODO: consider fixing bug where if door is on far side of block you can pearl through it (check if factions fixes this case)
+//	could fix by centering pearl teleport target (instead of 0.3 min edge dist)
+//		but only when some points connected to target (by faces) are generated points
 //TODO: make sure enderpearl doesn't work to go through doors/glass/etc (factions does fix it)
-//	current fix seems to work for doors/glass/etc but not for pearling through floor
-//		TODO: consider fixing bug where if door is on far side of block you can pearl through it (check if factions fixes this case)
-//			could fix by centering pearl teleport target (instead of 0.3 min edge dist)
+//	current fix seems to work for doors/glass/etc and for pearling through floor
 //	for floor glitch, maybe
 //		if above target is solid and origin is near target, cancel teleport
 //DONE: try pearling against a wall again and make sure target point is never actually the wall
@@ -149,9 +151,11 @@ public class FortressPlugin extends JavaPlugin {
 //	TODO: consider making animator keep track of current layer instead of searching all layers until generatable block found
 //		reset current layer on de/generate
 
+//TODO: consider protecting against the boat glitch (see https://www.youtube.com/watch?v=3qBGaqJ0yHc)
+
+
 //Major:
 //TODO: make generationBlockLimit limit search not generation
-
 
 //Minor:
 //TODO: make door white list have to be above door (leave trap door as is)

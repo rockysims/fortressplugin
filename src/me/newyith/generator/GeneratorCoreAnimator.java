@@ -187,6 +187,10 @@ public class GeneratorCoreAnimator implements Memorable {
 		}
 	}
 
+	public Set<Point> getAlteredPoints() {
+		return alteredPoints.keySet();
+	}
+
 	public Set<Point> getProtectedPoints() {
 		return protectedPoints;
 	}
@@ -293,7 +297,7 @@ public class GeneratorCoreAnimator implements Memorable {
 
 		Block b = p.getBlock();
 		if (wallMats.isAlterableWallMaterial(b.getType())) {
-			this.alteredPoints.put(p, b.getType());
+			addAlteredPoint(p, b.getType());
 			b.setType(Material.BEDROCK);
 			altered = true;
 		}
@@ -305,7 +309,7 @@ public class GeneratorCoreAnimator implements Memorable {
 		boolean unaltered = false;
 
 		if (this.alteredPoints.containsKey(p)) {
-			Material material = this.alteredPoints.remove(p);
+			Material material = removeAlteredPoint(p);
 			if (p.getBlock().getType() == Material.BEDROCK) {
 				p.getBlock().setType(material);
 			}
@@ -347,5 +351,16 @@ public class GeneratorCoreAnimator implements Memorable {
 	private void removeProtectedPoint(Point p) {
 		this.protectedPoints.remove(p);
 		FortressGeneratorRunesManager.removeProtectedPoint(p);
+	}
+
+
+	private void addAlteredPoint(Point p, Material m) {
+		this.alteredPoints.put(p, m);
+		FortressGeneratorRunesManager.addAlteredPoint(p);
+	}
+
+	private Material removeAlteredPoint(Point p) {
+		FortressGeneratorRunesManager.removeAlteredPoint(p);
+		return this.alteredPoints.remove(p);
 	}
 }
