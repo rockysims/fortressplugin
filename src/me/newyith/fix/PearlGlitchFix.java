@@ -5,9 +5,12 @@ import me.newyith.main.FortressPlugin;
 import me.newyith.util.Point;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class PearlGlitchFix implements Listener {
 
@@ -32,6 +35,10 @@ public class PearlGlitchFix implements Listener {
 				String msg = ChatColor.AQUA + "Pearling into a fortress wall is not allowed.";
 				event.getPlayer().sendMessage(msg);
 				event.setCancelled(true);
+
+				//give back ender pearl
+				Player player = event.getPlayer();
+				player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
 			}
 
 			boolean targetClaimed = FortressGeneratorRunesManager.isClaimed(target);

@@ -125,7 +125,11 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
-//TODO: consider making pearl cancel give back pearl
+
+
+
+//TODO: consider fixing boat/minecart/etc glitch for getting into fortress
+//	Entity vehicle = player.getVehicle(); //null if player is not riding anything
 
 //TODO: consider fixing bug where if door is on far side of block you can pearl through it (check if factions fixes this case)
 //	could fix by centering pearl teleport target (instead of 0.3 min edge dist)
