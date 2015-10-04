@@ -116,6 +116,8 @@ public class FortressPlugin extends JavaPlugin {
 			commandHandled = true;
 		}
 
+
+
         return commandHandled;
     }
 
@@ -127,7 +129,8 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: consider fixing bug where if door is on far side of block you can pearl through it (check if factions fixes this case)
 //	could fix by centering pearl teleport target (instead of 0.3 min edge dist)
-//		but only when some points connected to target (by faces) are generated points
+//		but only when some points connected to target (by points) are generated points
+//			consider just keeping global track of claimedPoints and using that
 //TODO: make sure enderpearl doesn't work to go through doors/glass/etc (factions does fix it)
 //	current fix seems to work for doors/glass/etc and for pearling through floor
 //	for floor glitch, maybe
@@ -137,7 +140,7 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: save everything with jackson instead of reconstructing (to reduce /reload time)
 
-//see https://github.com/shelajev/promises/blob/master/src/main/java/org/shelajev/examples/Examples.java
+//in java a promise is called CompletableFuture
 //TODO: think about making getPointsConnected() execute over time (to prevent lag) and after done collect results and start generating
 //	while waiting for getPointsConnected(), leave wall as is (if generating. degenerating should still be allowed)
 //	maybe make a class to represent a fortress wall update (onGenerate)

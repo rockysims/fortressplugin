@@ -115,6 +115,21 @@ public class FortressGeneratorRunesManager {
 		return protectedPoints.contains(p) || alteredPoints.contains(p);
 	}
 
+	public static boolean isClaimed(Point p) {
+		boolean claimed = false;
+
+		Iterator<FortressGeneratorRune> it = runeInstances.iterator();
+		while (it.hasNext()) {
+			FortressGeneratorRune rune = it.next();
+			claimed = rune.getGeneratorCore().getClaimedPoints().contains(p);
+			if (claimed) {
+				break;
+			}
+		}
+
+		return claimed;
+	}
+
 	public static int getRuneCount() {
 		return runeInstances.size();
 	}

@@ -390,7 +390,7 @@ public class GeneratorCore implements Memorable {
 		return claimedPoints;
 	}
 
-	private Set<Point> getClaimedPoints() {
+	public Set<Point> getClaimedPoints() {
 		//commented out because now that protectable blocks can be changed by user
 		//we don't want a generator to be able to degenerate another generator's generated points
 		//even though the other generator's points are no longer connected to the generator

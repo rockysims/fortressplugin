@@ -23,12 +23,9 @@ public class PearlGlitchFix implements Listener {
 	public void onEnderPearlThrown(PlayerTeleportEvent event) {
 		if (event.getCause() == PlayerTeleportEvent.TeleportCause.ENDER_PEARL) {
 			Location loc = event.getTo();
-
-			//enforce 0.3 minimum distance from edge of block at loc
-			loc = enforceMinEdgeDist(loc);
+			Point target = new Point(loc);
 
 			//cancel pearl if target or above is generated
-			Point target = new Point(loc);
 			boolean targetGenerated = FortressGeneratorRunesManager.isGenerated(target);
 			boolean aboveGenerated = FortressGeneratorRunesManager.isGenerated(target.add(0, 1, 0));
 			if (targetGenerated || aboveGenerated) {
@@ -37,11 +34,17 @@ public class PearlGlitchFix implements Listener {
 				event.setCancelled(true);
 			}
 
+			boolean targetClaimed = FortressGeneratorRunesManager.isClaimed(target);
+			if (targetClaimed) {
+				//enforce 0.31 minimum distance from edge of block
+				loc = enforceMinEdgeDist(loc, 0.31);
+			}
+
 			event.setTo(loc);
 		}
 	}
 
-	private Location enforceMinEdgeDist(Location loc) {
+	private Location enforceMinEdgeDist(Location loc, double minDist) {
 		Point target = new Point(loc);
 
 		Point targetDecimal = new Point(target);
@@ -54,9 +57,9 @@ public class PearlGlitchFix implements Listener {
 		targetWhole.y = target.y - targetDecimal.y;
 		targetWhole.z = target.z - targetDecimal.z;
 
-		//enforce 0.3 minimum distance from edge
-		double lowLimit = 0.3 + 0.01;
-		double highLimit = 0.7 - 0.01;
+		//enforce minDist minimum distance from edge
+		double lowLimit = minDist;
+		double highLimit = 1 - minDist;
 		targetDecimal.x = Math.max(lowLimit, Math.abs(targetDecimal.x));
 		targetDecimal.x = Math.min(highLimit, Math.abs(targetDecimal.x));
 		targetDecimal.y = Math.max(lowLimit, Math.abs(targetDecimal.y));
