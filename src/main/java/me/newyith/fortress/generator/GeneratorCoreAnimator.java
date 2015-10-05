@@ -2,8 +2,8 @@ package me.newyith.fortress.generator;
 
 import me.newyith.fortress.event.TickTimer;
 import me.newyith.fortress.main.FortressPlugin;
+import me.newyith.fortress.memory.AbstractMemory;
 import me.newyith.fortress.memory.Memorable;
-import me.newyith.fortress.memory.Memory;
 import me.newyith.fortress.util.Chat;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
@@ -31,7 +31,7 @@ public class GeneratorCoreAnimator implements Memorable {
 
 	//------------------------------------------------------------------------------------------------------------------
 
-	public void saveTo(Memory m) {
+	public void saveTo(AbstractMemory<?> m) {
 		m.save("anchorPoint", anchorPoint);
 //		Debug.msg("saved anchorPoint: " + anchorPoint);
 
@@ -59,7 +59,7 @@ public class GeneratorCoreAnimator implements Memorable {
 
 	}
 
-	public static GeneratorCoreAnimator loadFrom(Memory m) {
+	public static GeneratorCoreAnimator loadFrom(AbstractMemory<?> m) {
 		Point anchorPoint = m.loadPoint("anchorPoint");
 //		Debug.msg("loaded anchorPoint: " + anchorPoint);
 

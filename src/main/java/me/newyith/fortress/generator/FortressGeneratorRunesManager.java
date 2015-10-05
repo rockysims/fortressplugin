@@ -1,6 +1,6 @@
 package me.newyith.fortress.generator;
 
-import me.newyith.fortress.memory.Memory;
+import me.newyith.fortress.memory.AbstractMemory;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Wall;
@@ -25,11 +25,11 @@ public class FortressGeneratorRunesManager {
 	private static Set<Point> protectedPoints = new HashSet<>();
 	private static Set<Point> alteredPoints = new HashSet<>();
 
-	public static void saveTo(Memory m) {
+	public static void saveTo(AbstractMemory<?> m) {
 		m.save("runeInstances", runeInstances);
 	}
 
-	public static void loadFrom(Memory m) {
+	public static void loadFrom(AbstractMemory<?> m) {
 		runeInstances = m.loadFortressGeneratorRunes("runeInstances");
 
 		for (FortressGeneratorRune rune : runeInstances) {

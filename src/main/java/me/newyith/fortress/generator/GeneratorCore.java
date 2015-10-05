@@ -1,8 +1,8 @@
 package me.newyith.fortress.generator;
 
 import me.newyith.fortress.main.FortressPlugin;
+import me.newyith.fortress.memory.AbstractMemory;
 import me.newyith.fortress.memory.Memorable;
-import me.newyith.fortress.memory.Memory;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Wall;
@@ -41,7 +41,7 @@ public class GeneratorCore implements Memorable {
 
 	//------------------------------------------------------------------------------------------------------------------
 
-	public void saveTo(Memory m) {
+	public void saveTo(AbstractMemory<?> m) {
 		m.savePointSetCompact("claimedWallPoints", claimedWallPoints);
 //		Debug.msg("saved claimedWallPoints: " + claimedWallPoints.size());
 
@@ -54,7 +54,7 @@ public class GeneratorCore implements Memorable {
 		//Debug.msg("saved placedByPlayerId: " + placedByPlayerId);
 	}
 
-	public static GeneratorCore loadFrom(Memory m) {
+	public static GeneratorCore loadFrom(AbstractMemory<?> m) {
 		Set<Point> claimedWallPoints = m.loadPointSetCompact("claimedWallPoints");
 //		Debug.msg("loaded claimedWallPoints: " + claimedWallPoints.size());
 

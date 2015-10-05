@@ -1,9 +1,10 @@
 package me.newyith.fortress.memory;
 
+import com.google.common.base.Splitter;
 import me.newyith.fortress.generator.FortressGeneratorRune;
 import me.newyith.fortress.generator.FortressGeneratorRunePattern;
-import me.newyith.fortress.generator.GeneratorCoreAnimator;
 import me.newyith.fortress.generator.GeneratorCore;
+import me.newyith.fortress.generator.GeneratorCoreAnimator;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Bukkit;
@@ -13,66 +14,50 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.*;
 
-public class Memory {
-	private ConfigurationSection config;
+public abstract class AbstractMemory<ConfigType> {
+	protected ConfigType config;
 
-	public Memory(ConfigurationSection config) {
+	public AbstractMemory(ConfigType config) {
 		this.config = config;
 	}
 
-	public ConfigurationSection section(String sectionName) {
-		ConfigurationSection section = config.getConfigurationSection(sectionName);
-		if (section == null) {
-			section = config.createSection(sectionName);
-		}
-		return section;
+	public abstract ConfigType section(String sectionName);
+
+	public ConfigType getConfig() {
+		return config;
 	}
 
 	// --- PRIMITIVE SAVE/LOAD ---
 
 	//boolean
-	public void save(String key, boolean value) {
-		config.set(key, value);
-	}
-	public boolean loadBoolean(String key) {
-		return config.getBoolean(key);
-	}
+	abstract public void save(String key, boolean value);
+	abstract public boolean loadBoolean(String key);
 
 	//int
-	public void save(String key, int value) {
-		config.set(key, value);
-	}
-	public int loadInt(String key) {
-		return config.getInt(key);
-	}
+	abstract public void save(String key, int value);
+	abstract public int loadInt(String key);
 
 	//long
-	public void save(String key, long value) {
-		config.set(key, value);
-	}
-	public long loadLong(String key) {
-		return config.getLong(key);
-	}
+	abstract public void save(String key, long value);
+	abstract public long loadLong(String key);
 
 	//String
-	public void save(String key, String value) {
-		config.set(key, value);
-	}
-	public String loadString(String key) {
-		return config.getString(key);
-	}
+	abstract public void save(String key, String value);
+	abstract public String loadString(String key);
+	
+	abstract AbstractMemory<ConfigType> newMemory(ConfigType config);
 
 	// --- SAVE/LOAD COMPACT ---
 
 	//Set<Point> (compact)
 	public void savePointSetCompact(String key, Set<Point> set) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 		Point[] ary = set.toArray(new Point[set.size()]);
 		ArrayList<Point> list = new ArrayList<>(Arrays.asList(ary));
 		m.savePointListCompact(key, list);
 	}
 	public Set<Point> loadPointSetCompact(String key) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 
 		List<Point> list = m.loadPointListCompact(key);
 		Set<Point> set = new HashSet<>(list);
@@ -82,7 +67,7 @@ public class Memory {
 
 	//List<Point> (compact)
 	public void savePointListCompact(String key, List<Point> list) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 
 		String blob = "";
 		if (list.size() > 0) {
@@ -102,18 +87,17 @@ public class Memory {
 		m.save("blob", blob);
 	}
 	public List<Point> loadPointListCompact(String key) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 
 		ArrayList<Point> list = new ArrayList<>();
 		String blob = m.loadString("blob");
 		if (blob.length() > 0) {
 			World world = Bukkit.getWorld(m.loadString("world"));
-			String[] pointBlobs = blob.split("~");
-			for (String pointBlob : pointBlobs) {
-				String[] data = pointBlob.split(",");
-				int x = Integer.valueOf(data[0]);
-				int y = Integer.valueOf(data[1]);
-				int z = Integer.valueOf(data[2]);
+			for (String pointBlob : Splitter.on("~").split(blob)) {
+				List<String> data = Splitter.on(",").splitToList(pointBlob);
+				int x = Integer.valueOf(data.get(0));
+				int y = Integer.valueOf(data.get(1));
+				int z = Integer.valueOf(data.get(2));
 				list.add(new Point(world, x, y, z));
 			}
 		}
@@ -123,7 +107,7 @@ public class Memory {
 
 	//List<List<Point>> (compact)
 	public void saveLayersCompact(String key, List<List<Point>> layers) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 
 		int i = 0;
 		for (List<Point> layer : layers) {
@@ -132,7 +116,7 @@ public class Memory {
 		m.save("count", i);
 	}
 	public List<List<Point>> loadLayersCompact(String key) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 
 		List<List<Point>> layers = new ArrayList<>();
 		int count = m.loadInt("count");
@@ -145,7 +129,7 @@ public class Memory {
 
 	//HashMap<Point, Material> (compact)
 	public void savePointMaterialMapCompact(String key, HashMap<Point, Material> map) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 
 		String blob = "";
 		if (map.size() > 0) {
@@ -173,19 +157,18 @@ public class Memory {
 		m.save("blob", blob);
 	}
 	public HashMap<Point, Material> loadPointMaterialMapCompact(String key) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 
 		HashMap<Point, Material> map = new HashMap<>();
 		String blob = m.loadString("blob");
 		if (blob.length() > 0) {
 			World world = Bukkit.getWorld(m.loadString("world"));
-			String[] pairBlobs = blob.split("~");
-			for (String pairBlob : pairBlobs) {
-				String[] data = pairBlob.split(",");
-				int x = Integer.valueOf(data[0]);
-				int y = Integer.valueOf(data[1]);
-				int z = Integer.valueOf(data[2]);
-				Material mat = Material.values()[Integer.valueOf(data[3])];
+			for (String pairBlob : Splitter.on("~").splitToList(blob)) {
+				List<String> data = Splitter.on(",").splitToList(pairBlob);
+				int x = Integer.valueOf(data.get(0));
+				int y = Integer.valueOf(data.get(1));
+				int z = Integer.valueOf(data.get(2));
+				Material mat = Material.values()[Integer.valueOf(data.get(3))];
 				Point p = new Point(world, x, y, z);
 				map.put(p, mat);
 			}
@@ -198,13 +181,13 @@ public class Memory {
 
 	//Memorable
 	public void save(String key, Memorable value) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 		value.saveTo(m);
 	}
 
 	//List<Memorable>
 	public void save(String key, List list) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 		int i = 0;
 		for (Object item : list) {
 			if (item instanceof Memorable) {
@@ -222,7 +205,7 @@ public class Memory {
 
 	//Set<Point>
 	public void save(String key, Set<Point> set) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 		Point[] ary = set.toArray(new Point[set.size()]);
 		ArrayList<Point> list = new ArrayList<>(Arrays.asList(ary));
 		m.save(key, list);
@@ -230,7 +213,7 @@ public class Memory {
 
 	//HashMap<Point, Material>
 	public void save(String key, HashMap<Point, Material> map) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 
 		int i = 0;
 		Iterator it = map.entrySet().iterator();
@@ -249,15 +232,15 @@ public class Memory {
 
 	//Point
 	public Point loadPoint(String key) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 		return Point.loadFrom(m);
 	}
 
 	//ArrayList<Point>
 	public ArrayList<Point> loadPointList(String key) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 
-		ArrayList<Point> list = new ArrayList<Point>();
+		ArrayList<Point> list = new ArrayList<>();
 		int count = m.loadInt("count");
 		for (int i = 0; i < count; i++) {
 			list.add(m.loadPoint(Integer.toString(i)));
@@ -268,7 +251,7 @@ public class Memory {
 
 	//List<List<Point>>
 	public List<List<Point>> loadLayers(String key) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 
 		List<List<Point>> layers = new ArrayList<>();
 		int count = m.loadInt("count");
@@ -281,7 +264,7 @@ public class Memory {
 
 	//Set<Point>
 	public Set<Point> loadPointSet(String key) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 
 		List<Point> list = m.loadPointList(key);
 		Set<Point> set = new HashSet<>(list);
@@ -291,7 +274,7 @@ public class Memory {
 
 	//HashMap<Point, Material>
 	public HashMap<Point, Material> loadPointMaterialMap(String key) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 
 		HashMap<Point, Material> map = new HashMap<>();
 		int count = m.loadInt("count");
@@ -306,15 +289,15 @@ public class Memory {
 
 	//FortressGeneratorRune
 	public FortressGeneratorRune loadFortressGeneratorRune(String key) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 		return FortressGeneratorRune.loadFrom(m);
 	}
 
 	//ArrayList<FortressGeneratorRune>
 	public ArrayList<FortressGeneratorRune> loadFortressGeneratorRunes(String key) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 
-		ArrayList<FortressGeneratorRune> list = new ArrayList<FortressGeneratorRune>();
+		ArrayList<FortressGeneratorRune> list = new ArrayList<>();
 		int count = m.loadInt("count");
 		for (int i = 0; i < count; i++) {
 			list.add(m.loadFortressGeneratorRune(Integer.toString(i)));
@@ -325,19 +308,19 @@ public class Memory {
 
 	//FortressGeneratorRunePattern
 	public FortressGeneratorRunePattern loadFortressGeneratorRunePattern(String key) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 		return FortressGeneratorRunePattern.loadFrom(m);
 	}
 
 	//GeneratorCore
 	public GeneratorCore loadGeneratorCore(String key) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 		return GeneratorCore.loadFrom(m);
 	}
 
 	//GeneratorCoreAnimator
 	public GeneratorCoreAnimator loadGenerationAnimator(String key) {
-		Memory m = new Memory(section(key));
+		AbstractMemory m = newMemory(section(key));
 		return GeneratorCoreAnimator.loadFrom(m);
 	}
 }

@@ -2,8 +2,8 @@ package me.newyith.fortress.generator;
 
 import me.newyith.fortress.event.TickTimer;
 import me.newyith.fortress.main.FortressPlugin;
+import me.newyith.fortress.memory.AbstractMemory;
 import me.newyith.fortress.memory.Memorable;
-import me.newyith.fortress.memory.Memory;
 import me.newyith.fortress.util.Cuboid;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
@@ -29,7 +29,7 @@ public class FortressGeneratorRune implements Memorable {
 	private FortressGeneratorParticlesManager particles = null; //set by constructor
 	private List<Long> powerToggleTimeStamps = new ArrayList<Long>();
 
-	public void saveTo(Memory m) {
+	public void saveTo(AbstractMemory<?> m) {
 		m.save("pattern", pattern);
 		m.save("core", core);
 		m.save("powered", powered);
@@ -37,7 +37,7 @@ public class FortressGeneratorRune implements Memorable {
 		m.save("state", state.ordinal());
 	}
 
-	public static FortressGeneratorRune loadFrom(Memory m) {
+	public static FortressGeneratorRune loadFrom(AbstractMemory<?> m) {
 		FortressGeneratorRunePattern pattern = m.loadFortressGeneratorRunePattern("pattern");
 		GeneratorCore core = m.loadGeneratorCore("core");
 		boolean powered = m.loadBoolean("powered");

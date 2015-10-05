@@ -3,10 +3,14 @@ package me.newyith.fortress.memory;
 import me.newyith.fortress.generator.FortressGeneratorRunesManager;
 import me.newyith.fortress.main.FortressPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class SaveLoadMemoryManager {
 
@@ -35,32 +39,41 @@ public class SaveLoadMemoryManager {
 //	}
 
 
-	private static File dataFile;
 	private static FileConfiguration dataFileConfig;
+	private static File dataFile;
+	private static ObjectMapper objectMapper = (new ObjectMapper());
 
 	public static void onEnable(FortressPlugin plugin) {
-		dataFile = new File(plugin.getDataFolder(), "data.yml");
-		dataFileConfig = YamlConfiguration.loadConfiguration(dataFile);
-		Memory memory = new Memory(dataFileConfig);
-		Memory m = new Memory(memory.section("RunesManager"));
+		dataFile = new File(plugin.getDataFolder(), "data.json");
+//		dataFileConfig = YamlConfiguration.loadConfiguration(dataFile);
+		//dataFileConfig = new FileConfiguration();
 
-		FortressGeneratorRunesManager.loadFrom(m);
+		try {
+			//if (data.json doesn't exist) make an empty data.json
+			if (! dataFile.exists()) {
+				(new ObjectMapper()).writeValue(dataFile, new LinkedHashMap<String, Object>());
+			}
+
+			MapMemory memory = new MapMemory(objectMapper.readValue(dataFile, Map.class));
+			MapMemory m = new MapMemory(memory.section("RunesManager"));
+
+			FortressGeneratorRunesManager.loadFrom(m);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void onDisable(FortressPlugin plugin) {
-		//clear config
-		for(String key : dataFileConfig.getKeys(false)){
-			dataFileConfig.set(key, null);
-		}
 
-		Memory memory = new Memory(dataFileConfig);
-		Memory m = new Memory(memory.section("RunesManager"));
+		MapMemory memory = new MapMemory();
+		MapMemory m = new MapMemory(memory.section("RunesManager"));
 
 		FortressGeneratorRunesManager.saveTo(m);
 
 		//save data.yml
 		try {
-			dataFileConfig.save(dataFile);
+			//dataFileConfig.save(dataFile);
+			objectMapper.writeValue(new FileOutputStream(dataFile), memory.getConfig());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

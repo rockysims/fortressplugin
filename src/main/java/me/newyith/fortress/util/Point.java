@@ -1,7 +1,8 @@
 package me.newyith.fortress.util;
 
+import com.google.common.base.Splitter;
+import me.newyith.fortress.memory.AbstractMemory;
 import me.newyith.fortress.memory.Memorable;
-import me.newyith.fortress.memory.Memory;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,22 +11,23 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.text.DecimalFormat;
+import java.util.List;
 
 public class Point implements Memorable {
 	public World world;
 	public double x, y, z;
 
-	public void saveTo(Memory m) {
+	public void saveTo(AbstractMemory<?> m) {
 		//*
-		String s = "";
-		s += world.getName();
-		s += ",";
-		s += (int) x;
-		s += ",";
-		s += (int) y;
-		s += ",";
-		s += (int) z;
-		m.save("s", s);
+		StringBuilder s = new StringBuilder();
+		s.append(world.getName());
+		s.append(",");
+		s.append((int) x);
+		s.append(",");
+		s.append((int) y);
+		s.append(",");
+		s.append((int) z);
+		m.save("s", s.toString());
 		/*/
 		m.save("worldName", world.getName());
 		m.save("x", (int) x);
@@ -34,14 +36,14 @@ public class Point implements Memorable {
 		//*/
 	}
 
-	public static Point loadFrom(Memory m) {
+	public static Point loadFrom(AbstractMemory<?> m) {
 		//*
 		String s = m.loadString("s");
-		String[] data = s.split(",");
-		World world = Bukkit.getWorld(data[0]);
-		int x = Integer.valueOf(data[1]);
-		int y = Integer.valueOf(data[2]);
-		int z = Integer.valueOf(data[3]);
+		List<String> data = Splitter.on(",").splitToList(s);
+		World world = Bukkit.getWorld(data.get(0));
+		int x = Integer.valueOf(data.get(1));
+		int y = Integer.valueOf(data.get(2));
+		int z = Integer.valueOf(data.get(3));
 		return new Point(world, x, y, z);
 		/*/
 		String worldName = m.loadString("worldName");

@@ -126,7 +126,8 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
-
+//TODO: search saving/loading code for += strings and change to use StringBuilder
+//	also search for "split(" and use Splitter.on(",").splitToList(s); instead
 
 //TODO: consider fixing boat/minecart/etc glitch for getting into fortress (factions does not fix minecart and probably not boat)
 //	Entity vehicle = player.getVehicle(); //null if player is not riding anything
@@ -143,7 +144,6 @@ public class FortressPlugin extends JavaPlugin {
 // 			for each ridingPlayers
 //				if player is in a generated point, break vehicle
 
-//TODO: think about making water/lava mote create impassible wall above it
 
 //TODO: save everything with jackson instead of reconstructing (to reduce /reload time)
 
@@ -206,6 +206,7 @@ public class FortressPlugin extends JavaPlugin {
 //	maybe make getPointsConnected send stream of layers to animator?
 //		problem: without foreknowledge of blocks that will be generated, how can we make it crash tolerant
 
+//TODO: think about making water/lava mote create impassible wall above it
 
 
 
