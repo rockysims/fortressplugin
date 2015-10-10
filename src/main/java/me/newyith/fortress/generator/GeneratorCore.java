@@ -42,13 +42,17 @@ public class GeneratorCore implements Memorable {
 	//------------------------------------------------------------------------------------------------------------------
 
 	public void saveTo(AbstractMemory<?> m) {
+		Debug.start("coreSaveTo:claimedWallPoints");
 		m.savePointSetCompact("claimedWallPoints", claimedWallPoints);
+		Debug.end("coreSaveTo:claimedWallPoints");
 //		Debug.msg("saved claimedWallPoints: " + claimedWallPoints.size());
 
 		m.save("anchorPoint", anchorPoint);
 //		Debug.msg("saved anchorPoint: " + anchorPoint);
 
+		Debug.start("coreSaveTo:animator");
 		m.save("animator", animator);
+		Debug.end("coreSaveTo:animator");
 
 		m.save("placedByPlayerIdString", placedByPlayerId.toString());
 		//Debug.msg("saved placedByPlayerId: " + placedByPlayerId);

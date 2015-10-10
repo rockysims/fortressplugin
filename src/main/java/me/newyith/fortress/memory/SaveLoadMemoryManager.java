@@ -3,51 +3,19 @@ package me.newyith.fortress.memory;
 import me.newyith.fortress.generator.FortressGeneratorRunesManager;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.util.Debug;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class SaveLoadMemoryManager {
-
-
-
-
-
-
-
-
-//	public static void onEnable(FortressPlugin plugin) {
-//		newConfig = new File(getDataFolder(), "newconfig.yml");
-//		newConfigz = YamlConfiguration.loadConfiguration(newConfig);
-//	}
-//
-//	public void saveConfig() {
-//		try {
-//			newConfigz.save(newConfig);
-//		} catch(Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
-//
-//	public void onDisable(){
-//		saveConfig()
-//	}
-
-
-	private static FileConfiguration dataFileConfig;
 	private static File dataFile;
 	private static ObjectMapper objectMapper = (new ObjectMapper());
 
 	public static void onEnable(FortressPlugin plugin) {
 		Debug.start("load");
 
-		Debug.start("loadFile"); //very fast
 		dataFile = new File(plugin.getDataFolder(), "data.json");
 
 		try {
@@ -55,46 +23,48 @@ public class SaveLoadMemoryManager {
 			if (! dataFile.exists()) {
 				(new ObjectMapper()).writeValue(dataFile, new LinkedHashMap<String, Object>());
 			}
-			Debug.end("loadFile");
 
-
-			Debug.start("loadPrep"); //fairly fast
+//			Debug.start("loadPrep"); //fairly fast
 			MapMemory memory = new MapMemory(objectMapper.readValue(dataFile, Map.class));
 			MapMemory m = new MapMemory(memory.section("RunesManager"));
-			Debug.end("loadPrep");
+//			Debug.end("loadPrep");
 
-			Debug.start("loadFrom"); //very slow
+//			Debug.start("loadFrom"); //very slow
 			FortressGeneratorRunesManager.loadFrom(m);
-			Debug.end("loadFrom");
+//			Debug.end("loadFrom");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		Debug.end("load");
+
+		if (!FortressPlugin.releaseBuild) {
+			//do mock save so needed classes are loaded (new classes can't be loaded after I rebuild jar)
+			try {
+				writeDataToBuffer(new ByteArrayOutputStream());
+			} catch (IOException e) {}
+		}
+	}
+
+	private static void writeDataToBuffer(OutputStream stream) throws IOException {
+		MapMemory memory = new MapMemory();
+		MapMemory m = new MapMemory(memory.section("RunesManager"));
+		FortressGeneratorRunesManager.saveTo(m);
+		objectMapper.writeValue(stream, memory.getConfig());
 	}
 
 	public static void onDisable(FortressPlugin plugin) {
 		Debug.start("save");
-
-		Debug.start("savePrep"); //very fast
-		MapMemory memory = new MapMemory();
-		MapMemory m = new MapMemory(memory.section("RunesManager"));
-		Debug.end("savePrep");
-
-		Debug.start("saveTo"); //very slow (slower than loadFrom)
-		FortressGeneratorRunesManager.saveTo(m);
-		Debug.end("saveTo");
-
-		Debug.start("saveFile"); //fairly fast
-		//save data.json
 		try {
-			//dataFileConfig.save(dataFile);
-			objectMapper.writeValue(new FileOutputStream(dataFile), memory.getConfig());
+			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+			writeDataToBuffer(buffer);
+			FileOutputStream fos = new FileOutputStream(dataFile);
+			//write data.json
+			fos.write(buffer.toByteArray(), 0, buffer.size());
+			fos.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Debug.end("saveFile");
-
 		Debug.end("save");
 	}
 

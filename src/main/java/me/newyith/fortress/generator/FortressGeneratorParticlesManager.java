@@ -41,7 +41,7 @@ public class FortressGeneratorParticlesManager {
 		if (wallWaitTicks <= 0) {
 			wallWaitTicks = (500) / TickTimer.msPerTick;
 
-			Debug.start("tickWallParticles()");
+//			Debug.start("tickWallParticles()");
 
 			//fill wallOutsidePairs (if needed)
 			if (wallOutsidePairs == null) {

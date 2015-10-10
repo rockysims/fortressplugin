@@ -18,6 +18,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class FortressPlugin extends JavaPlugin {
+	public static boolean releaseBuild = false; //TODO: change to this to true for release builds
+
 	public static int config_glowstoneDustBurnTimeMs = 1000 * 60 * 60;
 	public static int config_stuckDelayMs = 30 * 1000;
 	public static int config_stuckCancelDistance = 4;
