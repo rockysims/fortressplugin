@@ -4,6 +4,7 @@ import me.newyith.fortress.particle.ParticleEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,9 +47,13 @@ public class Debug {
 	}
 
 	public static void end(String key) {
-		stop(key, false);
-		duration(key);
-		clear(key);
+		if (durations.containsKey(key)) {
+			stop(key, false);
+			duration(key);
+			clear(key);
+		} else {
+			Debug.print("Timer \"" + key + "\" ended WITHOUT A DURATION");
+		}
 	}
 
 	public static void stop(String key) {
