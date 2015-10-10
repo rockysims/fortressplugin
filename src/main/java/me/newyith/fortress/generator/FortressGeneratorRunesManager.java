@@ -66,6 +66,10 @@ public class FortressGeneratorRunesManager {
 		return runeByPoint.get(p);
 	}
 
+	public static List<FortressGeneratorRune> getRunes() {
+		return runeInstances;
+	}
+
 	public static Set<FortressGeneratorRune> getOtherRunesInRange(Point center, int range) {
 
 		//TODO: update this to use fortress cuboid instead of fixed range

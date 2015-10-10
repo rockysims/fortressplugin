@@ -52,11 +52,11 @@ public class WallMaterials {
 				Material mat = item.getType();
 				switch (mat) {
 					//non protectable
-					case GRASS:
-					case DIRT:
-					case STONE:
-					case GRAVEL:
-					case SAND:
+//					case GRASS:
+//					case DIRT:
+//					case STONE:
+//					case GRAVEL:
+//					case SAND:
 					case BEDROCK:
 						break;
 					//special protectable

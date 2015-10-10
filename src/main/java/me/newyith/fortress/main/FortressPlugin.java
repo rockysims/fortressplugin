@@ -126,23 +126,39 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
-//TODO: search saving/loading code for += strings and change to use StringBuilder
+//TODO: fix bug where compiling code then reloading causes EOF error
+
+//------------------------------//
+//		first priority			//
+//------------------------------//
+
+//TODO: clean up jackson branch and merge back into master
+//	search saving/loading code for += strings and change to use StringBuilder
 //	also search for "split(" and use Splitter.on(",").splitToList(s); instead
+//	review SaveLoadMemoryManager, MapMemory, YamlMemory, AbstractMemory
+
+//-------------------------------//
+//-------------------------------//
+
+
 
 //TODO: consider fixing boat/minecart/etc glitch for getting into fortress (factions does not fix minecart and probably not boat)
+//	check if making floor/side double think prevents this glitch from working
 //	Entity vehicle = player.getVehicle(); //null if player is not riding anything
 //	try to reproduce boat glitch to get in via side of fortress (see https://www.youtube.com/watch?v=3qBGaqJ0yHc)
 //	think of a way to fix minecart glitch for getting in through the floor
 //	think of a way to fix boat glitch for getting in through the floor/side
-//	check if making floor/side double think prevents this glitch from working
 //	maybe:
-//		on enter vehicle,
-// 			add player to ridingPlayers
+//		keep list of ridingPlayers (in vehicles)
+//		on enter/leave vehicle:
 //			cancel if player would be in a generated point
-//		on leave vehicle, remove player from ridingPlayers
 //		every half second:
 // 			for each ridingPlayers
-//				if player is in a generated point, break vehicle
+//				if player is in a generated point
+//					teleport to lastKnownPoint
+// 					break vehicle?
+//				else
+//					update lastKnownPoint (also update onEnterVehicle)
 
 
 //TODO: save everything with jackson instead of reconstructing (to reduce /reload time)
@@ -153,6 +169,9 @@ public class FortressPlugin extends JavaPlugin {
 //	in java a promise is called CompletableFuture
 
 
+//TODO: consider tracking and updating manual books so that existing copies get updated when manual changes
+
+//TODO: consider making it so when protected blocks are broken they turn to bedrock for between 2 and 4 seconds then back
 
 //DONE: make common blocks protectable and test tick speed for large fortress de/generate
 //	during generation? (not sure): about 30ms per tick for large fortress (about 1ms per tick for small)
@@ -168,6 +187,7 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: make door white list have to be above door (leave trap door as is)
 //TODO: think of a way to protect stuff inside fortress from explosions on the outside (maybe already done?)
 //TODO: try to track down why getPointsConnected is being called 4 times during generation (especially the 2 heavier calls)
+//TODO: check if you can pick up protected water/lava with bucket
 
 // --- MVP ---
 

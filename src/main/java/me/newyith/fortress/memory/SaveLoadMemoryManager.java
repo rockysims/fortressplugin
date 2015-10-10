@@ -2,6 +2,7 @@ package me.newyith.fortress.memory;
 
 import me.newyith.fortress.generator.FortressGeneratorRunesManager;
 import me.newyith.fortress.main.FortressPlugin;
+import me.newyith.fortress.util.Debug;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -44,42 +45,58 @@ public class SaveLoadMemoryManager {
 	private static ObjectMapper objectMapper = (new ObjectMapper());
 
 	public static void onEnable(FortressPlugin plugin) {
+		Debug.start("load");
+
+		Debug.start("loadFile"); //very fast
 		dataFile = new File(plugin.getDataFolder(), "data.json");
-//		dataFileConfig = YamlConfiguration.loadConfiguration(dataFile);
-		//dataFileConfig = new FileConfiguration();
 
 		try {
 			//if (data.json doesn't exist) make an empty data.json
 			if (! dataFile.exists()) {
 				(new ObjectMapper()).writeValue(dataFile, new LinkedHashMap<String, Object>());
 			}
+			Debug.end("loadFile");
 
+
+			Debug.start("loadPrep"); //fairly fast
 			MapMemory memory = new MapMemory(objectMapper.readValue(dataFile, Map.class));
 			MapMemory m = new MapMemory(memory.section("RunesManager"));
+			Debug.end("loadPrep");
 
+			Debug.start("loadFrom"); //very slow
 			FortressGeneratorRunesManager.loadFrom(m);
+			Debug.end("loadFrom");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		Debug.end("load");
 	}
 
 	public static void onDisable(FortressPlugin plugin) {
+		Debug.start("save");
 
+		Debug.start("savePrep"); //very fast
 		MapMemory memory = new MapMemory();
 		MapMemory m = new MapMemory(memory.section("RunesManager"));
+		Debug.end("savePrep");
 
+		Debug.start("saveTo"); //very slow (slower than loadFrom)
 		FortressGeneratorRunesManager.saveTo(m);
+		Debug.end("saveTo");
 
-		//save data.yml
+		Debug.start("saveFile"); //fairly fast
+		//save data.json
 		try {
 			//dataFileConfig.save(dataFile);
 			objectMapper.writeValue(new FileOutputStream(dataFile), memory.getConfig());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		Debug.end("saveFile");
+
+		Debug.end("save");
 	}
-
-
 
 
 
