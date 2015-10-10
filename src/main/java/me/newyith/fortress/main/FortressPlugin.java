@@ -128,7 +128,6 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
-//TODO: fix bug where compiling code then reloading causes EOF error
 
 //------------------------------//
 //		first priority			//

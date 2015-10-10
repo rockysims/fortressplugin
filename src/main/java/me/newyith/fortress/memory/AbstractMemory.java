@@ -71,22 +71,23 @@ public abstract class AbstractMemory<ConfigType> {
 	public void savePointListCompact(String key, List<Point> list) {
 		AbstractMemory m = newMemory(section(key));
 
-		String blob = "";
+		StringBuilder blob = new StringBuilder();
 		if (list.size() > 0) {
 			m.save("world", list.get(0).world.getName());
 
 			for (Point p : list) {
-				String pointBlob = "";
-				pointBlob += (int) p.x;
-				pointBlob += ",";
-				pointBlob += (int) p.y;
-				pointBlob += ",";
-				pointBlob += (int) p.z;
-				blob += pointBlob + "~";
+				StringBuilder pointBlob = new StringBuilder();
+				pointBlob.append((int)p.x);
+				pointBlob.append(",");
+				pointBlob.append((int) p.y);
+				pointBlob.append(",");
+				pointBlob.append((int) p.z);
+				pointBlob.append("~");
+				blob.append(pointBlob);
 			}
-			blob = blob.substring(0, blob.length() - 1); //remove last "~"
+			blob.setLength(Math.max(blob.length() - 1, 0)); //remove last "~"
 		}
-		m.save("blob", blob);
+		m.save("blob", blob.toString());
 	}
 	public List<Point> loadPointListCompact(String key) {
 		AbstractMemory m = newMemory(section(key));
