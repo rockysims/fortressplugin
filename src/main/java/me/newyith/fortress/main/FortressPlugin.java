@@ -131,6 +131,9 @@ public class FortressPlugin extends JavaPlugin {
 //	try saving inside/outside instead of rebuilding
 //	maybe: try saving runeByPoint and see if that means secondStageLoad is no longer needed
 
+//TODO: consider trying to make a bunch of nether particles gravitate toward newly protected blocks to indicate their protected
+//	no, a wave of bedrock is better I think even though it may mean some blocks (redstone stuff?) might lose state when protected
+
 //------------------------------//
 //		first priority			//
 //------------------------------//
@@ -143,7 +146,7 @@ public class FortressPlugin extends JavaPlugin {
 //-------------------------------//
 //-------------------------------//
 
-
+//TODO: save periodically (maybe every 1 minute)
 
 //TODO: consider fixing boat/minecart/etc glitch for getting into fortress (factions does not fix minecart and probably not boat)
 //	check if making floor/side double think prevents this glitch from working
@@ -166,7 +169,7 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: save everything with jackson instead of reconstructing (to reduce /reload time)
 
-//TODO: think about making getPointsConnected() execute over time (to prevent lag) and after done collect results and start generating
+//TODO: make getPointsConnected() execute over time (to prevent lag) and after done collect results and start generating
 //	while waiting for getPointsConnected(), leave wall as is (if generating. degenerating should still be allowed)
 //	maybe make a class (FortressWall?) to represent a fortress wall update (onGenerate)
 //	in java a promise is called CompletableFuture
@@ -180,6 +183,7 @@ public class FortressPlugin extends JavaPlugin {
 //	during generation? (not sure): about 30ms per tick for large fortress (about 1ms per tick for small)
 //	TODO: consider making animator keep track of current layer instead of searching all layers until generatable block found
 //		reset current layer on de/generate
+//	then retest tick speed
 
 
 
