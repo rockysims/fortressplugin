@@ -47,7 +47,7 @@ public class Debug {
 	}
 
 	public static void end(String key) {
-		if (durations.containsKey(key)) {
+		if (timestamps.containsKey(key) || durations.containsKey(key)) {
 			stop(key, false);
 			duration(key);
 			clear(key);
