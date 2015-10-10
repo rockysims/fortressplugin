@@ -51,12 +51,10 @@ public abstract class AbstractMemory<ConfigType> {
 
 	//Set<Point> (compact)
 	public void savePointSetCompact(String key, Set<Point> set) {
-		Debug.start("savePointSetCompact");
 		AbstractMemory m = newMemory(section(key));
 		Point[] ary = set.toArray(new Point[set.size()]);
 		ArrayList<Point> list = new ArrayList<>(Arrays.asList(ary));
 		m.savePointListCompact(key, list);
-		Debug.end("savePointSetCompact");
 	}
 	public Set<Point> loadPointSetCompact(String key) {
 		AbstractMemory m = newMemory(section(key));

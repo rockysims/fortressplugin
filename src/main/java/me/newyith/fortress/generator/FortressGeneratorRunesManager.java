@@ -30,8 +30,11 @@ public class FortressGeneratorRunesManager {
 	}
 
 	public static void loadFrom(AbstractMemory<?> m) {
+		Debug.start("runesManager::loadFrom runeInstances"); //10% of work
 		runeInstances = m.loadFortressGeneratorRunes("runeInstances");
+		Debug.end("runesManager::loadFrom runeInstances");
 
+		Debug.start("runesManager::loadFrom rebuilds"); //~0% of work
 		for (FortressGeneratorRune rune : runeInstances) {
 			//rebuild runeByPoint map
 			for (Point p : rune.getPattern().getPoints()) {
@@ -51,11 +54,14 @@ public class FortressGeneratorRunesManager {
 				runeByProtectedPoint.put(p, rune);
 			}
 		}
+		Debug.end("runesManager::loadFrom rebuilds");
 
+		Debug.start("runesManager::loadFrom secondStageLoading"); //90% of work
 		//second stage loading
 		for (FortressGeneratorRune rune : runeInstances) {
 			rune.secondStageLoad();
 		}
+		Debug.end("runesManager::loadFrom secondStageLoading");
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

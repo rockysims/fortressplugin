@@ -29,9 +29,9 @@ public class SaveLoadMemoryManager {
 			MapMemory m = new MapMemory(memory.section("RunesManager"));
 //			Debug.end("loadPrep");
 
-//			Debug.start("loadFrom"); //very slow
+			Debug.start("loadFrom"); //very slow
 			FortressGeneratorRunesManager.loadFrom(m);
-//			Debug.end("loadFrom");
+			Debug.end("loadFrom");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
