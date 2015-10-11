@@ -42,55 +42,63 @@ public class GeneratorCore implements Memorable {
 	//------------------------------------------------------------------------------------------------------------------
 
 	public void saveTo(AbstractMemory<?> m) {
+		m.savePointSetCompact("claimedPoints", claimedPoints);
 		m.savePointSetCompact("claimedWallPoints", claimedWallPoints);
-//		Debug.msg("saved claimedWallPoints: " + claimedWallPoints.size());
-
 		m.save("anchorPoint", anchorPoint);
-//		Debug.msg("saved anchorPoint: " + anchorPoint);
-
 		m.save("animator", animator);
-
 		m.save("placedByPlayerIdString", placedByPlayerId.toString());
-		//Debug.msg("saved placedByPlayerId: " + placedByPlayerId);
+		m.savePointSetCompact("layerOutsideFortress", layerOutsideFortress);
+		m.savePointSetCompact("pointsInsideFortress", pointsInsideFortress);
 	}
 
 	public static GeneratorCore loadFrom(AbstractMemory<?> m) {
+		Set<Point> claimedPoints = m.loadPointSetCompact("claimedPoints");
 		Set<Point> claimedWallPoints = m.loadPointSetCompact("claimedWallPoints");
-//		Debug.msg("loaded claimedWallPoints: " + claimedWallPoints.size());
-
 		Point anchorPoint = m.loadPoint("anchorPoint");
-//		Debug.msg("loaded anchorPoint: " + anchorPoint);
-
 		GeneratorCoreAnimator animator = m.loadGenerationAnimator("animator");
-
 		UUID placedByPlayerId = UUID.fromString(m.loadString("placedByPlayerIdString"));
+		Set<Point> layerOutsideFortress = m.loadPointSetCompact("layerOutsideFortress");
+		Set<Point> pointsInsideFortress = m.loadPointSetCompact("pointsInsideFortress");
 
 		//updateInsideOutside() called by rune (second stage loading)
 
 		GeneratorCore instance = new GeneratorCore(
 				animator,
+				claimedPoints,
 				claimedWallPoints,
 				anchorPoint,
-				placedByPlayerId);
+				placedByPlayerId,
+				layerOutsideFortress,
+				pointsInsideFortress
+				);
 		return instance;
 	}
 
 	private GeneratorCore(
 			GeneratorCoreAnimator animator,
+			Set<Point> claimedPoints,
 			Set<Point> claimedWallPoints,
 			Point anchorPoint,
-			UUID placedByPlayerId) {
+			UUID placedByPlayerId,
+			Set<Point> layerOutsideFortress,
+			Set<Point> pointsInsideFortress
+			) {
 		this.animator = animator;
+		this.claimedPoints = claimedPoints;
 		this.claimedWallPoints = claimedWallPoints;
 		this.anchorPoint = anchorPoint;
 		this.placedByPlayerId = placedByPlayerId;
+		this.layerOutsideFortress = layerOutsideFortress;
+		this.pointsInsideFortress = pointsInsideFortress;
 	}
 
 	public void secondStageLoad() {
 		//this is needed in case of /reload during generation
 		animator.wallMats.refresh(); //needs to be in second stage because refresh uses runeByPoint lookup
 
+		/* rebuild version (currently saving it instead)
 		updateClaimedPoints(claimedWallPoints); //needs to be in second stage because uses runeByPoint lookup
+		//*/
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

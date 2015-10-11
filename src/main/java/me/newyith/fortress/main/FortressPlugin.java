@@ -127,6 +127,8 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
+//TODO: consider saving wallOutsidePairs for particles instead of rebuilding it
+
 //TODO: improve load speed
 //	try saving inside/outside instead of rebuilding
 //	maybe: try saving runeByPoint and see if that means secondStageLoad is no longer needed

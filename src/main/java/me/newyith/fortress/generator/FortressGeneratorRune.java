@@ -56,17 +56,12 @@ public class FortressGeneratorRune implements Memorable {
 	}
 
 	public void secondStageLoad() {
-		Debug.start("rune secondStageLoad");
-
-
-		Debug.start("rune core.secondStageLoad()");
 		core.secondStageLoad();
-		Debug.end("rune core.secondStageLoad()");
 
-		//updateInsideOutside() needs to be called before onGeneratedChanged() so layerOutside is full
-		core.updateInsideOutside();
-		onGeneratedChanged(); //update which particles should be displayed
-		Debug.end("rune secondStageLoad");
+		/* rebuild version (currently saving it instead)
+		core.updateInsideOutside(); //updateInsideOutside() needs to be called before onGeneratedChanged() so layerOutside is full
+		//*/
+		onGeneratedChanged(); //update which particles should be displayed (requires layerOutside already be filled)
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

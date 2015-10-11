@@ -83,6 +83,6 @@ public class Debug {
 
 	public static void duration(String key) {
 		int durationNs = durations.get(key);
-		Debug.print("Timer " + key + " total duration: " + String.valueOf((durationNs / 1000) / 1000F) + "ms.");
+		Debug.print("Timer '" + key + "' total duration: " + String.valueOf((durationNs / 1000) / 1000F) + "ms.");
 	}
 }
