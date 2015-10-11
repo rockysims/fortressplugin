@@ -17,6 +17,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Random;
+
 public class FortressPlugin extends JavaPlugin {
 	public static boolean releaseBuild = false; //TODO: change to this to true for release builds
 
@@ -24,7 +26,7 @@ public class FortressPlugin extends JavaPlugin {
 	public static int config_stuckDelayMs = 30 * 1000;
 	public static int config_stuckCancelDistance = 4;
 	public static int config_generationRange = 128;
-	public static int config_generatorBlockLimit = 30000; //roughly 32x32x32
+	public static int config_generatorBlockLimit = 40000; //roughly 125 empty 8x8x8 rooms
 
 	private void readConfig() {
 		FileConfiguration config = getConfig();
@@ -118,16 +120,89 @@ public class FortressPlugin extends JavaPlugin {
 			commandHandled = true;
 		}
 
+		//TODO: remove this command
+		// /test2
+		if (cmd.getName().equalsIgnoreCase("test2")) {
+			if (sender instanceof Player) {
+				Debug.msg("executing test2 command...");
+
+				Player player = (Player)sender;
+				Point anchor = new Point(player.getLocation()).add(0, -1, 0);
+
+				int num = 2;
+				int size = 8;
+				for (int x = -1*num; x <= num; x++) {
+					for (int y = -1*num; y <= num; y++) {
+						for (int z = -1*num; z <= num; z++) {
+							Point p = anchor.add(x*size, y*size, z*size);
+							boxAt(p, size);
+						}
+					}
+				}
+
+			}
+			commandHandled = true;
+		}
 
 
-        return commandHandled;
+		//TODO: remove this command
+		// /test3
+		if (cmd.getName().equalsIgnoreCase("test3")) {
+			if (sender instanceof Player) {
+				Debug.msg("executing test3 command...");
+
+				int distance = 40;
+				Player player = (Player)sender;
+				Point center = new Point(player.getLocation());
+
+				for (int xOffset = -1 * distance; xOffset <= distance; xOffset++) {
+					for (int yOffset = -1 * distance; yOffset <= distance; yOffset++) {
+						for (int zOffset = -1 * distance; zOffset <= distance; zOffset++) {
+							Point p = new Point(center.world, center.x + xOffset, center.y + yOffset, center.z + zOffset);
+							if (p.y > 5) {
+								if (p.getBlock().getType() == Material.COBBLESTONE) {
+									p.getBlock().setType(Material.AIR);
+								}
+								if (p.getBlock().getType() == Material.GLASS) {
+									p.getBlock().setType(Material.AIR);
+								}
+							}
+						}
+					}
+				}
+			}
+			commandHandled = true;
+		}
+
+
+		return commandHandled;
     }
 
+	private void boxAt(Point anchor, int num) {
+		for (int x = 0; x < num; x++) {
+			for (int y = 0; y < num; y++) {
+				for (int z = 0; z < num; z++) {
 
+					boolean xMatch = x == 0 || x == num-1;
+					boolean yMatch = y == 0 || y == num-1;
+					boolean zMatch = z == 0 || z == num-1;
+					if (xMatch || yMatch || zMatch) {
+						Point p = anchor.add(x, y, z);
+						Material m = Material.COBBLESTONE;
+						if (new Random().nextBoolean()) {
+							m = Material.GLASS;
+						}
+						p.getBlock().setType(m);
+					}
 
+				}
+			}
+		}
+	}
 }
 
 
+//TODO: make tick more efficient while de/generating
 
 //------------------------------//
 //		first priority			//
