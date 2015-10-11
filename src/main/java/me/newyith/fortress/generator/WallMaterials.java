@@ -32,12 +32,12 @@ public class WallMaterials {
 		return generatableWallMaterials;
 	}
 
-	public boolean isProtectableWallMaterial(Material m) {
-		return protectableWallMaterials.contains(m);
+	public boolean isProtectable(Block b) {
+		return protectableWallMaterials.contains(b.getType());
 	}
 
-	public boolean isAlterableWallMaterial(Material m) {
-		return alterableWallMaterials.contains(m);
+	public boolean isAlterable(Block b) {
+		return alterableWallMaterials.contains(b.getType());
 	}
 
 	// - Refreshing -
@@ -86,6 +86,10 @@ public class WallMaterials {
 						break;
 					case LAVA_BUCKET:
 						addProtectable(Material.STATIONARY_LAVA);
+						break;
+					case STEP:
+						addProtectable(Material.STEP);
+						addProtectable(Material.DOUBLE_STEP);
 						break;
 //					case PISTON_BASE:
 //						addProtectable(Material.PISTON_BASE);

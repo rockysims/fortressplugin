@@ -98,7 +98,7 @@ public class FortressPlugin extends JavaPlugin {
 			if (sender instanceof Player) {
 				Debug.msg("executing test command...");
 
-				int distance = 20;
+				int distance = 40;
 				Player player = (Player)sender;
 				Point center = new Point(player.getLocation());
 
@@ -126,6 +126,8 @@ public class FortressPlugin extends JavaPlugin {
 
 
 }
+
+//TODO: consider fixing bug where if one type of slab is protected then all types of slabs are
 
 //TODO: consider saving wallOutsidePairs for particles instead of rebuilding it
 

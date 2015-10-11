@@ -296,7 +296,7 @@ public class GeneratorCoreAnimator implements Memorable {
 		boolean altered = false;
 
 		Block b = p.getBlock();
-		if (wallMats.isAlterableWallMaterial(b.getType())) {
+		if (wallMats.isAlterable(b)) {
 			addAlteredPoint(p, b.getType());
 			b.setType(Material.BEDROCK);
 			altered = true;
@@ -323,9 +323,9 @@ public class GeneratorCoreAnimator implements Memorable {
 		boolean pointProtected = false;
 
 		Block b = p.getBlock();
-		if (!this.protectedPoints.contains(p) && wallMats.isProtectableWallMaterial(b.getType())) {
+		if (!this.protectedPoints.contains(p) && wallMats.isProtectable(b)) {
 			addProtectedPoint(p);
-			//TODO: make FortressGeneratorParticlesManager show particles on protectedPoints
+			//TODO: make FortressGeneratorParticlesManager show particles on protectedPoints?
 			pointProtected = true;
 		}
 
