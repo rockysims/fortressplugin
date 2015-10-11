@@ -132,7 +132,7 @@ public abstract class AbstractMemory<ConfigType> {
 	public void savePointMaterialMapCompact(String key, HashMap<Point, Material> map) {
 		AbstractMemory m = newMemory(section(key));
 
-		String blob = "";
+		StringBuilder blob = new StringBuilder();
 		if (map.size() > 0) {
 			Point firstKey = map.keySet().iterator().next();
 			m.save("world", firstKey.world.getName());
@@ -143,19 +143,19 @@ public abstract class AbstractMemory<ConfigType> {
 				Point p = (Point) pair.getKey();
 				Material mat = (Material) pair.getValue();
 
-				String pairBlob = "";
-				pairBlob += (int) p.x;
-				pairBlob += ",";
-				pairBlob += (int) p.y;
-				pairBlob += ",";
-				pairBlob += (int) p.z;
-				pairBlob += ",";
-				pairBlob += mat.ordinal();
-				blob += pairBlob + "~";
+				StringBuilder pairBlob = new StringBuilder();
+				pairBlob.append((int) p.x);
+				pairBlob.append(",");
+				pairBlob.append((int) p.y);
+				pairBlob.append(",");
+				pairBlob.append((int) p.z);
+				pairBlob.append(",");
+				pairBlob.append(mat.ordinal());
+				blob.append(pairBlob + "~");
 			}
-			blob = blob.substring(0, blob.length() - 1); //remove last "~"
+			blob.setLength(Math.max(blob.length() - 1, 0)); //remove last "~"
 		}
-		m.save("blob", blob);
+		m.save("blob", blob.toString());
 	}
 	public HashMap<Point, Material> loadPointMaterialMapCompact(String key) {
 		AbstractMemory m = newMemory(section(key));

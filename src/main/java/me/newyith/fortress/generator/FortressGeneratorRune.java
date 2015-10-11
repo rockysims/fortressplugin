@@ -290,20 +290,20 @@ public class FortressGeneratorRune implements Memorable {
 		h = h % 24;
 		m = m % 60;
 		s = s % 60;
-		String str = "";
+		StringBuilder str = new StringBuilder();
 		if (d > 0) {
-			str += d + "d ";
+			str.append(d + "d ");
 		}
 		if (h > 0) {
-			str += h + "h ";
+			str.append(h + "h ");
 		}
 		if (m > 0) {
-			str += m + "m ";
+			str.append(m + "m ");
 		}
 		if (s > 0) {
-			str += s + "s";
+			str.append(s + "s");
 		}
-		this.setSignText(null, null, str);
+		this.setSignText(null, null, str.toString());
 	}
 
 	private boolean setSignText(String line1, String line2, String line3) {

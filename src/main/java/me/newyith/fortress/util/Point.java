@@ -157,13 +157,13 @@ public class Point implements Memorable {
 
 	public String toStringDoubles() {
 		String format = "#0.00";
-		String s = "";
-		s += new DecimalFormat(format).format(x);
-		s += ", ";
-		s += new DecimalFormat(format).format(y);
-		s += ", ";
-		s += new DecimalFormat(format).format(z);
-		return s;
+		StringBuilder s = new StringBuilder();
+		s.append(new DecimalFormat(format).format(x));
+		s.append(", ");
+		s.append(new DecimalFormat(format).format(y));
+		s.append(", ");
+		s.append(new DecimalFormat(format).format(z));
+		return s.toString();
 	}
 
 	@Override

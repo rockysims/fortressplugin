@@ -24,15 +24,15 @@ public class SaveLoadMemoryManager {
 				(new ObjectMapper()).writeValue(dataFile, new LinkedHashMap<String, Object>());
 			}
 
-//			Debug.start("loadPrep"); //very slow
+			Debug.start("loadPrep"); //very slow
 			Map<String, Object> memMap = objectMapper.readValue(dataFile, Map.class);
-//			Debug.end("loadPrep");
+			Debug.end("loadPrep");
 			MapMemory memory = new MapMemory(memMap);
 			MapMemory m = new MapMemory(memory.section("RunesManager"));
 
-//			Debug.start("loadFrom"); //slow
+			Debug.start("loadFrom"); //slow
 			FortressGeneratorRunesManager.loadFrom(m);
-//			Debug.end("loadFrom");
+			Debug.end("loadFrom");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -127,16 +127,7 @@ public class FortressPlugin extends JavaPlugin {
 
 }
 
-//TODO: consider fixing bug where if one type of slab is protected then all types of slabs are
 
-//TODO: consider saving wallOutsidePairs for particles instead of rebuilding it
-
-//TODO: improve load speed
-//	try saving inside/outside instead of rebuilding
-//	maybe: try saving runeByPoint and see if that means secondStageLoad is no longer needed
-
-//TODO: consider trying to make a bunch of nether particles gravitate toward newly protected blocks to indicate their protected
-//	no, a wave of bedrock is better I think even though it may mean some blocks (redstone stuff?) might lose state when protected
 
 //------------------------------//
 //		first priority			//
@@ -224,6 +215,10 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: add mcStats: http://mcstats.org/learn-more/
 
 // --- --- ---
+
+
+//TODO: consider saving wallOutsidePairs for particles instead of rebuilding it
+//TODO: consider fixing bug where if one type of slab is protected then all types of slabs are
 
 //TODO: save data using jackson instead of config?
 //use jackson to save/load instead of data.yml

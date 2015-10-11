@@ -197,15 +197,15 @@ public class GeneratorCore implements Memorable {
 		Set<String> names = new HashSet<>();
 
 		if (sign != null) {
-			String s = "";
-			s += sign.getLine(0);
-			s += "\n";
-			s += sign.getLine(1);
-			s += "\n";
-			s += sign.getLine(2);
-			s += "\n";
-			s += sign.getLine(3);
-			s = s.replaceAll(" ", "");
+			StringBuilder sb = new StringBuilder();
+			sb.append(sign.getLine(0));
+			sb.append("\n");
+			sb.append(sign.getLine(1));
+			sb.append("\n");
+			sb.append(sign.getLine(2));
+			sb.append("\n");
+			sb.append(sign.getLine(3));
+			String s = sb.toString().replaceAll(" ", "");
 
 			if (s.contains(",")) {
 				s = s.replaceAll("\n", "");
