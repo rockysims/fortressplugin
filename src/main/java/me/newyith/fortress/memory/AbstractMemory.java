@@ -10,21 +10,20 @@ import me.newyith.fortress.util.Point;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.*;
 
-public abstract class AbstractMemory<ConfigType> {
-	protected ConfigType config;
+public abstract class AbstractMemory<DataType> {
+	protected DataType data;
 
-	public AbstractMemory(ConfigType config) {
-		this.config = config;
+	public AbstractMemory(DataType data) {
+		this.data = data;
 	}
 
-	public abstract ConfigType section(String sectionName);
+	public abstract DataType section(String sectionName);
 
-	public ConfigType getConfig() {
-		return config;
+	public DataType getData() {
+		return data;
 	}
 
 	// --- PRIMITIVE SAVE/LOAD ---
@@ -45,7 +44,7 @@ public abstract class AbstractMemory<ConfigType> {
 	abstract public void save(String key, String value);
 	abstract public String loadString(String key);
 	
-	abstract AbstractMemory<ConfigType> newMemory(ConfigType config);
+	abstract AbstractMemory<DataType> newMemory(DataType data);
 
 	// --- SAVE/LOAD COMPACT ---
 

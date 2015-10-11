@@ -208,10 +208,8 @@ public class FortressPlugin extends JavaPlugin {
 //		first priority			//
 //------------------------------//
 
-//TODO: clean up jackson branch and merge back into master
-//	search saving/loading code for += strings and change to use StringBuilder
-//	also search for "split(" and use Splitter.on(",").splitToList(s); instead
-//	review SaveLoadMemoryManager, MapMemory, YamlMemory, AbstractMemory
+//DONE: clean up jackson branch
+//	TODO: merge back into master
 
 //-------------------------------//
 //-------------------------------//
