@@ -220,9 +220,8 @@ public class FortressPlugin extends JavaPlugin {
 //------------------------------//
 
 //TODO: make getPointsConnected() execute over time (to prevent lag) and after done collect results and start generating
-//	maybe add GenerationTask to represent generating/degenerating action?
+//	maybe add GenerationTask class to represent generating/degenerating action?
 //	while waiting for getPointsConnected(), leave wall as is (if generating. degenerating should still be allowed and cancel search)
-//	maybe make a class (FortressWall?) to represent a fortress wall update (onGenerate)
 //	in java a promise is called a CompletableFuture
 
 //TODO: consider making it so when protected blocks are broken they turn to bedrock for between 2 and 4 seconds then back
@@ -289,6 +288,7 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: make signs on generator's base a global white list
 
 //TODO: onProtect, if (block is solid || glass) change block to bedrock for a second then back to original material
+//	do the same to protected blocks onGenerated and to generated blocks onDegenerated
 //first try idea above with bedrock else try idea below with particles
 //MAYBE MVP?: make generation display wave of particle to indicate generating wall blocks
 //	onGenerateBlock, show particles appearing for a few seconds at random points on all faces not touching solid block
@@ -302,20 +302,17 @@ public class FortressPlugin extends JavaPlugin {
 // --- --- ---
 
 
-//TODO: consider saving wallOutsidePairs for particles instead of rebuilding it
+//TODO: consider saving wallOutsidePairs for particles instead of rebuilding it (or better spread out the recalculation)
 //TODO: consider fixing bug where if one type of slab is protected then all types of slabs are
 
-//TODO: save data using jackson instead of config?
-//use jackson to save/load instead of data.yml
-//http://www.mkyong.com/java/how-to-convert-java-object-to-from-json-jackson/
-
-//TODO: consider adding flag block/item to make generate/degenerate animation run faster
+//TODO: consider adding flag block/item to make generate/degenerate animation run faster (ghast tear?)
 
 
 //TODO: allow wall particles to be disabled via config
 
 //	maybe make getPointsConnected send stream of layers to animator?
 //		problem: without foreknowledge of blocks that will be generated, how can we make it crash tolerant
+//		solution: buffer 10 layers at a time
 
 //TODO: think about making water/lava mote create impassible wall above it
 
