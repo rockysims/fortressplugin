@@ -125,12 +125,14 @@ public class GeneratorCoreAnimator implements Memorable {
 		this.animationLayers = layers;
 		isGeneratingWall = true;
 		isChangingGenerated = true;
+		//TODO: set current curIndex to 0
 	}
 
 	public void degenerate(boolean animate) {
 		animationLayers = generatedLayers;
 		isGeneratingWall = false;
 		isChangingGenerated = true;
+		//TODO: set current curIndex to 0 (starting from end is handled else where)
 
 		if (!animate) {
 			this.animate = false;
@@ -166,27 +168,6 @@ public class GeneratorCoreAnimator implements Memorable {
 		isGeneratingWall = generatedLayers.size() > 0;
 	}
 
-	public void tick() {
-		if (isChangingGenerated) {
-			waitTicks++;
-			if (waitTicks >= ticksPerFrame) {
-				waitTicks = 0;
-
-				//update to next frame
-				boolean noNextFrame = !updateToNextFrame();
-				if (noNextFrame) {
-					isChangingGenerated = false;
-				}
-
-				//TODO: delete next 4 lines if leaving them commented out for a while doesn't seem to break anything
-//				//if (not animating) we finished all at once
-//				if (!animate) {
-//					isChangingGenerated = false;
-//				}
-			}
-		}
-	}
-
 	public Set<Point> getAlteredPoints() {
 		return alteredPoints.keySet();
 	}
@@ -202,6 +183,21 @@ public class GeneratorCoreAnimator implements Memorable {
 		return generatedPoints;
 	}
 
+	public void tick() {
+		if (isChangingGenerated) {
+			waitTicks++;
+			if (waitTicks >= ticksPerFrame) {
+				waitTicks = 0;
+
+				//update to next frame
+				boolean noNextFrame = !updateToNextFrame();
+				if (noNextFrame) {
+					isChangingGenerated = false;
+				}
+			}
+		}
+	}
+
 	// --------- Internal Methods ---------
 
 	private void onGeneratedChanged() {
@@ -209,18 +205,23 @@ public class GeneratorCoreAnimator implements Memorable {
 		if (rune != null) {
 			rune.onGeneratedChanged();
 		} //rune can be null during init sometimes?
-		else { //TODO: remove the else part
+		else { //TODO: remove the else part (after testing?)
 			Debug.msg("NULL RUNE AT " + anchorPoint);
 		}
 	}
 
 	private boolean updateToNextFrame() {
 		boolean updatedToNextFrame = false;
+		Debug.msg("updateToNextFrame()");
 
 		//check we haven't hit block limit
 		int generatedCount = alteredPoints.size() + protectedPoints.size();
 		if (!isGeneratingWall || generatedCount < FortressPlugin.config_generatorBlockLimit) {
 			for (int i = 0; i < this.animationLayers.size(); i++) {
+				//TODO: keep track of current layerIndex (and reset layerIndex on de/gen)
+				//current curIndex set to 0 on gen and on degen
+				//curIndex is i
+				//layerIndex is layerIndex
 				int layerIndex = i;
 				//if (degenerating) start from the outer most layer
 				if (!this.isGeneratingWall) {
@@ -230,6 +231,7 @@ public class GeneratorCoreAnimator implements Memorable {
 				List<Point> layer = new ArrayList<>(this.animationLayers.get(layerIndex)); //make copy to avoid concurrent modification errors (recheck this is needed)
 
 				//try to update layer
+				Debug.msg("try to update to layerIndex: " + layerIndex);
 				updatedToNextFrame = updateLayer(layer, layerIndex);
 				if (updatedToNextFrame) {
 					onGeneratedChanged();

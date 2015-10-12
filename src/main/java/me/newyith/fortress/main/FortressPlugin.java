@@ -202,19 +202,44 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
-//TODO: make tick more efficient while de/generating
 
 //------------------------------//
 //		first priority			//
 //------------------------------//
 
-//DONE: clean up jackson branch
-//	TODO: merge back into master
-
-//-------------------------------//
-//-------------------------------//
-
+//TODO: make tick more efficient while de/generating
 //TODO: save periodically (maybe every 1 minute)
+//TODO: make generationBlockLimit limit search not generation
+
+//-------------------------------//
+//-------------------------------//
+
+
+//------------------------------//
+//		next priority			//
+//------------------------------//
+
+//TODO: make getPointsConnected() execute over time (to prevent lag) and after done collect results and start generating
+//	maybe add GenerationTask to represent generating/degenerating action?
+//	while waiting for getPointsConnected(), leave wall as is (if generating. degenerating should still be allowed and cancel search)
+//	maybe make a class (FortressWall?) to represent a fortress wall update (onGenerate)
+//	in java a promise is called a CompletableFuture
+
+//TODO: consider making it so when protected blocks are broken they turn to bedrock for between 2 and 4 seconds then back
+
+//-------------------------------//
+//-------------------------------//
+
+
+//------------------------------//
+//			optional			//
+//------------------------------//
+
+//TODO: consider tracking and updating manual books so that existing copies get updated when manual changes
+
+//-------------------------------//
+//-------------------------------//
+
 
 //TODO: consider fixing boat/minecart/etc glitch for getting into fortress (factions does not fix minecart and probably not boat)
 //	check if making floor/side double think prevents this glitch from working
@@ -235,17 +260,9 @@ public class FortressPlugin extends JavaPlugin {
 //					update lastKnownPoint (also update onEnterVehicle)
 
 
-//TODO: save everything with jackson instead of reconstructing (to reduce /reload time)
-
-//TODO: make getPointsConnected() execute over time (to prevent lag) and after done collect results and start generating
-//	while waiting for getPointsConnected(), leave wall as is (if generating. degenerating should still be allowed)
-//	maybe make a class (FortressWall?) to represent a fortress wall update (onGenerate)
-//	in java a promise is called CompletableFuture
 
 
-//TODO: consider tracking and updating manual books so that existing copies get updated when manual changes
 
-//TODO: consider making it so when protected blocks are broken they turn to bedrock for between 2 and 4 seconds then back
 
 //DONE: make common blocks protectable and test tick speed for large fortress de/generate
 //	during generation? (not sure): about 30ms per tick for large fortress (about 1ms per tick for small)
@@ -255,20 +272,15 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-//Major:
-//TODO: make generationBlockLimit limit search not generation
-
 //Minor:
-//TODO: make door white list have to be above door (leave trap door as is)
 //TODO: think of a way to protect stuff inside fortress from explosions on the outside (maybe already done?)
-//TODO: try to track down why getPointsConnected is being called 4 times during generation (especially the 2 heavier calls)
 //TODO: check if you can pick up protected water/lava with bucket
+//TODO: make door white list have to be above door (leave trap door as is)
+//TODO: try to track down why getPointsConnected is being called 4 times during generation (especially the 2 heavier calls)
 
 // --- MVP ---
 
 //Reducing lag:
-	//learn mvn so I can use jackson
-	//jackson saving/loading
 	//animator should remember current layer
 	//getConnected calculation over time (need to learn promises in java)
 //protect inside from explosions
