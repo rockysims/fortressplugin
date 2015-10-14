@@ -21,13 +21,14 @@ public class GeneratorCoreAnimator implements Memorable {
 	private List<List<Point>> generatedLayers = new ArrayList<>();
 	private List<List<Point>> animationLayers = new ArrayList<>();
 	public boolean animate = true;
-	public boolean isChangingGenerated = false;
+	public boolean animationInProgress = false;
 	public boolean isGeneratingWall = false;
 	public WallMaterials wallMats;
 
 	//not saved
 	private final int ticksPerFrame = 150 / TickTimer.msPerTick; // msPerFrame / msPerTick
 	private int waitTicks = 0;
+	private int curIndex = 0;
 
 	//------------------------------------------------------------------------------------------------------------------
 
@@ -51,8 +52,8 @@ public class GeneratorCoreAnimator implements Memorable {
 		m.save("animate", animate);
 //		Debug.msg("saved animate: " + animate);
 
-		m.save("isChangingGenerated", isChangingGenerated);
-//		Debug.msg("saved isChangingGenerated: " + isChangingGenerated);
+		m.save("animationInProgress", animationInProgress);
+//		Debug.msg("saved animationInProgress: " + animationInProgress);
 
 		m.save("isGeneratingWall", isGeneratingWall);
 //		Debug.msg("saved isGeneratingWall: " + isGeneratingWall);
@@ -78,13 +79,13 @@ public class GeneratorCoreAnimator implements Memorable {
 		boolean animate = m.loadBoolean("animate");
 //		Debug.msg("loaded animate: " + animate);
 
-		boolean isChangingGenerated = m.loadBoolean("isChangingGenerated");
-//		Debug.msg("loaded isChangingGenerated: " + isChangingGenerated);
+		boolean animationInProgress = m.loadBoolean("animationInProgress");
+//		Debug.msg("loaded animationInProgress: " + animationInProgress);
 
 		boolean isGeneratingWall = m.loadBoolean("isGeneratingWall");
 //		Debug.msg("loaded isGeneratingWall: " + isGeneratingWall);
 
-		GeneratorCoreAnimator instance = new GeneratorCoreAnimator(anchorPoint, alteredPoints, protectedPoints, generatedLayers, animationLayers, animate, isChangingGenerated, isGeneratingWall);
+		GeneratorCoreAnimator instance = new GeneratorCoreAnimator(anchorPoint, alteredPoints, protectedPoints, generatedLayers, animationLayers, animate, animationInProgress, isGeneratingWall);
 		return instance;
 	}
 
@@ -95,7 +96,7 @@ public class GeneratorCoreAnimator implements Memorable {
 			List<List<Point>> generatedLayers,
 			List<List<Point>> animationLayers,
 			boolean animate,
-			boolean isChangingGenerated,
+			boolean animationInProgress,
 			boolean isGeneratingWall) {
 		this.anchorPoint = anchorPoint;
 		this.alteredPoints = alteredPoints;
@@ -103,7 +104,7 @@ public class GeneratorCoreAnimator implements Memorable {
 		this.generatedLayers = generatedLayers;
 		this.animationLayers = animationLayers;
 		this.animate = animate;
-		this.isChangingGenerated = isChangingGenerated;
+		this.animationInProgress = animationInProgress;
 		this.isGeneratingWall = isGeneratingWall;
 		this.wallMats = new WallMaterials(anchorPoint);
 
@@ -123,16 +124,16 @@ public class GeneratorCoreAnimator implements Memorable {
 
 	public void generate(List<List<Point>> layers) {
 		this.animationLayers = layers;
+		curIndex = 0;
 		isGeneratingWall = true;
-		isChangingGenerated = true;
-		//TODO: set current curIndex to 0
+		animationInProgress = true;
 	}
 
 	public void degenerate(boolean animate) {
 		animationLayers = generatedLayers;
+		curIndex = 0; //starting from end if degenerating is handled elsewhere
 		isGeneratingWall = false;
-		isChangingGenerated = true;
-		//TODO: set current curIndex to 0 (starting from end is handled else where)
+		animationInProgress = true;
 
 		if (!animate) {
 			this.animate = false;
@@ -150,7 +151,7 @@ public class GeneratorCoreAnimator implements Memorable {
 
 		this.animationLayers = layersToDegenerate;
 		isGeneratingWall = false;
-		isChangingGenerated = true;
+		animationInProgress = true;
 		animate = false;
 		tick();
 		animate = true;
@@ -184,15 +185,23 @@ public class GeneratorCoreAnimator implements Memorable {
 	}
 
 	public void tick() {
-		if (isChangingGenerated) {
+		if (animationInProgress) {
 			waitTicks++;
 			if (waitTicks >= ticksPerFrame) {
 				waitTicks = 0;
 
-				//update to next frame
-				boolean noNextFrame = !updateToNextFrame();
-				if (noNextFrame) {
-					isChangingGenerated = false;
+				while (true) {
+					//try to update to next frame
+					boolean updatedFrame = updateToNextFrame();
+					if (!updatedFrame) {
+						//no more layers to update so stop animating
+						animationInProgress = false;
+						break;
+					}
+					if (updatedFrame && this.animate) {
+						//updated a layer so we're done with this frame
+						break;
+					}
 				}
 			}
 		}
@@ -212,34 +221,26 @@ public class GeneratorCoreAnimator implements Memorable {
 
 	private boolean updateToNextFrame() {
 		boolean updatedToNextFrame = false;
-		Debug.msg("updateToNextFrame()");
 
 		//check we haven't hit block limit
 		int generatedCount = alteredPoints.size() + protectedPoints.size();
 		if (!isGeneratingWall || generatedCount < FortressPlugin.config_generatorBlockLimit) {
-			for (int i = 0; i < this.animationLayers.size(); i++) {
-				//TODO: keep track of current layerIndex (and reset layerIndex on de/gen)
-				//current curIndex set to 0 on gen and on degen
-				//curIndex is i
-				//layerIndex is layerIndex
-				int layerIndex = i;
+			while (!updatedToNextFrame && curIndex < animationLayers.size()) {
+				int layerIndex = curIndex;
 				//if (degenerating) start from the outer most layer
 				if (!this.isGeneratingWall) {
-					layerIndex = (animationLayers.size()-1) - i;
+					layerIndex = (animationLayers.size()-1) - curIndex;
 				}
 
 				List<Point> layer = new ArrayList<>(this.animationLayers.get(layerIndex)); //make copy to avoid concurrent modification errors (recheck this is needed)
 
 				//try to update layer
-				Debug.msg("try to update to layerIndex: " + layerIndex);
 				updatedToNextFrame = updateLayer(layer, layerIndex);
 				if (updatedToNextFrame) {
 					onGeneratedChanged();
 				}
-				if (updatedToNextFrame && this.animate) {
-					//updated a layer so we're done with this frame
-					break;
-				}
+
+				curIndex++;
 			}
 		} else {
 			String msg = "Fortress generator reached limit of " + String.valueOf(FortressPlugin.config_generatorBlockLimit) + " blocks.";

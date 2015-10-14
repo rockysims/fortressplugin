@@ -219,6 +219,10 @@ public class FortressPlugin extends JavaPlugin {
 //		next priority			//
 //------------------------------//
 
+//TODO: add potentialAlteredPoints and update + re-save it before generation (to make it robust enough to handle server crashes)
+
+//TODO: add mcStats: http://mcstats.org/learn-more/
+
 //TODO: make getPointsConnected() execute over time (to prevent lag) and after done collect results and start generating
 //	maybe add GenerationTask class to represent generating/degenerating action?
 //	while waiting for getPointsConnected(), leave wall as is (if generating. degenerating should still be allowed and cancel search)
@@ -272,8 +276,8 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //Minor:
-//TODO: think of a way to protect stuff inside fortress from explosions on the outside (maybe already done?)
 //TODO: check if you can pick up protected water/lava with bucket
+//TODO: think of a way to protect stuff inside fortress from explosions on the outside (maybe already done?)
 //TODO: make door white list have to be above door (leave trap door as is)
 //TODO: try to track down why getPointsConnected is being called 4 times during generation (especially the 2 heavier calls)
 
@@ -294,8 +298,8 @@ public class FortressPlugin extends JavaPlugin {
 //	onGenerateBlock, show particles appearing for a few seconds at random points on all faces not touching solid block
 //		maybe use nether particle but make the nether particle be drawn toward block (like the particles are drawn to nether portal)
 
-//TODO: add potentialAlteredPoints and update + re-save it before generation (to make it robust enough to handle server crashes)
 //TODO: finish writing version of manual that includes all planned features before actually releasing MVP (just so I've thought it all out)
+//TODO: add potentialAlteredPoints and update + re-save it before generation (to make it robust enough to handle server crashes)
 
 //TODO: add mcStats: http://mcstats.org/learn-more/
 
