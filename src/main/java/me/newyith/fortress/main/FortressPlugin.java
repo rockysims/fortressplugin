@@ -190,7 +190,7 @@ public class FortressPlugin extends JavaPlugin {
 						Point p = anchor.add(x, y, z);
 						Material m = Material.COBBLESTONE;
 						if (new Random().nextBoolean()) {
-							m = Material.GLASS;
+							m = Material.MOSSY_COBBLESTONE;
 						}
 						p.getBlock().setType(m);
 					}
@@ -202,6 +202,7 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
+//TODO: maybe when running/paused it should display % generated (if not 0 nor 100)
 
 //------------------------------//
 //		first priority			//

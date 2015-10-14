@@ -26,6 +26,7 @@ public class GeneratorCoreAnimator implements Memorable {
 	public WallMaterials wallMats;
 
 	//not saved
+	private final int maxBlocksPerFrame = 500;
 	private final int ticksPerFrame = 150 / TickTimer.msPerTick; // msPerFrame / msPerTick
 	private int waitTicks = 0;
 	private int curIndex = 0;
@@ -235,12 +236,15 @@ public class GeneratorCoreAnimator implements Memorable {
 				List<Point> layer = new ArrayList<>(this.animationLayers.get(layerIndex)); //make copy to avoid concurrent modification errors (recheck this is needed)
 
 				//try to update layer
-				updatedToNextFrame = updateLayer(layer, layerIndex);
-				if (updatedToNextFrame) {
+				int updatedCount = updateLayer(layer, layerIndex);
+				if (updatedCount > 0) {
+					updatedToNextFrame = true;
 					onGeneratedChanged();
 				}
 
-				curIndex++;
+				if (updatedCount < maxBlocksPerFrame) {
+					curIndex++;
+				}
 			}
 		} else {
 			String msg = "Fortress generator reached limit of " + String.valueOf(FortressPlugin.config_generatorBlockLimit) + " blocks.";
@@ -251,14 +255,16 @@ public class GeneratorCoreAnimator implements Memorable {
 		return updatedToNextFrame;
 	}
 
-	private boolean updateLayer(List<Point> layer, int layerIndex) {
-		boolean updatedLayer = false;
+	private int updateLayer(List<Point> layer, int layerIndex) {
+		int blockUpdates = 0;
 
 		for (Point p : layer) {
 			if (this.isGeneratingWall) {
 				//try to generate block at p
 				boolean pGenerated = generate(p);
-				updatedLayer = updatedLayer || pGenerated;
+				if (pGenerated) {
+					blockUpdates++;
+				}
 
 				if (pGenerated) {
 					//add p to generatedLayers
@@ -270,7 +276,9 @@ public class GeneratorCoreAnimator implements Memorable {
 			} else {
 				//try to degenerate block at p
 				boolean pDegenerated = unalter(p) || unprotect(p);
-				updatedLayer = updatedLayer || pDegenerated;
+				if (pDegenerated) {
+					blockUpdates++;
+				}
 
 				if (pDegenerated) {
 					//remove p from generatedLayers
@@ -279,9 +287,15 @@ public class GeneratorCoreAnimator implements Memorable {
 					} //else we would be degenerating another generators wall
 				}
 			}
+
+			if (blockUpdates >= maxBlocksPerFrame) {
+				break;
+			}
 		} // end for (Point p : layer)
 
-		return updatedLayer;
+//		Debug.msg("layer " + layerIndex + " blockUpdates: " + blockUpdates);
+
+		return blockUpdates;
 	}
 
 	private boolean generate(Point p) {
