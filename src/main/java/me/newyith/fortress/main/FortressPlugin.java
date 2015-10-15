@@ -202,13 +202,11 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
-//TODO: maybe when running/paused it should display % generated (if not 0 nor 100)
 
 //------------------------------//
 //		first priority			//
 //------------------------------//
 
-//TODO: make tick more efficient while de/generating
 //TODO: save periodically (maybe every 1 minute)
 //TODO: make generationBlockLimit limit search not generation
 
@@ -239,6 +237,7 @@ public class FortressPlugin extends JavaPlugin {
 //			optional			//
 //------------------------------//
 
+//TODO: maybe when running/paused it should display % generated (if not 0 nor 100)
 //TODO: consider tracking and updating manual books so that existing copies get updated when manual changes
 
 //-------------------------------//
