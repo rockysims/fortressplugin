@@ -20,13 +20,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.Random;
 
 public class FortressPlugin extends JavaPlugin {
-	public static boolean releaseBuild = false; //TODO: change to this to true for release builds
+	public static final boolean releaseBuild = false; //TODO: change to this to true for release builds
+	private static final double saveDelayMs = 60*1000;
+	private static int waitTicks = 0;
 
 	public static int config_glowstoneDustBurnTimeMs = 1000 * 60 * 60;
 	public static int config_stuckDelayMs = 30 * 1000;
 	public static int config_stuckCancelDistance = 4;
 	public static int config_generationRange = 128;
-	public static int config_generatorBlockLimit = 40000; //roughly 125 empty 8x8x8 rooms
+	public static int config_generatorBlockLimit = 40000; //roughly 125 empty 8x8x8 rooms (6x6x6 air inside)
 
 	private void readConfig() {
 		FileConfiguration config = getConfig();
@@ -64,7 +66,7 @@ public class FortressPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        SaveLoadMemoryManager.onDisable(this);
+        SaveLoadMemoryManager.onDisable();
 
 		sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
 		sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
@@ -77,6 +79,17 @@ public class FortressPlugin extends JavaPlugin {
         console.sendMessage(color + s);
     }
 
+	public static void onTick() {
+		if (waitTicks == 0) {
+			Debug.start("saving");
+			SaveLoadMemoryManager.save();
+			Debug.end("saving");
+
+			waitTicks = (int) (saveDelayMs / TickTimer.msPerTick);
+		} else {
+			waitTicks--;
+		}
+	}
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		String commandName = cmd.getName();
@@ -201,7 +214,11 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
-
+//TODO: reduce memory usage (currently with 5 giant cubes plugin takes ~900 MB or more as compared to minecraft which takes ~160 to ~700 MB)
+//	maybe try building claims
+//	maybe add death by age for things that require a lot of memory and then rebuild JIT
+//TODO: make saving faster by making loading slower (if we save periodically we really need saving to be fast)
+//	rebuild claims and insideOutside (instead of save/load)
 
 //------------------------------//
 //		first priority			//
@@ -239,6 +256,7 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: maybe when running/paused it should display % generated (if not 0 nor 100)
 //TODO: consider tracking and updating manual books so that existing copies get updated when manual changes
+//TODO: indicate generator waiting for search with lots of anchor particles
 
 //-------------------------------//
 //-------------------------------//

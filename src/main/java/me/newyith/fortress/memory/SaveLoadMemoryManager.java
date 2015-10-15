@@ -54,8 +54,12 @@ public class SaveLoadMemoryManager {
 		objectMapper.writeValue(stream, memory.getData());
 	}
 
-	public static void onDisable(FortressPlugin plugin) {
-		Debug.start("save");
+	public static void onDisable() {
+		save();
+	}
+
+	public static void save() {
+//		Debug.start("save");
 		try {
 			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 			writeDataToBuffer(buffer);
@@ -66,6 +70,6 @@ public class SaveLoadMemoryManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Debug.end("save");
+//		Debug.end("save");
 	}
 }

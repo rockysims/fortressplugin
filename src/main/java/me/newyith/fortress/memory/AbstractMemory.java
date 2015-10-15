@@ -91,7 +91,7 @@ public abstract class AbstractMemory<DataType> {
 
 		ArrayList<Point> list = new ArrayList<>();
 		String blob = m.loadString("blob");
-		if (blob.length() > 0) {
+		if (blob != null && blob.length() > 0) {
 			World world = Bukkit.getWorld(m.loadString("world"));
 			for (String pointBlob : Splitter.on("~").split(blob)) {
 				List<String> data = Splitter.on(",").splitToList(pointBlob);
