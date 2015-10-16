@@ -214,11 +214,14 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
-//TODO: reduce memory usage (currently with 5 giant cubes plugin takes ~900 MB or more as compared to minecraft which takes ~160 to ~700 MB)
+//TODO: reduce memory usage (currently with 5 giant cubes plugin takes ~160 MB as compared to minecraft which takes ~160 to ~700 MB)
 //	maybe try building claims
 //	maybe add death by age for things that require a lot of memory and then rebuild JIT
 //TODO: make saving faster by making loading slower (if we save periodically we really need saving to be fast)
-//	rebuild claims and insideOutside (instead of save/load)
+//	rebuild claims and insideOutside (instead of save/load)? seems to save/load fast but try it and see if it helps
+
+//TODO: consider clearing animationLayers after animation finishes to save memory
+//TODO: consider stopping particles when chunk is not loaded so we can free up the memory
 
 //------------------------------//
 //		first priority			//
@@ -234,6 +237,8 @@ public class FortressPlugin extends JavaPlugin {
 //------------------------------//
 //		next priority			//
 //------------------------------//
+
+//TODO: make existing runes reconfirm rune actually exists onEnable (in case its a whole new world but data.json still exists)
 
 //TODO: add potentialAlteredPoints and update + re-save it before generation (to make it robust enough to handle server crashes)
 

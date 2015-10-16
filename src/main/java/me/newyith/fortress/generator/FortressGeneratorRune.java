@@ -9,6 +9,7 @@ import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -311,20 +312,25 @@ public class FortressGeneratorRune implements Memorable {
 		if (signPoint != null) {
 			Block signBlock = signPoint.getBlock();
 			if (signBlock != null) {
-				Sign sign = (Sign)signBlock.getState();
-				if (sign != null) {
-					sign.setLine(0, "Generator:");
-					if (line1 != null) {
-						sign.setLine(1, line1);
+				BlockState blockState = signBlock.getState();
+				if (blockState instanceof Sign) {
+					Sign sign = (Sign)blockState;
+					if (sign != null) {
+						sign.setLine(0, "Generator:");
+						if (line1 != null) {
+							sign.setLine(1, line1);
+						}
+						if (line2 != null) {
+							sign.setLine(2, line2);
+						}
+						if (line3 != null) {
+							sign.setLine(3, line3);
+						}
+						sign.update();
+						return true;
 					}
-					if (line2 != null) {
-						sign.setLine(2, line2);
-					}
-					if (line3 != null) {
-						sign.setLine(3, line3);
-					}
-					sign.update();
-					return true;
+				} else {
+					Debug.error("setSignText() failed to find sign at " + signPoint);
 				}
 			}
 		}
