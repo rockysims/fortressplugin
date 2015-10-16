@@ -43,7 +43,7 @@ public class GeneratorCore implements Memorable {
 
 	public void saveTo(AbstractMemory<?> m) {
 		Debug.start("save claimedPoints");
-		//m.savePointSetCompact("claimedPoints", claimedPoints);
+		m.savePointSetCompact("claimedPoints", claimedPoints);
 		Debug.end("save claimedPoints");
 		m.savePointSetCompact("claimedWallPoints", claimedWallPoints);
 		m.save("anchorPoint", anchorPoint);
