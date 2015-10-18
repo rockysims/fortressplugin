@@ -45,10 +45,18 @@ public class GeneratorCore implements Memorable {
 		Debug.start("save claimedPoints");
 		m.savePointSetCompact("claimedPoints", claimedPoints);
 		Debug.end("save claimedPoints");
+		Debug.start("save claimedWallPoints");
 		m.savePointSetCompact("claimedWallPoints", claimedWallPoints);
+		Debug.end("save claimedWallPoints");
+
 		m.save("anchorPoint", anchorPoint);
+
+		Debug.start("save animator");
 		m.save("animator", animator);
+		Debug.end("save animator");
+
 		m.save("placedByPlayerIdString", placedByPlayerId.toString());
+
 		Debug.start("save layerOutsideFortress");
 		m.savePointSetCompact("layerOutsideFortress", layerOutsideFortress);
 		Debug.end("save layerOutsideFortress");

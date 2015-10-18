@@ -32,7 +32,9 @@ public class FortressGeneratorRune implements Memorable {
 
 	public void saveTo(AbstractMemory<?> m) {
 		m.save("pattern", pattern);
+		Debug.start("save rune core");
 		m.save("core", core);
+		Debug.end("save rune core");
 		m.save("powered", powered);
 		m.save("fuelTicksRemaining", fuelTicksRemaining);
 		m.save("state", state.ordinal());

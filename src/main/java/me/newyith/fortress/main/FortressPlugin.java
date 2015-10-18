@@ -79,6 +79,7 @@ public class FortressPlugin extends JavaPlugin {
         console.sendMessage(color + s);
     }
 
+	//TODO: consider moving this into runes manager
 	public static void onTick() {
 		if (waitTicks == 0) {
 			Debug.start("saving");
@@ -215,7 +216,7 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 //TODO: reduce memory usage (currently with 5 giant cubes plugin takes ~160 MB as compared to minecraft which takes ~160 to ~700 MB)
-//	maybe try building claims
+//	maybe try rebuilding claims
 //	maybe add death by age for things that require a lot of memory and then rebuild JIT
 //TODO: make saving faster by making loading slower (if we save periodically we really need saving to be fast)
 //	rebuild claims and insideOutside (instead of save/load)? seems to save/load fast but try it and see if it helps

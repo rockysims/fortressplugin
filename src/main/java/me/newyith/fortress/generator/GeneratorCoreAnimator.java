@@ -44,6 +44,7 @@ public class GeneratorCoreAnimator implements Memorable {
 		m.savePointSetCompact("protectedPoints", protectedPoints);
 //		Debug.msg("saved protectedPoints: " + protectedPoints.size());
 
+		//TODO: rebuild generatedLayers instead of save/load?
 		m.saveLayersCompact("generatedLayers", generatedLayers);
 //		Debug.msg("saved generatedLayers: " + generatedLayers.size());
 

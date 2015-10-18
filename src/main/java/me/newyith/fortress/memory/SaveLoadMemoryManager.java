@@ -50,7 +50,9 @@ public class SaveLoadMemoryManager {
 	private static void writeDataToBuffer(OutputStream stream) throws IOException {
 		MapMemory memory = new MapMemory();
 		MapMemory m = new MapMemory(memory.section("RunesManager"));
+		Debug.start("saving runes manager");
 		FortressGeneratorRunesManager.saveTo(m);
+		Debug.end("saving runes manager");
 		objectMapper.writeValue(stream, memory.getData());
 	}
 

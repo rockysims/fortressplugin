@@ -29,7 +29,7 @@ public class Point implements Memorable {
 		s.append((int) z);
 		m.save("s", s.toString());
 		/*/
-		m.save("worldName", world.getName());
+		m.save("w", world.getName());
 		m.save("x", (int) x);
 		m.save("y", (int) y);
 		m.save("z", (int) z);
@@ -46,7 +46,7 @@ public class Point implements Memorable {
 		int z = Integer.valueOf(data.get(3));
 		return new Point(world, x, y, z);
 		/*/
-		String worldName = m.loadString("worldName");
+		String worldName = m.loadString("w");
 		World world = Bukkit.getWorld(worldName);
 		int x = m.loadInt("x");
 		int y = m.loadInt("y");
