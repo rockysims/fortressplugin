@@ -1,9 +1,10 @@
 package me.newyith.fortress.main;
 
 import me.newyith.fortress.command.Commands;
-import me.newyith.fortress.event.EventListener;
+import me.newyith.fortress.generator2.manager.EventListener;
 import me.newyith.fortress.event.TickTimer;
 import me.newyith.fortress.fix.PearlGlitchFix;
+import me.newyith.fortress.generator2.manager.GeneratorRunesManager;
 import me.newyith.fortress.manual.ManualCraftManager;
 import me.newyith.fortress.memory.SaveLoadMemoryManager;
 import me.newyith.fortress.util.Debug;
@@ -23,6 +24,8 @@ public class FortressPlugin extends JavaPlugin {
 	public static final boolean releaseBuild = false; //TODO: change to this to true for release builds
 	private static final double saveDelayMs = 60*1000;
 	private static int waitTicks = 0;
+
+	public static GeneratorRunesManager generatorRunesManager;
 
 	public static int config_glowstoneDustBurnTimeMs = 1000 * 60 * 60;
 	public static int config_stuckDelayMs = 30 * 1000;
@@ -52,6 +55,9 @@ public class FortressPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
 		readConfig();
+
+		generatorRunesManager = new GeneratorRunesManager();
+
 		TickTimer.onEnable(this);
 		EventListener.onEnable(this);
 		SaveLoadMemoryManager.onEnable(this);
@@ -215,7 +221,19 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+
+//TODO: finish refactoring
+//	make Core, RichCore, etc. extend each other
+//	make rune have generatorCore as field (not extend GeneratorCore)
+//	add separate model classes to maintain state (for easy save/load with jackson)
+//		CoreModel, GeneratorRuneModel, etc.
+
+
+//TODO: onEnable, make sure all runes match rune pattern and destroy any that do not
+//	that also means we can rebuild runePattern instead of save/load
+
 //TODO: reduce memory usage (currently with 5 giant cubes plugin takes ~160 MB as compared to minecraft which takes ~160 to ~700 MB)
+//	see Point class todo comments for how to decrease memory usage
 //	maybe try rebuilding claims
 //	maybe add death by age for things that require a lot of memory and then rebuild JIT
 //TODO: make saving faster by making loading slower (if we save periodically we really need saving to be fast)
@@ -251,6 +269,9 @@ public class FortressPlugin extends JavaPlugin {
 //	in java a promise is called a CompletableFuture
 
 //TODO: consider making it so when protected blocks are broken they turn to bedrock for between 2 and 4 seconds then back
+
+//TODO: test if building generator on bedrock causes wall search to travel through y <= 5 bedrock
+//	maybe getPointsConnected() should ignore bedrock at y <= 5?
 
 //-------------------------------//
 //-------------------------------//

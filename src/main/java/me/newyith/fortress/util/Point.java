@@ -14,8 +14,10 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 public class Point implements Memorable {
-	public World world;
-	public double x, y, z;
+	public World world; //TODO: consider getting rid of World (to save memory). pass it in instead when needed
+	public double x, y, z; //TODO: consider making BlockPoint class and saving coordinates with int (to save memory)
+
+	// Caí
 
 	public void saveTo(AbstractMemory<?> m) {
 		//*
