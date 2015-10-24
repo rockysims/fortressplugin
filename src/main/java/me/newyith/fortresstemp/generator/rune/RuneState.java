@@ -1,4 +1,4 @@
-package me.newyith.fortress.generator2.rune;
+package me.newyith.fortresstemp.generator.rune;
 
 import me.newyith.fortress.util.Debug;
 

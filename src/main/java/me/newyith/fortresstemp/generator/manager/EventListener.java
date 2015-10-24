@@ -1,4 +1,4 @@
-package me.newyith.fortress.generator2.manager;
+package me.newyith.fortresstemp.generator.manager;
 
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.util.Point;

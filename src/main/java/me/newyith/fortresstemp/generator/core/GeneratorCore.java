@@ -1,6 +1,6 @@
-package me.newyith.fortress.generator2.core;
+package me.newyith.fortresstemp.generator.core;
 
-import me.newyith.fortress.generator2.generation.WallMaterials;
+import me.newyith.fortresstemp.generator.generation.WallMaterials;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Wall;
@@ -13,7 +13,8 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
-public class GeneratorCore extends RichCore {
+//i think maybe the only thing GeneratorCore adds to AwareCore is origin layer
+public class GeneratorCore extends AwareCore {
 
 
 

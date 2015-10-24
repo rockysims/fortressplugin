@@ -1,4 +1,4 @@
-package me.newyith.fortress.generator2.core;
+package me.newyith.fortresstemp.generator.core;
 
 /*
 
@@ -15,8 +15,8 @@ RunesManager
 ParticlesManager
  */
 
-import me.newyith.fortress.generator2.generation.GenerationTask;
-import me.newyith.fortress.generator2.generation.WallMaterials;
+import me.newyith.fortresstemp.generator.generation.GenerationTask;
+import me.newyith.fortresstemp.generator.generation.WallMaterials;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Wall;
 import org.bukkit.Material;

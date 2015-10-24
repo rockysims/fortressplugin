@@ -1,7 +1,7 @@
-package me.newyith.fortress.generator2.manager;
+package me.newyith.fortresstemp.generator.manager;
 
-import me.newyith.fortress.generator2.rune.GeneratorRune;
-import me.newyith.fortress.generator2.rune.GeneratorRunePattern;
+import me.newyith.fortresstemp.generator.rune.GeneratorRune;
+import me.newyith.fortresstemp.generator.rune.GeneratorRunePattern;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Wall;
@@ -21,25 +21,28 @@ import org.bukkit.material.*;
 import java.util.*;
 
 public class GeneratorRunesManager {
-	private ArrayList<GeneratorRune> runes = new ArrayList<>();
-	private HashMap<Point, GeneratorRune> runeByRunePoint = new HashMap<>();
-	private HashMap<Point, GeneratorRune> runeByProtectedPoint = new HashMap<>();
-	private Set<Point> protectedPoints = new HashSet<>();
-	private Set<Point> alteredPoints = new HashSet<>();
+	private static ArrayList<GeneratorRune> runes = new ArrayList<>();
+	private static HashMap<Point, GeneratorRune> runeByRunePoint = new HashMap<>();
+	private static HashMap<Point, GeneratorRune> runeByProtectedPoint = new HashMap<>();
+	private static Set<Point> protectedPoints = new HashSet<>();
+	private static Set<Point> alteredPoints = new HashSet<>();
 
 	//------------------------------------------------------------------------------------------------------------------
 
 	// - Getters / Setters -
 
-	public GeneratorRune getRune(Point p) {
+	public static GeneratorRune getRune(Point p) {
 		return runeByRunePoint.get(p);
 	}
 
-	public List<GeneratorRune> getRunes() {
+	public static List<GeneratorRune> getRunes() {
 		return runes;
 	}
 
-	public Set<GeneratorRune> getOtherRunesInRange(Point center, int range) {
+
+
+
+	public static Set<GeneratorRune> getOtherRunesInRange(Point center, int range) {
 		//TODO: update this to use fortress cuboid instead of fixed range
 
 		Set<GeneratorRune> runesInRange = new HashSet<>();
@@ -65,29 +68,29 @@ public class GeneratorRunesManager {
 		return runesInRange;
 	}
 
-	public void addProtectedPoint(Point p, Point anchor) {
+	public static void addProtectedPoint(Point p, Point anchor) {
 		protectedPoints.add(p);
 		runeByProtectedPoint.put(p, runeByRunePoint.get(anchor));
 	}
 
-	public void removeProtectedPoint(Point p) {
+	public static void removeProtectedPoint(Point p) {
 		protectedPoints.remove(p);
 		runeByProtectedPoint.remove(p);
 	}
 
-	public void addAlteredPoint(Point p) {
+	public static void addAlteredPoint(Point p) {
 		alteredPoints.add(p);
 	}
 
-	public void removeAlteredPoint(Point p) {
+	public static void removeAlteredPoint(Point p) {
 		alteredPoints.remove(p);
 	}
 
-	public boolean isGenerated(Point p) {
+	public static boolean isGenerated(Point p) {
 		return protectedPoints.contains(p) || alteredPoints.contains(p);
 	}
 
-	public boolean isClaimed(Point p) {
+	public static boolean isClaimed(Point p) {
 		boolean claimed = false;
 
 		Iterator<GeneratorRune> it = runes.iterator();
@@ -102,13 +105,16 @@ public class GeneratorRunesManager {
 		return claimed;
 	}
 
-	public int getRuneCount() {
+	public static int getRuneCount() {
 		return runes.size();
 	}
 
+
+
+
 	// - Utils -
 
-	private void createRune(GeneratorRunePattern runePattern, Player player) {
+	private static void createRune(GeneratorRunePattern runePattern, Player player) {
 		GeneratorRune rune = new GeneratorRune(runePattern);
 		runes.add(rune);
 
@@ -122,7 +128,7 @@ public class GeneratorRunesManager {
 		rune.onCreated(player);
 	}
 
-	private void destroyRune(GeneratorRune rune) {
+	private static void destroyRune(GeneratorRune rune) {
 		List<Point> patternPoints = rune.getPattern().getPoints();
 
 		rune.onBroken(); //breaking rune degenerates wall so runeByProtectedPoint should be cleaned up naturally
@@ -137,7 +143,7 @@ public class GeneratorRunesManager {
 	// - Events -
 
 	//consider creating rune
-	public boolean onSignChange(Player player, Block placedBlock) {
+	public static boolean onSignChange(Player player, Block placedBlock) {
 		boolean cancel = false;
 
 		GeneratorRunePattern runePattern = GeneratorRunePattern.tryPatternAt(placedBlock);
@@ -155,7 +161,7 @@ public class GeneratorRunesManager {
 		return cancel;
 	}
 
-	private void onRuneMightHaveBeenBrokenBy(Block block) {
+	private static void onRuneMightHaveBeenBrokenBy(Block block) {
 		if (runeByRunePoint.containsKey(new Point(block.getLocation()))) {
 			GeneratorRune rune = runeByRunePoint.get(new Point(block.getLocation()));
 			destroyRune(rune);
@@ -164,12 +170,13 @@ public class GeneratorRunesManager {
 
 	//consider cancelling if protected point (or part of protected piston)
 	//consider destroying rune if in rune pattern
-	public void onBlockBreakEvent(BlockBreakEvent event) {
+	public static void onBlockBreakEvent(BlockBreakEvent event) {
 		Block brokenBlock = event.getBlock();
 		Point brokenPoint = new Point(brokenBlock.getLocation());
 		boolean isProtected = protectedPoints.contains(brokenPoint);
 		boolean inCreative = event.getPlayer().getGameMode() == GameMode.CREATIVE;
 
+		//cancel if protected
 		boolean cancel = false;
 		if (isProtected && !inCreative) {
 			cancel = true;
@@ -189,6 +196,7 @@ public class GeneratorRunesManager {
 			}
 		}
 
+		//consider destroying rune
 		if (cancel) {
 			event.setCancelled(true);
 		} else {
@@ -196,13 +204,13 @@ public class GeneratorRunesManager {
 		}
 	}
 
-	public void onWaterBreaksRedstoneWireEvent(Block brokenBlock) {
+	public static void onWaterBreaksRedstoneWireEvent(Block brokenBlock) {
 		onRuneMightHaveBeenBrokenBy(brokenBlock);
 	}
 
 	//consider cancelling if protected point (to protect water/lava sources)
 	//consider destroying rune if in rune pattern
-	public boolean onBlockPlaceEvent(Player player, Block placedBlock) {
+	public static boolean onBlockPlaceEvent(Player player, Block placedBlock) {
 		boolean cancel = false;
 
 		Point placedPoint = new Point(placedBlock.getLocation());
@@ -219,23 +227,9 @@ public class GeneratorRunesManager {
 		return cancel;
 	}
 
-
-
-
-
-
-
-
-
-	// - Events (more/old) -
-
-	public void onTick() {
-		runes.forEach(GeneratorRune::onTick);
-	}
-
 	//detect rune un/powered
-
-	public void onBlockRedstoneEvent(BlockRedstoneEvent event) {
+	//make protected doors ignore redstone
+	public static void onBlockRedstoneEvent(BlockRedstoneEvent event) {
 		int signal = event.getNewCurrent();
 		Block block = event.getBlock();
 		Point p = new Point(block.getLocation());
@@ -257,18 +251,23 @@ public class GeneratorRunesManager {
 		}
 	}
 
-	public void onExplode(List<Block> explodeBlocks) {
+	//make protected immune to explosions
+	public static void onExplode(List<Block> explodeBlocks) {
 		Iterator<Block> it = explodeBlocks.iterator();
 		while (it.hasNext()) {
 			Point p = new Point(it.next().getLocation());
+			Debug.msg("skip explosion at " + p);
 			if (protectedPoints.contains(p)) {
-				Debug.msg("explode removed at " + p);
 				it.remove();
 			}
 		}
 	}
 
-	public void onPlayerOpenCloseDoor(PlayerInteractEvent event) {
+	public static void onTick() {
+		runes.forEach(GeneratorRune::onTick);
+	}
+
+	public static void onPlayerOpenCloseDoor(PlayerInteractEvent event) {
 		Block doorBlock = event.getClickedBlock();
 		Point doorPoint = new Point(doorBlock.getLocation());
 
@@ -324,7 +323,7 @@ public class GeneratorRunesManager {
 		}
 	}
 
-	public boolean onPistonEvent(boolean isSticky, Point piston, Point target, ArrayList<Block> movedBlocks) {
+	public static boolean onPistonEvent(boolean isSticky, Point piston, Point target, ArrayList<Block> movedBlocks) {
 		boolean cancel = false;
 
 		if (movedBlocks != null) {

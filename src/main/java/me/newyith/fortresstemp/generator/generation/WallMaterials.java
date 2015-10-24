@@ -1,4 +1,4 @@
-package me.newyith.fortress.generator2.generation;
+package me.newyith.fortresstemp.generator.generation;
 
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.util.Debug;

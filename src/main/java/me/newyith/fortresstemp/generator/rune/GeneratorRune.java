@@ -1,11 +1,9 @@
-package me.newyith.fortress.generator2.rune;
+package me.newyith.fortresstemp.generator.rune;
 
 import me.newyith.fortress.event.TickTimer;
-import me.newyith.fortress.generator2.particles.GeneratorParticlesManager;
-import me.newyith.fortress.generator2.core.GeneratorCore;
+import me.newyith.fortresstemp.generator.particles.GeneratorParticlesManager;
+import me.newyith.fortresstemp.generator.core.GeneratorCore;
 import me.newyith.fortress.main.FortressPlugin;
-import me.newyith.fortress.memory.AbstractMemory;
-import me.newyith.fortress.memory.Memorable;
 import me.newyith.fortress.util.Cuboid;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
@@ -20,8 +18,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-public class GeneratorRune extends GeneratorCore implements Memorable {
-	//TODO: save
+public class GeneratorRune {
+	//should be saved
 	private GeneratorRunePattern pattern = null; //set by constructor
 	private GeneratorCore core = null; //set by constructor
 	private boolean powered = false;
@@ -30,11 +28,11 @@ public class GeneratorRune extends GeneratorCore implements Memorable {
 
 	//not saved
 	private GeneratorParticlesManager particles = null; //set by constructor
-	private List<Long> powerToggleTimeStamps = new ArrayList<Long>();
+	private List<Long> powerToggleTimeStamps = new ArrayList<>();
 
 	//------------------------------------------------------------------------------------------------------------------
 
-	public FortressGeneratorRune(GeneratorRunePattern runePattern) {
+	public GeneratorRune(GeneratorRunePattern runePattern) {
 		this.pattern = runePattern;
 		this.particles = new GeneratorParticlesManager(this);
 		this.core = new GeneratorCore(this.pattern.anchorPoint);
@@ -43,7 +41,7 @@ public class GeneratorRune extends GeneratorCore implements Memorable {
 	// - Getters -
 
 	public Point getAnchor() {
-		return anchor;
+		return pattern.anchorPoint;
 	}
 
 	public GeneratorRunePattern getPattern() {
@@ -63,7 +61,8 @@ public class GeneratorRune extends GeneratorCore implements Memorable {
 	}
 
 	public Set<Point> getPoints() {
-		return new HashSet<Point>(this.getPattern().getPoints());
+		//not if new HashSet part is really needed (don't remember why I added it)
+		return new HashSet<>(this.getPattern().getPoints());
 	}
 
 	public GeneratorCore getGeneratorCore() {
@@ -129,7 +128,8 @@ public class GeneratorRune extends GeneratorCore implements Memorable {
 	}
 
 	public void onCoreBroken() {
-		FortressGeneratorRunesManager.doBreakRune(this);
+		FortressPlugin.generatorRunesManager.
+		GeneratorRunesManager.doBreakRune(this);
 	}
 
 	public void setPowered(boolean powered) {

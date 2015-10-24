@@ -1,7 +1,9 @@
-package me.newyith.fortress.generator2.particles;
+package me.newyith.fortresstemp.generator.particles;
 
 import javafx.util.Pair;
 import me.newyith.fortress.event.TickTimer;
+import me.newyith.fortresstemp.generator.rune.GeneratorRune;
+import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.particle.ColoredParticle;
 import me.newyith.fortress.particle.ParticleEffect;
 import me.newyith.fortress.particle.ThreeBitColor;
@@ -16,14 +18,14 @@ import org.bukkit.inventory.ItemStack;
 import java.util.*;
 
 public class GeneratorParticlesManager {
-	private FortressGeneratorRune rune;
+	private GeneratorRune rune;
 	private int runeWaitTicks = 0;
 	private int wallWaitTicks = 0;
 	private List<Pair<Point, Point>> wallOutsidePairs = null;
 	private int wallOutsideIndex = 0;
 	private long maxTimeNsPerParticleTick = 1000000 * 25; //25ms
 
-	public GeneratorParticlesManager(FortressGeneratorRune rune) {
+	public GeneratorParticlesManager(GeneratorRune rune) {
 		this.rune = rune;
 	}
 
@@ -72,7 +74,7 @@ public class GeneratorParticlesManager {
 			}
 
 			if (!wallOutsidePairs.isEmpty()) {
-				int runeCount = FortressGeneratorRunesManager.getRuneCount();
+				int runeCount = FortressPlugin.generatorRunesManager.getRuneCount();
 				if (runeCount == 0) runeCount++;
 
 				long timeAllottedNs = maxTimeNsPerParticleTick / runeCount;
