@@ -8,4 +8,13 @@ public class Wheel {
 	public Wheel(WheelModel model) {
 		this.model = model;
 	}
+
+	public Wheel(int speed) {
+		this.model = new WheelModel();
+		this.model.speed = speed;
+	}
+
+	public WheelModel getModel() {
+		return model;
+	}
 }

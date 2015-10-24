@@ -14,4 +14,8 @@ public class CarsManager {
 		this.model = model;
 		this.cars = model.cars.stream().map(Car::new).collect(Collectors.toSet());
 	}
+
+	public CarsManagerModel getModel() {
+		return model;
+	}
 }
