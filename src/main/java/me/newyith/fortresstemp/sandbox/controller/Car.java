@@ -1,6 +1,6 @@
-package me.newyith.fortresstemp.sandbox.car;
+package me.newyith.fortresstemp.sandbox.controller;
 
-import me.newyith.fortresstemp.sandbox.wheel.Wheel;
+import me.newyith.fortresstemp.sandbox.model.CarModel;
 
 import java.util.List;
 import java.util.stream.Collectors;

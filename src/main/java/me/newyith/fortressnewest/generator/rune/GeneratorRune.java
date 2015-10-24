@@ -1,12 +1,5 @@
-package me.newyith.fortress.generator;
+package me.newyith.fortressnewest.generator.rune;
 
-import me.newyith.fortress.event.TickTimer;
-import me.newyith.fortress.main.FortressPlugin;
-import me.newyith.fortress.memory.AbstractMemory;
-import me.newyith.fortress.memory.Memorable;
-import me.newyith.fortress.util.Cuboid;
-import me.newyith.fortress.util.Debug;
-import me.newyith.fortress.util.Point;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -18,13 +11,45 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-public class FortressGeneratorRune implements Memorable {
-    //saved
-	private FortressGeneratorRunePattern pattern = null; //set by constructor
+public class GeneratorRune {
+	private GeneratorRuneModel model;
+	private GeneratorRunePattern pattern;
+
+	public GeneratorRune(GeneratorRuneModel model) {
+		this.model = model;
+		this.pattern = new GeneratorRunePattern(model.pattern);
+	}
+
+	public GeneratorRune(GeneratorRunePattern pattern) {
+		model.pattern = pattern.getModel();
+		this.pattern = pattern;
+
+		//TODO: maybe rename cores:
+		//BaseCore (
+		//AwareCore (claims and insideOutside)
+		//FullCore (wall particles and any other eye candy)
+		//GeneratorCore (originLayer and any convenience methods needed by GeneratorRune)
+
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//		this.pattern = runePattern;
+		this.particles = new FortressGeneratorParticlesManager(this); //TODO: move particles handling into a core
+		this.core = new GeneratorCore(this.pattern.anchorPoint);
+	}
+
+
+
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+	//saved
+//	private GeneratorRunePattern pattern = null; //set by constructor
+//	private boolean powered = false;
+//	private int fuelTicksRemaining = 0;
+//	private FgState state = FgState.NULL;
+
 	private GeneratorCore core = null; //set by constructor
-	private boolean powered = false;
-	private int fuelTicksRemaining = 0;
-	private FgState state = FgState.NULL;
 
 	//not saved
 	private FortressGeneratorParticlesManager particles = null; //set by constructor
@@ -68,12 +93,12 @@ public class FortressGeneratorRune implements Memorable {
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
-
-	public FortressGeneratorRune(FortressGeneratorRunePattern runePattern) {
-		this.pattern = runePattern;
-		this.particles = new FortressGeneratorParticlesManager(this);
-		this.core = new GeneratorCore(this.pattern.anchorPoint);
-	}
+//
+//	public FortressGeneratorRune(FortressGeneratorRunePattern runePattern) {
+//		this.pattern = runePattern;
+//		this.particles = new FortressGeneratorParticlesManager(this);
+//		this.core = new GeneratorCore(this.pattern.anchorPoint);
+//	}
 
 	// - Getters -
 

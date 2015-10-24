@@ -1,7 +1,6 @@
-package me.newyith.fortresstemp.sandbox.car;
+package me.newyith.fortresstemp.sandbox.model;
 
 import me.newyith.fortresstemp.sandbox.Model;
-import me.newyith.fortresstemp.sandbox.wheel.WheelModel;
 
 import java.util.HashSet;
 import java.util.Set;

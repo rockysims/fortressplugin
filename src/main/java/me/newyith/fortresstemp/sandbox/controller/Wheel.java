@@ -1,4 +1,6 @@
-package me.newyith.fortresstemp.sandbox.wheel;
+package me.newyith.fortresstemp.sandbox.controller;
+
+import me.newyith.fortresstemp.sandbox.model.WheelModel;
 
 public class Wheel {
 	private WheelModel model;

@@ -1,13 +1,5 @@
-package me.newyith.fortress.main;
+package me.newyith.fortressnewest.main;
 
-import me.newyith.fortress.command.Commands;
-import me.newyith.fortresstemp.generator.manager.EventListener;
-import me.newyith.fortress.event.TickTimer;
-import me.newyith.fortress.fix.PearlGlitchFix;
-import me.newyith.fortress.manual.ManualCraftManager;
-import me.newyith.fortress.memory.SaveLoadMemoryManager;
-import me.newyith.fortress.util.Debug;
-import me.newyith.fortress.util.Point;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -18,6 +10,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Random;
+
+
+
+
+//TODO: get GeneratorRune (without GeneratorCore) working and saving again first to give myself a model for the rest of it
+//rebuild plugin by copying code over class by class
+
+
+
 
 public class FortressPlugin extends JavaPlugin {
 	public static final boolean releaseBuild = false; //TODO: change to this to true for release builds
@@ -49,36 +50,36 @@ public class FortressPlugin extends JavaPlugin {
 		return config.getInt(key);
 	}
 
-    @Override
-    public void onEnable() {
+	@Override
+	public void onEnable() {
 		readConfig();
 
-		TickTimer.onEnable(this);
 		EventListener.onEnable(this);
+		TickTimer.onEnable(this);
 		SaveLoadMemoryManager.onEnable(this);
 		ManualCraftManager.onEnable(this);
 		PearlGlitchFix.onEnable(this);
 
-        sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
-        sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
-        sendToConsole("         >> ON <<           ", ChatColor.GREEN);
-        sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
-    }
+		sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
+		sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
+		sendToConsole("         >> ON <<           ", ChatColor.GREEN);
+		sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
+	}
 
-    @Override
-    public void onDisable() {
-        SaveLoadMemoryManager.onDisable();
+	@Override
+	public void onDisable() {
+		SaveLoadMemoryManager.onDisable();
 
 		sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
 		sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
-        sendToConsole("         >> OFF <<          ", ChatColor.RED);
-        sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
-    }
+		sendToConsole("         >> OFF <<          ", ChatColor.RED);
+		sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
+	}
 
-    private void sendToConsole(String s, ChatColor color) {
-        ConsoleCommandSender console = this.getServer().getConsoleSender();
-        console.sendMessage(color + s);
-    }
+	private void sendToConsole(String s, ChatColor color) {
+		ConsoleCommandSender console = this.getServer().getConsoleSender();
+		console.sendMessage(color + s);
+	}
 
 	//TODO: consider moving this into runes manager
 	public static void onTick() {
@@ -93,7 +94,7 @@ public class FortressPlugin extends JavaPlugin {
 		}
 	}
 
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		String commandName = cmd.getName();
 		boolean commandHandled = false;
 
@@ -191,7 +192,7 @@ public class FortressPlugin extends JavaPlugin {
 
 
 		return commandHandled;
-    }
+	}
 
 	private void boxAt(Point anchor, int num) {
 		for (int x = 0; x < num; x++) {
@@ -224,7 +225,7 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: finish refactoring
 //	make Core, AwareCore, etc. extend each other
 //	make rune have generatorCore as field (not extend GeneratorCore)
-//	add separate model classes to maintain state (for easy save/load with jackson)
+//	add separate wheel classes to maintain state (for easy save/load with jackson)
 //		CoreModel, GeneratorRuneModel, etc.
 //TODO: consider splitting off GeneratorRunesManager functionality into classes:
 //	DoorProtection (for protecting doors and handling white list)
@@ -342,8 +343,8 @@ public class FortressPlugin extends JavaPlugin {
 // --- MVP ---
 
 //Reducing lag:
-	//animator should remember current layer
-	//getConnected calculation over time (need to learn promises in java)
+//animator should remember current layer
+//getConnected calculation over time (need to learn promises in java)
 //protect inside from explosions
 
 //TODO: make 'fort stuck' only work in range of generator (almost done but need to make it based on cuboid instead of range)

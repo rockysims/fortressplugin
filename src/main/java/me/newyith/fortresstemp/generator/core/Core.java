@@ -25,8 +25,8 @@ import java.util.*;
 
 public abstract class Core {
 	//TODO: save
-	//TODO: move saved fields to CoreModel and add 'CoreModel model;' field
-	//	model should contain all permanent state
+	//TODO: move saved fields to CoreModel and add 'CoreModel wheel;' field
+	//	wheel should contain all permanent state
 	protected Point anchor;
 	private Set<Point> originLayer;
 	private HashMap<Point, Material> alteredPoints = new HashMap<>();

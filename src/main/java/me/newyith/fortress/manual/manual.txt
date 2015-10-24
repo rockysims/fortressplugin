@@ -3,8 +3,8 @@ Fortress Manual
 1) Table of Contents
 2) Generator Rune
 3) Rune Pattern
-4) Doors
-5) Redstone
+4) Redstone
+5) Doors
 6) /fort stuck
 =======
 Generator Rune
@@ -35,6 +35,18 @@ Bottom layer: IDI
 Place a sign on side of
 gold block to activate.
 =======
+Redstone
+
+While powered by
+redstone, generator
+pauses fuel usage and
+makes structures
+breakable again.
+
+Cycle power to spread
+protection to newly
+placed blocks.
+=======
 Doors
 
 Protected doors open
@@ -48,18 +60,6 @@ list player(s).
 If door has no white
 list signs, it looks for
 signs on rune's base.
-=======
-Redstone
-
-While powered by
-redstone, generator
-pauses fuel usage and
-makes structures
-breakable again.
-
-Cycle power to spread
-protection to newly
-placed blocks.
 =======
 /fort stuck
 
