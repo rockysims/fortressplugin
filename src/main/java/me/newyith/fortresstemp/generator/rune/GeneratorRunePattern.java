@@ -1,8 +1,8 @@
 package me.newyith.fortresstemp.generator.rune;
 
-import me.newyith.fortress.memory.AbstractMemory;
-import me.newyith.fortress.memory.Memorable;
-import me.newyith.fortress.util.Point;
+import me.newyith.fortressold.memory.AbstractMemory;
+import me.newyith.fortressold.memory.Memorable;
+import me.newyith.fortressold.util.Point;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;

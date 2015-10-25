@@ -1,23 +1,7 @@
 package me.newyith.fortresstemp.generator.particles;
 
-import javafx.util.Pair;
-import me.newyith.fortress.event.TickTimer;
-import me.newyith.fortresstemp.generator.rune.GeneratorRune;
-import me.newyith.fortress.main.FortressPlugin;
-import me.newyith.fortress.particle.ColoredParticle;
-import me.newyith.fortress.particle.ParticleEffect;
-import me.newyith.fortress.particle.ThreeBitColor;
-import me.newyith.fortress.util.Debug;
-import me.newyith.fortress.util.Point;
-import me.newyith.fortress.util.Wall;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.*;
-
 public class GeneratorParticlesManager {
+	/*
 	private GeneratorRune rune;
 	private int runeWaitTicks = 0;
 	private int wallWaitTicks = 0;
@@ -98,9 +82,9 @@ public class GeneratorParticlesManager {
 					}
 
 					//Debug.msg("wallOutsideIndex: " + wallOutsideIndex);
-
+*/
 					//* //TODO: delete alternate block (or decide its efficient enough)
-					showParticleForWallOutsidePair(wallOutsidePairs.get(wallOutsideIndex));
+//					showParticleForWallOutsidePair(wallOutsidePairs.get(wallOutsideIndex));
 					/*/
 					//this version doesn't display particles for blocks broken in creative mode
 					Pair<Point, Point> wallOutsidePair = wallOutsidePairs.get(wallOutsideIndex);
@@ -109,6 +93,7 @@ public class GeneratorParticlesManager {
 						showParticleForWallOutsidePair(wallOutsidePair);
 					}
 					//*/
+/*
 				}
 			}
 
@@ -189,4 +174,5 @@ public class GeneratorParticlesManager {
 			runeWaitTicks--;
 		}
 	}
+*/
 }

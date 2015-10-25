@@ -1,14 +1,13 @@
 package me.newyith.fortresstemp.generator.generation;
 
-import me.newyith.fortress.event.TickTimer;
-import me.newyith.fortress.util.Point;
+import me.newyith.fortressold.event.TickTimer;
+import me.newyith.fortressold.util.Point;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
-import java.util.Observable;
 import java.util.Set;
 
-public class GenerationTask extends BukkitRunnable implements Observable {
+public class GenerationTask extends BukkitRunnable {
 	private List<Set<Point>> layers;
 	private boolean isGenerating;
 	private boolean animate = true;
@@ -19,15 +18,15 @@ public class GenerationTask extends BukkitRunnable implements Observable {
 	private int curIndex = 0;
 
 	public GenerationTask(List<Set<Point>> layers, boolean isGenerating, boolean instant) {
-		this.layers = layers;
-		this.isGenerating = isGenerating;
-
-		if (instant) {
-			animate = false;
-			onTick();
-		} else {
-			TickTimer.onTick(onTick());
-		}
+//		this.layers = layers;
+//		this.isGenerating = isGenerating;
+//
+//		if (instant) {
+//			animate = false;
+//			onTick();
+//		} else {
+//			TickTimer.onTick(onTick());
+//		}
 	}
 
 	private void onTick() {

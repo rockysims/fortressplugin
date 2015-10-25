@@ -1,31 +1,35 @@
 package me.newyith.fortress.command;
 
-import me.newyith.fortress.generator.FortressGeneratorRune;
-import me.newyith.fortress.generator.FortressGeneratorRunesManager;
+import me.newyith.fortress.generator.rune.GeneratorRune;
 import me.newyith.fortress.main.FortressPlugin;
+import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Cuboid;
 import me.newyith.fortress.util.Point;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.*;
 
 public class StuckPlayer {
 	private Player player;
+	private World world;
 	private Point startPoint;
 	private double maxHealthOnRecord;
 	private long startTimestamp;
 
 	private Map<Integer, String> messages;
 
-	private final int nearbyRange = 10;
+	private final int distBeyondFortress = 10; //how far outside combinedCuboid to teleport
 	private final int stuckDelayMs = FortressPlugin.config_stuckDelayMs;
 	private final int cancelDistance = FortressPlugin.config_stuckCancelDistance;
-	private Set<FortressGeneratorRune> nearbyRunes;
+	private Set<GeneratorRune> nearbyGeneratorRunes;
 
 	public StuckPlayer(Player player) {
 		this.player = player;
+		this.world = player.getWorld();
 		this.startPoint = new Point(player.getLocation());
 		this.maxHealthOnRecord = player.getHealth();
 		this.startTimestamp = new Date().getTime();
@@ -63,7 +67,7 @@ public class StuckPlayer {
 			}
 		}
 
-		nearbyRunes = FortressGeneratorRunesManager.getOtherRunesInRange(startPoint, FortressPlugin.config_generationRange);
+		nearbyGeneratorRunes = FortressesManager.getOtherGeneratorRunesInRange(startPoint, FortressPlugin.config_generationRangeLimit);
 	}
 
 	public void considerSendingMessage() {
@@ -87,11 +91,11 @@ public class StuckPlayer {
 		boolean cancel = false;
 
 		Point p = new Point(player.getLocation());
-		double changeInX = Math.abs(p.x - startPoint.x);
-		double changeInY = Math.abs(p.y - startPoint.y);
-		double changeInZ = Math.abs(p.z - startPoint.z);
+		double changeInX = Math.abs(p.x() - startPoint.x());
+		double changeInY = Math.abs(p.y() - startPoint.y());
+		double changeInZ = Math.abs(p.z() - startPoint.z());
 
-		if (nearbyRunes.size() == 0) {
+		if (nearbyGeneratorRunes.size() == 0) {
 			//player is too far from any fortress
 			cancel = true;
 			sendMessage("/stuck failed because you are too far from any fortress.");
@@ -174,9 +178,8 @@ public class StuckPlayer {
 			p = getRandomNearbyPoint(startPoint);
 			p = getValidTeleportDest(p);
 			if (p != null) {
-				p.x += 0.5F;
-				p.z += 0.5F;
-				player.teleport(p.toLocation());
+				p = p.add(0.5F, 0, 0.5F);
+				player.teleport(p.toLocation(world));
 				teleported = true;
 			}
 		}
@@ -189,19 +192,14 @@ public class StuckPlayer {
 		Point validDest = null;
 
 		if (p != null) {
-			int maxHeight = p.world.getMaxHeight();
-			for (int y = maxHeight-2; y >= 0; y--) {
-				p.y = y;
-				if (!p.is(Material.AIR)) {
-					//first non air block
+			Block block = world.getHighestBlockAt(p.xInt(), p.zInt());
 
-					//check if valid teleport destination
-					if (p.getBlock().getType().isSolid()) {
-						p.y++;
-						validDest = p;
-					}
-
-					break;
+			//check if valid teleport destination
+			if (block.getType().isSolid()) {
+				Point dest = new Point(block.getLocation()).add(0, 1, 0);
+				Point aboveDest = new Point(dest).add(0, 1, 0);
+				if (dest.is(Material.AIR, world) && aboveDest.is(Material.AIR, world)) {
+					validDest = dest;
 				}
 			}
 		}
@@ -212,21 +210,21 @@ public class StuckPlayer {
 	private Point getRandomNearbyPoint(Point p) {
 		Point nearbyPoint = null;
 
-		if (nearbyRunes.size() > 0) {
+		if (nearbyGeneratorRunes.size() > 0) {
 			//set combinedCuboid
 			List<Cuboid> runeCuboids = new ArrayList<>();
-			nearbyRunes.stream().forEach(nearbyRune -> {
+			nearbyGeneratorRunes.stream().forEach(nearbyRune -> {
 				runeCuboids.add(nearbyRune.getFortressCuboid());
 			});
-			Cuboid combinedCuboid = Cuboid.fromCuboids(runeCuboids, p.world);
+			Cuboid combinedCuboid = Cuboid.fromCuboids(runeCuboids, world);
 
 			//set outerCuboid
-			Point outerMin = combinedCuboid.getMin().add(-1 * nearbyRange, -1 * nearbyRange, -1 * nearbyRange);
-			Point outerMax = combinedCuboid.getMax().add(nearbyRange, nearbyRange, nearbyRange);
-			Cuboid outerCuboid = new Cuboid(outerMin, outerMax);
+			Point outerMin = combinedCuboid.getMin().add(-1 * distBeyondFortress, -1 * distBeyondFortress, -1 * distBeyondFortress);
+			Point outerMax = combinedCuboid.getMax().add(distBeyondFortress, distBeyondFortress, distBeyondFortress);
+			Cuboid outerCuboid = new Cuboid(outerMin, outerMax, world);
 
 			//set combinedSheet and outerSheet
-			double y = combinedCuboid.getMax().y;
+			double y = combinedCuboid.getMax().y();
 			Set<Point> combinedSheet = combinedCuboid.getPointsAtHeight(y);
 			Set<Point> outerSheet = outerCuboid.getPointsAtHeight(y);
 

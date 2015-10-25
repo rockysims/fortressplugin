@@ -1,6 +1,6 @@
 package me.newyith.fortresstemp.generator.rune;
 
-import me.newyith.fortress.util.Debug;
+import me.newyith.fortressold.util.Debug;
 
 enum RuneState {
 	RUNNING,

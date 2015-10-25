@@ -1,26 +1,7 @@
 package me.newyith.fortresstemp.generator.manager;
 
-import me.newyith.fortresstemp.generator.rune.GeneratorRune;
-import me.newyith.fortresstemp.generator.rune.GeneratorRunePattern;
-import me.newyith.fortress.util.Debug;
-import me.newyith.fortress.util.Point;
-import me.newyith.fortress.util.Wall;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.material.*;
-
-import java.util.*;
-
 public class GeneratorRunesManager {
+	/*
 	private static ArrayList<GeneratorRune> runes = new ArrayList<>();
 	private static HashMap<Point, GeneratorRune> runeByRunePoint = new HashMap<>();
 	private static HashMap<Point, GeneratorRune> runeByProtectedPoint = new HashMap<>();
@@ -371,4 +352,5 @@ public class GeneratorRunesManager {
 
 		return cancel;
 	}
+*/
 }

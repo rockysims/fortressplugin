@@ -1,5 +1,5 @@
 name: FortressPlugin
-main: me.newyith.fortressnewest.main.FortressPlugin
+main: me.newyith.fortress.main.FortressPlugin
 version: 0.1
 author: NewYith
   

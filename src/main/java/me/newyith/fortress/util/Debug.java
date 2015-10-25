@@ -1,10 +1,11 @@
 package me.newyith.fortress.util;
 
-import me.newyith.fortress.particle.ParticleEffect;
+import me.newyith.fortress.util.particle.ParticleEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,11 +19,25 @@ public class Debug {
 	}
 
 	public static void particleAt(Point point, ParticleEffect particleEffect) {
-		float speed = 0;
-		int amount = 1;
-		double range = 25;
-		point.add(0.5, 0.5, 0.5);
-		particleEffect.display(0.0F, 0.0F, 0.0F, speed, amount, point.toLocation(), range);
+		Player player = getPlayer();
+		if (player != null) {
+			World world = player.getWorld();
+			float speed = 0;
+			int amount = 1;
+			double range = 25;
+			Point p = new Point(point).add(0.5, 0.5, 0.5);
+			particleEffect.display(0.0F, 0.0F, 0.0F, speed, amount, p.toLocation(world), range);
+		}
+	}
+	
+	private static Player getPlayer() {
+		Player player = null;
+		for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+			if (onlinePlayer.getName().equalsIgnoreCase("newyith")) {
+				player = onlinePlayer;
+			}
+		}
+		return player;
 	}
 
 	public static void print(String s) {

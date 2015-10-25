@@ -1,19 +1,7 @@
 package me.newyith.fortresstemp.generator.manager;
 
-import me.newyith.fortress.main.FortressPlugin;
-import me.newyith.fortress.util.Point;
-import me.newyith.fortress.util.Wall;
-import org.bukkit.event.EventHandler;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
+import me.newyith.fortressold.main.FortressPlugin;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.*;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-
-import java.util.ArrayList;
 
 public class EventListener implements Listener {
 
@@ -25,6 +13,7 @@ public class EventListener implements Listener {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
+	/*
 	@EventHandler(ignoreCancelled = true) //ignoreCancelled adds a virtual "if (event.isCancelled()) { return; }" to the method
 	public void onBlockBreakEvent(BlockBreakEvent event) {
 		FortressPlugin.generatorRunesManager.onBlockBreakEvent(event);
@@ -110,4 +99,5 @@ public class EventListener implements Listener {
 			}
 		}
 	}
+	*/
 }

@@ -10,10 +10,10 @@ public class Commands {
 	private static List<StuckPlayer> stuckList = new ArrayList<>();
 
 	public static void onTick() {
-		onTickStuck();
+		tickStuck();
 	}
 
-	private static void onTickStuck() {
+	private static void tickStuck() {
 		//check if any stuck players need message or teleport
 		Iterator<StuckPlayer> it = stuckList.iterator();
 		while (it.hasNext()) {

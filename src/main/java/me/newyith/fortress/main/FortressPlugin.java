@@ -1,15 +1,12 @@
 package me.newyith.fortress.main;
 
-import me.newyith.fortress.command.Commands;
-import me.newyith.fortresstemp.generator.manager.EventListener;
+import me.newyith.fortress.event.EventListener;
 import me.newyith.fortress.event.TickTimer;
-import me.newyith.fortress.fix.PearlGlitchFix;
-import me.newyith.fortress.manual.ManualCraftManager;
-import me.newyith.fortress.memory.SaveLoadMemoryManager;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -22,24 +19,25 @@ import java.util.Random;
 public class FortressPlugin extends JavaPlugin {
 	public static final boolean releaseBuild = false; //TODO: change to this to true for release builds
 	private static final double saveDelayMs = 60*1000;
-	private static int waitTicks = 0;
+	private static int saveWaitTicks = 0;
+
+	private static SaveLoadManager saveLoadManager;
 
 	public static int config_glowstoneDustBurnTimeMs = 1000 * 60 * 60;
 	public static int config_stuckDelayMs = 30 * 1000;
 	public static int config_stuckCancelDistance = 4;
-	public static int config_generationRange = 128;
-	public static int config_generatorBlockLimit = 40000; //roughly 125 empty 8x8x8 rooms (6x6x6 air inside)
+	public static int config_generationRangeLimit = 128;
+	public static int config_generationBlockLimit = 40000; //roughly 125 empty 8x8x8 rooms (6x6x6 air inside)
 
-	private void readConfig() {
+	private void loadConfig() {
 		FileConfiguration config = getConfig();
-		//TODO: uncomment out following block
-		/*
-		config_glowstoneDustBurnTimeMs = getConfigInt(config, "glowstoneDustBurnTimeMs", config_glowstoneDustBurnTimeMs);
-		config_stuckDelayMs = getConfigInt(config, "stuckDelayMs", config_stuckDelayMs);
-		config_stuckCancelDistance = getConfigInt(config, "stuckCancelDistance", config_stuckCancelDistance);
-		config_generationRange = getConfigInt(config, "generationRange", config_generationRange);
-		config_generatorBlockLimit = getConfigInt(config, "generatorBlockLimit", config_generatorBlockLimit);
-		//*/
+		if (releaseBuild) {
+			config_glowstoneDustBurnTimeMs = getConfigInt(config, "glowstoneDustBurnTimeMs", config_glowstoneDustBurnTimeMs);
+			config_stuckDelayMs = getConfigInt(config, "stuckDelayMs", config_stuckDelayMs);
+			config_stuckCancelDistance = getConfigInt(config, "stuckCancelDistance", config_stuckCancelDistance);
+			config_generationRangeLimit = getConfigInt(config, "generationRangeLimit", config_generationRangeLimit);
+			config_generationBlockLimit = getConfigInt(config, "generationBlockLimit", config_generationBlockLimit);
+		}
 		saveConfig();
 	}
 	private int getConfigInt(FileConfiguration config, String key, int defaultValue) {
@@ -49,151 +47,158 @@ public class FortressPlugin extends JavaPlugin {
 		return config.getInt(key);
 	}
 
-    @Override
-    public void onEnable() {
-		readConfig();
+	@Override
+	public void onEnable() {
+		loadConfig();
+		saveLoadManager = new SaveLoadManager(this);
+		saveLoadManager.load();
 
-		TickTimer.onEnable(this);
 		EventListener.onEnable(this);
-		SaveLoadMemoryManager.onEnable(this);
-		ManualCraftManager.onEnable(this);
-		PearlGlitchFix.onEnable(this);
-
-        sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
-        sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
-        sendToConsole("         >> ON <<           ", ChatColor.GREEN);
-        sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
-    }
-
-    @Override
-    public void onDisable() {
-        SaveLoadMemoryManager.onDisable();
+		TickTimer.onEnable(this);
+//		ManualCraftManager.onEnable(this);
+//		PearlGlitchFix.onEnable(this);
 
 		sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
 		sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
-        sendToConsole("         >> OFF <<          ", ChatColor.RED);
-        sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
-    }
+		sendToConsole("         >> ON <<           ", ChatColor.GREEN);
+		sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
+	}
 
-    private void sendToConsole(String s, ChatColor color) {
-        ConsoleCommandSender console = this.getServer().getConsoleSender();
-        console.sendMessage(color + s);
-    }
+	@Override
+	public void onDisable() {
+		saveLoadManager.save();
 
-	//TODO: consider moving this into runes manager
+		sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
+		sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
+		sendToConsole("         >> OFF <<          ", ChatColor.RED);
+		sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
+	}
+
+	private void sendToConsole(String s, ChatColor color) {
+		ConsoleCommandSender console = this.getServer().getConsoleSender();
+		console.sendMessage(color + s);
+	}
+
 	public static void onTick() {
-		if (waitTicks == 0) {
-			Debug.start("saving");
-			SaveLoadMemoryManager.save();
-			Debug.end("saving");
-
-			waitTicks = (int) (saveDelayMs / TickTimer.msPerTick);
+		if (saveWaitTicks == 0) {
+			saveLoadManager.save();
+			saveWaitTicks = (int) (saveDelayMs / TickTimer.msPerTick);
 		} else {
-			waitTicks--;
+			saveWaitTicks--;
 		}
 	}
 
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+
+
+
+
+
+
+
+
+
 		String commandName = cmd.getName();
 		boolean commandHandled = false;
 
-		// /fort [subCommand]
-		if (commandName.equalsIgnoreCase("fort") && args.length > 0 && sender instanceof Player) {
-			String subCommand = args[0];
+//		// /fort [subCommand]
+//		if (commandName.equalsIgnoreCase("fort") && args.length > 0 && sender instanceof Player) {
+//			String subCommand = args[0];
+//
+//			// /fort stuck
+//			if (subCommand.equalsIgnoreCase("stuck")) {
+//				Player player = (Player)sender;
+//				Commands.onStuckCommand(player);
+//				commandHandled = true;
+//			}
+//		}
 
-			// /fort stuck
-			if (subCommand.equalsIgnoreCase("stuck")) {
-				Player player = (Player)sender;
-				Commands.onStuckCommand(player);
+		if (!releaseBuild) {
+			// /test
+			if (cmd.getName().equalsIgnoreCase("test")) {
+				if (sender instanceof Player) {
+					Debug.msg("executing test command...");
+
+					int distance = 40;
+					Player player = (Player)sender;
+					World world = player.getWorld();
+					Point center = new Point(player.getLocation());
+
+					for (int xOffset = -1 * distance; xOffset <= distance; xOffset++) {
+						for (int yOffset = -1 * distance; yOffset <= distance; yOffset++) {
+							for (int zOffset = -1 * distance; zOffset <= distance; zOffset++) {
+								Point p = center.add(xOffset, yOffset, zOffset);
+								if (p.y() > 5) {
+									if (p.is(Material.BEDROCK, world)) {
+										p.getBlock(world).setType(Material.COBBLESTONE);
+									}
+								}
+							}
+						}
+					}
+				}
+				commandHandled = true;
+			}
+
+			// /test2
+			if (cmd.getName().equalsIgnoreCase("test2")) {
+				if (sender instanceof Player) {
+					Debug.msg("executing test2 command...");
+
+					Player player = (Player)sender;
+					World world = player.getWorld();
+					Point anchor = new Point(player.getLocation()).add(0, -1, 0);
+
+					int num = 2;
+					int size = 8;
+					for (int x = -1*num; x <= num; x++) {
+						for (int y = -1*num; y <= num; y++) {
+							for (int z = -1*num; z <= num; z++) {
+								Point p = anchor.add(x*size, y*size, z*size);
+								boxAt(p, world, size);
+							}
+						}
+					}
+
+				}
+				commandHandled = true;
+			}
+
+			// /test3
+			if (cmd.getName().equalsIgnoreCase("test3")) {
+				if (sender instanceof Player) {
+					Debug.msg("executing test3 command...");
+
+					int distance = 40;
+					Player player = (Player)sender;
+					World world = player.getWorld();
+					Point center = new Point(player.getLocation());
+
+					for (int xOffset = -1 * distance; xOffset <= distance; xOffset++) {
+						for (int yOffset = -1 * distance; yOffset <= distance; yOffset++) {
+							for (int zOffset = -1 * distance; zOffset <= distance; zOffset++) {
+								Point p = center.add(xOffset, yOffset, zOffset);
+								if (p.y() > 5) {
+									if (p.is(Material.COBBLESTONE, world)) {
+										p.getBlock(world).setType(Material.AIR);
+									}
+									if (p.is(Material.GLASS, world)) {
+										p.getBlock(world).setType(Material.AIR);
+									}
+								}
+							}
+						}
+					}
+				}
 				commandHandled = true;
 			}
 		}
 
-		//TODO: remove this command
-		// /test
-		if (cmd.getName().equalsIgnoreCase("test")) {
-			if (sender instanceof Player) {
-				Debug.msg("executing test command...");
-
-				int distance = 40;
-				Player player = (Player)sender;
-				Point center = new Point(player.getLocation());
-
-				for (int xOffset = -1 * distance; xOffset <= distance; xOffset++) {
-					for (int yOffset = -1 * distance; yOffset <= distance; yOffset++) {
-						for (int zOffset = -1 * distance; zOffset <= distance; zOffset++) {
-							Point p = new Point(center.world, center.x + xOffset, center.y + yOffset, center.z + zOffset);
-							if (p.y > 5) {
-								if (p.getBlock().getType() == Material.BEDROCK) {
-									p.getBlock().setType(Material.COBBLESTONE);
-								}
-							}
-						}
-					}
-				}
-			}
-			commandHandled = true;
-		}
-
-		//TODO: remove this command
-		// /test2
-		if (cmd.getName().equalsIgnoreCase("test2")) {
-			if (sender instanceof Player) {
-				Debug.msg("executing test2 command...");
-
-				Player player = (Player)sender;
-				Point anchor = new Point(player.getLocation()).add(0, -1, 0);
-
-				int num = 2;
-				int size = 8;
-				for (int x = -1*num; x <= num; x++) {
-					for (int y = -1*num; y <= num; y++) {
-						for (int z = -1*num; z <= num; z++) {
-							Point p = anchor.add(x*size, y*size, z*size);
-							boxAt(p, size);
-						}
-					}
-				}
-
-			}
-			commandHandled = true;
-		}
-
-
-		//TODO: remove this command
-		// /test3
-		if (cmd.getName().equalsIgnoreCase("test3")) {
-			if (sender instanceof Player) {
-				Debug.msg("executing test3 command...");
-
-				int distance = 40;
-				Player player = (Player)sender;
-				Point center = new Point(player.getLocation());
-
-				for (int xOffset = -1 * distance; xOffset <= distance; xOffset++) {
-					for (int yOffset = -1 * distance; yOffset <= distance; yOffset++) {
-						for (int zOffset = -1 * distance; zOffset <= distance; zOffset++) {
-							Point p = new Point(center.world, center.x + xOffset, center.y + yOffset, center.z + zOffset);
-							if (p.y > 5) {
-								if (p.getBlock().getType() == Material.COBBLESTONE) {
-									p.getBlock().setType(Material.AIR);
-								}
-								if (p.getBlock().getType() == Material.GLASS) {
-									p.getBlock().setType(Material.AIR);
-								}
-							}
-						}
-					}
-				}
-			}
-			commandHandled = true;
-		}
-
-
 		return commandHandled;
-    }
+	}
 
-	private void boxAt(Point anchor, int num) {
+	private void boxAt(Point anchor, World world, int num) {
+		Random random = new Random();
 		for (int x = 0; x < num; x++) {
 			for (int y = 0; y < num; y++) {
 				for (int z = 0; z < num; z++) {
@@ -204,10 +209,10 @@ public class FortressPlugin extends JavaPlugin {
 					if (xMatch || yMatch || zMatch) {
 						Point p = anchor.add(x, y, z);
 						Material m = Material.COBBLESTONE;
-						if (new Random().nextBoolean()) {
+						if (random.nextBoolean()) {
 							m = Material.MOSSY_COBBLESTONE;
 						}
-						p.getBlock().setType(m);
+						p.getBlock(world).setType(m);
 					}
 
 				}
@@ -218,13 +223,25 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 //now that things will be saved via Model classes we don't need GeneratorRunesManager to be non static
 //TODO: change GeneratorRunesManager back to static
 
 //TODO: finish refactoring
 //	make Core, AwareCore, etc. extend each other
 //	make rune have generatorCore as field (not extend GeneratorCore)
-//	add separate model classes to maintain state (for easy save/load with jackson)
+//	add separate wheel classes to maintain state (for easy save/load with jackson)
 //		CoreModel, GeneratorRuneModel, etc.
 //TODO: consider splitting off GeneratorRunesManager functionality into classes:
 //	DoorProtection (for protecting doors and handling white list)
@@ -342,8 +359,8 @@ public class FortressPlugin extends JavaPlugin {
 // --- MVP ---
 
 //Reducing lag:
-	//animator should remember current layer
-	//getConnected calculation over time (need to learn promises in java)
+//animator should remember current layer
+//getConnected calculation over time (need to learn promises in java)
 //protect inside from explosions
 
 //TODO: make 'fort stuck' only work in range of generator (almost done but need to make it based on cuboid instead of range)

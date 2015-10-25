@@ -1,6 +1,8 @@
 package me.newyith.fortress.util;
 
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.util.Vector;
@@ -8,7 +10,8 @@ import org.bukkit.util.Vector;
 import java.util.*;
 
 public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Block> {
-	protected String worldName;
+	protected final String worldName;
+	protected World world;
 	protected final Vector minimumPoint, maximumPoint;
 
 	public static Cuboid fromCuboids(List<Cuboid> cuboids, World world) {
@@ -17,23 +20,28 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
 		if (cuboids.size() > 0) {
 			//init bestMin and bestMax points
 			Cuboid firstCuboid = cuboids.get(0);
-			Point bestMin = new Point(firstCuboid.minimumPoint, world);
-			Point bestMax = new Point(firstCuboid.maximumPoint, world);
+			Vector bestMin = new Point(firstCuboid.minimumPoint).toVector();
+			Vector bestMax = new Point(firstCuboid.maximumPoint).toVector();
 
 			//find bestMin and bestMax points
-			cuboids.stream().forEach(cuboid -> {
-				Point cubMin = new Point(cuboid.minimumPoint, world);
-				bestMin.x = Math.min(bestMin.x, cubMin.x);
-				bestMin.y = Math.min(bestMin.y, cubMin.y);
-				bestMin.z = Math.min(bestMin.z, cubMin.z);
+			Iterator<Cuboid> it = cuboids.iterator();
+			while (it.hasNext()) {
+				Cuboid cuboid = it.next();
+				Point cubMin = new Point(cuboid.minimumPoint);
+				Point cubMax = new Point(cuboid.maximumPoint);
 
-				Point cubMax = new Point(cuboid.maximumPoint, world);
-				bestMax.x = Math.max(bestMax.x, cubMax.x);
-				bestMax.y = Math.max(bestMax.y, cubMax.y);
-				bestMax.z = Math.max(bestMax.z, cubMax.z);
-			});
+				//update bestMin
+				bestMin.setX(Math.min(bestMin.getX(), cubMin.x()));
+				bestMin.setY(Math.min(bestMin.getY(), cubMin.y()));
+				bestMin.setZ(Math.min(bestMin.getZ(), cubMin.z()));
 
-			resultCuboid = new Cuboid(bestMin, bestMax);
+				//update bestMax
+				bestMax.setX(Math.max(bestMax.getX(), cubMax.x()));
+				bestMax.setY(Math.max(bestMax.getY(), cubMax.y()));
+				bestMax.setZ(Math.max(bestMax.getZ(), cubMax.z()));
+			}
+
+			resultCuboid = new Cuboid(bestMin, bestMax, world);
 		}
 
 		return resultCuboid;
@@ -47,8 +55,12 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
 		this(loc, loc);
 	}
 
-	public Cuboid(Point p1, Point p2) {
-		this(p1.toLocation(), p2.toLocation());
+	public Cuboid(Vector v1, Vector v2, World world) {
+		this(new Point(v1), new Point(v2), world);
+	}
+
+	public Cuboid(Point p1, Point p2, World world) {
+		this(p1.toLocation(world), p2.toLocation(world));
 	}
 
 	public Cuboid(Location loc1, Location loc2) {
@@ -90,21 +102,21 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
 	}
 
 	public Point getMin() {
-		return new Point(minimumPoint, getWorld());
+		return new Point(minimumPoint);
 	}
 
 	public Point getMax() {
-		return new Point(maximumPoint, getWorld());
+		return new Point(maximumPoint);
 	}
 
 	public Set<Point> getPointsAtHeight(double y) {
 		Set<Point> points = new HashSet<>();
 
-		Point min = new Point(minimumPoint, getWorld());
-		Point max = new Point(maximumPoint, getWorld());
-		for (double x = min.x; x <= max.x; x++) {
-			for (double z = min.z; z <= max.z; z++) {
-				points.add(new Point(getWorld(), x, y, z));
+		Point min = new Point(minimumPoint);
+		Point max = new Point(maximumPoint);
+		for (double x = min.x(); x <= max.x(); x++) {
+			for (double z = min.z(); z <= max.z(); z++) {
+				points.add(new Point(x, y, z));
 			}
 		}
 
@@ -112,7 +124,7 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
 	}
 
 	public boolean contains(Point point) {
-		return containsLocation(point.toLocation());
+		return containsLocation(point.toLocation(getWorld()));
 	}
 
 	public boolean containsLocation(Location location) {
@@ -175,14 +187,12 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
 	}
 
 	public World getWorld() {
-		World world = Bukkit.getServer().getWorld(this.worldName);
+		if (world == null) {
+			world = Bukkit.getServer().getWorld(worldName);
+		}
+
 		if (world == null) throw new NullPointerException("World '" + this.worldName + "' is not loaded.");
 		return world;
-	}
-
-	public void setWorld(World world) {
-		if (world != null) this.worldName = world.getName();
-		else throw new NullPointerException("The world cannot be null.");
 	}
 
 	@Override

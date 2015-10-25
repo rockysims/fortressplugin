@@ -17,8 +17,7 @@ ParticlesManager
 
 import me.newyith.fortresstemp.generator.generation.GenerationTask;
 import me.newyith.fortresstemp.generator.generation.WallMaterials;
-import me.newyith.fortress.util.Point;
-import me.newyith.fortress.util.Wall;
+import me.newyith.fortressold.util.Point;
 import org.bukkit.Material;
 
 import java.util.*;
@@ -44,7 +43,7 @@ public abstract class Core {
 
 	protected abstract WallMaterials getWallMats();
 	protected abstract void sendMessage(String msg);
-
+/*
 	private List<Set<Point>> getGeneratableWallLayers() {
 		Set<Point> claimedPoints = getClaimedPointsOfNearbyGenerators();
 
@@ -93,7 +92,7 @@ public abstract class Core {
 	}
 
 
-
+*/
 
 
 }

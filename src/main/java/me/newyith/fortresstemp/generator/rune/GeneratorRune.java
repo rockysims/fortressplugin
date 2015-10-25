@@ -1,24 +1,7 @@
 package me.newyith.fortresstemp.generator.rune;
 
-import me.newyith.fortress.event.TickTimer;
-import me.newyith.fortresstemp.generator.particles.GeneratorParticlesManager;
-import me.newyith.fortresstemp.generator.core.GeneratorCore;
-import me.newyith.fortress.main.FortressPlugin;
-import me.newyith.fortress.util.Cuboid;
-import me.newyith.fortress.util.Debug;
-import me.newyith.fortress.util.Point;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Chest;
-import org.bukkit.block.Sign;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.*;
-
 public class GeneratorRune {
+/*
 	//should be saved
 	private GeneratorRunePattern pattern = null; //set by constructor
 	private GeneratorCore core = null; //set by constructor
@@ -366,4 +349,5 @@ public class GeneratorRune {
 	public int hashCode() {
 		return this.pattern.anchorPoint.hashCode();
 	}
+*/
 }

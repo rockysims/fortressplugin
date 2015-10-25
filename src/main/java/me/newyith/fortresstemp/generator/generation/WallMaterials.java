@@ -1,8 +1,8 @@
 package me.newyith.fortresstemp.generator.generation;
 
-import me.newyith.fortress.main.FortressPlugin;
-import me.newyith.fortress.util.Debug;
-import me.newyith.fortress.util.Point;
+import me.newyith.fortressold.main.FortressPlugin;
+import me.newyith.fortressold.util.Debug;
+import me.newyith.fortressold.util.Point;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
