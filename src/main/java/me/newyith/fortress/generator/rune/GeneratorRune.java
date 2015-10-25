@@ -7,6 +7,9 @@ package me.newyith.fortress.generator.rune;
 //GeneratorCore (originLayer and any convenience methods needed by GeneratorRune)
 //TODO: put particles handling into a core
 
+import me.newyith.fortress.util.Cuboid;
+import me.newyith.fortress.util.Point;
+
 public class GeneratorRune {
 	private GeneratorRuneModel model;
 	private GeneratorRunePattern pattern;
@@ -27,6 +30,28 @@ public class GeneratorRune {
 //		this.pattern = runePattern;
 //		this.particles = new FortressGeneratorParticlesManager(this);
 		//this.core = new GeneratorCore(this.pattern.anchorPoint);
+	}
+
+
+	public Cuboid getFortressCuboid() {
+
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+		Point min = new Point(pattern.anchorPoint);
+		Point max = new Point(pattern.anchorPoint);
+
+		getGeneratedPoints().stream().forEach(p -> {
+			min.x = Math.min(min.x, p.x);
+			min.y = Math.min(min.y, p.y);
+			min.z = Math.min(min.z, p.z);
+			max.x = Math.max(max.x, p.x);
+			max.y = Math.max(max.y, p.y);
+			max.z = Math.max(max.z, p.z);
+		});
+
+		//TODO: min-- and max++ (so as to include claimed points)
+
+		return new Cuboid(min, max);
 	}
 
 

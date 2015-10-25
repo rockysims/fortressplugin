@@ -1,5 +1,6 @@
 package me.newyith.fortress.main;
 
+import me.newyith.fortress.command.Commands;
 import me.newyith.fortress.event.EventListener;
 import me.newyith.fortress.event.TickTimer;
 import me.newyith.fortress.util.Debug;
@@ -89,29 +90,20 @@ public class FortressPlugin extends JavaPlugin {
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-
-
-
-
-
-
-
-
-
 		String commandName = cmd.getName();
 		boolean commandHandled = false;
 
-//		// /fort [subCommand]
-//		if (commandName.equalsIgnoreCase("fort") && args.length > 0 && sender instanceof Player) {
-//			String subCommand = args[0];
-//
-//			// /fort stuck
-//			if (subCommand.equalsIgnoreCase("stuck")) {
-//				Player player = (Player)sender;
-//				Commands.onStuckCommand(player);
-//				commandHandled = true;
-//			}
-//		}
+		// /fort [subCommand]
+		if (commandName.equalsIgnoreCase("fort") && args.length > 0 && sender instanceof Player) {
+			String subCommand = args[0];
+
+			// /fort stuck
+			if (subCommand.equalsIgnoreCase("stuck")) {
+				Player player = (Player)sender;
+				Commands.onStuckCommand(player);
+				commandHandled = true;
+			}
+		}
 
 		if (!releaseBuild) {
 			// /test
