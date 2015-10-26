@@ -1,5 +1,7 @@
 package me.newyith.fortress.util;
 
+import me.newyith.fortress.util.model.BaseModel;
+import me.newyith.fortress.util.model.Modelable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;

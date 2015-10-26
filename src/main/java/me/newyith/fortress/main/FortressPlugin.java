@@ -18,7 +18,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.Random;
 
 public class FortressPlugin extends JavaPlugin {
-	public static final boolean releaseBuild = false; //TODO: change to this to true for release builds
+	public static final boolean releaseBuild = false; //TODO: change this to true for release builds
 	private static final double saveDelayMs = 60*1000;
 	private static int saveWaitTicks = 0;
 
@@ -213,7 +213,9 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
-
+//TODO: finish GeneratorRuneSet and write PointSet then abstract overlap into ModelableSet
+//TODO: get runes (without core) working again
+//TODO: finish getting /fort stuck working again
 
 
 

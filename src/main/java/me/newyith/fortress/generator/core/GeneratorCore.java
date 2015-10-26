@@ -1,7 +1,7 @@
 package me.newyith.fortress.generator.core;
 
-import me.newyith.fortress.util.BaseModel;
-import me.newyith.fortress.util.Modelable;
+import me.newyith.fortress.util.model.BaseModel;
+import me.newyith.fortress.util.model.Modelable;
 import me.newyith.fortress.util.Point;
 
 public class GeneratorCore implements Modelable {

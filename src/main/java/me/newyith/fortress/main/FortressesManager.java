@@ -1,8 +1,8 @@
 package me.newyith.fortress.main;
 
 import me.newyith.fortress.generator.rune.GeneratorRune;
-import me.newyith.fortress.util.BaseModel;
-import me.newyith.fortress.util.ModelableSet;
+import me.newyith.fortress.util.model.BaseModel;
+import me.newyith.fortress.util.model.GeneratorRuneSet;
 import me.newyith.fortress.util.Point;
 
 import java.util.HashSet;
@@ -10,33 +10,23 @@ import java.util.Set;
 
 public class FortressesManager { //implements Modelable statically
 	public static class Model extends BaseModel {
-		public boolean temp = true; //TODO: delete this line (once model contains other stuff)
+		GeneratorRuneSet.Model generatorRunes = null;
 
-		public Model() {
-
+		public Model(GeneratorRuneSet generatorRunes) {
+			this.generatorRunes = generatorRunes.getModel();
 		}
 	}
 	private static Model model;
-
-
-
-
-
-	private static Set<GeneratorRune> generatorRunes; //TODO: figure out how to add this to model
-	private static ModelableSet<GeneratorRune> generatorRunes;
-
-
-
-
-
+	private static GeneratorRuneSet generatorRunes = new GeneratorRuneSet();
 
 	public static void setModel(Model m) {
 		model = m;
+		generatorRunes = new GeneratorRuneSet(m.generatorRunes);
 	}
 
 	public static Model getModel() {
 		if (model == null) {
-			model = new Model();
+			model = new Model(generatorRunes);
 		}
 		return model;
 	}
@@ -47,11 +37,21 @@ public class FortressesManager { //implements Modelable statically
 
 	}
 
-	public static Set<GeneratorRune> getOtherGeneratorRunesNear(GeneratorRune centerRune) {
-		//TODO: return generator runes where cuboid overlaps with centerRune (+2 blocks)
+
+
+
+
+
+	public static Set<GeneratorRune> getGeneratorRunesNear(Point center) {
+		//TODO: return generator runes where cuboid overlaps with center
 		return null;
 	}
 
+	//TODO: finish writing this method
+	//	when getting nearby generators during generation, we need all potentially conflicting generators (not just known ones)
+	//		so we need this method to get nearby by range
+	//	when getting nearby generators during /fort stuck, we need all generators player might be inside of
+	//		so also write getGeneratorRunesNear()
 	public static Set<GeneratorRune> getGeneratorRunesInRange(Point center, int range) {
 		Set<GeneratorRune> runesInRange = new HashSet<>();
 		int x = center.xInt();
@@ -77,4 +77,11 @@ public class FortressesManager { //implements Modelable statically
 		runesInRange.remove(getRune(center));
 		return runesInRange;
 	}
+
+
+
+
+
+
+
 }

@@ -8,9 +8,9 @@ package me.newyith.fortress.generator.rune;
 //TODO: put particles handling into a core
 
 import me.newyith.fortress.generator.core.GeneratorCore;
-import me.newyith.fortress.util.BaseModel;
+import me.newyith.fortress.util.model.BaseModel;
 import me.newyith.fortress.util.Cuboid;
-import me.newyith.fortress.util.Modelable;
+import me.newyith.fortress.util.model.Modelable;
 import me.newyith.fortress.util.Point;
 import org.bukkit.util.Vector;
 
