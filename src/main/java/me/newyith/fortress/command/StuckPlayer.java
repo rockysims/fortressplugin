@@ -67,7 +67,7 @@ public class StuckPlayer {
 			}
 		}
 
-		nearbyGeneratorRunes = FortressesManager.getOtherGeneratorRunesInRange(startPoint, FortressPlugin.config_generationRangeLimit);
+		nearbyGeneratorRunes = FortressesManager.getGeneratorRunesInRange(startPoint, FortressPlugin.config_generationRangeLimit);
 	}
 
 	public void considerSendingMessage() {

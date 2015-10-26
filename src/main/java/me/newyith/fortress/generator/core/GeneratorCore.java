@@ -1,9 +1,11 @@
 package me.newyith.fortress.generator.core;
 
+import me.newyith.fortress.util.BaseModel;
+import me.newyith.fortress.util.Modelable;
 import me.newyith.fortress.util.Point;
 
-public class GeneratorCore {
-	public static class Model {
+public class GeneratorCore implements Modelable {
+	public static class Model extends BaseModel {
 		Point.Model anchor = null;
 
 		public Model(Point anchor) {

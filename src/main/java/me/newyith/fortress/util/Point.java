@@ -6,9 +6,9 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-public class Point {
+public class Point implements Modelable {
 	private Model model;
-	public static class Model {
+	public static class Model extends BaseModel {
 		public final double x;
 		public final double y;
 		public final double z;

@@ -1,13 +1,15 @@
 package me.newyith.fortress.main;
 
 import me.newyith.fortress.generator.rune.GeneratorRune;
+import me.newyith.fortress.util.BaseModel;
+import me.newyith.fortress.util.ModelableSet;
 import me.newyith.fortress.util.Point;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class FortressesManager {
-	public static class Model {
+public class FortressesManager { //implements Modelable statically
+	public static class Model extends BaseModel {
 		public boolean temp = true; //TODO: delete this line (once model contains other stuff)
 
 		public Model() {
@@ -15,6 +17,18 @@ public class FortressesManager {
 		}
 	}
 	private static Model model;
+
+
+
+
+
+	private static Set<GeneratorRune> generatorRunes; //TODO: figure out how to add this to model
+	private static ModelableSet<GeneratorRune> generatorRunes;
+
+
+
+
+
 
 	public static void setModel(Model m) {
 		model = m;
@@ -35,18 +49,17 @@ public class FortressesManager {
 
 	public static Set<GeneratorRune> getOtherGeneratorRunesNear(GeneratorRune centerRune) {
 		//TODO: return generator runes where cuboid overlaps with centerRune (+2 blocks)
+		return null;
 	}
 
-	public static Set<GeneratorRune> getOtherGeneratorRunesInRange(Point center) {
-		//TODO: update this to use fortress cuboid instead of fixed range
-
+	public static Set<GeneratorRune> getGeneratorRunesInRange(Point center, int range) {
 		Set<GeneratorRune> runesInRange = new HashSet<>();
 		int x = center.xInt();
 		int y = center.yInt();
 		int z = center.zInt();
 
 		//fill runesInRange
-		for (GeneratorRune rune : runeInstances) {
+		for (GeneratorRune rune : generatorRunes) {
 
 
 			//set inRange
@@ -64,6 +77,4 @@ public class FortressesManager {
 		runesInRange.remove(getRune(center));
 		return runesInRange;
 	}
-
-	FortressesManager.getOtherGeneratorRunesInRange(startPoint, FortressPlugin.config_generationRangeLimit);
 }

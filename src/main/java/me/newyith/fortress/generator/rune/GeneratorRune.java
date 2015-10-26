@@ -7,51 +7,96 @@ package me.newyith.fortress.generator.rune;
 //GeneratorCore (originLayer and any convenience methods needed by GeneratorRune)
 //TODO: put particles handling into a core
 
+import me.newyith.fortress.generator.core.GeneratorCore;
+import me.newyith.fortress.util.BaseModel;
 import me.newyith.fortress.util.Cuboid;
+import me.newyith.fortress.util.Modelable;
 import me.newyith.fortress.util.Point;
+import org.bukkit.util.Vector;
 
-public class GeneratorRune {
-	private GeneratorRuneModel model;
+import java.util.Iterator;
+import java.util.Set;
+
+public class GeneratorRune implements Modelable {
+	public static class Model extends BaseModel {
+		public GeneratorRunePattern.Model pattern = null;
+		public GeneratorCore.Model core = null;
+		public int state = GeneratorState.toInt(GeneratorState.NULL);
+		public int fuelTicksRemaining = 0;
+		public boolean powered = false;
+
+
+		public Model(GeneratorRunePattern pattern,
+					 GeneratorCore core,
+					 GeneratorState state,
+					 int fuelTicksRemaining,
+					 boolean powered) {
+			this.pattern = pattern.getModel();
+			this.core = core.getModel();
+			this.state = GeneratorState.toInt(state);
+			this.fuelTicksRemaining = fuelTicksRemaining;
+			this.powered = powered;
+		}
+	}
+	private Model model;
 	private GeneratorRunePattern pattern;
+	private GeneratorCore core;
+	private GeneratorState state;
 
-	public GeneratorRune(GeneratorRuneModel model) {
+	public GeneratorRune(Model model) {
 		this.model = model;
 		this.pattern = new GeneratorRunePattern(model.pattern);
+		this.core = new GeneratorCore(model.core);
+		this.state = GeneratorState.fromInt(model.state);
+	}
+
+	public Model getModel() {
+		return this.model;
 	}
 
 	//-----------------------------------------------------------------------
 
 	public GeneratorRune(GeneratorRunePattern pattern) {
-		model.pattern = pattern.getModel();
+		GeneratorCore core = new GeneratorCore(pattern.getAnchor());
+		GeneratorState state = GeneratorState.NULL;
+		int fuelTicksRemaining = 0;
+		boolean powered = false;
+
+		model = new Model(pattern, core, state, fuelTicksRemaining, powered);
 		this.pattern = pattern;
-
-		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//		this.pattern = runePattern;
-//		this.particles = new FortressGeneratorParticlesManager(this);
-		//this.core = new GeneratorCore(this.pattern.anchorPoint);
+		this.core = core;
+		this.state = state;
 	}
 
+
+	public Set<Point> getGeneratedPoints() {
+		return core.getGeneratedPoints();
+	}
 
 	public Cuboid getFortressCuboid() {
 
 		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-		Point min = new Point(pattern.anchorPoint);
-		Point max = new Point(pattern.anchorPoint);
+		Point anchor = pattern.getAnchor();
+		Vector min = new Point(anchor).toVector();
+		Vector max = new Point(anchor).toVector();
 
-		getGeneratedPoints().stream().forEach(p -> {
-			min.x = Math.min(min.x, p.x);
-			min.y = Math.min(min.y, p.y);
-			min.z = Math.min(min.z, p.z);
-			max.x = Math.max(max.x, p.x);
-			max.y = Math.max(max.y, p.y);
-			max.z = Math.max(max.z, p.z);
-		});
+		Iterator<Point> it = getGeneratedPoints().iterator();
+		while (it.hasNext()) {
+			Point p = it.next();
+			min.setX(Math.min(min.getX(), p.x()));
+			min.setY(Math.min(min.getY(), p.y()));
+			min.setZ(Math.min(min.getZ(), p.z()));
+			max.setX(Math.max(max.getX(), p.x()));
+			max.setY(Math.max(max.getY(), p.y()));
+			max.setZ(Math.max(max.getZ(), p.z()));
+		}
 
-		//TODO: min-- and max++ (so as to include claimed points)
+		//min-- and max++ (so as to include claimed points)
+		Point minPoint = new Point(min).add(-1, -1, -1);
+		Point maxPoint = new Point(max).add(1, 1, 1);
 
-		return new Cuboid(min, max);
+		return new Cuboid(minPoint, maxPoint, pattern.getWorld());
 	}
 
 
