@@ -21,6 +21,7 @@ public class SaveLoadManager {
 		try {
 			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 			saveToBuffer(buffer);
+			//write buffer to file
 			FileOutputStream fos = new FileOutputStream(dataFile);
 			fos.write(buffer.toByteArray(), 0, buffer.size());
 			fos.close();
@@ -39,9 +40,13 @@ public class SaveLoadManager {
 			}
 
 			Map<String, Object> data = objectMapper.readValue(dataFile, Map.class);
+
+			//load FortressesManager
 			Object obj = data.get("FortressesManager");
 			if (obj instanceof FortressesManager.Model) {
 				FortressesManager.setModel((FortressesManager.Model) obj);
+			} else {
+				Debug.error("Failed to load FortressesManager because obj is not instanceof FortressesManager.Model");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -52,13 +57,18 @@ public class SaveLoadManager {
 			//do mock save so needed classes are loaded (new classes can't be loaded after I rebuild jar)
 			try {
 				saveToBuffer(new ByteArrayOutputStream());
-			} catch (IOException e) {}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 	private void saveToBuffer(OutputStream stream) throws IOException {
 		Map<String, Object> data = new HashMap<>();
+
+		//save FortressesManager
 		data.put("FortressesManager", FortressesManager.getModel());
+
 		objectMapper.writeValue(stream, data);
 	}
 }

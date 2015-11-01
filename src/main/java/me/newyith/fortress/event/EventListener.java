@@ -1,7 +1,16 @@
 package me.newyith.fortress.event;
 
 import me.newyith.fortress.main.FortressPlugin;
+import me.newyith.fortress.main.FortressesManager;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockRedstoneEvent;
+import org.bukkit.event.block.SignChangeEvent;
 
 public class EventListener implements Listener {
 
@@ -15,7 +24,7 @@ public class EventListener implements Listener {
 
 	// - - - //
 
-	/*
+	//*
 
 	//ignoreCancelled adds a virtual "if (event.isCancelled()) { return; }" to the method
 	@EventHandler(ignoreCancelled = true)
@@ -39,8 +48,6 @@ public class EventListener implements Listener {
 			FortressesManager.onWaterBreaksRedstoneWireEvent(event.getToBlock());
 		}
 	}
-
-
 
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockRedstoneEvent(BlockRedstoneEvent event) {

@@ -1,12 +1,21 @@
 package me.newyith.fortress.generator.core;
 
+import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.model.BaseModel;
 import me.newyith.fortress.util.model.Modelable;
 import me.newyith.fortress.util.Point;
 
+import java.util.Set;
+
 public class GeneratorCore implements Modelable {
+	public Set<Point> getGeneratedPoints() {
+		Debug.msg("//TODO: write GeneratorCore.getGeneratedPoints()");
+		return null;
+	}
+
 	public static class Model extends BaseModel {
 		Point.Model anchor = null;
+		transient Point anchorReal = null;
 
 		public Model(Point anchor) {
 			this.anchor = anchor.getModel();
