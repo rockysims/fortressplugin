@@ -1,20 +1,20 @@
-package me.newyith.fortress.main;
+package me.newyith.fortress.sandbox.jackson;
 
-import me.newyith.fortress.temp.TempExample;
+import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.util.Debug;
-import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class SaveLoadManager {
+public class SandboxSaveLoadManager {
 	private File dataFile;
 	private ObjectMapper mapper = new ObjectMapper();
 
-	public SaveLoadManager(FortressPlugin plugin) {
+	public SandboxSaveLoadManager(FortressPlugin plugin) {
 		dataFile = new File(plugin.getDataFolder(), "data.json");
 		mapper.setVisibilityChecker(mapper.getSerializationConfig().getDefaultVisibilityChecker()
 				.withFieldVisibility(JsonAutoDetect.Visibility.ANY)
@@ -24,56 +24,22 @@ public class SaveLoadManager {
 	}
 
 	private void saveToMap(Map<String, Object> data) {
-//		data.put("FortressesManager", FortressesManager.getInstance());
-
-
-		/*
-		//save FortressesManager
-		data.put("FortressesManager", FortressesManager.getInstance());
-		/*/
-		//saving sandbox
-		TempExample tempExample = TempExample.getInstance();
-		Debug.msg("saving obj class name: " + tempExample.getClass().getName());
-		data.put("TempExample", tempExample);
-		//*/
+		SandboxThingToSave thing = SandboxThingToSave.getInstance();
+		data.put("thing", thing);
 	}
 
 	private void loadFromMap(Map<String, Object> data) {
-//		Object obj = data.get("FortressesManager");
-//		if (obj == null) {
-//			FortressesManager.setInstance(new FortressesManager());
-//		} else {
-//			FortressesManager fortressesManager = mapper.convertValue(obj, FortressesManager.class);
-//			FortressesManager.setInstance(fortressesManager);
-//		}
-
-		/*
-		//load FortressesManager
-		Object obj = data.get("FortressesManager");
+		Object obj = data.get("thing");
 		if (obj == null) {
-			FortressesManager.setInstance(new FortressesManager());
-		} else if (obj instanceof FortressesManager) {
-			FortressesManager.setInstance((FortressesManager) obj);
+			SandboxThingToSave.setInstance(new SandboxThingToSave());
 		} else {
-			Debug.error("Failed to load FortressesManager because obj is not instanceof FortressesManager.Model");
+			Debug.msg("loadFromMap(). obj class name: " + obj.getClass().getName());
+			SandboxThingToSave thing = mapper.convertValue(obj, SandboxThingToSave.class);
+			SandboxThingToSave.setInstance(thing);
 		}
-		/*/
-		//loading sandbox
-		Object obj = data.get("TempExample");
-		if (obj == null) {
-			Debug.msg("obj was null");
-			TempExample.setInstance(new TempExample());
-		} else {
-			Debug.msg("obj was not null");
-			TempExample tempExample = mapper.convertValue(obj, TempExample.class);
-			TempExample.setInstance(tempExample);
-			TempExample.print();
-		}
-		//*/
 	}
 
 	public void save() {
-		Debug.start("save");
 		try {
 			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 			saveToBuffer(buffer);
@@ -84,11 +50,9 @@ public class SaveLoadManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Debug.end("save");
 	}
 
 	public void load() {
-		Debug.start("load");
 		try {
 			//if (data.json doesn't exist) make an empty data.json
 			if (! dataFile.exists()) {
@@ -100,7 +64,6 @@ public class SaveLoadManager {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Debug.end("load");
 
 		if (!FortressPlugin.releaseBuild) {
 			//do mock save so needed classes are loaded (new classes can't be loaded after I rebuild jar)

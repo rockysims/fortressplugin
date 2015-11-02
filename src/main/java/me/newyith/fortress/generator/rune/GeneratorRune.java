@@ -12,12 +12,17 @@ import me.newyith.fortress.util.model.BaseModel;
 import me.newyith.fortress.util.Cuboid;
 import me.newyith.fortress.util.model.Modelable;
 import me.newyith.fortress.util.Point;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.util.Iterator;
 import java.util.Set;
 
 public class GeneratorRune implements Modelable {
+	public void onCreated(Player player) {
+		//TODO: handle
+	}
+
 	public static class Model extends BaseModel {
 		public GeneratorRunePattern.Model pattern = null;
 		public GeneratorCore.Model core = null;
@@ -68,6 +73,10 @@ public class GeneratorRune implements Modelable {
 		this.state = state;
 	}
 
+
+	public GeneratorRunePattern getPattern() {
+		return pattern;
+	}
 
 	public Set<Point> getGeneratedPoints() {
 		return core.getGeneratedPoints();

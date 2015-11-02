@@ -60,6 +60,7 @@ public abstract class ModelableSet<T extends Modelable> extends AbstractSet<T> i
 		} catch (Exception e) {
 			e.printStackTrace();
 			Debug.msg("ModelableSet.remove() failed.");
+			return false;
 		}
 //		//remove from both wheels and model.wheels
 	}

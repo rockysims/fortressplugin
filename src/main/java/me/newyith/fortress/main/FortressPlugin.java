@@ -3,6 +3,7 @@ package me.newyith.fortress.main;
 import me.newyith.fortress.command.Commands;
 import me.newyith.fortress.event.EventListener;
 import me.newyith.fortress.event.TickTimer;
+import me.newyith.fortress.sandbox.jackson.SandboxSaveLoadManager;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.ChatColor;
@@ -22,7 +23,11 @@ public class FortressPlugin extends JavaPlugin {
 	private static final double saveDelayMs = 60*1000;
 	private static int saveWaitTicks = 0;
 
+	/*
 	private static SaveLoadManager saveLoadManager;
+	/*/
+	private static SandboxSaveLoadManager sandboxSaveLoadManager;
+	//*/
 
 	public static int config_glowstoneDustBurnTimeMs = 1000 * 60 * 60;
 	public static int config_stuckDelayMs = 30 * 1000;
@@ -51,11 +56,16 @@ public class FortressPlugin extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		loadConfig();
+		/*
 		saveLoadManager = new SaveLoadManager(this);
 		saveLoadManager.load();
+		/*/
+		sandboxSaveLoadManager = new SandboxSaveLoadManager(this);
+		sandboxSaveLoadManager.load();
+		//*/
 
-		EventListener.onEnable(this);
-		TickTimer.onEnable(this);
+		//EventListener.onEnable(this);
+		//TickTimer.onEnable(this);
 //		ManualCraftManager.onEnable(this);
 //		PearlGlitchFix.onEnable(this);
 
@@ -67,7 +77,11 @@ public class FortressPlugin extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
+		/*
 		saveLoadManager.save();
+		/*/
+		sandboxSaveLoadManager.save();
+		//*/
 
 		sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
 		sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
@@ -82,7 +96,7 @@ public class FortressPlugin extends JavaPlugin {
 
 	public static void onTick() {
 		if (saveWaitTicks == 0) {
-			saveLoadManager.save();
+//			saveLoadManager.save(); //TODO: uncomment out this line
 			saveWaitTicks = (int) (saveDelayMs / TickTimer.msPerTick);
 		} else {
 			saveWaitTicks--;

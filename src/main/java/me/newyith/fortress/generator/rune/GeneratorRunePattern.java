@@ -1,7 +1,6 @@
 package me.newyith.fortress.generator.rune;
 
 import me.newyith.fortress.util.model.BaseModel;
-import me.newyith.fortress.util.model.Modelable;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -10,7 +9,52 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.material.Sign;
 
-public class GeneratorRunePattern implements Modelable {
+import java.util.Set;
+
+public class GeneratorRunePattern {
+	private transient World world = null;
+	private String worldName = "";
+	private Point anchor;
+
+	public World getWorld() {
+		if (world == null) {
+			world = Bukkit.getWorld(worldName);
+		}
+		return world;
+	}
+
+	//=======================================================================
+
+	private GeneratorRunePattern(World world, Point s, Point w, Point a, Point c, Point p, Point r, Point f) {
+//		this.worldName = world.getName();
+//		signPoint = s;
+//		wirePoint = w;
+//		anchorPoint = a;
+//		chestPoint = c;
+//		pausePoint = p;
+//		runningPoint = r;
+//		fuelPoint = f;
+//
+//		//fill pointsInPattern
+//		this.pointsInPattern.add(s);
+//		this.pointsInPattern.add(w);
+//		this.pointsInPattern.add(a);
+//		this.pointsInPattern.add(c);
+//		this.pointsInPattern.add(p);
+//		this.pointsInPattern.add(r);
+//		this.pointsInPattern.add(f);
+	}
+
+	public Set<Point> getPoints() {
+		//TODO: write this method
+		return null;
+	}
+
+	public Point getAnchor() {
+		return anchor;
+	}
+
+
 	public static class Model extends BaseModel {
 		//world
 		private transient World world = null;
@@ -63,32 +107,32 @@ public class GeneratorRunePattern implements Modelable {
 
 
 	private GeneratorRunePattern(Point s, Point w, Point a, Point c, Point p, Point r, Point f) {
-		signPoint = s;
-		wirePoint = w;
-		anchorPoint = a;
-		chestPoint = c;
-		pausePoint = p;
-		runningPoint = r;
-		fuelPoint = f;
-
-		//fill pointsInPattern
-		this.pointsInPattern.add(s);
-		this.pointsInPattern.add(w);
-		this.pointsInPattern.add(a);
-		this.pointsInPattern.add(c);
-		this.pointsInPattern.add(p);
-		this.pointsInPattern.add(r);
-		this.pointsInPattern.add(f);
+//		signPoint = s;
+//		wirePoint = w;
+//		anchorPoint = a;
+//		chestPoint = c;
+//		pausePoint = p;
+//		runningPoint = r;
+//		fuelPoint = f;
+//
+//		//fill pointsInPattern
+//		this.pointsInPattern.add(s);
+//		this.pointsInPattern.add(w);
+//		this.pointsInPattern.add(a);
+//		this.pointsInPattern.add(c);
+//		this.pointsInPattern.add(p);
+//		this.pointsInPattern.add(r);
+//		this.pointsInPattern.add(f);
 	}
 
 
-	public Point getAnchor() {
-		return model.getAnchorPoint();
-	}
-
-	public World getWorld() {
-		return model.getWorld();
-	}
+//	public Point getAnchor() {
+//		return model.getAnchorPoint();
+//	}
+//
+//	public World getWorld() {
+//		return model.getWorld();
+//	}
 
 
 
