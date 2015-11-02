@@ -1,5 +1,7 @@
 package me.newyith.fortress.util.model;
 
+import me.newyith.fortress.util.Debug;
+
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -7,27 +9,8 @@ import java.util.stream.Stream;
 
 public abstract class ModelableSet<T extends Modelable> extends AbstractSet<T> implements Modelable {
 	public static abstract class Model extends BaseModel {}
-//	private Model model;
-//	private Set<T> delegate = new HashSet<>();
-//
-//	public ModelableSet(Model model) {
-//		this.model = model;
-//
-//	}
-//
-//	public Model getModel() {
-//		return this.model;
-//	}
-//
-//	public static void fromModel(Model m) {
-//
-//	}
-
-	//-----------------------------------------------------------------------
-
-	private Set<T> delegate = new HashSet<>();
-
 	public abstract BaseModel getModel();
+	private Set<T> delegate = new HashSet<>();
 
 	@Override
 	public void forEach(Consumer<? super T> action) {
@@ -71,12 +54,14 @@ public abstract class ModelableSet<T extends Modelable> extends AbstractSet<T> i
 
 	@Override
 	public boolean remove(Object o) {
-//		T t = (T)o;
-//		if (o instanceof T) {
-
-//			//remove from both wheels and model.wheels
-//		}
-		return delegate.remove(o);
+		try {
+			T t = (T)o;
+			return delegate.remove(t);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Debug.msg("ModelableSet.remove() failed.");
+		}
+//		//remove from both wheels and model.wheels
 	}
 }
 

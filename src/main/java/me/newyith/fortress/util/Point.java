@@ -38,6 +38,10 @@ public class Point implements Modelable {
 		model = new Model(x, y, z);
 	}
 
+	public Point(int x, int y, int z) {
+		this((double)x, (double)y, (double)z);
+	}
+
 	public Point(Point p) {
 		model = p.getModel();
 	}
@@ -54,6 +58,10 @@ public class Point implements Modelable {
 		double y = vec.getY();
 		double z = vec.getZ();
 		model = new Model(x, y, z);
+	}
+
+	public Point(Block b) {
+		this(b.getLocation());
 	}
 
 	// - Getters / Setters - //
@@ -85,6 +93,25 @@ public class Point implements Modelable {
 
 	public Vector toVector() {
 		return new Vector(x(), y(), z());
+	}
+
+	public Point difference(Point p) {
+		double x = x() - p.x();
+		double y = y() - p.y();
+		double z = z() - p.z();
+		return new Point(x, y, z);
+	}
+
+
+	public Point add(Point p) {
+		if(p != null) {
+			double x = x() + p.x();
+			double y = y() + p.y();
+			double z = z() + p.z();
+			return new Point(x, y, z);
+		} else {
+			throw new IllegalArgumentException("Point.add() passed null.");
+		}
 	}
 
 	public Point add(double xAdd, double yAdd, double zAdd) {

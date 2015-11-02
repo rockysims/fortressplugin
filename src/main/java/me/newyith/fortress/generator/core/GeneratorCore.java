@@ -8,25 +8,29 @@ import me.newyith.fortress.util.Point;
 import java.util.Set;
 
 public class GeneratorCore implements Modelable {
-	public Set<Point> getGeneratedPoints() {
-		Debug.msg("//TODO: write GeneratorCore.getGeneratedPoints()");
-		return null;
-	}
-
 	public static class Model extends BaseModel {
-		Point.Model anchor = null;
-		transient Point anchorReal = null;
+		//anchor
+		private transient Point anchor = null;
+		private Point.Model anchorModel = null;
+		public Point getAnchor() {
+			if (anchor == null) {
+				anchor = new Point(anchorModel);
+			}
+			return anchor;
+		}
+		public void setAnchor(Point p) {
+			anchor = p;
+			anchorModel = anchor.getModel();
+		}
 
 		public Model(Point anchor) {
-			this.anchor = anchor.getModel();
+			setAnchor(anchor);
 		}
 	}
 	private Model model;
-	private Point anchor;
 
 	public GeneratorCore(Model model) {
 		this.model = model;
-		this.anchor = new Point(model.anchor);
 	}
 
 	public Model getModel() {
@@ -38,4 +42,10 @@ public class GeneratorCore implements Modelable {
 	public GeneratorCore(Point anchor) {
 		this.model = new Model(anchor);
 	}
+
+	public Set<Point> getGeneratedPoints() {
+		Debug.msg("//TODO: write GeneratorCore.getGeneratedPoints()");
+		return null;
+	}
+
 }

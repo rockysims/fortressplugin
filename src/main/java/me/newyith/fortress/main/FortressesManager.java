@@ -1,6 +1,7 @@
 package me.newyith.fortress.main;
 
 import me.newyith.fortress.generator.rune.GeneratorRune;
+import me.newyith.fortress.generator.rune.GeneratorRunePattern;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.model.BaseModel;
 import me.newyith.fortress.util.model.GeneratorRuneSet;
@@ -10,39 +11,100 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class FortressesManager { //implements Modelable statically
 	public static class Model extends BaseModel {
-		GeneratorRuneSet.Model generatorRunes = null;
+		//generatorRunes
+		private transient GeneratorRuneSet generatorRunes = null;
+		private GeneratorRuneSet.Model generatorRunesModel = null;
+		public GeneratorRuneSet getGeneratorRunes() {
+			if (generatorRunes == null) {
+				generatorRunes = new GeneratorRuneSet(generatorRunesModel);
+			}
+			return generatorRunes;
+		}
+
+		//runeByPoint (not saved)
+		private transient HashMap<Point, GeneratorRune> runeByPoint = null;
+		public Map<Point, GeneratorRune> getRuneByPointMap() {
+			if (runeByPoint == null) {
+				runeByPoint = new HashMap<>();
+				Iterator<GeneratorRune> it = generatorRunes.iterator();
+
+
+
+			}
+			return runeByPoint;
+		}
 
 		public Model(GeneratorRuneSet generatorRunes) {
-			this.generatorRunes = generatorRunes.getModel();
+			this.generatorRunesModel = generatorRunes.getModel();
 		}
 	}
-	private static Model model;
-	private static GeneratorRuneSet generatorRunes = new GeneratorRuneSet();
+	private static Model model = null;
 
 	public static void setModel(Model m) {
 		model = m;
-		generatorRunes = new GeneratorRuneSet(m.generatorRunes);
 	}
 
 	public static Model getModel() {
 		if (model == null) {
-			model = new Model(generatorRunes);
+			model = new Model(new GeneratorRuneSet());
 		}
 		return model;
 	}
 
 	//-----------------------------------------------------------------------
 
-	public static boolean onSignChange(Player player, Block block) {
-		//TODO: write this method
-		Debug.msg("FortressesManager.onSignChange");
-		return false;
+
+
+
+
+
+
+	public static boolean onSignChange_old(Player player, Block placedBlock) {
+		boolean cancel = false;
+
+		FortressGeneratorRunePattern runePattern = FortressGeneratorRunePattern.tryPatternAt(placedBlock);
+		if (runePattern != null) {
+			boolean runeAlreadyCreated = runeByPoint.containsKey(new Point(placedBlock.getLocation()));
+			if (!runeAlreadyCreated) {
+				FortressGeneratorRune rune = new FortressGeneratorRune(runePattern);
+				runeInstances.add(rune);
+
+				//add new rune to runeByPoint map
+				for (Point p : runePattern.getPoints()) {
+					runeByPoint.put(p, rune);
+				}
+
+				rune.onCreated(player);
+				cancel = true; //otherwise initial text on sign is replaced by what user wrote
+			} else {
+				//TODO: consider coloring this message or better yet abstracting sendMsg among all classes
+				player.sendMessage("Failed to create rune because rune already created here.");
+			}
+		}
+
+		return cancel;
 	}
+
+	//TODO: write this method
+	public static boolean onSignChange(Player player, Block signBlock) {
+		boolean cancel = false;
+
+		GeneratorRunePattern runePattern = GeneratorRunePattern.tryReadyPattern(signBlock);
+		if (runePattern != null) {
+
+		}
+
+
+		Debug.msg("FortressesManager.onSignChange");
+		return cancel;
+	}
+
+
+
 
 	public static void onBlockBreakEvent(BlockBreakEvent event) {
 		//TODO: write this method
