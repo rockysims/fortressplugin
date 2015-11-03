@@ -10,15 +10,52 @@ package me.newyith.fortress.generator.rune;
 import me.newyith.fortress.generator.core.GeneratorCore;
 import me.newyith.fortress.util.model.BaseModel;
 import me.newyith.fortress.util.Cuboid;
-import me.newyith.fortress.util.model.Modelable;
 import me.newyith.fortress.util.Point;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.codehaus.jackson.annotate.JsonProperty;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public class GeneratorRune implements Modelable {
+public class GeneratorRune {
+	private static class Model {
+		private String datum = "datum";
+		private transient Set<String> dataDerivative = null;
+
+		public Model() {
+			onLoaded();
+		}
+
+		private void onLoaded() {
+			//rebuild transient fields
+			dataDerivative = new HashSet<>();
+			for (int i = 0; i < 3; i++) {
+				dataDerivative.add(datum + i);
+			}
+		}
+	}
+	private Model model = new Model();
+
+	@JsonProperty("model")
+	private void setModel(Model model) {
+		this.model = model;
+		model.onLoaded();
+	}
+
+	//-----------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
 	public void onCreated(Player player) {
 		//TODO: handle
 	}

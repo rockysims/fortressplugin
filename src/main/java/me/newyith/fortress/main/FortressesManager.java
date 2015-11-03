@@ -9,15 +9,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.DeserializationContext;
-import org.codehaus.jackson.map.JsonDeserializer;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
 import java.util.*;
 
 public class FortressesManager {
@@ -32,72 +25,73 @@ public class FortressesManager {
 		instance = newInstance;
 	}
 
-	//--- fields (saved and transient) ---
+	//-----------------------------------------------------------------------
 
-	private Set<GeneratorRune> generatorRunes = new HashSet<>();
-	private transient Map<Point, GeneratorRune> generatorRuneByPointMap = null;
-	private transient Map<Point, GeneratorRune> generatorRuneByProtectedPointMap = null;
-	private transient Set<Point> protectedPoints = null;
-	private transient Set<Point> alteredPoints = null;
+	private static class Model {
+		private Set<GeneratorRune> generatorRunes = new HashSet<>();
+		private transient Map<Point, GeneratorRune> generatorRuneByPoint = null;
+		private transient Map<Point, GeneratorRune> generatorRuneByProtectedPoint = null;
+		private transient Set<Point> protectedPoints = null;
+		private transient Set<Point> alteredPoints = null;
 
-	@JsonProperty("generatorRunes")
-	private void setGeneratorRunes(Set<GeneratorRune> generatorRunes) {
-		Debug.msg("FortressesManager.setGeneratorRunes() called via @JsonProperty annotation. YAY!");
-		this.generatorRunes = generatorRunes;
-		buildTransients();
-	}
-
-	private void buildTransients() {
-		generatorRuneByPointMap = new HashMap<>();
-		generatorRuneByProtectedPointMap = new HashMap<>();
-		protectedPoints = new HashSet<>();
-		alteredPoints = new HashSet<>();
-
-		//TODO: build
-	}
-
-
-
-	//--- utils (for keeping transients updated when changing saved fields) ---
-
-	private void addGeneratorRune(GeneratorRune rune) {
-		generatorRunes.add(rune);
-
-		//update generatorRuneByPointMap
-		for (Point p : rune.getPattern().getPoints()) {
-			generatorRuneByPointMap.put(p, rune);
+		public Model() {
+			refreshTransients();
 		}
 
-		/* //TODO: uncomment this out once GeneratorRune has GeneratorCore
-		//update alteredPoints
-		Set<Point> altereds = rune.getGeneratorCore().getAlteredPoints();
-		alteredPoints.addAll(altereds);
-
-		//update protectedPoints
-		Set<Point> protecteds = rune.getGeneratorCore().getProtectedPoints();
-		protectedPoints.addAll(protecteds);
-
-		//update runeByProtectedPoint
-		for (Point p : protecteds) {
-			generatorRuneByProtectedPointMap.put(p, rune);
+		private void onLoaded() {
+			refreshTransients();
 		}
-		//*/
+
+		private void addGeneratorRune(GeneratorRune rune) {
+			generatorRunes.add(rune);
+			refreshTransients();
+		}
+
+		private void refreshTransients() {
+			generatorRuneByPoint = new HashMap<>();
+			generatorRuneByProtectedPoint = new HashMap<>();
+			protectedPoints = new HashSet<>();
+			alteredPoints = new HashSet<>();
+
+			for (GeneratorRune rune : generatorRunes) {
+				//rebuild runeByPoint map
+				for (Point p : rune.getPattern().getPoints()) {
+					generatorRuneByPoint.put(p, rune);
+				}
+
+				//TODO: build others
+
+//				//rebuild alteredPoints
+//				Set<Point> altereds = rune.getGeneratorCore().getAlteredPoints();
+//				alteredPoints.addAll(altereds);
+//
+//				//rebuild protectedPoints
+//				Set<Point> protecteds = rune.getGeneratorCore().getProtectedPoints();
+//				protectedPoints.addAll(protecteds);
+//
+//				//rebuild runeByProtectedPoint
+//				for (Point p : protecteds) {
+//					runeByProtectedPoint.put(p, rune);
+//				}
+			}
+		}
 	}
-	private void removeGeneratorRune(GeneratorRune rune) {
-		for (Point p : rune.getPattern().getPoints()) {
-			generatorRuneByPointMap.remove(p);
-		}
+	private Model model = new Model();
 
-		//update generatorRuneByPointMap
-		Set<Point> patternPoints = rune.getPattern().getPoints();
-		for (Point p : patternPoints) {
-			generatorRuneByPointMap.remove(p);
-		}
-
-		//generatorRuneByProtectedPointMap, alteredPoints, and protectedPoints should update naturally on rune destroyed
-
-		generatorRunes.remove(rune);
+	@JsonProperty("model")
+	private void setModel(Model model) {
+		this.model = model;
+		model.onLoaded();
 	}
+
+	//-----------------------------------------------------------------------
+
+
+
+
+
+
+
 
 	//-----------------------------------------------------------------------
 
@@ -106,10 +100,10 @@ public class FortressesManager {
 
 		GeneratorRunePattern runePattern = GeneratorRunePattern.tryReadyPattern(signBlock);
 		if (runePattern != null) {
-			boolean runeAlreadyCreated = instance.generatorRuneByPointMap.containsKey(new Point(signBlock));
+			boolean runeAlreadyCreated = instance.model.generatorRuneByPoint.containsKey(new Point(signBlock));
 			if (!runeAlreadyCreated) {
 				GeneratorRune rune = new GeneratorRune(runePattern);
-				instance.addGeneratorRune(rune);
+				instance.model.addGeneratorRune(rune);
 				rune.onCreated(player);
 				cancel = true; //otherwise initial text on sign is replaced by what user wrote
 			} else {

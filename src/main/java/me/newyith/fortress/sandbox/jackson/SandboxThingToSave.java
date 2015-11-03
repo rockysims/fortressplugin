@@ -42,7 +42,6 @@ public class SandboxThingToSave {
 	private void setModel(Model model) {
 		this.model = model;
 		model.onLoaded();
-		Debug.msg("dataDerivative: " + model.dataDerivative.toString());
 	}
 
 	//-----------------------------------------------------------------------

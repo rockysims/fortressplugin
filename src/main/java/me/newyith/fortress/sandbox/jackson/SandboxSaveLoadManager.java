@@ -15,7 +15,7 @@ public class SandboxSaveLoadManager {
 	private ObjectMapper mapper = new ObjectMapper();
 
 	public SandboxSaveLoadManager(FortressPlugin plugin) {
-		dataFile = new File(plugin.getDataFolder(), "data.json");
+		dataFile = new File(plugin.getDataFolder(), "sandbox.json");
 		mapper.setVisibilityChecker(mapper.getSerializationConfig().getDefaultVisibilityChecker()
 				.withFieldVisibility(JsonAutoDetect.Visibility.ANY)
 				.withGetterVisibility(JsonAutoDetect.Visibility.NONE)

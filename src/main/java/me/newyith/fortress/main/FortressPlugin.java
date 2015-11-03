@@ -23,7 +23,7 @@ public class FortressPlugin extends JavaPlugin {
 	private static final double saveDelayMs = 60*1000;
 	private static int saveWaitTicks = 0;
 
-	/*
+	//*
 	private static SaveLoadManager saveLoadManager;
 	/*/
 	private static SandboxSaveLoadManager sandboxSaveLoadManager;
@@ -56,7 +56,7 @@ public class FortressPlugin extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		loadConfig();
-		/*
+		//*
 		saveLoadManager = new SaveLoadManager(this);
 		saveLoadManager.load();
 		/*/
@@ -77,7 +77,7 @@ public class FortressPlugin extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		/*
+		//*
 		saveLoadManager.save();
 		/*/
 		sandboxSaveLoadManager.save();
@@ -227,8 +227,9 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
-//TODO: finish GeneratorRuneSet and write PointSet then abstract overlap into ModelableSet
 //TODO: get runes (without core) working again
+//	write GeneratorRune then test save/load feature
+//	get rune destroyed detection working again
 //TODO: finish getting /fort stuck working again
 
 

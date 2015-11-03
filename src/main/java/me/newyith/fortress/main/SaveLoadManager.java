@@ -27,7 +27,7 @@ public class SaveLoadManager {
 //		data.put("FortressesManager", FortressesManager.getInstance());
 
 
-		/*
+		//*
 		//save FortressesManager
 		data.put("FortressesManager", FortressesManager.getInstance());
 		/*/
@@ -39,24 +39,27 @@ public class SaveLoadManager {
 	}
 
 	private void loadFromMap(Map<String, Object> data) {
-//		Object obj = data.get("FortressesManager");
-//		if (obj == null) {
-//			FortressesManager.setInstance(new FortressesManager());
-//		} else {
-//			FortressesManager fortressesManager = mapper.convertValue(obj, FortressesManager.class);
-//			FortressesManager.setInstance(fortressesManager);
-//		}
+		//*
 
-		/*
 		//load FortressesManager
+
 		Object obj = data.get("FortressesManager");
 		if (obj == null) {
 			FortressesManager.setInstance(new FortressesManager());
-		} else if (obj instanceof FortressesManager) {
-			FortressesManager.setInstance((FortressesManager) obj);
 		} else {
-			Debug.error("Failed to load FortressesManager because obj is not instanceof FortressesManager.Model");
+			FortressesManager fortressesManager = mapper.convertValue(obj, FortressesManager.class);
+			FortressesManager.setInstance(fortressesManager);
 		}
+
+//		Object obj = data.get("FortressesManager");
+//		if (obj == null) {
+//			FortressesManager.setInstance(new FortressesManager());
+//		} else if (obj instanceof FortressesManager) {
+//			FortressesManager.setInstance((FortressesManager) obj);
+//		} else {
+//			Debug.error("Failed to load FortressesManager because obj is not instanceof FortressesManager.Model");
+//		}
+
 		/*/
 		//loading sandbox
 		Object obj = data.get("TempExample");
