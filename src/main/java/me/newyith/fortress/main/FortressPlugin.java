@@ -64,8 +64,8 @@ public class FortressPlugin extends JavaPlugin {
 		sandboxSaveLoadManager.load();
 		//*/
 
-		//EventListener.onEnable(this);
-		//TickTimer.onEnable(this);
+		EventListener.onEnable(this);
+		TickTimer.onEnable(this);
 //		ManualCraftManager.onEnable(this);
 //		PearlGlitchFix.onEnable(this);
 
@@ -233,7 +233,13 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: finish getting /fort stuck working again
 
 
+//TODO: add particles manager to a core (was in rune)
 
+//TODO: maybe rename cores:
+//BaseCore
+//AwareCore (claims and insideOutside)
+//FullCore (wall particles and any other eye candy)
+//GeneratorCore (originLayer and any convenience methods needed by GeneratorRune)
 
 
 

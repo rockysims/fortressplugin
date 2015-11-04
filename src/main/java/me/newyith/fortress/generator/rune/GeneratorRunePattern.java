@@ -17,13 +17,13 @@ public class GeneratorRunePattern {
 		private transient Set<Point> pointsInPattern = null;
 		private transient World world = null;
 		private String worldName = "";
-		public Point anchorPoint = null;
-		public Point pausePoint = null;
-		public Point runningPoint = null;
-		public Point fuelPoint = null;
-		public Point signPoint = null;
-		public Point chestPoint = null;
-		public Point wirePoint = null;
+		private Point anchorPoint = null;
+		private Point pausePoint = null;
+		private Point runningPoint = null;
+		private Point fuelPoint = null;
+		private Point signPoint = null;
+		private Point chestPoint = null;
+		private Point wirePoint = null;
 
 		public Model(World world, Point s, Point w, Point a, Point c, Point p, Point r, Point f) {
 			this.worldName = world.getName();
@@ -72,12 +72,36 @@ public class GeneratorRunePattern {
 		return model.pointsInPattern;
 	}
 
-	public Point getAnchor() {
+	public Point getAnchorPoint() {
 		return model.anchorPoint;
 	}
 
-	public boolean contains(Block block) {
-		return model.pointsInPattern.contains(new Point(block));
+	public Point getSignPoint() {
+		return model.signPoint;
+	}
+
+	public Point getPausePoint() {
+		return model.pausePoint;
+	}
+
+	public Point getRunningPoint() {
+		return model.runningPoint;
+	}
+
+	public Point getFuelPoint() {
+		return model.fuelPoint;
+	}
+
+	public Point getWirePoint() {
+		return model.wirePoint;
+	}
+
+	public Point getChestPoint() {
+		return model.chestPoint;
+	}
+
+	public boolean contains(Point p) {
+		return model.pointsInPattern.contains(p);
 	}
 
 	public static GeneratorRunePattern tryReadyPattern(Block signBlock) {

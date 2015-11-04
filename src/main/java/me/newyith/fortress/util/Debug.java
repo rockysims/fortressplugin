@@ -15,7 +15,7 @@ public class Debug {
 	}
 
 	public static void error(String s) {
-		Bukkit.broadcastMessage(ChatColor.RED + s);
+		Bukkit.broadcastMessage(ChatColor.RED + "Error: " + s);
 	}
 
 	public static void particleAt(Point point, ParticleEffect particleEffect) {

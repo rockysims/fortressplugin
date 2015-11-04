@@ -35,7 +35,7 @@ public class GeneratorRunesManager {
 		for (GeneratorRune rune : runes) {
 			//set inRange
 			boolean inRange = true;
-			Point p = rune.getAnchor();
+			Point p = rune.getAnchorPoint();
 			inRange = inRange && Math.abs(p.x - x) <= range;
 			inRange = inRange && Math.abs(p.y - y) <= range;
 			inRange = inRange && Math.abs(p.z - z) <= range;

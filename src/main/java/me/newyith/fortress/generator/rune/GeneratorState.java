@@ -1,9 +1,8 @@
 package me.newyith.fortress.generator.rune;
 
-import me.newyith.fortress.util.Point;
 import me.newyith.fortressold.util.Debug;
 
-enum GeneratorState {
+public enum GeneratorState {
 	NULL,
 	RUNNING,
 	PAUSED,

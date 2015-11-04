@@ -23,7 +23,7 @@ public class GeneratorRune {
 
 	// - Getters -
 
-	public Point getAnchor() {
+	public Point getAnchorPoint() {
 		return pattern.anchorPoint;
 	}
 

@@ -1,42 +1,52 @@
 package me.newyith.fortress.generator.rune;
 
-//TODO: maybe rename cores:
-//BaseCore
-//AwareCore (claims and insideOutside)
-//FullCore (wall particles and any other eye candy)
-//GeneratorCore (originLayer and any convenience methods needed by GeneratorRune)
-//TODO: put particles handling into a core
-
+import me.newyith.fortress.event.TickTimer;
 import me.newyith.fortress.generator.core.GeneratorCore;
-import me.newyith.fortress.util.model.BaseModel;
+import me.newyith.fortress.main.FortressPlugin;
+import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Cuboid;
+import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Chest;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
+//fully written again (except particles manager which should go in a core)
 public class GeneratorRune {
 	private static class Model {
-		private String datum = "datum";
-		private transient Set<String> dataDerivative = null;
+		private GeneratorRunePattern pattern = null;
+		private GeneratorCore core = null;
+		private boolean powered = false;
+		private int fuelTicksRemaining = 0;
+		private GeneratorState state = GeneratorState.NULL;
 
-		public Model() {
+		private transient List<Long> powerToggleTimeStamps = null;
+
+		public Model(GeneratorRunePattern pattern, GeneratorCore core, GeneratorState state, int fuelTicksRemaining, boolean powered) {
+			this.pattern = pattern;
+			this.core = core;
+			this.state = state;
+			this.fuelTicksRemaining = fuelTicksRemaining;
+			this.powered = powered;
 			onLoaded();
 		}
 
 		private void onLoaded() {
 			//rebuild transient fields
-			dataDerivative = new HashSet<>();
-			for (int i = 0; i < 3; i++) {
-				dataDerivative.add(datum + i);
-			}
+			powerToggleTimeStamps = new ArrayList<>();
 		}
 	}
-	private Model model = new Model();
+	private Model model = null;
 
 	@JsonProperty("model")
 	private void setModel(Model model) {
@@ -46,90 +56,54 @@ public class GeneratorRune {
 
 	//-----------------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-
-
-	public void onCreated(Player player) {
-		//TODO: handle
-	}
-
-	public static class Model extends BaseModel {
-		public GeneratorRunePattern.Model pattern = null;
-		public GeneratorCore.Model core = null;
-		public int state = GeneratorState.toInt(GeneratorState.NULL);
-		public int fuelTicksRemaining = 0;
-		public boolean powered = false;
-
-
-		public Model(GeneratorRunePattern pattern,
-					 GeneratorCore core,
-					 GeneratorState state,
-					 int fuelTicksRemaining,
-					 boolean powered) {
-			this.pattern = pattern.getModel();
-			this.core = core.getModel();
-			this.state = GeneratorState.toInt(state);
-			this.fuelTicksRemaining = fuelTicksRemaining;
-			this.powered = powered;
-		}
-	}
-	private Model model;
-	private GeneratorRunePattern pattern;
-	private GeneratorCore core;
-	private GeneratorState state;
-
-	public GeneratorRune(Model model) {
-		this.model = model;
-		this.pattern = new GeneratorRunePattern(model.pattern);
-		this.core = new GeneratorCore(model.core);
-		this.state = GeneratorState.fromInt(model.state);
-	}
-
-	public Model getModel() {
-		return this.model;
-	}
-
-	//-----------------------------------------------------------------------
-
 	public GeneratorRune(GeneratorRunePattern pattern) {
-		GeneratorCore core = new GeneratorCore(pattern.getAnchor());
+		GeneratorCore core = new GeneratorCore(pattern.getAnchorPoint());
 		GeneratorState state = GeneratorState.NULL;
 		int fuelTicksRemaining = 0;
 		boolean powered = false;
-
 		model = new Model(pattern, core, state, fuelTicksRemaining, powered);
-		this.pattern = pattern;
-		this.core = core;
-		this.state = state;
 	}
 
+	// - Getters -
 
 	public GeneratorRunePattern getPattern() {
-		return pattern;
+		return model.pattern;
+	}
+
+	public boolean isRunning() {
+		return model.state == GeneratorState.RUNNING;
+	}
+
+	private boolean isPaused() {
+		return model.state == GeneratorState.PAUSED;
+	}
+
+	private boolean isPowered() {
+		return model.powered;
+	}
+
+	public Set<Point> getPoints() {
+		return model.pattern.getPoints();
+	}
+
+	public GeneratorCore getGeneratorCore() {
+		return model.core;
+	}
+
+	public Set<Point> getLayerOutsideFortress() {
+		return model.core.getLayerOutsideFortress();
 	}
 
 	public Set<Point> getGeneratedPoints() {
-		return core.getGeneratedPoints();
+		return model.core.getGeneratedPoints();
 	}
 
 	public Cuboid getFortressCuboid() {
-
-		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-		Point anchor = pattern.getAnchor();
+		Point anchor = model.pattern.getAnchorPoint();
 		Vector min = new Point(anchor).toVector();
 		Vector max = new Point(anchor).toVector();
 
-		Iterator<Point> it = getGeneratedPoints().iterator();
-		while (it.hasNext()) {
-			Point p = it.next();
+		for (Point p : getGeneratedPoints()) {
 			min.setX(Math.min(min.getX(), p.x()));
 			min.setY(Math.min(min.getY(), p.y()));
 			min.setZ(Math.min(min.getZ(), p.z()));
@@ -142,246 +116,120 @@ public class GeneratorRune {
 		Point minPoint = new Point(min).add(-1, -1, -1);
 		Point maxPoint = new Point(max).add(1, 1, 1);
 
-		return new Cuboid(minPoint, maxPoint, pattern.getWorld());
-	}
-
-
-
-	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/*
-	//saved
-//	private GeneratorRunePattern pattern = null; //set by constructor
-//	private boolean powered = false;
-//	private int fuelTicksRemaining = 0;
-//	private FgState state = FgState.NULL;
-
-	private GeneratorCore core = null; //set by constructor
-
-	//not saved
-	private FortressGeneratorParticlesManager particles = null; //set by constructor
-	private List<Long> powerToggleTimeStamps = new ArrayList<Long>();
-
-	public void saveTo(AbstractMemory<?> m) {
-		m.save("pattern", pattern);
-		Debug.start("save rune core");
-		m.save("core", core);
-		Debug.end("save rune core");
-		m.save("powered", powered);
-		m.save("fuelTicksRemaining", fuelTicksRemaining);
-		m.save("state", state.ordinal());
-	}
-
-	public static FortressGeneratorRune loadFrom(AbstractMemory<?> m) {
-		FortressGeneratorRunePattern pattern = m.loadFortressGeneratorRunePattern("pattern");
-		GeneratorCore core = m.loadGeneratorCore("core");
-		boolean powered = m.loadBoolean("powered");
-		int fuelTicksRemaining= m.loadInt("fuelTicksRemaining");
-		FgState fgState = FgState.fromInt(m.loadInt("state"));
-		return new FortressGeneratorRune(pattern, core, powered, fuelTicksRemaining, fgState);
-	}
-
-	private FortressGeneratorRune(FortressGeneratorRunePattern runePattern, GeneratorCore core, boolean powered, int fuelTicksRemaining, FgState state) {
-		this.pattern = runePattern;
-		this.core = core;
-		this.powered = powered;
-		this.fuelTicksRemaining = fuelTicksRemaining;
-		this.state = state;
-		this.particles = new FortressGeneratorParticlesManager(this);
-	}
-
-	public void secondStageLoad() {
-		core.secondStageLoad();
-*/
-		/* rebuild version (currently saving it instead)
-		core.updateInsideOutside(); //updateInsideOutside() needs to be called before onGeneratedChanged() so layerOutside is full
-		//*/
-/*
-		onGeneratedChanged(); //update which particles should be displayed (requires layerOutside already be filled)
-	}
-
-	//------------------------------------------------------------------------------------------------------------------
-//
-//	public FortressGeneratorRune(FortressGeneratorRunePattern runePattern) {
-//		this.pattern = runePattern;
-//		this.particles = new FortressGeneratorParticlesManager(this);
-//		this.core = new GeneratorCore(this.pattern.anchorPoint);
-//	}
-
-	// - Getters -
-
-	public FortressGeneratorRunePattern getPattern() {
-		return this.pattern;
-	}
-
-	public boolean isRunning() {
-		return this.state == FgState.RUNNING;
-	}
-
-	private boolean isPaused() {
-		return this.state == FgState.PAUSED;
-	}
-
-	private boolean isPowered() {
-		return this.powered;
-	}
-
-	public Set<Point> getPoints() {
-		//not if new HashSet part is really needed (don't remember why I added it)
-		return new HashSet<>(this.getPattern().getPoints());
-	}
-
-	public GeneratorCore getGeneratorCore() {
-		return this.core;
-	}
-
-	public Set<Point> getLayerOutsideFortress() {
-		return this.core.getLayerOutsideFortress();
-	}
-
-	public Set<Point> getGeneratedPoints() {
-		return this.core.getGeneratedPoints();
-	}
-
-	public Cuboid getFortressCuboid() {
-		Point min = new Point(pattern.anchorPoint);
-		Point max = new Point(pattern.anchorPoint);
-
-		getGeneratedPoints().stream().forEach(p -> {
-			min.x = Math.min(min.x, p.x);
-			min.y = Math.min(min.y, p.y);
-			min.z = Math.min(min.z, p.z);
-			max.x = Math.max(max.x, p.x);
-			max.y = Math.max(max.y, p.y);
-			max.z = Math.max(max.z, p.z);
-		});
-
-		return new Cuboid(min, max);
+		return new Cuboid(minPoint, maxPoint, model.pattern.getWorld());
 	}
 
 	// - Events -
 
 	public void onTick() {
 		tickFuel();
-		particles.tick();
-		core.tick();
+		model.core.tick();
 	}
 
 	public void onCreated(Player player) {
-		this.moveBlockTo(Material.GOLD_BLOCK, pattern.runningPoint);
-		this.moveBlockTo(Material.DIAMOND_BLOCK, pattern.anchorPoint);
+		moveBlockTo(Material.GOLD_BLOCK, model.pattern.getRunningPoint());
+		moveBlockTo(Material.DIAMOND_BLOCK, model.pattern.getAnchorPoint());
 
-		//initialize this.powered
-		Point wirePoint = this.pattern.wirePoint;
+		//initialize model.powered
+		Point wirePoint = model.pattern.getWirePoint();
 		if (wirePoint != null) {
-			this.powered = wirePoint.getBlock().getBlockPower() > 0;
+			model.powered = wirePoint.getBlock(model.pattern.getWorld()).getBlockPower() > 0;
 		}
 
-		this.updateState();
+		updateState();
 
-		boolean placed = this.core.onPlaced(player);
+		boolean placed = model.core.onPlaced(player);
 		if (!placed) {
-			this.onCoreBroken();
+			FortressesManager.breakRune(this);
 		}
 	}
 
 	public void onBroken() {
-		this.moveBlockTo(Material.DIAMOND_BLOCK, pattern.runningPoint);
-		this.moveBlockTo(Material.GOLD_BLOCK, pattern.anchorPoint);
-		this.setSignText("Broken", "", "");
+		moveBlockTo(Material.DIAMOND_BLOCK, model.pattern.getRunningPoint());
+		moveBlockTo(Material.GOLD_BLOCK, model.pattern.getAnchorPoint());
+		setSignText("Broken", "", "");
 
-		this.core.onBroken();
-	}
-
-	public void onCoreBroken() {
-		FortressGeneratorRunesManager.doBreakRune(this);
+		model.core.onBroken();
 	}
 
 	public void setPowered(boolean powered) {
-		if (this.powered != powered) {
+		if (model.powered != powered) {
 			if (countRecentPowerToggles() > 10) {
-				this.onCoreBroken();
+				FortressesManager.breakRune(this);
 			} else {
-				powerToggleTimeStamps.add(System.currentTimeMillis()); //used by countRecentPowerToggles()
-				this.powered = powered;
-				this.updateState();
+				model.powerToggleTimeStamps.add(System.currentTimeMillis()); //used by countRecentPowerToggles()
+				model.powered = powered;
+				updateState();
 			}
 		}
-	}
-
-	public void onGeneratedChanged() { //called by GeneratorCoreAnimator
-		particles.onGeneratedChanges();
 	}
 
 	// - Handlers -
 
 	private void tickFuel() {
-		if (fuelTicksRemaining > 0 && isRunning()) {
-			fuelTicksRemaining--;
+		if (model.fuelTicksRemaining > 0 && isRunning()) {
+			model.fuelTicksRemaining--;
 		}
 
-		if (fuelTicksRemaining <= 0) {
+		if (model.fuelTicksRemaining <= 0) {
 			tryReplenishFuel();
-			this.updateState();
+			updateState();
 		}
 
 		//always update sign in case amount of fuel in chest has changed
-		updateFuelRemainingDisplay(fuelTicksRemaining * TickTimer.msPerTick);
+		updateFuelRemainingDisplay(model.fuelTicksRemaining * TickTimer.msPerTick);
 	}
 	private void tryReplenishFuel() {
-		Chest chest = this.getChest();
+		Chest chest = getChest();
 		if (chest != null) {
 			Inventory inv = chest.getInventory();
 			if (inv.contains(Material.GLOWSTONE_DUST)) {
 				inv.removeItem(new ItemStack(Material.GLOWSTONE_DUST, 1));
 				chest.update(true);
 
-				fuelTicksRemaining = FortressPlugin.config_glowstoneDustBurnTimeMs / TickTimer.msPerTick;
-				updateFuelRemainingDisplay(fuelTicksRemaining * TickTimer.msPerTick);
+				model.fuelTicksRemaining = FortressPlugin.config_glowstoneDustBurnTimeMs / TickTimer.msPerTick;
+				updateFuelRemainingDisplay(model.fuelTicksRemaining * TickTimer.msPerTick);
 			}
 		}
 	}
 
 	private void updateState() {
-		if (fuelTicksRemaining == 0) {
+		if (model.fuelTicksRemaining == 0) {
 			tryReplenishFuel();
 		}
 
-		if (fuelTicksRemaining > 0) {
-			if (this.isPowered()) {
-				this.setState(FgState.PAUSED);
+		if (model.fuelTicksRemaining > 0) {
+			if (isPowered()) {
+				setState(GeneratorState.PAUSED);
 			} else {
-				this.setState(FgState.RUNNING);
+				setState(GeneratorState.RUNNING);
 			}
 		} else {
-			this.setState(FgState.NEEDS_FUEL);
+			setState(GeneratorState.NEEDS_FUEL);
 		}
 	}
 
-	private void setState(FgState state) {
-		if (this.state != state) {
+	private void setState(GeneratorState state) {
+		if (model.state != state) {
 			switch (state) {
 				case RUNNING:
-					this.setSignText("Running", "", null);
-					this.moveBlockTo(Material.GOLD_BLOCK, this.getPattern().runningPoint);
+					setSignText("Running", "", null);
+					moveBlockTo(Material.GOLD_BLOCK, model.pattern.getRunningPoint());
 					break;
 				case PAUSED:
-					this.setSignText("Paused", "", null);
-					this.moveBlockTo(Material.GOLD_BLOCK, this.getPattern().pausePoint);
+					setSignText("Paused", "", null);
+					moveBlockTo(Material.GOLD_BLOCK, model.pattern.getPausePoint());
 					break;
 				case NEEDS_FUEL:
-					this.setSignText("Needs Fuel", "(glowstone dust)", "");
-					this.moveBlockTo(Material.GOLD_BLOCK, this.getPattern().fuelPoint);
+					setSignText("Needs Fuel", "(glowstone dust)", "");
+					moveBlockTo(Material.GOLD_BLOCK, model.pattern.getFuelPoint());
 					break;
 				default:
 					Debug.error("FortressGeneratorRune setState method couldn't find a case matching FgState: " + state);
 			}
 
-			this.state = state;
-			if (this.core != null) {
-				this.core.onStateChanged(state);
-			} else {
-				Debug.error("FGRune setState() core == null");
-			}
+			model.state = state;
+			model.core.onStateChanged(state);
 		}
 	}
 
@@ -389,7 +237,7 @@ public class GeneratorRune {
 
 	public int countFuelItemsRemaining() { //TODO: time this and make sure its very fast (called several times a second)
 		int count = 0;
-		Chest chest = this.getChest();
+		Chest chest = getChest();
 		if (chest != null) {
 			Inventory inv = chest.getInventory();
 			ItemStack[] items = inv.getContents();
@@ -403,9 +251,9 @@ public class GeneratorRune {
 	}
 
 	private Chest getChest() {
-		Point chestPoint = this.pattern.chestPoint;
+		Point chestPoint = model.pattern.getChestPoint();
 		if (chestPoint != null) {
-			Block chestBlock = chestPoint.getBlock();
+			Block chestBlock = chestPoint.getBlock(model.pattern.getWorld());
 
 			if (chestBlock.getState() instanceof Chest) {
 				Chest chest = (Chest)chestBlock.getState();
@@ -416,7 +264,7 @@ public class GeneratorRune {
 	}
 
 	private void updateFuelRemainingDisplay(long ms) {
-		int glowstoneDustInChest = this.countFuelItemsRemaining();
+		int glowstoneDustInChest = countFuelItemsRemaining();
 		ms += FortressPlugin.config_glowstoneDustBurnTimeMs * glowstoneDustInChest;
 
 		long s = ms / 1000;
@@ -439,13 +287,13 @@ public class GeneratorRune {
 		if (s > 0) {
 			str.append(s + "s");
 		}
-		this.setSignText(null, null, str.toString());
+		setSignText(null, null, str.toString());
 	}
 
 	private boolean setSignText(String line1, String line2, String line3) {
-		Point signPoint = this.pattern.signPoint;
+		Point signPoint = model.pattern.getSignPoint();
 		if (signPoint != null) {
-			Block signBlock = signPoint.getBlock();
+			Block signBlock = signPoint.getBlock(model.pattern.getWorld());
 			if (signBlock != null) {
 				BlockState blockState = signBlock.getState();
 				if (blockState instanceof Sign) {
@@ -475,26 +323,27 @@ public class GeneratorRune {
 	private void moveBlockTo(Material material, Point targetPoint) {
 		Point materialPoint = null;
 		ArrayList<Point> points = new ArrayList<>();
-		points.add(pattern.anchorPoint);
-		points.add(pattern.runningPoint);
-		points.add(pattern.pausePoint);
-		points.add(pattern.fuelPoint);
+		points.add(model.pattern.getAnchorPoint());
+		points.add(model.pattern.getRunningPoint());
+		points.add(model.pattern.getPausePoint());
+		points.add(model.pattern.getFuelPoint());
 		for (Point p : points) {
-			if (p.matches(material)) {
+			if (p.is(material, model.pattern.getWorld())) {
 				materialPoint = p;
 			}
 		}
 
 		if (materialPoint != null) {
-			this.swapBlocks(materialPoint, targetPoint);
+			swapBlocks(materialPoint, targetPoint);
 		}
 	}
 
 	private void swapBlocks(Point a, Point b) {
-		Material aMat = a.getBlock().getType();
-		Material bMat = b.getBlock().getType();
-		a.getBlock().setType(bMat);
-		b.getBlock().setType(aMat);
+		World world = model.pattern.getWorld();
+		Material aMat = a.getBlock(world).getType();
+		Material bMat = b.getBlock(world).getType();
+		a.getBlock(world).setType(bMat);
+		b.getBlock(world).setType(aMat);
 	}
 
 	private int countRecentPowerToggles() {
@@ -502,12 +351,13 @@ public class GeneratorRune {
 		long now = System.currentTimeMillis();
 		int stampLifetimeMs = 5*1000;
 		int count = 0;
-		for (Iterator<Long> itr = powerToggleTimeStamps.iterator(); itr.hasNext(); ) {
-			Long stamp = itr.next();
+		Iterator<Long> it = model.powerToggleTimeStamps.iterator();
+		while (it.hasNext()) {
+			Long stamp = it.next();
 			if (now - stamp < stampLifetimeMs) {
 				count++;
 			} else {
-				itr.remove();
+				it.remove();
 			}
 		}
 
@@ -518,9 +368,9 @@ public class GeneratorRune {
 	public boolean equals(Object ob) {
 		boolean match = false;
 
-		if (ob instanceof FortressGeneratorRune) {
-			FortressGeneratorRune rune = (FortressGeneratorRune) ob;
-			match = this.pattern.anchorPoint == rune.pattern.anchorPoint;
+		if (ob instanceof GeneratorRune) {
+			GeneratorRune rune = (GeneratorRune) ob;
+			match = model.pattern.getAnchorPoint() == rune.getPattern().getAnchorPoint();
 		}
 
 		return match;
@@ -528,7 +378,6 @@ public class GeneratorRune {
 
 	@Override
 	public int hashCode() {
-		return this.pattern.anchorPoint.hashCode();
+		return model.pattern.getAnchorPoint().hashCode();
 	}
-*/
 }
