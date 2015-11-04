@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.*;
@@ -26,13 +27,18 @@ public class GeneratorRune {
 	private static class Model {
 		private GeneratorRunePattern pattern = null;
 		private GeneratorCore core = null;
-		private boolean powered = false;
 		private int fuelTicksRemaining = 0;
+		private boolean powered = false;
 		private GeneratorState state = GeneratorState.NULL;
 
 		private transient List<Long> powerToggleTimeStamps = null;
 
-		public Model(GeneratorRunePattern pattern, GeneratorCore core, GeneratorState state, int fuelTicksRemaining, boolean powered) {
+		@JsonCreator
+		public Model(@JsonProperty("pattern") GeneratorRunePattern pattern,
+					 @JsonProperty("core") GeneratorCore core,
+					 @JsonProperty("state") GeneratorState state,
+					 @JsonProperty("fuelTicksRemaining") int fuelTicksRemaining,
+					 @JsonProperty("powered") boolean powered) {
 			this.pattern = pattern;
 			this.core = core;
 			this.state = state;
@@ -47,12 +53,6 @@ public class GeneratorRune {
 		}
 	}
 	private Model model = null;
-
-	@JsonProperty("model")
-	private void setModel(Model model) {
-		this.model = model;
-		model.onLoaded();
-	}
 
 	//-----------------------------------------------------------------------
 

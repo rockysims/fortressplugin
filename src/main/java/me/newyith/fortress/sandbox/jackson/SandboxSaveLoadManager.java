@@ -9,6 +9,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class SandboxSaveLoadManager {
 	private File dataFile;
@@ -25,17 +26,21 @@ public class SandboxSaveLoadManager {
 
 	private void saveToMap(Map<String, Object> data) {
 		SandboxThingToSave thing = SandboxThingToSave.getInstance();
+//		thing.setDatum(String.valueOf(new Random().nextInt()));
 		data.put("thing", thing);
+		thing.print("saved thing");
 	}
 
 	private void loadFromMap(Map<String, Object> data) {
 		Object obj = data.get("thing");
 		if (obj == null) {
-			SandboxThingToSave.setInstance(new SandboxThingToSave());
+			SandboxThingToSave thing = new SandboxThingToSave("loadObjNullDatum");
+			SandboxThingToSave.setInstance(thing);
 		} else {
 			Debug.msg("loadFromMap(). obj class name: " + obj.getClass().getName());
 			SandboxThingToSave thing = mapper.convertValue(obj, SandboxThingToSave.class);
 			SandboxThingToSave.setInstance(thing);
+			thing.print("loaded thing");
 		}
 	}
 

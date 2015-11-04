@@ -47,6 +47,7 @@ public class SaveLoadManager {
 		if (obj == null) {
 			FortressesManager.setInstance(new FortressesManager());
 		} else {
+			Debug.msg("load obj (FM) type: " + obj.getClass().getName());
 			FortressesManager fortressesManager = mapper.convertValue(obj, FortressesManager.class);
 			FortressesManager.setInstance(fortressesManager);
 		}

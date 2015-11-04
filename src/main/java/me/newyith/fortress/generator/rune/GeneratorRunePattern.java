@@ -38,6 +38,8 @@ public class GeneratorRunePattern {
 			onLoaded();
 		}
 
+		public Model() {} //dummy constructor for jackson
+
 		private void onLoaded() {
 			//rebuild transient fields
 			pointsInPattern = new HashSet<>();
@@ -62,6 +64,8 @@ public class GeneratorRunePattern {
 	public GeneratorRunePattern(World world, Point s, Point w, Point a, Point c, Point p, Point r, Point f) {
 		model = new Model(world, s, w, a, c, p, r, f);
 	}
+
+	public GeneratorRunePattern() {} //dummy constructor for jackson
 
 	//-----------------------------------------------------------------------
 

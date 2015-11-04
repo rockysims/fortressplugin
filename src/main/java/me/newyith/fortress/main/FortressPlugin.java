@@ -23,11 +23,8 @@ public class FortressPlugin extends JavaPlugin {
 	private static final double saveDelayMs = 60*1000;
 	private static int saveWaitTicks = 0;
 
-	//*
 	private static SaveLoadManager saveLoadManager;
-	/*/
 	private static SandboxSaveLoadManager sandboxSaveLoadManager;
-	//*/
 
 	public static int config_glowstoneDustBurnTimeMs = 1000 * 60 * 60;
 	public static int config_stuckDelayMs = 30 * 1000;
@@ -56,16 +53,16 @@ public class FortressPlugin extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		loadConfig();
-		//*
 		saveLoadManager = new SaveLoadManager(this);
-		saveLoadManager.load();
-		/*/
-		sandboxSaveLoadManager = new SandboxSaveLoadManager(this);
-		sandboxSaveLoadManager.load();
-		//*/
+//		saveLoadManager.load(); //TODO: uncomment out this line
 
-		EventListener.onEnable(this);
-		TickTimer.onEnable(this);
+		if (!releaseBuild) {
+			sandboxSaveLoadManager = new SandboxSaveLoadManager(this);
+			sandboxSaveLoadManager.load();
+		}
+
+//		EventListener.onEnable(this); //TODO: uncomment out this line
+//		TickTimer.onEnable(this); //TODO: uncomment out this line
 //		ManualCraftManager.onEnable(this);
 //		PearlGlitchFix.onEnable(this);
 
@@ -77,11 +74,10 @@ public class FortressPlugin extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		//*
-		saveLoadManager.save();
-		/*/
-		sandboxSaveLoadManager.save();
-		//*/
+//		saveLoadManager.save(); //TODO: uncomment out this line
+		if (!releaseBuild) {
+			sandboxSaveLoadManager.save();
+		}
 
 		sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
 		sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
@@ -226,6 +222,10 @@ public class FortressPlugin extends JavaPlugin {
 		}
 	}
 }
+
+//TODO: update saved classes to use new SandboxThingToSave pattern
+
+//TODO: work on Point (not fully written yet)
 
 //TODO: get runes (without core) working again
 //	write GeneratorRune then test save/load feature

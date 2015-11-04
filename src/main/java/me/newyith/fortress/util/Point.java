@@ -1,16 +1,55 @@
 package me.newyith.fortress.util;
 
-import me.newyith.fortress.util.model.BaseModel;
-import me.newyith.fortress.util.model.Modelable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
 
-public class Point implements Modelable {
+public class Point {
+//	private static class Model {
+//		private final double x;
+//		private final double y;
+//		private final double z;
+//
+//		@JsonCreator
+//		public Model(@JsonProperty("x") double x,
+//					 @JsonProperty("y") double y,
+//					 @JsonProperty("y") double z) {
+//			this.x = x;
+//			this.y = y;
+//			this.z = z;
+//			onLoaded();
+//		}
+//
+//		private void onLoaded() {
+//			//rebuild transient fields
+//		}
+//	}
+//	private Model model = new Model("datum");
+//
+//	public SandboxThingToSave() {} //dummy constructor for jackson
+//
+//	@JsonProperty("model")
+//	private void setModel(Model model) {
+//		this.model = model;
+//		model.onLoaded();
+//	}
+//
+//	//-----------------------------------------------------------------------
+//
+
+
+
+
+
+
+
+
 	private Model model;
-	public static class Model extends BaseModel {
+	public static class Model {
 		public final double x;
 		public final double y;
 		public final double z;
@@ -19,6 +58,12 @@ public class Point implements Modelable {
 			this.x = x;
 			this.y = y;
 			this.z = z;
+		}
+
+		public Model() { //dummy constructor for jackson
+			x = 0;
+			y = 0;
+			z = 0;
 		}
 	}
 
