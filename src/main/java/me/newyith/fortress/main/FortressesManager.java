@@ -20,6 +20,7 @@ import java.util.*;
 
 //TODO: consider combining protectedPoints and generatorRuneByProtectedPoint to save memory?
 
+//fully written again
 public class FortressesManager {
 	private static FortressesManager instance = null;
 	public static FortressesManager getInstance() {
@@ -232,8 +233,6 @@ public class FortressesManager {
 		}
 	}
 
-	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 	public static void onPlayerOpenCloseDoor(PlayerInteractEvent event) {
 		Block doorBlock = event.getClickedBlock();
 		Point doorPoint = new Point(doorBlock.getLocation());
@@ -323,7 +322,7 @@ public class FortressesManager {
 			onRuneMightHaveBeenBrokenBy(brokenBlock);
 		}
 	}
-	public static void onWaterBreaksRedstoneWireEvent(Block brokenBlock) {
+	public static void onEnvironmentBreaksRedstoneWireEvent(Block brokenBlock) {
 		onRuneMightHaveBeenBrokenBy(brokenBlock);
 	}
 	public static boolean onBlockPlaceEvent(Player player, Block placedBlock, Material replacedMaterial) {
@@ -357,7 +356,7 @@ public class FortressesManager {
 		}
 	}
 
-	public static boolean onPistonEvent(boolean isSticky, Point piston, Point target, ArrayList<Block> movedBlocks) {
+	public static boolean onPistonEvent(boolean isSticky, Point piston, Point target, Set<Block> movedBlocks) {
 		boolean cancel = false;
 
 		if (movedBlocks != null) {
@@ -409,6 +408,7 @@ public class FortressesManager {
 		Set<Point> patternPoints = rune.getPattern().getPoints();
 
 		rune.onBroken();
+		//breaking should naturally update: alteredPoints, protectedPoints, and generatorRuneByProtectedPoint
 
 		for (Point p : patternPoints) {
 			instance.model.generatorRuneByPoint.remove(p);

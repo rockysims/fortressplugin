@@ -2,18 +2,23 @@ package me.newyith.fortress.event;
 
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
+import me.newyith.fortress.util.Point;
+import me.newyith.fortress.util.Wall;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.block.*;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 
+import java.util.HashSet;
+import java.util.Set;
+
+//fully written again
 public class EventListener implements Listener {
-
 	public EventListener(FortressPlugin plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
@@ -23,8 +28,6 @@ public class EventListener implements Listener {
 	}
 
 	// - - - //
-
-	//*
 
 	//ignoreCancelled adds a virtual "if (event.isCancelled()) { return; }" to the method
 	@EventHandler(ignoreCancelled = true)
@@ -45,7 +48,7 @@ public class EventListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void onEnvironmentBreaksRedstoneWireEvent(BlockFromToEvent event) {
 		if(event.getToBlock().getType() == Material.REDSTONE_WIRE) {
-			FortressesManager.onWaterBreaksRedstoneWireEvent(event.getToBlock());
+			FortressesManager.onEnvironmentBreaksRedstoneWireEvent(event.getToBlock());
 		}
 	}
 
@@ -53,16 +56,7 @@ public class EventListener implements Listener {
 	public void onBlockRedstoneEvent(BlockRedstoneEvent event) {
 		FortressesManager.onBlockRedstoneEvent(event);
 	}
-	//*/
 
-
-
-
-
-
-
-
-/*
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockPlaceEvent(BlockPlaceEvent event) {
 		Player player = event.getPlayer();
@@ -76,16 +70,15 @@ public class EventListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockPistonExtendEvent(BlockPistonExtendEvent event) {
-		Point p = new Point(event.getBlock().getLocation());
+		Point p = new Point(event.getBlock());
 
 		BlockFace d = event.getDirection();
 		int x = d.getModX();
 		int y = d.getModY();
 		int z = d.getModZ();
-		Point t = new Point(p.world, p.x + x, p.y + y, p.z + z);
+		Point t = p.add(x, y, z);
 
-		ArrayList<Block> movedBlocks = new ArrayList<>(event.getBlocks());
-
+		Set<Block> movedBlocks = new HashSet<>(event.getBlocks());
 		boolean isSticky = event.isSticky();
 
 		boolean cancel = FortressesManager.onPistonEvent(isSticky, p, t, movedBlocks);
@@ -96,9 +89,9 @@ public class EventListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockPistonRetractEvent(BlockPistonRetractEvent event) {
-		Point p = new Point(event.getBlock().getLocation());
+		Point p = new Point(event.getBlock());
 		boolean isSticky = event.isSticky();
-		ArrayList<Block> movedBlocks = new ArrayList<>(event.getBlocks());
+		Set<Block> movedBlocks = new HashSet<>(event.getBlocks());
 
 		boolean cancel = FortressesManager.onPistonEvent(isSticky, p, null, movedBlocks);
 		if (cancel) {
@@ -122,5 +115,4 @@ public class EventListener implements Listener {
 			}
 		}
 	}
-//*/
 }

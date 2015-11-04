@@ -12,6 +12,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.HashSet;
 import java.util.Set;
 
+//fully written again
 public class GeneratorRunePattern {
 	private static class Model {
 		private transient Set<Point> pointsInPattern = null;

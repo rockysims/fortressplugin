@@ -5,6 +5,7 @@ import org.bukkit.World;
 
 import java.util.*;
 
+//fully written again
 public class Wall {
 	public enum ConnectedThreshold {
 		POINTS,
