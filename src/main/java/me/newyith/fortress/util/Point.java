@@ -8,6 +8,9 @@ import org.bukkit.util.Vector;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import java.text.DecimalFormat;
+
+//fully written again
 public class Point {
 	private static class Model {
 	public final double x;
@@ -102,7 +105,6 @@ public class Point {
 		return new Point(x, y, z);
 	}
 
-
 	public Point add(Point p) {
 		if(p != null) {
 			double x = x() + p.x();
@@ -127,6 +129,32 @@ public class Point {
 
 	public Block getBlock(World world) {
 		return world.getBlockAt(xInt(), yInt(), zInt());
+	}
+
+	public double distance(Point p) {
+		Vector v1 = this.toVector();
+		Vector v2 = p.toVector();
+		return v1.distance(v2);
+	}
+
+	@Override
+	public String toString() {
+		int x = xInt();
+		int y = yInt();
+		int z = zInt();
+
+		return x + ", " + y + ", " + z;
+	}
+
+	public String toStringDoubles() {
+		String format = "#0.00";
+		StringBuilder s = new StringBuilder();
+		s.append(new DecimalFormat(format).format(model.x));
+		s.append(", ");
+		s.append(new DecimalFormat(format).format(model.y));
+		s.append(", ");
+		s.append(new DecimalFormat(format).format(model.z));
+		return s.toString();
 	}
 
 	// - Overrides - //

@@ -223,11 +223,6 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
-//TODO: update saved classes to use new SandboxThingToSave pattern
-//	at least for "fully written again" classes (others can wait until needed)
-
-//TODO: work on Point (not fully written yet)
-
 //TODO: get runes (without core) working again
 //	write GeneratorRune then test save/load feature
 //	get rune destroyed detection working again
