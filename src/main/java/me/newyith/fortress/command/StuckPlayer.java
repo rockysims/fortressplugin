@@ -196,8 +196,8 @@ public class StuckPlayer {
 			int maxHeight = world.getMaxHeight();
 			for (int y = maxHeight-2; y >= 0; y--) {
 				p = new Point(p.xInt(), y, p.zInt());
-				if (!p.is(Material.AIR, world)) {
-					//first non air block
+				if (!Wall.isAiry(p, world)) {
+					//first non airy block
 					break;
 				}
 			}
