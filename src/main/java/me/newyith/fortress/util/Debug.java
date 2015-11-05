@@ -4,6 +4,7 @@ import me.newyith.fortress.util.particle.ParticleEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -100,4 +101,10 @@ public class Debug {
 		int durationNs = durations.get(key);
 		Debug.print("Timer '" + key + "' total duration: " + String.valueOf((durationNs / 1000) / 1000F) + "ms.");
 	}
+
+	public static void console(String s) {
+		ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
+		console.sendMessage(s);
+	}
+
 }

@@ -1,6 +1,9 @@
 package me.newyith.fortress.main;
 
 import me.newyith.fortress.util.Debug;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.command.ConsoleCommandSender;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.map.ObjectMapper;
 

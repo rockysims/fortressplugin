@@ -54,15 +54,15 @@ public class FortressPlugin extends JavaPlugin {
 	public void onEnable() {
 		loadConfig();
 		saveLoadManager = new SaveLoadManager(this);
-		saveLoadManager.load(); //TODO: uncomment out this line
+		saveLoadManager.load();
 
 		if (!releaseBuild) {
 			sandboxSaveLoadManager = new SandboxSaveLoadManager(this);
 //			sandboxSaveLoadManager.load();
 		}
 
-		EventListener.onEnable(this); //TODO: uncomment out this line
-		TickTimer.onEnable(this); //TODO: uncomment out this line
+		EventListener.onEnable(this);
+		TickTimer.onEnable(this);
 //		ManualCraftManager.onEnable(this);
 //		PearlGlitchFix.onEnable(this);
 
@@ -74,7 +74,7 @@ public class FortressPlugin extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		saveLoadManager.save(); //TODO: uncomment out this line
+		saveLoadManager.save();
 		if (!releaseBuild) {
 //			sandboxSaveLoadManager.save();
 		}
@@ -92,7 +92,7 @@ public class FortressPlugin extends JavaPlugin {
 
 	public static void onTick() {
 		if (saveWaitTicks == 0) {
-//			saveLoadManager.save(); //TODO: uncomment out this line
+			saveLoadManager.save();
 			saveWaitTicks = (int) (saveDelayMs / TickTimer.msPerTick);
 		} else {
 			saveWaitTicks--;
