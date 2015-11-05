@@ -176,7 +176,6 @@ public class GeneratorRunePattern {
 		return s.add(x, y, z);
 	}
 
-	@JsonIgnore
 	public boolean isValid() { //TODO: FortressesManager should call this during load and destroy invalid generators
 		boolean valid = true;
 		valid = valid && model.signPoint.is(Material.WALL_SIGN, model.world);

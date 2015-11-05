@@ -17,8 +17,9 @@ public class SaveLoadManager {
 		dataFile = new File(plugin.getDataFolder(), "data.json");
 		mapper.setVisibilityChecker(mapper.getSerializationConfig().getDefaultVisibilityChecker()
 				.withFieldVisibility(JsonAutoDetect.Visibility.ANY)
-				.withGetterVisibility(JsonAutoDetect.Visibility.NONE)
 				.withSetterVisibility(JsonAutoDetect.Visibility.NONE)
+				.withGetterVisibility(JsonAutoDetect.Visibility.NONE)
+				.withIsGetterVisibility(JsonAutoDetect.Visibility.NONE)
 				.withCreatorVisibility(JsonAutoDetect.Visibility.NONE));
 	}
 

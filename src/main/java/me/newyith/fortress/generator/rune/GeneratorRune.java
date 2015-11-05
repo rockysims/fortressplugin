@@ -73,8 +73,7 @@ public class GeneratorRune {
 		return model.pattern;
 	}
 
-	@JsonIgnore
-	public boolean isRunning() {
+	private boolean isRunning() {
 		return model.state == GeneratorState.RUNNING;
 	}
 
