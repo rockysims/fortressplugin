@@ -84,6 +84,16 @@ public class FortressesManager {
 		model = new Model(new HashSet<>());
 	}
 
+	public static void secondStageLoad() {
+		//break any invalid runes
+		Set<GeneratorRune> generatorRunesCopy = new HashSet<>(instance.model.generatorRunes);
+		for (GeneratorRune rune : generatorRunesCopy) {
+			if (!rune.getPattern().isValid()) {
+				breakRune(rune);
+			}
+		}
+	}
+
 	//-----------------------------------------------------------------------
 
 	// - Getters / Setters -

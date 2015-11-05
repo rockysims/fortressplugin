@@ -189,9 +189,9 @@ public class GeneratorRunePattern {
 		points.add(model.runningPoint);
 		points.add(model.fuelPoint);
 		for (Point p : points) {
-			if (model.pausePoint.is(Material.IRON_BLOCK, model.world)) {
+			if (p.is(Material.IRON_BLOCK, model.world)) {
 				ironCount++;
-			} else if (model.pausePoint.is(Material.GOLD_BLOCK, model.world)) {
+			} else if (p.is(Material.GOLD_BLOCK, model.world)) {
 				goldCount++;
 			}
 		}

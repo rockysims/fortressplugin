@@ -230,18 +230,14 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
-//TODO: finish getting /fort stuck working again
-
-
-//TODO: add particles manager to a core (was in rune)
-
 //TODO: maybe rename cores:
 //BaseCore
 //AwareCore (claims and insideOutside)
 //FullCore (wall particles and any other eye candy)
 //GeneratorCore (originLayer and any convenience methods needed by GeneratorRune)
 
-//TODO: FortressesManager should call pattern.isValid() during load and break invalid generators
+//TODO: add particles manager to a core (was in rune)
+
 
 
 

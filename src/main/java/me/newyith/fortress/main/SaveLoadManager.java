@@ -27,17 +27,12 @@ public class SaveLoadManager {
 	}
 
 	private void saveToMap(Map<String, Object> data) {
-//		data.put("FortressesManager", FortressesManager.getInstance());
-
-
 		//save FortressesManager
 		data.put("FortressesManager", FortressesManager.getInstance());
-		Debug.msg("Saved " + FortressesManager.getRuneCount() + " rune(s).");
+		Debug.msg("Saved " + FortressesManager.getRuneCount() + " rune(s)."); //TODO: delete this line
 	}
 
 	private void loadFromMap(Map<String, Object> data) {
-		//*
-
 		//load FortressesManager
 		Object obj = data.get("FortressesManager");
 		if (obj == null) {
@@ -46,18 +41,9 @@ public class SaveLoadManager {
 			Debug.msg("load obj (FM) type: " + obj.getClass().getName());
 			FortressesManager fortressesManager = mapper.convertValue(obj, FortressesManager.class);
 			FortressesManager.setInstance(fortressesManager);
+			FortressesManager.secondStageLoad();
 		}
-		Debug.msg("Loaded " + FortressesManager.getRuneCount() + " rune(s).");
-
-//		Object obj = data.get("FortressesManager");
-//		if (obj == null) {
-//			FortressesManager.setInstance(new FortressesManager());
-//		} else if (obj instanceof FortressesManager) {
-//			FortressesManager.setInstance((FortressesManager) obj);
-//		} else {
-//			Debug.error("Failed to load FortressesManager because obj is not instanceof FortressesManager.Model");
-//		}
-
+		Debug.msg("Loaded " + FortressesManager.getRuneCount() + " rune(s)."); //TODO: delete this line
 	}
 
 	public void save() {
@@ -93,7 +79,6 @@ public class SaveLoadManager {
 		if (!FortressPlugin.releaseBuild) {
 			//do mock save so needed classes are loaded (new classes can't be loaded after I rebuild jar)
 			try {
-				Debug.msg("dummy saving");
 				saveToBuffer(new ByteArrayOutputStream());
 			} catch (IOException e) {
 				e.printStackTrace();
