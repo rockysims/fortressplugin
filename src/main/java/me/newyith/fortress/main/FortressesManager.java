@@ -98,8 +98,16 @@ public class FortressesManager {
 
 	//during /fort stuck, we need all generators player might be inside so we can search by fortress cuboids
 	public static Set<GeneratorRune> getGeneratorRunesNear(Point center) {
-		//TODO (later): return generator runes where cuboid overlaps with center
-		return null;
+		Set<GeneratorRune> overlapRunes = new HashSet<>();
+
+		//overlapRunes = runes where fortress cuboid contains 'center' point
+		for (GeneratorRune rune : instance.model.generatorRunes) {
+			if (rune.getFortressCuboid().contains(center)) {
+				overlapRunes.add(rune);
+			}
+		}
+
+		return overlapRunes;
 	}
 
 	//during generation, we need all potentially conflicting generators (not just known ones) so search by range

@@ -121,6 +121,12 @@ public class FortressPlugin extends JavaPlugin {
 				if (sender instanceof Player) {
 					Debug.msg("executing test command...");
 
+					/*
+					Player player = (Player) sender;
+					Point p = new Point(player.getLocation());
+					Material mat = p.getBlock(player.getWorld()).getType();
+					Debug.msg(p + " is " + mat);
+					/*/
 					int distance = 40;
 					Player player = (Player)sender;
 					World world = player.getWorld();
@@ -138,6 +144,7 @@ public class FortressPlugin extends JavaPlugin {
 							}
 						}
 					}
+					//*/
 				}
 				commandHandled = true;
 			}
@@ -223,9 +230,6 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
-//TODO: get runes (without core) working again
-//	write GeneratorRune then test save/load feature
-//	get rune destroyed detection working again
 //TODO: finish getting /fort stuck working again
 
 

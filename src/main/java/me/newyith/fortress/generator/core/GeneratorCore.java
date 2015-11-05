@@ -36,7 +36,7 @@ public class GeneratorCore {
 
 	public Set<Point> getGeneratedPoints() {
 		Debug.msg("//TODO: write GeneratorCore.getGeneratedPoints()");
-		return null;
+		return new HashSet<>();
 	}
 
 	public Set<Point> getLayerOutsideFortress() {

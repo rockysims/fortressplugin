@@ -106,7 +106,10 @@ public class GeneratorRune {
 		Vector min = new Point(anchor).toVector();
 		Vector max = new Point(anchor).toVector();
 
-		for (Point p : getGeneratedPoints()) {
+		Set<Point> points = new HashSet<>();
+		points.addAll(model.pattern.getPoints());
+		points.addAll(getGeneratedPoints());
+		for (Point p : points) {
 			min.setX(Math.min(min.getX(), p.x()));
 			min.setY(Math.min(min.getY(), p.y()));
 			min.setZ(Math.min(min.getZ(), p.z()));

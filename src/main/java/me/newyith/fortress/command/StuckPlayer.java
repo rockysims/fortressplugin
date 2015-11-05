@@ -5,10 +5,10 @@ import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Cuboid;
 import me.newyith.fortress.util.Point;
+import me.newyith.fortress.util.Wall;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -192,13 +192,21 @@ public class StuckPlayer {
 		Point validDest = null;
 
 		if (p != null) {
-			Block block = world.getHighestBlockAt(p.xInt(), p.zInt());
+			//p = highest non air block at p.x, p.zkk
+			int maxHeight = world.getMaxHeight();
+			for (int y = maxHeight-2; y >= 0; y--) {
+				p = new Point(p.xInt(), y, p.zInt());
+				if (!p.is(Material.AIR, world)) {
+					//first non air block
+					break;
+				}
+			}
 
 			//check if valid teleport destination
-			if (block.getType().isSolid()) {
-				Point dest = new Point(block.getLocation()).add(0, 1, 0);
-				Point aboveDest = new Point(dest).add(0, 1, 0);
-				if (dest.is(Material.AIR, world) && aboveDest.is(Material.AIR, world)) {
+			if (p.getBlock(world).getType().isSolid()) {
+				Point dest = p.add(0, 1, 0);
+				Point aboveDest = dest.add(0, 1, 0);
+				if (Wall.isAiry(dest, world) && Wall.isAiry(aboveDest, world)) {
 					validDest = dest;
 				}
 			}

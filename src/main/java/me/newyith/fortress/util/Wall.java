@@ -54,6 +54,22 @@ public class Wall {
 		return points;
 	}
 
+	public static boolean isAiry(Point dest, World world) {
+		boolean airy = false;
+		Material mat = dest.getBlock(world).getType();
+		airy = airy || mat == Material.AIR;
+		airy = airy || mat == Material.LONG_GRASS;
+		airy = airy || mat == Material.RED_ROSE;
+		airy = airy || mat == Material.YELLOW_FLOWER;
+		airy = airy || mat == Material.DOUBLE_PLANT;
+		airy = airy || mat == Material.DEAD_BUSH;
+		airy = airy || mat == Material.SUGAR_CANE_BLOCK;
+		airy = airy || mat == Material.SAPLING;
+		airy = airy || mat == Material.CROPS;
+		airy = airy || mat == Material.POTATO;
+		return airy;
+	}
+
 	public static boolean isDoor(Material mat) {
 		boolean isDoor = false;
 		switch (mat) {
