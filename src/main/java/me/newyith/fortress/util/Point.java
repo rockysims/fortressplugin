@@ -9,93 +9,39 @@ import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class Point {
-//	private static class Model {
-//		private final double x;
-//		private final double y;
-//		private final double z;
-//
-//		@JsonCreator
-//		public Model(@JsonProperty("x") double x,
-//					 @JsonProperty("y") double y,
-//					 @JsonProperty("y") double z) {
-//			this.x = x;
-//			this.y = y;
-//			this.z = z;
-//			onLoaded();
-//		}
-//
-//		private void onLoaded() {
-//			//rebuild transient fields
-//		}
-//	}
-//	private Model model = new Model("datum");
-//
-//	public SandboxThingToSave() {} //dummy constructor for jackson
-//
-//	@JsonProperty("model")
-//	private void setModel(Model model) {
-//		this.model = model;
-//		model.onLoaded();
-//	}
-//
-//	//-----------------------------------------------------------------------
-//
+	private static class Model {
+	public final double x;
+	public final double y;
+	public final double z;
 
+	@JsonCreator
+	public Model(@JsonProperty("x") double x,
+				 @JsonProperty("y") double y,
+				 @JsonProperty("z") double z) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
 
-
-
-
-
-
-
-	private Model model;
-	public static class Model {
-		public final double x;
-		public final double y;
-		public final double z;
-
-		public Model(double x, double y, double z) {
-			this.x = x;
-			this.y = y;
-			this.z = z;
-		}
-
-		public Model() { //dummy constructor for jackson
-			x = 0;
-			y = 0;
-			z = 0;
-		}
+		//rebuild transient fields
 	}
+}
+	private Model model = null;
 
-	public Model getModel() {
-		return this.model;
-	}
-
-	public Point(Model model) {
+	@JsonCreator
+	public Point(@JsonProperty("model") Model model) {
 		this.model = model;
 	}
-
-	//-----------------------------------------------------------------------
-
-	// - Constructors - //
 
 	public Point(double x, double y, double z) {
 		model = new Model(x, y, z);
 	}
 
 	public Point(int x, int y, int z) {
-		this((double)x, (double)y, (double)z);
+		model = new Model(x, y, z);
 	}
 
 	public Point(Point p) {
-		model = p.getModel();
-	}
-
-	public Point(Location loc) {
-		double x = loc.getX();
-		double y = loc.getY();
-		double z = loc.getZ();
-		model = new Model(x, y, z);
+		model = new Model(p.x(), p.y(), p.z());
 	}
 
 	public Point(Vector vec) {
@@ -105,9 +51,18 @@ public class Point {
 		model = new Model(x, y, z);
 	}
 
+	public Point(Location loc) {
+		double x = loc.getX();
+		double y = loc.getY();
+		double z = loc.getZ();
+		model = new Model(x, y, z);
+	}
+
 	public Point(Block b) {
 		this(b.getLocation());
 	}
+
+	//-----------------------------------------------------------------------
 
 	// - Getters / Setters - //
 

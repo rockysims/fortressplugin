@@ -54,15 +54,15 @@ public class FortressPlugin extends JavaPlugin {
 	public void onEnable() {
 		loadConfig();
 		saveLoadManager = new SaveLoadManager(this);
-//		saveLoadManager.load(); //TODO: uncomment out this line
+		saveLoadManager.load(); //TODO: uncomment out this line
 
 		if (!releaseBuild) {
 			sandboxSaveLoadManager = new SandboxSaveLoadManager(this);
-			sandboxSaveLoadManager.load();
+//			sandboxSaveLoadManager.load();
 		}
 
-//		EventListener.onEnable(this); //TODO: uncomment out this line
-//		TickTimer.onEnable(this); //TODO: uncomment out this line
+		EventListener.onEnable(this); //TODO: uncomment out this line
+		TickTimer.onEnable(this); //TODO: uncomment out this line
 //		ManualCraftManager.onEnable(this);
 //		PearlGlitchFix.onEnable(this);
 
@@ -74,9 +74,9 @@ public class FortressPlugin extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-//		saveLoadManager.save(); //TODO: uncomment out this line
+		saveLoadManager.save(); //TODO: uncomment out this line
 		if (!releaseBuild) {
-			sandboxSaveLoadManager.save();
+//			sandboxSaveLoadManager.save();
 		}
 
 		sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
@@ -224,6 +224,7 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 //TODO: update saved classes to use new SandboxThingToSave pattern
+//	at least for "fully written again" classes (others can wait until needed)
 
 //TODO: work on Point (not fully written yet)
 
@@ -241,7 +242,7 @@ public class FortressPlugin extends JavaPlugin {
 //FullCore (wall particles and any other eye candy)
 //GeneratorCore (originLayer and any convenience methods needed by GeneratorRune)
 
-
+//TODO: FortressesManager should call pattern.isValid() during load and break invalid generators
 
 
 

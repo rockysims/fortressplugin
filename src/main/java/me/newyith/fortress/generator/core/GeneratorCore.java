@@ -2,48 +2,37 @@ package me.newyith.fortress.generator.core;
 
 import me.newyith.fortress.generator.rune.GeneratorState;
 import me.newyith.fortress.util.Debug;
-import me.newyith.fortress.util.model.BaseModel;
 import me.newyith.fortress.util.Point;
 import org.bukkit.entity.Player;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class GeneratorCore {
-	public static class Model extends BaseModel {
-		//anchor
-		private transient Point anchor = null;
-		private Point.Model anchorModel = null;
-		public Point getAnchor() {
-			if (anchor == null) {
-				anchor = new Point(anchorModel);
-			}
-			return anchor;
-		}
-		public void setAnchor(Point p) {
-			anchor = p;
-			anchorModel = anchor.getModel();
-		}
+	private static class Model {
+		private Point anchor = null;
 
-		public Model(Point anchor) {
-			setAnchor(anchor);
+		@JsonCreator
+		public Model(@JsonProperty("anchor") Point anchor) {
+			this.anchor = anchor;
+
+			//rebuild transient fields
 		}
 	}
-	private Model model;
+	private Model model = null;
 
-	public GeneratorCore(Model model) {
+	@JsonCreator
+	public GeneratorCore(@JsonProperty("model") Model model) {
 		this.model = model;
 	}
 
-	public Model getModel() {
-		return this.model;
+	public GeneratorCore(Point anchor) {
+		model = new Model(anchor);
 	}
 
 	//-----------------------------------------------------------------------
-
-	public GeneratorCore(Point anchor) {
-		this.model = new Model(anchor);
-	}
 
 	public Set<Point> getGeneratedPoints() {
 		Debug.msg("//TODO: write GeneratorCore.getGeneratedPoints()");

@@ -1,6 +1,5 @@
 package me.newyith.fortress.main;
 
-import me.newyith.fortress.temp.TempExample;
 import me.newyith.fortress.util.Debug;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -27,22 +26,15 @@ public class SaveLoadManager {
 //		data.put("FortressesManager", FortressesManager.getInstance());
 
 
-		//*
 		//save FortressesManager
 		data.put("FortressesManager", FortressesManager.getInstance());
-		/*/
-		//saving sandbox
-		TempExample tempExample = TempExample.getInstance();
-		Debug.msg("saving obj class name: " + tempExample.getClass().getName());
-		data.put("TempExample", tempExample);
-		//*/
+		Debug.msg("Saved " + FortressesManager.getRuneCount() + " rune(s).");
 	}
 
 	private void loadFromMap(Map<String, Object> data) {
 		//*
 
 		//load FortressesManager
-
 		Object obj = data.get("FortressesManager");
 		if (obj == null) {
 			FortressesManager.setInstance(new FortressesManager());
@@ -51,6 +43,7 @@ public class SaveLoadManager {
 			FortressesManager fortressesManager = mapper.convertValue(obj, FortressesManager.class);
 			FortressesManager.setInstance(fortressesManager);
 		}
+		Debug.msg("Loaded " + FortressesManager.getRuneCount() + " rune(s).");
 
 //		Object obj = data.get("FortressesManager");
 //		if (obj == null) {
@@ -61,19 +54,6 @@ public class SaveLoadManager {
 //			Debug.error("Failed to load FortressesManager because obj is not instanceof FortressesManager.Model");
 //		}
 
-		/*/
-		//loading sandbox
-		Object obj = data.get("TempExample");
-		if (obj == null) {
-			Debug.msg("obj was null");
-			TempExample.setInstance(new TempExample());
-		} else {
-			Debug.msg("obj was not null");
-			TempExample tempExample = mapper.convertValue(obj, TempExample.class);
-			TempExample.setInstance(tempExample);
-			TempExample.print();
-		}
-		//*/
 	}
 
 	public void save() {
@@ -109,6 +89,7 @@ public class SaveLoadManager {
 		if (!FortressPlugin.releaseBuild) {
 			//do mock save so needed classes are loaded (new classes can't be loaded after I rebuild jar)
 			try {
+				Debug.msg("dummy saving");
 				saveToBuffer(new ByteArrayOutputStream());
 			} catch (IOException e) {
 				e.printStackTrace();

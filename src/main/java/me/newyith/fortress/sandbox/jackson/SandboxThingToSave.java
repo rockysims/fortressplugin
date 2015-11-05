@@ -27,7 +27,6 @@ public class SandboxThingToSave {
 
 		@JsonCreator
 		public Model(@JsonProperty("datum") String datum) {
-			Debug.msg("SandboxThingToSave JsonCreator called with datum: " + datum);
 			this.datum = datum;
 
 			//rebuild transient fields

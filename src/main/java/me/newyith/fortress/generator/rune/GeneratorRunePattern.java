@@ -7,6 +7,8 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.material.Sign;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.HashSet;
@@ -18,29 +20,32 @@ public class GeneratorRunePattern {
 		private transient Set<Point> pointsInPattern = null;
 		private transient World world = null;
 		private String worldName = "";
+		private Point signPoint = null;
+		private Point wirePoint = null;
 		private Point anchorPoint = null;
+		private Point chestPoint = null;
 		private Point pausePoint = null;
 		private Point runningPoint = null;
 		private Point fuelPoint = null;
-		private Point signPoint = null;
-		private Point chestPoint = null;
-		private Point wirePoint = null;
 
-		public Model(World world, Point s, Point w, Point a, Point c, Point p, Point r, Point f) {
-			this.worldName = world.getName();
-			signPoint = s;
-			wirePoint = w;
-			anchorPoint = a;
-			chestPoint = c;
-			pausePoint = p;
-			runningPoint = r;
-			fuelPoint = f;
-			onLoaded();
-		}
+		@JsonCreator
+		public Model(@JsonProperty("worldName")  String worldName,
+					 @JsonProperty("signPoint") Point signPoint,
+					 @JsonProperty("wirePoint") Point wirePoint,
+					 @JsonProperty("anchorPoint") Point anchorPoint,
+					 @JsonProperty("chestPoint") Point chestPoint,
+					 @JsonProperty("pausePoint") Point pausePoint,
+					 @JsonProperty("runningPoint") Point runningPoint,
+					 @JsonProperty("fuelPoint") Point fuelPoint) {
+			this.worldName = worldName;
+			this.signPoint = signPoint;
+			this.wirePoint = wirePoint;
+			this.anchorPoint = anchorPoint;
+			this.chestPoint = chestPoint;
+			this.pausePoint = pausePoint;
+			this.runningPoint = runningPoint;
+			this.fuelPoint = fuelPoint;
 
-		public Model() {} //dummy constructor for jackson
-
-		private void onLoaded() {
 			//rebuild transient fields
 			pointsInPattern = new HashSet<>();
 			pointsInPattern.add(signPoint);
@@ -55,17 +60,14 @@ public class GeneratorRunePattern {
 	}
 	private Model model = null;
 
-	@JsonProperty("model")
-	private void setModel(Model model) {
+	@JsonCreator
+	public GeneratorRunePattern(@JsonProperty("model") Model model) {
 		this.model = model;
-		model.onLoaded();
 	}
 
 	public GeneratorRunePattern(World world, Point s, Point w, Point a, Point c, Point p, Point r, Point f) {
-		model = new Model(world, s, w, a, c, p, r, f);
+		model = new Model(world.getName(), s, w, a, c, p, r, f);
 	}
-
-	public GeneratorRunePattern() {} //dummy constructor for jackson
 
 	//-----------------------------------------------------------------------
 
@@ -171,9 +173,10 @@ public class GeneratorRunePattern {
 		int x = af.getModX();
 		int y = af.getModY();
 		int z = af.getModZ();
-		return new Point(s.x() + x, s.y() + y, s.z() + z);
+		return s.add(x, y, z);
 	}
 
+	@JsonIgnore
 	public boolean isValid() { //TODO: FortressesManager should call this during load and destroy invalid generators
 		boolean valid = true;
 		valid = valid && model.signPoint.is(Material.WALL_SIGN, model.world);

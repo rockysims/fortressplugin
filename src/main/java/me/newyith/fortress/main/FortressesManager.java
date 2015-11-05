@@ -14,6 +14,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.material.*;
+import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.*;
@@ -36,26 +37,21 @@ public class FortressesManager {
 	//-----------------------------------------------------------------------
 
 	private static class Model {
-		private Set<GeneratorRune> generatorRunes = new HashSet<>();
+		private Set<GeneratorRune> generatorRunes = null;
 		private transient Map<Point, GeneratorRune> generatorRuneByPoint = null;
 		private transient Map<Point, GeneratorRune> generatorRuneByProtectedPoint = null;
 		private transient Set<Point> protectedPoints = null;
 		private transient Set<Point> alteredPoints = null;
 
-		public Model() {
-			onLoaded();
-		}
+		@JsonCreator
+		public Model(@JsonProperty("generatorRunes") Set<GeneratorRune> generatorRunes) {
+			this.generatorRunes = generatorRunes;
 
-		private void onLoaded() {
-			refreshTransients();
-		}
-
-		private void refreshTransients() {
+			//rebuild transient fields
 			generatorRuneByPoint = new HashMap<>();
 			generatorRuneByProtectedPoint = new HashMap<>();
 			protectedPoints = new HashSet<>();
 			alteredPoints = new HashSet<>();
-
 			for (GeneratorRune rune : generatorRunes) {
 				//rebuild runeByPoint map
 				for (Point p : rune.getPattern().getPoints()) {
@@ -77,12 +73,15 @@ public class FortressesManager {
 			}
 		}
 	}
-	private Model model = new Model();
+	private Model model = null;
 
-	@JsonProperty("model")
-	private void setModel(Model model) {
+	@JsonCreator
+	public FortressesManager(@JsonProperty("model") Model model) {
 		this.model = model;
-		model.onLoaded();
+	}
+
+	public FortressesManager() {
+		model = new Model(new HashSet<>());
 	}
 
 	//-----------------------------------------------------------------------
