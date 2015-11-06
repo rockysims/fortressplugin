@@ -230,14 +230,16 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+//TODO: maybe write GeneratorCore and then split into multiple cores via inheritance?
+//	or start with BaseCore?
+
 //TODO: maybe rename cores:
 //BaseCore
-//AwareCore (claims and insideOutside)
-//FullCore (wall particles and any other eye candy)
+//FullCore (claims, insideOutside, and wall particles)
 //GeneratorCore (originLayer and any convenience methods needed by GeneratorRune)
 
 //TODO: add particles manager to a core (was in rune)
-
+//	including anchor particles?
 
 
 
