@@ -1,19 +1,13 @@
 package me.newyith.fortress.sandbox.promises;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.Uninterruptibles;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by rockysims on 11/5/15.
- */
 public class ConcurrencyPlay {
 	public static void main(String[] args) {
 
