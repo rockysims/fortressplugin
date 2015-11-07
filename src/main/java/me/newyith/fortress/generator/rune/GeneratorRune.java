@@ -64,6 +64,15 @@ public class GeneratorRune {
 		model = new Model(pattern, core, state, fuelTicksRemaining, powered);
 	}
 
+	public void secondStageLoad() {
+		model.core.secondStageLoad();
+
+		/* rebuild version (currently saving it instead)
+		model.core.updateInsideOutside(); //updateInsideOutside() needs to be called before onGeneratedChanged() so layerOutside is full
+		//*/
+		model.core.onGeneratedChanged(); //update which particles should be displayed (requires layerOutside already be filled)
+	}
+
 	//-----------------------------------------------------------------------
 
 	// - Getters -
@@ -143,7 +152,7 @@ public class GeneratorRune {
 
 		updateState();
 
-		boolean placed = model.core.onPlaced(player);
+		boolean placed = model.core.onCreated(player);
 		if (!placed) {
 			FortressesManager.breakRune(this);
 		}

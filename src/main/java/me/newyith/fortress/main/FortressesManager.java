@@ -71,6 +71,8 @@ public class FortressesManager {
 					generatorRuneByProtectedPoint.put(p, rune);
 				}
 			}
+
+			secondStageLoad();
 		}
 	}
 	private Model model = null;
@@ -84,7 +86,12 @@ public class FortressesManager {
 		model = new Model(new HashSet<>());
 	}
 
-	public static void secondStageLoad() {
+	private static void secondStageLoad() {
+		//pass along secondStageLoad event to runes
+		for (GeneratorRune rune : instance.model.generatorRunes) {
+			rune.secondStageLoad();
+		}
+
 		//break any invalid runes
 		Set<GeneratorRune> generatorRunesCopy = new HashSet<>(instance.model.generatorRunes);
 		for (GeneratorRune rune : generatorRunesCopy) {
@@ -93,11 +100,14 @@ public class FortressesManager {
 			}
 		}
 	}
-
+	
 	//-----------------------------------------------------------------------
 
 	// - Getters / Setters -
 
+	//TODO: fix PROBLEM: we need to know the world too and there can be multiple runes per point
+	//	maybe not a big deal since that just means you can't create a rune at a point if point is already taken in another world
+	//	should still fix it (maybe something like runeByPoint[world].get(p) instead of runeByPoint.get(p)?)
 	public static GeneratorRune getRune(Point p) {
 		return instance.model.generatorRuneByPoint.get(p);
 	}

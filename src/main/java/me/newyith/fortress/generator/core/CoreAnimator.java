@@ -15,6 +15,17 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.*;
 
+/*
+altered:
+	blocks changed to bedrock
+protected:
+	blocks made unbreakable
+generated:
+	blocks made unbreakable and blocks changed to bedrock
+claimed:
+	points the generate thinks it owns
+//*/
+
 public class CoreAnimator {
 	private static class Model {
 		private Point anchorPoint = null;
@@ -59,7 +70,7 @@ public class CoreAnimator {
 			this.ticksPerFrame = 150 / TickTimer.msPerTick; // msPerFrame / msPerTick
 			this.animationWaitTicks = 0;
 			this.curIndex = 0;
-			this.wallMats = new WallMaterials(anchorPoint);
+			this.wallMats = new WallMaterials(world, anchorPoint);
 		}
 	}
 	private Model model = null;
@@ -136,6 +147,10 @@ public class CoreAnimator {
 //			}
 //		}
 //		onGeneratedChanged();
+	}
+
+	public WallMaterials getWallMaterials() {
+		return model.wallMats;
 	}
 
 	public Set<Point> getAlteredPoints() {

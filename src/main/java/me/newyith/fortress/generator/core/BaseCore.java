@@ -1,114 +1,81 @@
-package me.newyith.fortressold.generator;
+package me.newyith.fortress.generator.core;
 
-import me.newyith.fortressold.main.FortressPlugin;
-import me.newyith.fortressold.memory.AbstractMemory;
-import me.newyith.fortressold.memory.Memorable;
-import me.newyith.fortressold.util.Debug;
-import me.newyith.fortressold.util.Point;
-import me.newyith.fortressold.util.Wall;
+import me.newyith.fortress.generator.rune.GeneratorRune;
+import me.newyith.fortress.main.FortressPlugin;
+import me.newyith.fortress.main.FortressesManager;
+import me.newyith.fortress.util.Point;
+import me.newyith.fortress.util.Wall;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.*;
 
-public class GeneratorCore implements Memorable {
-	//saved
-	private Set<Point> claimedPoints = new HashSet<>();
-	private Set<Point> claimedWallPoints = new HashSet<>();
-	private Point anchorPoint = null; //set by constructor
-	private GeneratorCoreAnimator animator = null; //set by constructor
-	private UUID placedByPlayerId = null; //set by onCreated
-	private Set<Point> layerOutsideFortress = new HashSet<>();
-	private Set<Point> pointsInsideFortress = new HashSet<>(); //TODO: consider changing to layerInsideFortress (need it so we can cancel explosions)
+public class BaseCore {
+	private static class Model {
+		private Point anchorPoint = null;
+		private Set<Point> claimedPoints = null;
+		private Set<Point> claimedWallPoints = null;
+		private CoreAnimator animator = null;
+		private UUID placedByPlayerId = null;
+		private Set<Point> layerOutsideFortress = null;
+		private Set<Point> pointsInsideFortress = null;
+		private String worldName = null;
+		private transient World world = null;
+		private transient final int generationRangeLimit;
 
-	//not saved
-	private final int generationRangeLimit = FortressPlugin.config_generationRange;
+		@JsonCreator
+		public Model(@JsonProperty("anchorPoint") Point anchorPoint,
+					 @JsonProperty("claimedPoints") Set<Point> claimedPoints,
+					 @JsonProperty("claimedWallPoints") Set<Point> claimedWallPoints,
+					 @JsonProperty("animator") CoreAnimator animator,
+					 @JsonProperty("placedByPlayerId") UUID placedByPlayerId,
+					 @JsonProperty("layerOutsideFortress") Set<Point> layerOutsideFortress,
+					 @JsonProperty("pointsInsideFortress") Set<Point> pointsInsideFortress,
+					 @JsonProperty("worldName") String worldName) {
+			this.anchorPoint = anchorPoint;
+			this.claimedPoints = claimedPoints;
+			this.claimedWallPoints = claimedWallPoints;
+			this.animator = animator;
+			this.placedByPlayerId = placedByPlayerId;
+			this.layerOutsideFortress = layerOutsideFortress;
+			this.pointsInsideFortress = pointsInsideFortress;
+			this.worldName = worldName;
 
-	/*
-	altered:
-		blocks changed to bedrock
-	protected:
-		blocks made unbreakable
-	generated:
-		blocks made unbreakable and blocks changed to bedrock
-	claimed:
-		points the generate thinks it owns
-	//*/
+			//rebuild transient fields
+			this.world = Bukkit.getWorld(worldName);
+			this.generationRangeLimit = FortressPlugin.config_generationRangeLimit;
+			//"//updateInsideOutside() called by rune (second stage loading)" not sure if this is important
+		}
+	}
+	private Model model = null;
 
-	//------------------------------------------------------------------------------------------------------------------
-
-	public void saveTo(AbstractMemory<?> m) {
-		Debug.start("save claimedPoints");
-		m.savePointSetCompact("claimedPoints", claimedPoints);
-		Debug.end("save claimedPoints");
-		Debug.start("save claimedWallPoints");
-		m.savePointSetCompact("claimedWallPoints", claimedWallPoints);
-		Debug.end("save claimedWallPoints");
-
-		m.save("anchorPoint", anchorPoint);
-
-		Debug.start("save animator");
-		m.save("animator", animator);
-		Debug.end("save animator");
-
-		m.save("placedByPlayerIdString", placedByPlayerId.toString());
-
-		Debug.start("save layerOutsideFortress");
-		m.savePointSetCompact("layerOutsideFortress", layerOutsideFortress);
-		Debug.end("save layerOutsideFortress");
-		Debug.start("save pointsInsideFortress");
-		m.savePointSetCompact("pointsInsideFortress", pointsInsideFortress);
-		Debug.end("save pointsInsideFortress");
+	@JsonCreator
+	public BaseCore(@JsonProperty("model") Model model) {
+		this.model = model;
 	}
 
-	public static GeneratorCore loadFrom(AbstractMemory<?> m) {
-		Set<Point> claimedPoints = m.loadPointSetCompact("claimedPoints");
-		Set<Point> claimedWallPoints = m.loadPointSetCompact("claimedWallPoints");
-		Point anchorPoint = m.loadPoint("anchorPoint");
-		GeneratorCoreAnimator animator = m.loadGenerationAnimator("animator");
-		UUID placedByPlayerId = UUID.fromString(m.loadString("placedByPlayerIdString"));
-		Set<Point> layerOutsideFortress = m.loadPointSetCompact("layerOutsideFortress");
-		Set<Point> pointsInsideFortress = m.loadPointSetCompact("pointsInsideFortress");
-
-		//updateInsideOutside() called by rune (second stage loading)
-
-		GeneratorCore instance = new GeneratorCore(
-				animator,
-				claimedPoints,
-				claimedWallPoints,
-				anchorPoint,
-				placedByPlayerId,
-				layerOutsideFortress,
-				pointsInsideFortress
-				);
-		return instance;
-	}
-
-	private GeneratorCore(
-			GeneratorCoreAnimator animator,
-			Set<Point> claimedPoints,
-			Set<Point> claimedWallPoints,
-			Point anchorPoint,
-			UUID placedByPlayerId,
-			Set<Point> layerOutsideFortress,
-			Set<Point> pointsInsideFortress
-			) {
-		this.animator = animator;
-		this.claimedPoints = claimedPoints;
-		this.claimedWallPoints = claimedWallPoints;
-		this.anchorPoint = anchorPoint;
-		this.placedByPlayerId = placedByPlayerId;
-		this.layerOutsideFortress = layerOutsideFortress;
-		this.pointsInsideFortress = pointsInsideFortress;
+	public BaseCore(World world, Point anchorPoint) {
+		Set<Point> claimedPoints = new HashSet<>();
+		Set<Point> claimedWallPoints = new HashSet<>();
+		CoreAnimator animator = new CoreAnimator(world, anchorPoint);
+		UUID placedByPlayerId = null; //set by onCreated()
+		Set<Point> layerOutsideFortress = new HashSet<>();
+		Set<Point> pointsInsideFortress = new HashSet<>();
+		String worldName = world.getName();
+		model = new Model(anchorPoint, claimedPoints, claimedWallPoints, animator,
+				placedByPlayerId, layerOutsideFortress, pointsInsideFortress, worldName);
 	}
 
 	public void secondStageLoad() {
 		//this is needed in case of /reload during generation
-		animator.wallMats.refresh(); //needs to be in second stage because refresh uses runeByPoint lookup
+		model.animator.getWallMaterials().refresh(); //needs to be in second stage because refresh uses runeByPoint lookup
 
 		/* rebuild version (currently saving it instead)
 		updateClaimedPoints(claimedWallPoints); //needs to be in second stage because uses runeByPoint lookup
@@ -117,19 +84,14 @@ public class GeneratorCore implements Memorable {
 
 	//------------------------------------------------------------------------------------------------------------------
 
-	public GeneratorCore(Point anchorPoint) {
-		this.anchorPoint = anchorPoint;
-		this.animator = new GeneratorCoreAnimator(anchorPoint);
-	}
-
 	public Player getOwner() {
-		return Bukkit.getPlayer(placedByPlayerId);
+		return Bukkit.getPlayer(model.placedByPlayerId);
 	}
 
 	public boolean playerCanOpenDoor(Player player, Point doorPoint) {
 		String playerName = player.getName();
 		Set<Point> potentialSigns = new HashSet<>();
-		boolean isTrapDoor = Wall.isTrapDoor(doorPoint.getBlock().getType());
+		boolean isTrapDoor = Wall.isTrapDoor(doorPoint.getBlock(model.world).getType());
 
 		if (isTrapDoor) {
 			potentialSigns.addAll(Wall.getAdjacent6(doorPoint));
@@ -138,41 +100,37 @@ public class GeneratorCore implements Memorable {
 			Point aboveDoorPoint = new Point(doorPoint).add(0, 1, 0);
 			potentialSigns.addAll(Wall.getAdjacent6(aboveDoorPoint));
 			potentialSigns.add(aboveDoorPoint);
-
-			//potentialSigns.addAll(point below door and points adjacent to it)
-			Point belowDoorPoint = new Point(doorPoint).add(0, -2, 0);
-			potentialSigns.addAll(Wall.getAdjacent6(belowDoorPoint));
-			potentialSigns.add(belowDoorPoint);
 		}
 
 		if (signMustBeInside(doorPoint)) {
-			potentialSigns.retainAll(pointsInsideFortress);
+			potentialSigns.retainAll(model.pointsInsideFortress);
 		}
 
-		//filter potentialSigns for actual signs
-		Iterator<Point> it = potentialSigns.iterator();
-		while (it.hasNext()) {
-			Point potentialSign = it.next();
-			if (!Wall.isSign(potentialSign.getBlock().getType())) {
-				it.remove();
+		//fill actualSigns (from potentialSigns)
+		Set<Point> actualSigns = new HashSet<>();
+		for (Point potentialSign : potentialSigns) {
+			Material mat = potentialSign.getBlock(model.world).getType();
+			if (Wall.isSign(mat)) {
+				actualSigns.add(potentialSign);
 			}
 		}
 
 		//potentialSigns.addAll(connected signs)
 		Point origin = doorPoint;
-		Set<Point> originLayer = potentialSigns;
-		Set<Material> wallMaterials = Wall.getSignMaterials();
+		Set<Point> originLayer = actualSigns;
+		Set<Material> traverseMaterials = Wall.getSignMaterials();
 		Set<Material> returnMaterials = Wall.getSignMaterials();
-		int rangeLimit = generationRangeLimit * 2;
+		int rangeLimit = model.generationRangeLimit * 2;
 		Set<Point> ignorePoints = null;
 		Set<Point> searchablePoints = null;
-		Set<Point> connectedSigns = Wall.getPointsConnected(origin, originLayer, wallMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
-		potentialSigns.addAll(connectedSigns);
+		Set<Point> connectedSigns = Wall.getPointsConnected(model.world, origin, originLayer,
+				traverseMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
+		actualSigns.addAll(connectedSigns);
 
 		Set<String> names = new HashSet<>();
-		for (Point p : potentialSigns) {
-			if (Wall.isSign(p.getBlock().getType())) {
-				Block signBlock = p.getBlock();
+		for (Point p : actualSigns) {
+			if (Wall.isSign(p.getBlock(model.world).getType())) {
+				Block signBlock = p.getBlock(model.world);
 				Sign sign = (Sign)signBlock.getState();
 				names.addAll(getNamesFromSign(sign));
 			}
@@ -188,21 +146,18 @@ public class GeneratorCore implements Memorable {
 		Set<Point> adjacentToDoor = new HashSet<>();
 		Set<Point> doorPoints = new HashSet<>();
 		doorPoints.add(doorPoint);
-		Point belowDoorPoint = new Point(doorPoint).add(0, -1, 0);
-		if (!Wall.isTrapDoor(doorPoint.getBlock().getType())) {
-			doorPoints.add(belowDoorPoint);
+		boolean doorIsTrapDoor = Wall.isTrapDoor(doorPoint.getBlock(model.world).getType());
+		if (!doorIsTrapDoor) {
+			doorPoints.add(new Point(doorPoint).add(0, -1, 0));
 		}
 		for (Point p : doorPoints) {
 			adjacentToDoor.addAll(Wall.getAdjacent6(p));
 		}
+		adjacentToDoor.removeAll(doorPoints);
 
 		//if any of the blocks adjacent to door point(s) are pointsInsideFortress, signMustBeInside = true
-		for (Point p : adjacentToDoor) {
-			if (pointsInsideFortress.contains(p)) {
-				signMustBeInside = true;
-				break;
-			}
-		}
+		boolean allAdjacentAreOutside = Collections.disjoint(adjacentToDoor, model.pointsInsideFortress);
+		signMustBeInside = !allAdjacentAreOutside;
 
 		return signMustBeInside;
 	}
@@ -238,11 +193,11 @@ public class GeneratorCore implements Memorable {
 
 	// - Events -
 
-	public boolean onPlaced(Player placingPlayer) { //<--------- called by rune
-		placedByPlayerId = placingPlayer.getUniqueId();
+	public boolean onCreated(Player placingPlayer) {
+		model.placedByPlayerId = placingPlayer.getUniqueId();
 
 		//set overlapWithClaimed = true if placed generator is connected (by faces) to another generator's claimed points
-		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(anchorPoint);
+		GeneratorRune rune = FortressesManager.getRune(model.anchorPoint);
 		Set<Point> claimPoints = rune.getPoints();
 		Set<Point> alreadyClaimedPoints = getClaimedPointsOfNearbyGenerators();
 		boolean overlapWithClaimed = !Collections.disjoint(alreadyClaimedPoints, claimPoints); //disjoint means no points in common
@@ -505,6 +460,10 @@ public class GeneratorCore implements Memorable {
 //
 //		return matches;
 //	}
+
+
+
+
 
 
 

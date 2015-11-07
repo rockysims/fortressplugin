@@ -1,7 +1,11 @@
 package me.newyith.fortress.generator;
 
+import me.newyith.fortress.generator.rune.GeneratorRune;
+import me.newyith.fortress.main.FortressesManager;
+import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.inventory.Inventory;
@@ -11,13 +15,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class WallMaterials {
+	private World world;
 	private Point anchorPoint;
 	private Set<Material> wallMaterials = new HashSet<>();
 	private Set<Material> generatableWallMaterials = new HashSet<>();
 	private Set<Material> protectableWallMaterials = new HashSet<>();
 	private Set<Material> alterableWallMaterials = new HashSet<>();
 
-	public WallMaterials(Point anchorPoint) {
+	public WallMaterials(World world, Point anchorPoint) {
+		this.world = world;
 		this.anchorPoint = anchorPoint;
 	}
 
@@ -51,11 +57,13 @@ public class WallMaterials {
 				Material mat = item.getType();
 				switch (mat) {
 					//non protectable
-//					case GRASS:
-//					case DIRT:
-//					case STONE:
-//					case GRAVEL:
-//					case SAND:
+					//* //TODO: uncomment out this block
+					case GRASS:
+					case DIRT:
+					case STONE:
+					case GRAVEL:
+					case SAND:
+					//*/
 					case BEDROCK:
 						break;
 					//special protectable
@@ -111,9 +119,9 @@ public class WallMaterials {
 		}
 	}
 	private ItemStack[] getChestContents() {
-		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(anchorPoint);
+		GeneratorRune rune = FortressesManager.getRune(anchorPoint);
 		if (rune != null) {
-			Block chestBlock = rune.getPattern().chestPoint.getBlock();
+			Block chestBlock = rune.getPattern().getChestPoint().getBlock(world);
 			if (chestBlock.getState() instanceof Chest) {
 				Chest chest = (Chest)chestBlock.getState();
 				Inventory inv = chest.getInventory();

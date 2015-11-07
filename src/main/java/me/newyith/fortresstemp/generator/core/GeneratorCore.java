@@ -134,7 +134,7 @@ public class GeneratorCore { // extends AwareCore {
 
 	// - Events -
 
-	public boolean onPlaced(Player placingPlayer) { //<--------- called by rune
+	public boolean onCreated(Player placingPlayer) { //<--------- called by rune
 		placedByPlayerId = placingPlayer.getUniqueId();
 
 		//set overlapWithClaimed = true if placed generator is connected (by faces) to another generator's claimed points

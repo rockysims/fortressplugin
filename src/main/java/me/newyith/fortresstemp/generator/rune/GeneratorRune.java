@@ -96,7 +96,7 @@ public class GeneratorRune {
 
 		this.updateState();
 
-		boolean placed = this.core.onPlaced(player);
+		boolean placed = this.core.onCreated(player);
 		if (!placed) {
 			this.onCoreBroken();
 		}
