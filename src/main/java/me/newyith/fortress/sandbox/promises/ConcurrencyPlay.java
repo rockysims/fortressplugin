@@ -15,10 +15,10 @@ public class ConcurrencyPlay {
 
 		System.out.println("Before Generation");
 		future.thenAccept(values -> System.out.println("thenAccept: " + values));
-		System.out.println("join: " + future.join());
+		System.out.println("join: " + future.join()); //future.join() means wait for the other thread
 		System.out.println("After Generation");
 
-		future.getNow(null); //return null if !future.isDone()
+		List<Integer> promisedList = future.getNow(null); //return null if !future.isDone()
 
 		Uninterruptibles.sleepUninterruptibly(10, TimeUnit.SECONDS);
 	}
