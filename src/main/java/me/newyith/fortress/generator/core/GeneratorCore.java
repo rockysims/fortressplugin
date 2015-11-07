@@ -81,4 +81,10 @@ public class GeneratorCore {
 		return false;
 	}
 
+	//method was in FortressGeneratorRune but now belongs here (basically just passed event along to particles manager)
+	public void onGeneratedChanged() {
+		//TODO: write
+		//particles.onGeneratedChanges();
+	}
+
 }
