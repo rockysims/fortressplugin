@@ -57,7 +57,7 @@ public class GeneratorRune {
 	}
 
 	public GeneratorRune(GeneratorRunePattern pattern) {
-		GeneratorCore core = new GeneratorCore(pattern.getAnchorPoint());
+		GeneratorCore core = new GeneratorCore(pattern.getWorld(), pattern.getAnchorPoint());
 		GeneratorState state = GeneratorState.NULL;
 		int fuelTicksRemaining = 0;
 		boolean powered = false;
@@ -91,10 +91,6 @@ public class GeneratorRune {
 
 	private boolean isPowered() {
 		return model.powered;
-	}
-
-	public Set<Point> getPoints() {
-		return model.pattern.getPoints();
 	}
 
 	public GeneratorCore getGeneratorCore() {

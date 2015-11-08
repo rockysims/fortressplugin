@@ -230,18 +230,13 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
-//TODO: maybe write GeneratorCore and then split into multiple cores via inheritance?
-//	or start with BaseCore?
-
-//TODO: maybe rename cores:
-//BaseCore
-//FullCore (claims, insideOutside, and wall particles)
-//GeneratorCore (originLayer and any convenience methods needed by GeneratorRune)
+//TODO: keep working on BaseCore next
+//	then move anything rune specific out of BaseCore and into GeneratorCore
 
 //TODO: add particles manager to a core (was in rune)
-//	including anchor particles?
+//	including anchor particles? yes
 
-
+//TODO: write Wall.getConnectedPointsPromise()
 
 
 
@@ -254,12 +249,11 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: finish refactoring
 //	make Core, AwareCore, etc. extend each other
 //	make rune have generatorCore as field (not extend GeneratorCore)
-//	add separate wheel classes to maintain state (for easy save/load with jackson)
-//		CoreModel, GeneratorRuneModel, etc.
 //TODO: consider splitting off GeneratorRunesManager functionality into classes:
 //	DoorProtection (for protecting doors and handling white list)
 //	ExplosionProtection (for protecting blocks from explosions and related eye candy)
 //	PistonProtection (for protecting blocks from being moved by pistons)
+// or maybe just one ProtectionManager?
 //	Don't split off: rune create/break, public util methods, protected/altered/etc lists,
 //	add GeneratorRunesManager.isProtected() method
 //	have the split off classes be called by EventListener instead of through GeneratorRunesManager
@@ -288,8 +282,7 @@ public class FortressPlugin extends JavaPlugin {
 //		first priority			//
 //------------------------------//
 
-//TODO: save periodically (maybe every 1 minute)
-//TODO: make generationBlockLimit limit search not generation
+//TODO: make generationBlockLimit limit search (not generation)
 
 //-------------------------------//
 //-------------------------------//

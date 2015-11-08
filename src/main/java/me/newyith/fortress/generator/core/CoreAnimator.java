@@ -149,7 +149,7 @@ public class CoreAnimator {
 //		onGeneratedChanged();
 	}
 
-	public WallMaterials getWallMaterials() {
+	public WallMaterials getWallMats() {
 		return model.wallMats;
 	}
 
