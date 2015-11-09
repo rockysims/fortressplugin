@@ -71,8 +71,6 @@ public class FortressesManager {
 					generatorRuneByProtectedPoint.put(p, rune);
 				}
 			}
-
-			secondStageLoad();
 		}
 	}
 	private Model model = null;
@@ -86,7 +84,7 @@ public class FortressesManager {
 		model = new Model(new HashSet<>());
 	}
 
-	private static void secondStageLoad() {
+	public static void secondStageLoad() {
 		//pass along secondStageLoad event to runes
 		for (GeneratorRune rune : instance.model.generatorRunes) {
 			rune.secondStageLoad();
@@ -100,7 +98,7 @@ public class FortressesManager {
 			}
 		}
 	}
-	
+
 	//-----------------------------------------------------------------------
 
 	// - Getters / Setters -

@@ -41,6 +41,7 @@ public class SaveLoadManager {
 			Debug.msg("load obj (FM) type: " + obj.getClass().getName());
 			FortressesManager fortressesManager = mapper.convertValue(obj, FortressesManager.class);
 			FortressesManager.setInstance(fortressesManager);
+			FortressesManager.secondStageLoad();
 		}
 		Debug.msg("Loaded " + FortressesManager.getRuneCount() + " rune(s)."); //TODO: delete this line
 	}

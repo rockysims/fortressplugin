@@ -1,5 +1,6 @@
 package me.newyith.fortress.util;
 
+import com.google.common.base.Splitter;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -7,32 +8,48 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonValue;
 
 import java.text.DecimalFormat;
+import java.util.List;
 
 //fully written again
 public class Point {
 	private static class Model {
-	public final double x;
-	public final double y;
-	public final double z;
+		public final double x;
+		public final double y;
+		public final double z;
 
-	@JsonCreator
-	public Model(@JsonProperty("x") double x,
-				 @JsonProperty("y") double y,
-				 @JsonProperty("z") double z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		@JsonCreator
+		public Model(@JsonProperty("x") double x,
+					 @JsonProperty("y") double y,
+					 @JsonProperty("z") double z) {
+			this.x = x;
+			this.y = y;
+			this.z = z;
 
-		//rebuild transient fields
+			//rebuild transient fields
+		}
 	}
-}
 	private Model model = null;
 
+	@JsonValue
+	private String toStringValue() {
+		StringBuilder s = new StringBuilder();
+		s.append(xInt());
+		s.append(",");
+		s.append(yInt());
+		s.append(",");
+		s.append(zInt());
+		return s.toString();
+	}
 	@JsonCreator
-	public Point(@JsonProperty("model") Model model) {
-		this.model = model;
+	private Point(String s) {
+		List<String> data = Splitter.on(",").splitToList(s);
+		double x = Double.valueOf(data.get(0));
+		double y = Double.valueOf(data.get(1));
+		double z = Double.valueOf(data.get(2));
+		model = new Model(x, y, z);
 	}
 
 	public Point(double x, double y, double z) {
@@ -139,11 +156,13 @@ public class Point {
 
 	@Override
 	public String toString() {
-		int x = xInt();
-		int y = yInt();
-		int z = zInt();
-
-		return x + ", " + y + ", " + z;
+		StringBuilder s = new StringBuilder();
+		s.append(xInt());
+		s.append(", ");
+		s.append(yInt());
+		s.append(", ");
+		s.append(zInt());
+		return s.toString();
 	}
 
 	public String toStringDoubles() {
