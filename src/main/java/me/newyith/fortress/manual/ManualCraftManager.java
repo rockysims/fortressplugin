@@ -51,15 +51,11 @@ public class ManualCraftManager {
 	private static String readManualFile() {
 		String manualStr = "Failed to read manual.txt";
 
-		InputStream stream = ManualCraftManager.class.getResourceAsStream("manual.txt");
-		Debug.msg("a");
+		InputStream stream = ManualCraftManager.class.getResourceAsStream("/manual.txt"); //(work)?"/":"" + "manual.txt"
 		if (stream != null) {
-			Debug.msg("b");
 			InputStreamReader streamReader = new InputStreamReader(stream);
 			BufferedReader br = new BufferedReader(streamReader);
-			Debug.msg("c");
 			try {
-				Debug.msg("d");
 				StringBuilder sb = new StringBuilder();
 
 				String line = br.readLine();
@@ -71,7 +67,6 @@ public class ManualCraftManager {
 				}
 
 				manualStr = sb.toString();
-				Debug.msg("manualStr set to: " + manualStr);
 
 				br.close();
 			} catch (IOException e) {
