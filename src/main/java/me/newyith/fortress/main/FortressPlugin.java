@@ -3,6 +3,7 @@ package me.newyith.fortress.main;
 import me.newyith.fortress.command.Commands;
 import me.newyith.fortress.event.EventListener;
 import me.newyith.fortress.event.TickTimer;
+import me.newyith.fortress.manual.ManualCraftManager;
 import me.newyith.fortress.sandbox.jackson.SandboxSaveLoadManager;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
@@ -63,7 +64,7 @@ public class FortressPlugin extends JavaPlugin {
 
 		EventListener.onEnable(this);
 		TickTimer.onEnable(this);
-//		ManualCraftManager.onEnable(this);
+		ManualCraftManager.onEnable(this);
 //		PearlGlitchFix.onEnable(this);
 
 		sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
