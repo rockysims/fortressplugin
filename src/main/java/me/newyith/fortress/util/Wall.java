@@ -1,9 +1,13 @@
 package me.newyith.fortress.util;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.Uninterruptibles;
 import org.bukkit.Material;
 import org.bukkit.World;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 //fully written again
 public class Wall {
@@ -132,6 +136,39 @@ public class Wall {
 		return getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints, null, ConnectedThreshold.FACES);
 	}
 
+
+
+
+	public void getPointsConnectedAsLayers() {
+		CompletableFuture<List<Set<Point>>> future = getPointsConnectedAsLayersPromise();
+
+		System.out.println("Before Generation");
+		future.thenAccept(values -> System.out.println("thenAccept: " + values));
+		System.out.println("join: " + future.join()); //future.join() means wait for the other thread
+		System.out.println("After Generation");
+
+		List<Integer> promisedList = future.getNow(null); //return null if !future.isDone()
+
+		Uninterruptibles.sleepUninterruptibly(10, TimeUnit.SECONDS);
+	}
+
+	public static CompletableFuture<List<Set<Point>>> getPointsConnectedAsLayersPromise(int count) {
+		return CompletableFuture.supplyAsync(() -> {
+
+
+
+			List<Integer> values = new ArrayList<>(count);
+			for (int i = 0; i < count; i++) {
+				Uninterruptibles.sleepUninterruptibly(250, TimeUnit.MILLISECONDS);
+				values.add(i);
+			}
+			return ImmutableList.copyOf(values);
+		});
+	}
+
+
+
+
 	/**
 	 * Looks at all blocks connected to the originLayer by traverseMaterials (directly or recursively).
 	 *
@@ -145,136 +182,130 @@ public class Wall {
 	 * @param connectedThreshold Whether connected means 3x3x3 area or only the 6 blocks connected by faces.
 	 * @return List of all points (blocks) connected to the originLayer by traverseMaterials and matching a block type in returnMaterials.
 	 */
-	public static List<Set<Point>> getPointsConnectedAsLayers(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints, ConnectedThreshold connectedThreshold) {
-		Debug.start("getPointsConnectedAsLayers() all");
-
-		List<Set<Point>> matchesAsLayers = new ArrayList<>();
-		Set<Point> connected = new HashSet<>();
-
-		Set<Point> visited = new HashSet<>(1000);
-		Deque<Point> layer;
-		Deque<Point> nextLayer = new ArrayDeque<>();
-		int layerIndex = -1;
-		Material mat;
-		Point center;
-
-		//fill nextLayer and visited from originLayer
-		nextLayer.addAll(originLayer);
-		visited.addAll(originLayer);
-
+	public static CompletableFuture<List<Set<Point>>> getPointsConnectedAsLayers(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints, ConnectedThreshold connectedThreshold) {
 		//make ignorePoints default to empty
 		if (ignorePoints == null)
 			ignorePoints = new HashSet<>();
+		final Set<Point> finalIgnorePoints = ignorePoints;
 
-		int recursionLimit2Max = 10 * 6*(int)Math.pow(rangeLimit*2, 2);
-		int recursionLimit = (int)Math.pow(rangeLimit/2, 3);
-		while (!nextLayer.isEmpty()) {
-			if (recursionLimit-- <= 0) {
-				Debug.error("Wall recursionLimit exhausted");
-				break;
-			}
+		return CompletableFuture.supplyAsync(() -> {
+			List<Set<Point>> matchesAsLayers = new ArrayList<>();
+			Set<Point> connected = new HashSet<>();
 
-			layerIndex++;
-			layer = nextLayer;
-			nextLayer = new ArrayDeque<>();
+			Set<Point> visited = new HashSet<>(1000);
+			Deque<Point> layer;
+			Deque<Point> nextLayer = new ArrayDeque<>();
+			int layerIndex = -1;
+			Material mat;
+			Point center;
 
-			//Debug.start("process layer");
-			//Debug.msg("layer.size(): " + String.valueOf(layer.size()));
+			//fill nextLayer and visited from originLayer
+			nextLayer.addAll(originLayer);
+			visited.addAll(originLayer);
 
-			//process layer
-			int recursionLimit2 = recursionLimit2Max;
-			while (!layer.isEmpty()) {
-				//Debug.start("inner loop");
+			int recursionLimit2Max = 10 * 6*(int)Math.pow(rangeLimit*2, 2);
+			int recursionLimit = (int)Math.pow(rangeLimit/2, 3);
+			long lastSleepEnd = 0;
+			while (!nextLayer.isEmpty()) {
+				long now = System.currentTimeMillis();
+				long elapsed = now - lastSleepEnd;
+				if (elapsed > 25) {
+					Debug.msg("Sleeping 50ms");
+					Uninterruptibles.sleepUninterruptibly(50, TimeUnit.MILLISECONDS); //TODO: tweak sleep duration?
+					lastSleepEnd = System.currentTimeMillis();
+				} else {
+					Debug.msg("Not sleeping. Elapsed: " + elapsed);
+				}
 
-				if (recursionLimit2-- <= 0) {
-					Debug.error("Wall recursionLimit2 exhausted");
+				if (recursionLimit-- <= 0) {
+					Debug.error("Wall recursionLimit exhausted");
 					break;
 				}
 
-				//Debug.start("find connected points");
+				layerIndex++;
+				layer = nextLayer;
+				nextLayer = new ArrayDeque<>();
 
-				center = layer.pop();
-				connected.clear();
+				//process layer
+				int recursionLimit2 = recursionLimit2Max;
+				while (!layer.isEmpty()) {
+					if (recursionLimit2-- <= 0) {
+						Debug.error("Wall recursionLimit2 exhausted");
+						break;
+					}
 
-				//handle ConnectedThreshold.POINTS
-				if (connectedThreshold == ConnectedThreshold.POINTS) {
-					//iterate over the 27 (3*3*3) blocks around center
-					for (int x = center.xInt()-1; x <= center.xInt()+1; x++) {
-						for (int y = center.yInt()-1; y <= center.yInt()+1; y++) {
-							for (int z = center.zInt()-1; z <= center.zInt()+1; z++) {
-								connected.add(new Point(x, y, z));
+					center = layer.pop();
+					connected.clear();
+
+					//handle ConnectedThreshold.POINTS
+					if (connectedThreshold == ConnectedThreshold.POINTS) {
+						//iterate over the 27 (3*3*3) blocks around center
+						for (int x = center.xInt()-1; x <= center.xInt()+1; x++) {
+							for (int y = center.yInt()-1; y <= center.yInt()+1; y++) {
+								for (int z = center.zInt()-1; z <= center.zInt()+1; z++) {
+									connected.add(new Point(x, y, z));
+								}
+							}
+						}
+					}
+
+					//handle ConnectedThreshold.FACES
+					if (connectedThreshold == ConnectedThreshold.FACES) {
+						//iterate over the 6 blocks adjacent to center
+						connected.add(center.add(1, 0, 0));
+						connected.add(center.add(-1, 0, 0));
+						connected.add(center.add(0, 1, 0));
+						connected.add(center.add(0, -1, 0));
+						connected.add(center.add(0, 0, 1));
+						connected.add(center.add(0, 0, -1));
+					}
+
+					//process connected points
+					for (Point p : connected) {
+						if (!visited.contains(p)) {
+							visited.add(p);
+
+							//ignore ignorePoints
+							if (finalIgnorePoints.contains(p))
+								continue;
+
+							//ignore unsearchable points
+							if (searchablePoints != null && !searchablePoints.contains(p)) {
+								continue;
+							}
+
+							//ignore out of range points
+							if (!isInRange(p, origin, rangeLimit))
+								continue;
+
+							mat = p.getBlock(world).getType();
+
+							//add to matchesAsLayers if it matches a returnMaterials type
+							if (returnMaterials == null || returnMaterials.contains(mat)) {
+								//"while" not "if" because maybe only matching blocks are far away but connected by wall
+								while (layerIndex >= matchesAsLayers.size()) {
+									matchesAsLayers.add(new HashSet<>());
+								}
+								matchesAsLayers.get(layerIndex).add(p);
+							}
+
+							//consider adding point to nextLayer
+							if (traverseMaterials == null || traverseMaterials.contains(mat)) {
+								nextLayer.push(p);
 							}
 						}
 					}
 				}
-
-				//handle ConnectedThreshold.FACES
-				if (connectedThreshold == ConnectedThreshold.FACES) {
-					//iterate over the 6 blocks adjacent to center
-					connected.add(center.add(1, 0, 0));
-					connected.add(center.add(-1, 0, 0));
-					connected.add(center.add(0, 1, 0));
-					connected.add(center.add(0, -1, 0));
-					connected.add(center.add(0, 0, 1));
-					connected.add(center.add(0, 0, -1));
-				}
-
-				//Debug.stop("find connected points");
-
-				//Debug.start("process connected points");
-
-				//process connected points
-				for (Point p : connected) {
-					if (!visited.contains(p)) {
-						visited.add(p);
-
-						//ignore ignorePoints
-						if (ignorePoints.contains(p))
-							continue;
-
-						//ignore unsearchable points
-						if (searchablePoints != null && !searchablePoints.contains(p)) {
-							continue;
-						}
-
-						//ignore out of range points
-						if (!isInRange(p, origin, rangeLimit))
-							continue;
-
-						mat = p.getBlock(world).getType();
-
-						//add to matchesAsLayers if it matches a returnMaterials type
-						if (returnMaterials == null || returnMaterials.contains(mat)) {
-							//"while" not "if" because maybe only matching blocks are far away but connected by wall
-							while (layerIndex >= matchesAsLayers.size()) {
-								matchesAsLayers.add(new HashSet<>());
-							}
-							matchesAsLayers.get(layerIndex).add(p);
-						}
-
-						//consider adding point to nextLayer
-						if (traverseMaterials == null || traverseMaterials.contains(mat)) {
-							nextLayer.push(p);
-						}
-					}
-				}
-
-				//Debug.stop("process connected points");
-
-				//Debug.stop("inner loop");
-
 			}
 
-			//Debug.stop("process layer");
+			return ImmutableList.copyOf(matchesAsLayers);
+		});
 
-		}
 
-//		Debug.msg("Wall.getPointsConnected visited " + String.valueOf(visited.size()));
-		//Debug.msg("Wall.getPointsConnected returning " + String.valueOf(matchesAsLayers.size()) + " matchesAsLayers");
+//		List<Set<Point>> matchesAsLayers = new ArrayList<>();
 
-//		Debug.end("getPointsConnectedAsLayers() all");
 
-		return matchesAsLayers;
+//		return matchesAsLayers;
 	}
 
 	private static boolean isInRange(Point p, Point origin, int rangeLimit) {
