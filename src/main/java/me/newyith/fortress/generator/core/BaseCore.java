@@ -9,7 +9,6 @@ import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Wall;
-import me.newyith.fortress.util.particle.ParticleEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -35,6 +34,7 @@ public class BaseCore {
 		protected final String worldName;
 		protected final transient World world;
 		protected final transient int generationRangeLimit;
+		protected transient CoreParticles coreParticles;
 		protected transient CompletableFuture<GenPrepData> genPrepDataFuture;
 
 		@JsonCreator
@@ -58,6 +58,7 @@ public class BaseCore {
 			//rebuild transient fields
 			this.world = Bukkit.getWorld(worldName);
 			this.generationRangeLimit = FortressPlugin.config_generationRangeLimit;
+			this.coreParticles = new CoreParticles();
 			this.genPrepDataFuture = null;
 			//"//updateInsideOutside() called by rune (second stage loading)" not sure if this is important
 		}
@@ -250,11 +251,17 @@ public class BaseCore {
 		}
 	}
 
+	public void onGeneratedChanged() {
+		model.coreParticles.onGeneratedChanges();
+	}
+
 	public void tick() {
 		CompletableFuture<GenPrepData> future = model.genPrepDataFuture;
 		if (future != null) {
 			GenPrepData data = future.getNow(null);
 			if (data != null) {
+				model.genPrepDataFuture = null;
+
 				//update claimed points
 				List<Set<Point>> wallLayers = Wall.merge(data.generatableLayers, model.animator.getGeneratedLayers());
 				Set<Point> wallPoints = Wall.flattenLayers(wallLayers);
@@ -268,12 +275,16 @@ public class BaseCore {
 
 				model.animator.generate(data.generatableLayers);
 			} else {
-				//TODO: show particles over anchor
-				Debug.particleAt(model.anchorPoint, ParticleEffect.FLAME);
+				model.coreParticles.displayAnchorParticle(this);
 			}
 		}
 
-		model.animator.tick();
+		model.coreParticles.tick(this);
+
+		boolean waitingForGenPrepData = future != null && !future.isDone();
+		if (!waitingForGenPrepData) {
+			model.animator.tick();
+		}
 	}
 
 	// --------- Internal Methods ---------
@@ -291,7 +302,7 @@ public class BaseCore {
 
 		//cancel pending generation (if any)
 		if (model.genPrepDataFuture != null) {
-			model.genPrepDataFuture.cancel(true);
+			model.genPrepDataFuture.cancel(true); //apparently cancelling CompletableFuture doesn't actually stop process. it just doesn't resolve
 			model.genPrepDataFuture = null;
 		}
 
@@ -308,7 +319,7 @@ public class BaseCore {
 
 		//cancel pending generation (if any)
 		if (model.genPrepDataFuture != null) {
-			model.genPrepDataFuture.cancel(true);
+			model.genPrepDataFuture.cancel(true); //apparently cancelling CompletableFuture doesn't actually stop process. it just doesn't resolve
 			model.genPrepDataFuture = null;
 		}
 
@@ -317,9 +328,10 @@ public class BaseCore {
 	}
 
 	private CompletableFuture<GenPrepData> getGenPrepDataFuture() {
-		Debug.msg("getGenPrepDataFuture() called");
+//		Debug.msg("getGenPrepDataFuture() called");
 
-		return CompletableFuture.supplyAsync(() -> {
+		CompletableFuture<GenPrepData> future = CompletableFuture.supplyAsync(() -> {
+//			Debug.msg("getGenPrepDataFuture() start");
 			List<Set<Point>> generatableLayers = getGeneratableWallLayers().join();
 
 			//set layerAroundWall
@@ -330,9 +342,20 @@ public class BaseCore {
 			Set<Point> layerOutside = getLayerOutside(wallPoints, layerAroundWall);
 			Set<Point> pointsInside = getPointsInside(layerOutside, layerAroundWall, wallPoints);
 
-			Debug.msg("getGenPrepDataFuture() returning");
+//			Debug.msg("getGenPrepDataFuture() returning");
 			return new GenPrepData(generatableLayers, layerAroundWall, pointsInside, layerOutside);
 		});
+
+		onSearchingChanged(true);
+		future.thenAccept((data) -> {
+			onSearchingChanged(false);
+		});
+
+		return future;
+	}
+
+	protected void onSearchingChanged(boolean searching) {
+		//this method exists so GeneratorCore can override it and pass along the event to GeneratorRune
 	}
 
 	private Set<Point> getLayerOutside(Set<Point> wallPoints, Set<Point> layerAroundWall) {
@@ -364,7 +387,7 @@ public class BaseCore {
 			layerOutside.retainAll(layerAroundWall); //this is needed because we add rune points to searchablePoints
 		}
 
-		Debug.msg("layerOutside.size(): " + layerOutside.size());
+//		Debug.msg("layerOutside.size(): " + layerOutside.size());
 		return layerOutside;
 	}
 
@@ -391,7 +414,7 @@ public class BaseCore {
 			}
 		}
 
-		Debug.msg("pointsInside.size(): " + pointsInside.size());
+//		Debug.msg("pointsInside.size(): " + pointsInside.size());
 		return pointsInside;
 	}
 

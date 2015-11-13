@@ -238,6 +238,8 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+//TODO: figure out why manual book won't load again
+
 //TODO: keep working on BaseCore next
 //	then move anything rune specific out of BaseCore and into GeneratorCore
 

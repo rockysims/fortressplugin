@@ -159,8 +159,6 @@ public class Wall {
 			ignorePoints = new HashSet<>();
 		final Set<Point> finalIgnorePoints = ignorePoints;
 
-		Debug.msg("getPointsConnectedAsLayersPromise() called");
-
 		return CompletableFuture.supplyAsync(() -> {
 			List<Set<Point>> matchesAsLayers = new ArrayList<>();
 			Set<Point> connected = new HashSet<>();
@@ -179,7 +177,7 @@ public class Wall {
 			int recursionLimit2Max = 10 * 6*(int)Math.pow(rangeLimit*2, 2);
 			int recursionLimit = (int)Math.pow(rangeLimit/2, 3);
 			long lastSleepEnd = System.currentTimeMillis();
-			int temp = 0; //TODO: delete this line and all uses of 'temp'
+			int sleeplessCount = 0; //just for debugging
 			while (!nextLayer.isEmpty()) {
 				if (recursionLimit-- <= 0) {
 					Debug.error("Wall recursionLimit exhausted");
@@ -193,20 +191,15 @@ public class Wall {
 				//process layer
 				int recursionLimit2 = recursionLimit2Max;
 				while (!layer.isEmpty()) {
-
-
-
 					long elapsed = System.currentTimeMillis() - lastSleepEnd;
-					if (elapsed > 0) { //TODO: change "> 0" to "> 15"
-						Debug.msg("Sleeping after not sleeping " + temp + " times.");
-						Uninterruptibles.sleepUninterruptibly(1000, TimeUnit.MILLISECONDS); //TODO: tweak sleep duration?
+					if (elapsed > 15) { //use "> 15" except when debugging
+//						Debug.msg("Sleeping after not sleeping " + sleeplessCount + " times.");
+						Uninterruptibles.sleepUninterruptibly(50, TimeUnit.MILLISECONDS); //use "50"ms except when debugging
 						lastSleepEnd = System.currentTimeMillis();
-						temp = 0;
+						sleeplessCount = 0;
 					} else {
-						temp++;
+						sleeplessCount++;
 					}
-
-
 
 					if (recursionLimit2-- <= 0) {
 						Debug.error("Wall recursionLimit2 exhausted");

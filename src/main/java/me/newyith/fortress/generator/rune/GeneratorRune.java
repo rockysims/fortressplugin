@@ -174,6 +174,27 @@ public class GeneratorRune {
 		}
 	}
 
+	public void onSearchingChanged(boolean searching) {
+		if (searching) {
+			setSignText("Searching", null, null);
+		} else {
+			//change back line1 to match state
+			switch (model.state) {
+				case RUNNING:
+					setSignText("Running", null, null);
+					break;
+				case PAUSED:
+					setSignText("Paused", null, null);
+					break;
+				case NEEDS_FUEL:
+					setSignText("Needs Fuel", null, null);
+					break;
+				default:
+					Debug.error("GeneratorRune::setState() couldn't find a case matching GeneratorState: " + model.state);
+			}
+		}
+	}
+
 	// - Handlers -
 
 	private void tickFuel() {
@@ -235,7 +256,7 @@ public class GeneratorRune {
 					moveBlockTo(Material.GOLD_BLOCK, model.pattern.getFuelPoint());
 					break;
 				default:
-					Debug.error("FortressGeneratorRune setState method couldn't find a case matching FgState: " + state);
+					Debug.error("GeneratorRune::setState() couldn't find a case matching GeneratorState: " + state);
 			}
 
 			model.state = state;

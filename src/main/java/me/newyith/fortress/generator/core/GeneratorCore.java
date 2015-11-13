@@ -1,5 +1,7 @@
 package me.newyith.fortress.generator.core;
 
+import me.newyith.fortress.generator.rune.GeneratorRune;
+import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Point;
 import org.bukkit.World;
 import org.codehaus.jackson.annotate.JsonCreator;
@@ -50,9 +52,11 @@ public class GeneratorCore extends BaseCore {
 
 	//-----------------------------------------------------------------------
 
-	//method was in FortressGeneratorRune but now belongs here (basically just passed event along to particles manager)
-	public void onGeneratedChanged() {
-		//TODO: write
-		//particles.onGeneratedChanges();
+	@Override
+	protected void onSearchingChanged(boolean searching) {
+		GeneratorRune rune = FortressesManager.getRune(model.anchorPoint);
+		if (rune != null) {
+			rune.onSearchingChanged(searching);
+		}
 	}
 }
