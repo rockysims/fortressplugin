@@ -238,27 +238,21 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
-//TODO: figure out why manual book won't load again
+//TODO: merge inherit back into master?
 
-//TODO: keep working on BaseCore next
-//	then move anything rune specific out of BaseCore and into GeneratorCore
+//TODO: move anything rune specific out of BaseCore and into GeneratorCore?
+//	need to figure out how to do this in prep for PistonCore, right?
 
-//TODO: add particles manager to a core (was in rune)
-//	including anchor particles? yes
+//TODO: add whitelist signs on rune base feature (manual book is written as if it does)
 
-//TODO: write Wall.getConnectedPointsPromise()
-
+//TODO: make it robust enough to handle server crashes
 
 
 
 
 
-//now that things will be saved via Model classes we don't need GeneratorRunesManager to be non static
-//TODO: change GeneratorRunesManager back to static
 
-//TODO: finish refactoring
-//	make Core, AwareCore, etc. extend each other
-//	make rune have generatorCore as field (not extend GeneratorCore)
+
 //TODO: consider splitting off GeneratorRunesManager functionality into classes:
 //	DoorProtection (for protecting doors and handling white list)
 //	ExplosionProtection (for protecting blocks from explosions and related eye candy)
@@ -281,10 +275,6 @@ public class FortressPlugin extends JavaPlugin {
 //	unknown:
 //		clear animationLayers after animation finishes
 //		stop particles when chunk is not loaded so we can free up the wallOutsidePairs memory
-
-//TODO: onEnable, make sure all runes match rune pattern and destroy any that do not
-//	that also means we can rebuild runePattern instead of save/load
-//		probably not worth doing to speed up saving but might as well use the new pattern since we're more sure its right
 
 //spread out periodic save over time to prevent any lag
 

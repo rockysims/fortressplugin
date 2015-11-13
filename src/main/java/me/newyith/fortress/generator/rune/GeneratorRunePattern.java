@@ -175,7 +175,7 @@ public class GeneratorRunePattern {
 		return s.add(x, y, z);
 	}
 
-	public boolean isValid() { //TODO: FortressesManager should call this during load and destroy invalid generators
+	public boolean isValid() {
 		boolean valid = true;
 		valid = valid && model.signPoint.is(Material.WALL_SIGN, model.world);
 		valid = valid && model.anchorPoint.is(Material.DIAMOND_BLOCK, model.world);
