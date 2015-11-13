@@ -238,8 +238,6 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
-//TODO: merge inherit back into master?
-
 //TODO: move anything rune specific out of BaseCore and into GeneratorCore?
 //	need to figure out how to do this in prep for PistonCore, right?
 
