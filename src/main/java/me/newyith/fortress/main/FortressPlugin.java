@@ -24,6 +24,7 @@ public class FortressPlugin extends JavaPlugin {
 	private static final double saveDelayMs = 60*1000;
 	private static int saveWaitTicks = 0;
 
+	private static FortressPlugin instance;
 	private static SaveLoadManager saveLoadManager;
 	private static SandboxSaveLoadManager sandboxSaveLoadManager;
 
@@ -53,6 +54,8 @@ public class FortressPlugin extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
+		instance = this;
+
 		loadConfig();
 		saveLoadManager = new SaveLoadManager(this);
 		saveLoadManager.load();
@@ -228,6 +231,10 @@ public class FortressPlugin extends JavaPlugin {
 				}
 			}
 		}
+	}
+
+	public static FortressPlugin getInstance() {
+		return instance;
 	}
 }
 

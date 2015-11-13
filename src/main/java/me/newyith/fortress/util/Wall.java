@@ -118,56 +118,27 @@ public class Wall {
 		return mats;
 	}
 
-	public static Set<Point> getPointsConnected(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
-		List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints, ConnectedThreshold.FACES);
-		return flattenLayers(layers);
+	public static CompletableFuture<Set<Point>> getPointsConnected(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
+		return CompletableFuture.supplyAsync(() -> {
+			List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints, ConnectedThreshold.FACES).join();
+			return flattenLayers(layers);
+		});
 	}
 
-	public static Set<Point> getPointsConnected(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, ConnectedThreshold connectedThreshold) {
-		List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints, null, connectedThreshold);
-		return flattenLayers(layers);
+	public static CompletableFuture<Set<Point>> getPointsConnected(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, ConnectedThreshold connectedThreshold) {
+		return CompletableFuture.supplyAsync(() -> {
+			List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints, null, connectedThreshold).join();
+			return flattenLayers(layers);
+		});
 	}
 
-	public static List<Set<Point>> getPointsConnectedAsLayers(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints) {
+	public static CompletableFuture<List<Set<Point>>> getPointsConnectedAsLayers(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints) {
 		if (originLayer == null) {
 			originLayer = new HashSet<>();
 			originLayer.add(origin);
 		}
 		return getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints, null, ConnectedThreshold.FACES);
 	}
-
-
-
-
-	public void getPointsConnectedAsLayers() {
-		CompletableFuture<List<Set<Point>>> future = getPointsConnectedAsLayersPromise();
-
-		System.out.println("Before Generation");
-		future.thenAccept(values -> System.out.println("thenAccept: " + values));
-		System.out.println("join: " + future.join()); //future.join() means wait for the other thread
-		System.out.println("After Generation");
-
-		List<Integer> promisedList = future.getNow(null); //return null if !future.isDone()
-
-		Uninterruptibles.sleepUninterruptibly(10, TimeUnit.SECONDS);
-	}
-
-	public static CompletableFuture<List<Set<Point>>> getPointsConnectedAsLayersPromise(int count) {
-		return CompletableFuture.supplyAsync(() -> {
-
-
-
-			List<Integer> values = new ArrayList<>(count);
-			for (int i = 0; i < count; i++) {
-				Uninterruptibles.sleepUninterruptibly(250, TimeUnit.MILLISECONDS);
-				values.add(i);
-			}
-			return ImmutableList.copyOf(values);
-		});
-	}
-
-
-
 
 	/**
 	 * Looks at all blocks connected to the originLayer by traverseMaterials (directly or recursively).
@@ -188,6 +159,8 @@ public class Wall {
 			ignorePoints = new HashSet<>();
 		final Set<Point> finalIgnorePoints = ignorePoints;
 
+		Debug.msg("getPointsConnectedAsLayersPromise() called");
+
 		return CompletableFuture.supplyAsync(() -> {
 			List<Set<Point>> matchesAsLayers = new ArrayList<>();
 			Set<Point> connected = new HashSet<>();
@@ -205,18 +178,9 @@ public class Wall {
 
 			int recursionLimit2Max = 10 * 6*(int)Math.pow(rangeLimit*2, 2);
 			int recursionLimit = (int)Math.pow(rangeLimit/2, 3);
-			long lastSleepEnd = 0;
+			long lastSleepEnd = System.currentTimeMillis();
+			int temp = 0; //TODO: delete this line and all uses of 'temp'
 			while (!nextLayer.isEmpty()) {
-				long now = System.currentTimeMillis();
-				long elapsed = now - lastSleepEnd;
-				if (elapsed > 25) {
-					Debug.msg("Sleeping 50ms");
-					Uninterruptibles.sleepUninterruptibly(50, TimeUnit.MILLISECONDS); //TODO: tweak sleep duration?
-					lastSleepEnd = System.currentTimeMillis();
-				} else {
-					Debug.msg("Not sleeping. Elapsed: " + elapsed);
-				}
-
 				if (recursionLimit-- <= 0) {
 					Debug.error("Wall recursionLimit exhausted");
 					break;
@@ -229,6 +193,21 @@ public class Wall {
 				//process layer
 				int recursionLimit2 = recursionLimit2Max;
 				while (!layer.isEmpty()) {
+
+
+
+					long elapsed = System.currentTimeMillis() - lastSleepEnd;
+					if (elapsed > 0) { //TODO: change "> 0" to "> 15"
+						Debug.msg("Sleeping after not sleeping " + temp + " times.");
+						Uninterruptibles.sleepUninterruptibly(1000, TimeUnit.MILLISECONDS); //TODO: tweak sleep duration?
+						lastSleepEnd = System.currentTimeMillis();
+						temp = 0;
+					} else {
+						temp++;
+					}
+
+
+
 					if (recursionLimit2-- <= 0) {
 						Debug.error("Wall recursionLimit2 exhausted");
 						break;
