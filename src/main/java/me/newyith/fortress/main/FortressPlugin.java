@@ -238,6 +238,8 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+//TODO: make fortress block limit apply to search (not generation)
+
 //TODO: consider splitting FortressesManager into CoresManager and RunesManager
 
 //TODO: move anything rune specific out of BaseCore and into GeneratorCore?

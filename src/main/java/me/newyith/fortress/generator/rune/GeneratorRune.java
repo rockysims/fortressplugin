@@ -1,6 +1,7 @@
 package me.newyith.fortress.generator.rune;
 
 import me.newyith.fortress.event.TickTimer;
+import me.newyith.fortress.generator.core.CoreMaterials;
 import me.newyith.fortress.generator.core.GeneratorCore;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
@@ -57,7 +58,8 @@ public class GeneratorRune {
 	}
 
 	public GeneratorRune(GeneratorRunePattern pattern) {
-		GeneratorCore core = new GeneratorCore(pattern.getWorld(), pattern.getAnchorPoint());
+		CoreMaterials coreMats = new CoreMaterials(pattern.getWorld(), pattern.getChestPoint());
+		GeneratorCore core = new GeneratorCore(pattern.getWorld(), pattern.getAnchorPoint(), coreMats);
 		GeneratorState state = GeneratorState.NULL;
 		int fuelTicksRemaining = 0;
 		boolean powered = false;
@@ -65,8 +67,6 @@ public class GeneratorRune {
 	}
 
 	public void secondStageLoad() {
-		model.core.secondStageLoad();
-
 		/* rebuild version (currently saving it instead)
 		model.core.updateInsideOutside(); //updateInsideOutside() needs to be called before onGeneratedChanged() so layerOutside is full
 		//*/

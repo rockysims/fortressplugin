@@ -111,6 +111,18 @@ public class FortressesManager {
 		return instance.model.generatorRuneByPoint.get(p);
 	}
 
+	//this helps separate Rune and Core (kind of a hack to find core through rune. fix later)
+	public static BaseCore getCore(Point p) {
+		BaseCore core = null;
+
+		GeneratorRune rune = getRune(p);
+		if (rune != null) {
+			core = rune.getGeneratorCore();
+		}
+
+		return core;
+	}
+
 	public static Set<GeneratorRune> getRunes() {
 		return instance.model.generatorRunes;
 	}

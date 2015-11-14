@@ -44,8 +44,8 @@ public class GeneratorCore extends BaseCore {
 		this.model = model;
 	}
 
-	public GeneratorCore(World world, Point anchorPoint) {
-		super(world, anchorPoint); //sets super.model
+	public GeneratorCore(World world, Point anchorPoint, CoreMaterials coreMats) {
+		super(world, anchorPoint, coreMats); //sets super.model
 		String datum = "myDatum";
 		model = new Model(super.model, datum);
 	}

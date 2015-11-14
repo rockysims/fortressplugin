@@ -1,8 +1,6 @@
 package me.newyith.fortress.generator.core;
 
 import me.newyith.fortress.event.TickTimer;
-import me.newyith.fortress.generator.WallMaterials;
-import me.newyith.fortress.generator.rune.GeneratorRune;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
@@ -33,6 +31,7 @@ public class CoreAnimator {
 		private Set<Point> protectedPoints = null;
 		private List<Set<Point>> generatedLayers = null;
 		private List<Set<Point>> animationLayers = null;
+		private CoreMaterials coreMats = null;
 		private boolean skipAnimation = false;
 		private boolean animationInProgress = false;
 		private boolean isGeneratingWall = false;
@@ -42,7 +41,6 @@ public class CoreAnimator {
 		private transient final int ticksPerFrame;
 		private transient int animationWaitTicks = 0;
 		private transient int curIndex = 0;
-		public transient WallMaterials wallMats;
 
 		@JsonCreator
 		public Model(@JsonProperty("anchorPoint") Point anchorPoint,
@@ -50,6 +48,7 @@ public class CoreAnimator {
 					 @JsonProperty("protectedPoints") Set<Point> protectedPoints,
 					 @JsonProperty("generatedLayers") List<Set<Point>> generatedLayers,
 					 @JsonProperty("animationLayers") List<Set<Point>> animationLayers,
+					 @JsonProperty("coreMats") CoreMaterials coreMats,
 					 @JsonProperty("skipAnimation") boolean skipAnimation,
 					 @JsonProperty("animationInProgress") boolean animationInProgress,
 					 @JsonProperty("isGeneratingWall") boolean isGeneratingWall,
@@ -59,6 +58,7 @@ public class CoreAnimator {
 			this.protectedPoints = protectedPoints;
 			this.generatedLayers = generatedLayers;
 			this.animationLayers = animationLayers;
+			this.coreMats = coreMats;
 			this.skipAnimation = skipAnimation;
 			this.animationInProgress = animationInProgress;
 			this.isGeneratingWall = isGeneratingWall;
@@ -70,7 +70,6 @@ public class CoreAnimator {
 			this.ticksPerFrame = 150 / TickTimer.msPerTick; // msPerFrame / msPerTick
 			this.animationWaitTicks = 0;
 			this.curIndex = 0;
-			this.wallMats = new WallMaterials(world, anchorPoint);
 		}
 	}
 	private Model model = null;
@@ -80,7 +79,7 @@ public class CoreAnimator {
 		this.model = model;
 	}
 
-	public CoreAnimator(World world, Point anchorPoint) {
+	public CoreAnimator(World world, Point anchorPoint, CoreMaterials coreMats) {
 		HashMap<Point, Material> alteredPoints = new HashMap<>();
 		Set<Point> protectedPoints = new HashSet<>();
 		List<Set<Point>> generatedLayers = new ArrayList<>();
@@ -89,8 +88,8 @@ public class CoreAnimator {
 		boolean animationInProgress = false;
 		boolean isGeneratingWall = false;
 		String worldName = world.getName();
-		model = new Model(anchorPoint, alteredPoints, protectedPoints, generatedLayers,
-				animationLayers, skipAnimation, animationInProgress, isGeneratingWall, worldName);
+		model = new Model(anchorPoint, alteredPoints, protectedPoints, generatedLayers, animationLayers,
+				coreMats, skipAnimation, animationInProgress, isGeneratingWall, worldName);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -149,8 +148,8 @@ public class CoreAnimator {
 //		onGeneratedChanged();
 	}
 
-	public WallMaterials getWallMats() {
-		return model.wallMats;
+	public CoreMaterials getCoreMats() {
+		return model.coreMats;
 	}
 
 	public Set<Point> getAlteredPoints() {
@@ -194,12 +193,11 @@ public class CoreAnimator {
 	// --------- Internal Methods ---------
 
 	private void onGeneratedChanged() {
-		GeneratorRune rune = FortressesManager.getRune(model.anchorPoint);
-		if (rune != null) {
-			rune.getGeneratorCore().onGeneratedChanged();
-		} //rune can be null during init sometimes?
-		else { //TODO: remove the else part (after testing?)
-			Debug.error("CoreAnimator.onGeneratedChanged(): Rune at " + model.anchorPoint + " is null.");
+		BaseCore core = FortressesManager.getCore(model.anchorPoint);
+		if (core != null) {
+			core.onGeneratedChanged();
+		} else {
+			Debug.error("CoreAnimator.onGeneratedChanged(): Core at " + model.anchorPoint + " is null.");
 		}
 	}
 
@@ -276,7 +274,7 @@ public class CoreAnimator {
 		boolean altered = false;
 
 		Block b = p.getBlock(model.world);
-		if (model.wallMats.isAlterable(b)) {
+		if (model.coreMats.isAlterable(b)) {
 			addAlteredPoint(p, b.getType());
 			b.setType(Material.BEDROCK);
 			altered = true;
@@ -303,7 +301,7 @@ public class CoreAnimator {
 		boolean pointProtected = false;
 
 		Block b = p.getBlock(model.world);
-		if (!model.protectedPoints.contains(p) && model.wallMats.isProtectable(b)) {
+		if (!model.protectedPoints.contains(p) && model.coreMats.isProtectable(b)) {
 			addProtectedPoint(p);
 			pointProtected = true;
 		}
