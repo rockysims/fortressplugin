@@ -240,11 +240,8 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: make fortress block limit apply to search (not generation)
 
-//TODO: consider splitting FortressesManager into CoresManager and RunesManager
-
 //TODO: move anything rune specific out of BaseCore and into GeneratorCore?
 //	need to figure out how to do this in prep for PistonCore, right?
-//TODO: consider, within cores, changing 'anchorPoint's to 'originPoint's to emphasize the disconnect
 
 //TODO: make it robust enough to handle server crashes
 //things to try:
@@ -255,8 +252,10 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: add whitelist signs on rune base feature (manual book is written as if it does)
 
-//TODO: look into permissions... seems like it should be really easy to integrate
+//TODO: consider splitting FortressesManager into CoresManager and RunesManager
+//TODO: consider, within cores, changing 'anchorPoint's to 'originPoint's to emphasize the disconnect
 
+//TODO: look into permissions... seems like it should be really easy to integrate
 //TODO: add mcStats: http://mcstats.org/learn-more/
 
 

@@ -175,6 +175,7 @@ public class GeneratorRune {
 	}
 
 	public void onSearchingChanged(boolean searching) {
+		/* //commented out because flashing "Searching" for a fraction of a second looks bad
 		if (searching) {
 			setSignText("Searching", null, null);
 		} else {
@@ -193,6 +194,7 @@ public class GeneratorRune {
 					Debug.error("GeneratorRune::setState() couldn't find a case matching GeneratorState: " + model.state);
 			}
 		}
+		//*/
 	}
 
 	// - Handlers -

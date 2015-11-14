@@ -56,7 +56,6 @@ public class BaseCore {
 			this.generationRangeLimit = FortressPlugin.config_generationRangeLimit;
 			this.coreParticles = new CoreParticles();
 			this.genPrepDataFuture = null;
-			//"//updateInsideOutside() called by rune (second stage loading)" not sure if this is important
 		}
 
 		public Model(Model m) {
