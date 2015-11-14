@@ -59,4 +59,10 @@ public class GeneratorCore extends BaseCore {
 			rune.onSearchingChanged(searching);
 		}
 	}
+
+	@Override
+	protected Set<Point> getOriginPoints() {
+		GeneratorRune rune = FortressesManager.getRune(model.anchorPoint);
+		return rune.getPattern().getPoints();
+	}
 }

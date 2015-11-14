@@ -238,14 +238,24 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+//TODO: consider splitting FortressesManager into CoresManager and RunesManager
+
 //TODO: move anything rune specific out of BaseCore and into GeneratorCore?
 //	need to figure out how to do this in prep for PistonCore, right?
+//TODO: consider, within cores, changing 'anchorPoint's to 'originPoint's to emphasize the disconnect
+
+//TODO: make it robust enough to handle server crashes
+//things to try:
+//	using ctrl+c to stop server while not generating
+//	using ctrl+c to stop server while generating
+//	changing worlds without deleting data
+//	try it along side some other people's plugins
 
 //TODO: add whitelist signs on rune base feature (manual book is written as if it does)
 
-//TODO: make it robust enough to handle server crashes
+//TODO: look into permissions... seems like it should be really easy to integrate
 
-
+//TODO: add mcStats: http://mcstats.org/learn-more/
 
 
 

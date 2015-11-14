@@ -260,7 +260,7 @@ public class GeneratorRune {
 			}
 
 			model.state = state;
-			model.core.onStateChanged(state);
+			model.core.setActive(state == GeneratorState.RUNNING);
 		}
 	}
 

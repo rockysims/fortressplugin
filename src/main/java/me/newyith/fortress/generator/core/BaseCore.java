@@ -2,8 +2,6 @@ package me.newyith.fortress.generator.core;
 
 import me.newyith.fortress.generator.GenPrepData;
 import me.newyith.fortress.generator.WallMaterials;
-import me.newyith.fortress.generator.rune.GeneratorRune;
-import me.newyith.fortress.generator.rune.GeneratorState;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Debug;
@@ -210,9 +208,8 @@ public class BaseCore {
 		model.placedByPlayerId = placingPlayer.getUniqueId();
 
 		//set overlapWithClaimed = true if placed generator is connected (by faces) to another generator's claimed points
-		GeneratorRune rune = FortressesManager.getRune(model.anchorPoint);
-		Set<Point> claimPoints = rune.getPattern().getPoints();
-		Set<Point> alreadyClaimedPoints = getClaimedPointsOfNearbyGenerators();
+		Set<Point> claimPoints = getOriginPoints();
+		Set<Point> alreadyClaimedPoints = getClaimedPointsOfNearbyCores();
 		boolean overlapWithClaimed = !Collections.disjoint(alreadyClaimedPoints, claimPoints); //disjoint means no points in common
 
 		boolean canPlace = !overlapWithClaimed;
@@ -243,8 +240,8 @@ public class BaseCore {
 		degenerateWall(true); //true means skipAnimation
 	}
 
-	public void onStateChanged(GeneratorState newState) {
-		if (newState == GeneratorState.RUNNING) {
+	public void setActive(boolean active) {
+		if (active) {
 			generateWall();
 		} else {
 			degenerateWall(false); //false means don't skipAnimation
@@ -355,7 +352,7 @@ public class BaseCore {
 	}
 
 	protected void onSearchingChanged(boolean searching) {
-		//this method exists so GeneratorCore can override it and pass along the event to GeneratorRune
+		//this method exists so GeneratorCore can override it
 	}
 
 	private Set<Point> getLayerOutside(Set<Point> wallPoints, Set<Point> layerAroundWall) {
@@ -379,16 +376,20 @@ public class BaseCore {
 			int rangeLimit = 2 * model.generationRangeLimit + 2;
 			Set<Point> ignorePoints = wallPoints;
 			Set<Point> searchablePoints = new HashSet<>(layerAroundWall);
-			GeneratorRune rune = FortressesManager.getRune(model.anchorPoint);
-			searchablePoints.addAll(rune.getPattern().getPoints());
+			searchablePoints.addAll(getOriginPoints());
 			layerOutside = Wall.getPointsConnected(model.world, origin, originLayer,
 					traverseMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints).join();
 			layerOutside.addAll(originLayer);
-			layerOutside.retainAll(layerAroundWall); //this is needed because we add rune points to searchablePoints
+			layerOutside.retainAll(layerAroundWall); //this is needed because we add origin points to searchablePoints
 		}
 
 //		Debug.msg("layerOutside.size(): " + layerOutside.size());
 		return layerOutside;
+	}
+	protected Set<Point> getOriginPoints() {
+		Set<Point> originPoints = new HashSet<>();
+		originPoints.add(model.anchorPoint);
+		return originPoints;
 	}
 
 	private Set<Point> getPointsInside(Set<Point> layerOutside, Set<Point> layerAroundWall, Set<Point> wallPoints) {
@@ -419,32 +420,28 @@ public class BaseCore {
 	}
 
 	private void updateClaimedPoints(Set<Point> wallPoints, Set<Point> layerAroundWall) {
-		//claim wallPoints
 		model.claimedPoints.clear();
-		model.claimedPoints.addAll(wallPoints);
 		model.claimedWallPoints.clear();
+
+		//claim wallPoints
+		model.claimedPoints.addAll(wallPoints);
 		model.claimedWallPoints.addAll(wallPoints);
 
 		//claim layerAroundWall
 		model.claimedPoints.addAll(layerAroundWall);
 
-		GeneratorRune rune = FortressesManager.getRune(model.anchorPoint);
-		if (rune != null) {
-			//claim runePoints
-			Set<Point> runePoints = rune.getPattern().getPoints();
-			model.claimedPoints.addAll(runePoints);
-
-			//claim layerAroundRune
-			Set<Point> layerAroundRune = getLayerAround(runePoints).join(); //should be nearly instant so ok to wait
-			model.claimedPoints.addAll(layerAroundRune);
-		}
+		//claim originPoints and layer around
+		Set<Point> originPoints = getOriginPoints();
+		Set<Point> layerAroundOrigins = getLayerAround(originPoints).join(); //should be nearly instant so ok to wait
+		model.claimedPoints.addAll(originPoints);
+		model.claimedPoints.addAll(layerAroundOrigins);
 	}
 
 	private CompletableFuture<List<Set<Point>>> getGeneratableWallLayers() {
 		WallMaterials wallMats = model.animator.getWallMats();
 		wallMats.refresh(); //refresh protectable blocks list based on chest contents
 
-		Set<Point> claimedPoints = getClaimedPointsOfNearbyGenerators();
+		Set<Point> claimedPoints = getClaimedPointsOfNearbyCores();
 
 		//return all connected wall points ignoring (and not traversing) claimedPoints (generationRangeLimit search range)
 		Set<Material> traverseMaterials = wallMats.getWallMaterials();
@@ -454,15 +451,15 @@ public class BaseCore {
 		return getPointsConnectedAsLayers(traverseMaterials, returnMaterials, rangeLimit, ignorePoints);
 	}
 
-	private Set<Point> getClaimedPointsOfNearbyGenerators() {
-		Set<GeneratorRune> nearbyRunes = FortressesManager.getOtherGeneratorRunesInRange(model.anchorPoint, model.generationRangeLimit * 2 + 1); //not sure if the + 1 is needed
+	private Set<Point> getClaimedPointsOfNearbyCores() {
+		Set<BaseCore> nearbyCores = FortressesManager.getOtherCoresInRange(model.anchorPoint, model.generationRangeLimit * 2 + 1); //not sure if the + 1 is needed
 
-		Set<Point> claimedPoints = new HashSet<>();
-		for (GeneratorRune rune : nearbyRunes) {
-			claimedPoints.addAll(rune.getGeneratorCore().getClaimedPoints());
+		Set<Point> nearbyClaimedPoints = new HashSet<>();
+		for (BaseCore core : nearbyCores) {
+			nearbyClaimedPoints.addAll(core.getClaimedPoints());
 		}
 
-		return claimedPoints;
+		return nearbyClaimedPoints;
 	}
 
 	public Set<Point> getClaimedPoints() {
@@ -520,6 +517,7 @@ public class BaseCore {
 		return model.layerOutsideFortress;
 	}
 
+	//used by unclaimDisconnected()?
 //	private CompletableFuture<Set<Point>> getPointsConnected(Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
 //		GeneratorRune rune = FortressesManager.getRune(model.anchorPoint);
 //		Point origin = model.anchorPoint;
@@ -528,9 +526,8 @@ public class BaseCore {
 //	}
 
 	private CompletableFuture<List<Set<Point>>> getPointsConnectedAsLayers(Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints) {
-		GeneratorRune rune = FortressesManager.getRune(model.anchorPoint);
 		Point origin = model.anchorPoint;
-		Set<Point> originLayer = rune.getPattern().getPoints();
+		Set<Point> originLayer = getOriginPoints();
 		return Wall.getPointsConnectedAsLayers(model.world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints);
 	}
 

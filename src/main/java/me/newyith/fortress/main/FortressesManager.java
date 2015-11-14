@@ -1,5 +1,6 @@
 package me.newyith.fortress.main;
 
+import me.newyith.fortress.generator.core.BaseCore;
 import me.newyith.fortress.generator.rune.GeneratorRune;
 import me.newyith.fortress.generator.rune.GeneratorRunePattern;
 import me.newyith.fortress.util.Debug;
@@ -129,27 +130,24 @@ public class FortressesManager {
 	}
 
 	//during generation, we need all potentially conflicting generators (not just known ones) so search by range
-	public static Set<GeneratorRune> getOtherGeneratorRunesInRange(Point center, int range) {
-		Set<GeneratorRune> runesInRange = new HashSet<>();
-		int x = center.xInt();
-		int y = center.yInt();
-		int z = center.zInt();
+	public static Set<BaseCore> getOtherCoresInRange(Point center, int range) {
+		Set<BaseCore> coresInRange = new HashSet<>();
 
 		//fill runesInRange
 		for (GeneratorRune rune : instance.model.generatorRunes) {
 			//set inRange
 			boolean inRange = true;
 			Point p = rune.getPattern().getAnchorPoint();
-			inRange = inRange && Math.abs(p.xInt() - x) <= range;
-			inRange = inRange && Math.abs(p.yInt() - y) <= range;
-			inRange = inRange && Math.abs(p.zInt() - z) <= range;
+			inRange = inRange && Math.abs(p.xInt() - center.xInt()) <= range;
+			inRange = inRange && Math.abs(p.yInt() - center.yInt()) <= range;
+			inRange = inRange && Math.abs(p.zInt() - center.zInt()) <= range;
 
 			if (inRange) {
-				runesInRange.add(rune);
+				coresInRange.add(rune.getGeneratorCore());
 			}
 		}
-		runesInRange.remove(getRune(center));
-		return runesInRange;
+		coresInRange.remove(getRune(center).getGeneratorCore());
+		return coresInRange;
 	}
 
 	public static void addProtectedPoint(Point p, Point anchor) {
