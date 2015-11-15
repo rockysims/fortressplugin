@@ -120,24 +120,24 @@ public class Wall {
 
 	public static CompletableFuture<Set<Point>> getPointsConnected(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
 		return CompletableFuture.supplyAsync(() -> {
-			List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints, ConnectedThreshold.FACES).join();
+			List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, -1, rangeLimit, ignorePoints, searchablePoints, ConnectedThreshold.FACES).join();
 			return flattenLayers(layers);
 		});
 	}
 
 	public static CompletableFuture<Set<Point>> getPointsConnected(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, ConnectedThreshold connectedThreshold) {
 		return CompletableFuture.supplyAsync(() -> {
-			List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints, null, connectedThreshold).join();
+			List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, -1, rangeLimit, ignorePoints, null, connectedThreshold).join();
 			return flattenLayers(layers);
 		});
 	}
 
-	public static CompletableFuture<List<Set<Point>>> getPointsConnectedAsLayers(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints) {
+	public static CompletableFuture<List<Set<Point>>> getPointsConnectedAsLayers(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int maxReturns, int rangeLimit, Set<Point> ignorePoints) {
 		if (originLayer == null) {
 			originLayer = new HashSet<>();
 			originLayer.add(origin);
 		}
-		return getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints, null, ConnectedThreshold.FACES);
+		return getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints, null, ConnectedThreshold.FACES);
 	}
 
 	/**
@@ -147,13 +147,14 @@ public class Wall {
 	 * @param originLayer The first point(s) to search outward from.
 	 * @param traverseMaterials List of connecting block types. If null, all materials traversable.
 	 * @param returnMaterials List of block types to look for and return when connected to the wall or null to return all block types.
+	 * @param maxReturns Maximum number of points found before returning.
 	 * @param rangeLimit The maximum distance away from origin to search.
 	 * @param ignorePoints When searching, these points will be ignored (not traversed or returned). If null, no points ignored.
 	 * @param searchablePoints When searching, only these points will be visited (traversed and/or returned). If null, all points searchable.
 	 * @param connectedThreshold Whether connected means 3x3x3 area or only the 6 blocks connected by faces.
 	 * @return List of all points (blocks) connected to the originLayer by traverseMaterials and matching a block type in returnMaterials.
 	 */
-	public static CompletableFuture<List<Set<Point>>> getPointsConnectedAsLayers(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints, ConnectedThreshold connectedThreshold) {
+	public static CompletableFuture<List<Set<Point>>> getPointsConnectedAsLayers(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int maxReturns, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints, ConnectedThreshold connectedThreshold) {
 		//make ignorePoints default to empty
 		if (ignorePoints == null)
 			ignorePoints = new HashSet<>();
@@ -177,6 +178,7 @@ public class Wall {
 			int recursionLimit2Max = 10 * 6*(int)Math.pow(rangeLimit*2, 2);
 			int recursionLimit = (int)Math.pow(rangeLimit/2, 3);
 			long lastSleepEnd = System.currentTimeMillis();
+			int matchCount = 0;
 			int sleeplessCount = 0; //just for debugging
 			while (!nextLayer.isEmpty()) {
 				if (recursionLimit-- <= 0) {
@@ -259,15 +261,20 @@ public class Wall {
 									matchesAsLayers.add(new HashSet<>());
 								}
 								matchesAsLayers.get(layerIndex).add(p);
+								matchCount++;
 							}
 
 							//consider adding point to nextLayer
 							if (traverseMaterials == null || traverseMaterials.contains(mat)) {
 								nextLayer.push(p);
 							}
+
+							if (maxReturns != -1 && matchCount >= maxReturns) break;
 						}
-					}
+					} //end of for loop
+					if (maxReturns != -1 && matchCount >= maxReturns) break;
 				}
+				if (maxReturns != -1 && matchCount >= maxReturns) break;
 			}
 
 			return ImmutableList.copyOf(matchesAsLayers);

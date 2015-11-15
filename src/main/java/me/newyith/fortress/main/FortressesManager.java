@@ -184,6 +184,10 @@ public class FortressesManager {
 		return instance.model.protectedPoints.contains(p) || instance.model.alteredPoints.contains(p);
 	}
 
+	public static boolean isAltered(Point p) {
+		return instance.model.alteredPoints.contains(p);
+	}
+
 	public static boolean isClaimed(Point p) {
 		boolean claimed = false;
 

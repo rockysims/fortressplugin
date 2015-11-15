@@ -72,6 +72,10 @@ public class CoreMaterials {
 		return model.alterableWallMaterials.contains(b.getType());
 	}
 
+	public boolean isAlterable(Material m) {
+		return model.alterableWallMaterials.contains(m);
+	}
+
 	// - Refreshing -
 
 	public void refresh() {

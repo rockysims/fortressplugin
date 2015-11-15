@@ -1,8 +1,11 @@
 package me.newyith.fortress.generator.core;
 
+import me.newyith.fortress.generator.TimedBedrock;
 import me.newyith.fortress.generator.GenPrepData;
+import me.newyith.fortress.generator.TimedBedrockData;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
+import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Wall;
 import org.bukkit.Bukkit;
@@ -308,6 +311,33 @@ public class BaseCore {
 			model.genPrepDataFuture = null;
 		}
 
+
+
+
+//		//add bedrock wave remains to official altered points (if origMaterial is alterable)
+//		Set<Point> points = new HashSet<>(model.claimedWallPoints);
+//		points.removeAll(getGeneratedPoints());
+//		points.retainAll(TimedBedrock.getPoints());
+//		Map<Point, TimedBedrockData> data = TimedBedrock.getDataFor(model.world, points);
+//		for (Point p : points) {
+//			Material origMaterial = data.get(p).material;
+//			CoreMaterials coreMats = model.animator.getCoreMats();
+//			boolean isBedrock = p.is(Material.BEDROCK, model.world);
+//			boolean wasAlterable = coreMats.isAlterable(origMaterial);
+//			if (isBedrock) {
+//				if (wasAlterable) {
+//					TimedBedrock.abandon(model.world, p);
+//					model.animator.addAlteredPoint(p, origMaterial);
+//				}
+//			} else {
+//				Debug.msg("TimedBedrock.getPoints() returned non bedrock point!?");
+//			}
+//		}
+
+
+
+
+
 		//start preparing for generation (tick() handles it when future completes)
 		model.genPrepDataFuture = getGenPrepDataFuture();
 	}
@@ -325,16 +355,16 @@ public class BaseCore {
 			Set<Point> layerAroundWall = getLayerAround(wallPoints).join();
 
 			Set<Point> layerOutside = getLayerOutside(wallPoints, layerAroundWall);
+			Debug.msg("layerOutside.size(): " + layerOutside.size());
 			Set<Point> pointsInside = getPointsInside(layerOutside, layerAroundWall, wallPoints);
+			Debug.msg("prep done");
 
 //			Debug.msg("getGenPrepDataFuture() returning");
 			return new GenPrepData(generatableLayers, layerAroundWall, pointsInside, layerOutside);
 		});
 
 		onSearchingChanged(true);
-		future.thenAccept((data) -> {
-			onSearchingChanged(false);
-		});
+		future.thenAccept((data) -> onSearchingChanged(false)); //thenAccept is not called if future was cancelled
 
 		return future;
 	}
@@ -383,13 +413,17 @@ public class BaseCore {
 	private Set<Point> getPointsInside(Set<Point> layerOutside, Set<Point> layerAroundWall, Set<Point> wallPoints) {
 		Set<Point> pointsInside = new HashSet<>();
 
+		Debug.msg("getPointsInside() 0");
 		if (!layerAroundWall.isEmpty()) {
 			//get layerInside
 			Set<Point> layerInside = new HashSet<>(layerAroundWall);
 			layerInside.removeAll(layerOutside);
 
+			Debug.msg("getPointsInside() 1");
+
 			//fill pointsInside
 			if (layerInside.size() > 0) {
+				Debug.msg("getPointsInside() 2");
 				Point origin = layerInside.iterator().next();
 				Set<Point> originLayer = layerInside;
 				Set<Material> traverseMaterials = null; //traverse all block types
@@ -397,13 +431,17 @@ public class BaseCore {
 				int rangeLimit = 2 * model.generationRangeLimit;
 				Set<Point> ignorePoints = wallPoints;
 				Set<Point> searchablePoints = null; //search all points
+				Debug.msg("getPointsInside() 3");
 				pointsInside = Wall.getPointsConnected(model.world, origin, originLayer,
 						traverseMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints).join();
+				Debug.msg("getPointsInside() 4");
 				pointsInside.addAll(originLayer);
+				Debug.msg("getPointsInside() 5");
 			}
 		}
 
 //		Debug.msg("pointsInside.size(): " + pointsInside.size());
+		Debug.msg("getPointsInside() 6");
 		return pointsInside;
 	}
 
@@ -434,9 +472,10 @@ public class BaseCore {
 		//return all connected wall points ignoring (and not traversing) claimedPoints (generationRangeLimit search range)
 		Set<Material> traverseMaterials = coreMats.getWallMaterials();
 		Set<Material> returnMaterials = coreMats.getGeneratableWallMaterials();
+		int maxReturns = Math.max(0, FortressPlugin.config_generationBlockLimit - getGeneratedPoints().size());
 		int rangeLimit = model.generationRangeLimit;
 		Set<Point> ignorePoints = claimedPoints;
-		return getPointsConnectedAsLayers(traverseMaterials, returnMaterials, rangeLimit, ignorePoints);
+		return getPointsConnectedAsLayers(traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints);
 	}
 
 	private Set<Point> getClaimedPointsOfNearbyCores() {
@@ -513,10 +552,10 @@ public class BaseCore {
 //		return Wall.getPointsConnected(model.world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
 //	}
 
-	private CompletableFuture<List<Set<Point>>> getPointsConnectedAsLayers(Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints) {
+	private CompletableFuture<List<Set<Point>>> getPointsConnectedAsLayers(Set<Material> traverseMaterials, Set<Material> returnMaterials, int maxReturns, int rangeLimit, Set<Point> ignorePoints) {
 		Point origin = model.anchorPoint;
 		Set<Point> originLayer = getOriginPoints();
-		return Wall.getPointsConnectedAsLayers(model.world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints);
+		return Wall.getPointsConnectedAsLayers(model.world, origin, originLayer, traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints);
 	}
 
 	private CompletableFuture<Set<Point>> getLayerAround(Set<Point> originLayer) {

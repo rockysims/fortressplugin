@@ -1,6 +1,7 @@
 package me.newyith.fortress.generator.core;
 
 import me.newyith.fortress.event.TickTimer;
+import me.newyith.fortress.generator.TimedBedrock;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
@@ -215,7 +216,7 @@ public class CoreAnimator {
 			int updatedCount = updateLayer(layerIndex);
 			if (updatedCount > 0) {
 				updatedToNextFrame = true;
-				onGeneratedChanged();
+				onGeneratedChanged(); //particles update
 			}
 
 			if (updatedCount < model.maxBlocksPerFrame) {
@@ -227,18 +228,19 @@ public class CoreAnimator {
 	}
 
 	private int updateLayer(int layerIndex) {
-		int blockUpdates = 0;
+		Set<Point> updatedAlteredPoints = new HashSet<>();
+		Set<Point> updatedProtectedPoints = new HashSet<>();
 
 		Set<Point> layer = new HashSet<>(model.animationLayers.get(layerIndex)); //make copy to avoid concurrent modification errors (recheck this is needed)
 		for (Point p : layer) {
 			if (model.isGeneratingWall) {
 				//try to generate block at p
-				boolean pGenerated = alter(p) || protect(p);
-				if (pGenerated) {
-					blockUpdates++;
-				}
+				boolean pAltered = alter(p);
+				boolean pProtected = protect(p);
+				if (pAltered) updatedAlteredPoints.add(p);
+				if (pProtected) updatedProtectedPoints.add(p);
 
-				if (pGenerated) {
+				if (pAltered || pProtected) {
 					//add p to generatedLayers
 					while (layerIndex >= model.generatedLayers.size()) {
 						model.generatedLayers.add(new HashSet<>());
@@ -247,12 +249,12 @@ public class CoreAnimator {
 				}
 			} else {
 				//try to degenerate block at p
-				boolean pDegenerated = unalter(p) || unprotect(p);
-				if (pDegenerated) {
-					blockUpdates++;
-				}
+				boolean pUnaltered = unalter(p);
+				boolean pUnprotected = unprotect(p);
+				if (pUnaltered) updatedAlteredPoints.add(p);
+				if (pUnprotected) updatedProtectedPoints.add(p);
 
-				if (pDegenerated) {
+				if (pUnaltered || pUnprotected) {
 					//remove p from generatedLayers
 					if (layerIndex < model.generatedLayers.size()) {
 						model.generatedLayers.get(layerIndex).remove(p);
@@ -260,14 +262,31 @@ public class CoreAnimator {
 				}
 			}
 
-			if (blockUpdates >= model.maxBlocksPerFrame) {
+			if (updatedAlteredPoints.size() + updatedProtectedPoints.size() >= model.maxBlocksPerFrame) {
 				break;
 			}
 		} // end for (Point p : layer)
 
-//		Debug.msg("layer " + layerIndex + " blockUpdates: " + blockUpdates);
+//		Debug.msg("layer " + layerIndex + " blockUpdates: " + updatedPoints.size());
 
-		return blockUpdates;
+
+		if (!model.skipAnimation) {
+			int durationTicks = 4 * model.ticksPerFrame;
+			if (model.isGeneratingWall) {
+//				timedBedrock(updatedProtectedPoints, ms);
+				TimedBedrock.at(model.world, updatedProtectedPoints, durationTicks);
+			} else {
+				Set<Point> updatedPoints = new HashSet<>();
+				updatedPoints.addAll(updatedAlteredPoints);
+				updatedPoints.addAll(updatedProtectedPoints);
+//				timedBedrock(updatedPoints, ms);
+				TimedBedrock.at(model.world, updatedPoints, durationTicks);
+			}
+		}
+
+
+
+		return updatedAlteredPoints.size() + updatedProtectedPoints.size();
 	}
 
 	private boolean alter(Point p) {
@@ -331,7 +350,7 @@ public class CoreAnimator {
 	}
 
 
-	private void addAlteredPoint(Point p, Material m) {
+	public void addAlteredPoint(Point p, Material m) {
 		model.alteredPoints.put(p, m);
 		FortressesManager.addAlteredPoint(p);
 	}

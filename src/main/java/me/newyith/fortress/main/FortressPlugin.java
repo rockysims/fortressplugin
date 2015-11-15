@@ -238,25 +238,38 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
-//TODO: make fortress block limit apply to search (not generation)
+//TODO: move 'core' package up a level and swap names of package 'generator' with package 'rune'
+//	fortress.core
+//	fortress.rune.generator
 
-//TODO: move anything rune specific out of BaseCore and into GeneratorCore?
-//	need to figure out how to do this in prep for PistonCore, right?
+//TODO: add bedrock wave to protection animation
+//TODO: add whitelist signs on rune base feature (manual book is written as if it does)
+//TODO: look into why outside explosions can break inside chests (through protected glass)
 
 //TODO: make it robust enough to handle server crashes
+//	maybe I can save onWorldSave? so I don't need to track potential altered points?
+//		still need to track other potential bedrock I think (such as bedrock wave)
 //things to try:
 //	using ctrl+c to stop server while not generating
 //	using ctrl+c to stop server while generating
 //	changing worlds without deleting data
 //	try it along side some other people's plugins
 
-//TODO: add whitelist signs on rune base feature (manual book is written as if it does)
+//TODO: look into permissions... seems like it should be really easy to integrate
+//TODO: add mcStats: http://mcstats.org/learn-more/
+
+//TODO: move anything rune specific out of BaseCore and into GeneratorCore
+//	DONE at least for BaseCore, CoreAnimator, CoreMaterials, CoreParticles
+
+//good plugin review and maker asks for more plugins to review. https://www.youtube.com/watch?v=u6MbqUbcp6Q
+
+//--
 
 //TODO: consider splitting FortressesManager into CoresManager and RunesManager
 //TODO: consider, within cores, changing 'anchorPoint's to 'originPoint's to emphasize the disconnect
 
-//TODO: look into permissions... seems like it should be really easy to integrate
-//TODO: add mcStats: http://mcstats.org/learn-more/
+
+
 
 
 
@@ -353,7 +366,7 @@ public class FortressPlugin extends JavaPlugin {
 //					update lastKnownPoint (also update onEnterVehicle)
 
 
-
+//use NBT tags on disruptor fuel items (see https://hypixel.net/threads/bukkit-spigot-adding-and-checking-for-nbt-tags-on-items.383877/)
 
 
 

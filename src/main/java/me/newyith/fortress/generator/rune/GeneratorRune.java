@@ -175,7 +175,8 @@ public class GeneratorRune {
 	}
 
 	public void onSearchingChanged(boolean searching) {
-		/* //commented out because flashing "Searching" for a fraction of a second looks bad
+		//TODO: comment out again (see next line)
+		//* //commented out because flashing "Searching" for a fraction of a second looks bad
 		if (searching) {
 			setSignText("Searching", null, null);
 		} else {
