@@ -1,12 +1,10 @@
 package me.newyith.fortress.generator.core;
 
 import me.newyith.fortress.event.TickTimer;
-import me.newyith.fortress.generator.TimedBedrock;
-import me.newyith.fortress.generator.TimedBedrockData;
+import me.newyith.fortress.generator.BlockRevertData;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
-import me.newyith.fortress.util.Wall;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -34,14 +32,16 @@ public class CoreAnimator {
 		private Set<Point> protectedPoints = null;
 		private List<Set<Point>> generatedLayers = null;
 		private List<Set<Point>> animationLayers = null;
+		private LinkedList<Set<BlockRevertData>> waveLayers = null;
 		private CoreMaterials coreMats = null;
 		private boolean skipAnimation = false;
 		private boolean animationInProgress = false;
 		private boolean isGeneratingWall = false;
 		private String worldName = null;
 		private transient World world = null;
-		private transient final int maxBlocksPerFrame;
-		private transient final int ticksPerFrame;
+		private final transient int maxWaveLayers;
+		private final transient int maxBlocksPerFrame;
+		private final transient int ticksPerFrame;
 		private transient int animationWaitTicks = 0;
 		private transient int curIndex = 0;
 
@@ -51,6 +51,7 @@ public class CoreAnimator {
 					 @JsonProperty("protectedPoints") Set<Point> protectedPoints,
 					 @JsonProperty("generatedLayers") List<Set<Point>> generatedLayers,
 					 @JsonProperty("animationLayers") List<Set<Point>> animationLayers,
+					 @JsonProperty("waveLayers") LinkedList<Set<BlockRevertData>> waveLayers,
 					 @JsonProperty("coreMats") CoreMaterials coreMats,
 					 @JsonProperty("skipAnimation") boolean skipAnimation,
 					 @JsonProperty("animationInProgress") boolean animationInProgress,
@@ -61,6 +62,7 @@ public class CoreAnimator {
 			this.protectedPoints = protectedPoints;
 			this.generatedLayers = generatedLayers;
 			this.animationLayers = animationLayers;
+			this.waveLayers = waveLayers;
 			this.coreMats = coreMats;
 			this.skipAnimation = skipAnimation;
 			this.animationInProgress = animationInProgress;
@@ -69,6 +71,7 @@ public class CoreAnimator {
 
 			//rebuild transient fields
 			this.world = Bukkit.getWorld(worldName);
+			this.maxWaveLayers = 4;
 			this.maxBlocksPerFrame = 500;
 			this.ticksPerFrame = 150 / TickTimer.msPerTick; // msPerFrame / msPerTick
 			this.animationWaitTicks = 0;
@@ -87,12 +90,13 @@ public class CoreAnimator {
 		Set<Point> protectedPoints = new HashSet<>();
 		List<Set<Point>> generatedLayers = new ArrayList<>();
 		List<Set<Point>> animationLayers = new ArrayList<>();
+		LinkedList<Set<BlockRevertData>> waveLayers = new LinkedList<>();
 		boolean skipAnimation = false;
 		boolean animationInProgress = false;
 		boolean isGeneratingWall = false;
 		String worldName = world.getName();
 		model = new Model(anchorPoint, alteredPoints, protectedPoints, generatedLayers, animationLayers,
-				coreMats, skipAnimation, animationInProgress, isGeneratingWall, worldName);
+				waveLayers, coreMats, skipAnimation, animationInProgress, isGeneratingWall, worldName);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -103,14 +107,12 @@ public class CoreAnimator {
 
 	public void generate(List<Set<Point>> layers) {
 		model.animationLayers = layers;
-		Debug.msg("set animationLayers. flat.size(): " + Wall.flattenLayers(model.animationLayers).size());
 		model.curIndex = 0;
 		model.isGeneratingWall = true;
 		model.animationInProgress = true;
 	}
 
 	public void degenerate(boolean skipAnimation) {
-//		model.animationLayers = model.generatedLayers; //TODO: consider uncomment out this line
 		model.curIndex = 0; //starting from end if degenerating is handled elsewhere
 		model.isGeneratingWall = false;
 		model.animationInProgress = true;
@@ -203,86 +205,7 @@ public class CoreAnimator {
 
 
 	public void onBeforeGenPrep() {
-		Debug.msg("flatAnimationLayers.size(): " + Wall.flattenLayers(model.animationLayers).size());
-
-//		Map<Integer, Integer> waitTicksByLayerIndex = new HashMap<>();
-		for (int layerIndex = 0; layerIndex < model.animationLayers.size(); layerIndex++) {
-//			Debug.msg("onBeforeGenPrep() layerIndex: " + layerIndex);
-			Set<Point> layer = model.animationLayers.get(layerIndex);
-//			Debug.msg("layer.size(): " + layer.size());
-			for (Point p : layer) {
-				TimedBedrockData data = TimedBedrock.getDataFor(model.world, p);
-
-
-//				//TODO: check if all waitTicks for a given layer are always the same
-//				if (waitTicksByLayerIndex.containsKey(layerIndex)) {
-//					if (data.waitTicks == waitTicksByLayerIndex.get(layerIndex)) {
-//						Debug.msg("matching waitTicks (" + data.waitTicks + ") on layerIndex " + layerIndex);
-//					} else {
-//						Debug.msg("waitTicks mismatch on layerIndex: " + layerIndex);
-//						Debug.msg("data.waitTicks: " + data.waitTicks);
-//						Debug.msg("recorded waitTicks: " + waitTicksByLayerIndex.get(layerIndex));
-//					}
-//				}
-//				waitTicksByLayerIndex.put(layerIndex, data.waitTicks);
-
-
-				if (data != null) {
-					Debug.msg("found data at " + p);
-					//adopt timed bedrock as already altered/protected point
-					Material origMaterial = data.material;
-					CoreMaterials coreMats = getCoreMats();
-					boolean isBedrock = p.is(Material.BEDROCK, model.world); //TODO: change back to BEDROCK (or delete line once it seems to work)
-					boolean wasAlterable = coreMats.isAlterable(origMaterial);
-					boolean wasProtectable = coreMats.isProtectable(origMaterial);
-					if (isBedrock) {
-						if (wasAlterable || wasProtectable) {
-							//add to altered/protected
-							if (wasAlterable) {
-								TimedBedrock.abandon(model.world, p);
-								Debug.msg("abandon (alter): " + p + " (was " + origMaterial + ")");
-								addAlteredPoint(p, origMaterial);
-							} else { //wasProtected
-								Debug.msg("not abandon (protect): " + p);
-								addProtectedPoint(p);
-							}
-							//add to generated
-							while (layerIndex >= model.generatedLayers.size()) {
-								model.generatedLayers.add(new HashSet<>());
-								Debug.msg("Adding extra layer to model.generatedLayers");
-							}
-							model.generatedLayers.get(layerIndex).add(p);
-						} else {
-							Debug.msg("TimedBedrock.getDataFor() returned non generatable point!?");
-						}
-					} else {
-						Debug.msg("TimedBedrock.getDataFor() returned non bedrock point!?");
-					}
-				}
-			}
-		}
-
-
-
-
-
-//		//re-save waitTicks in reverse order
-//		for (int i = 0; i < model.animationLayers.size(); i++) {
-//			int layerIndex = (model.animationLayers.size()-1) - i;
-//			Set<Point> layer = model.animationLayers.get(layerIndex);
-//			for (Point p : layer) {
-//				TimedBedrockData data = TimedBedrock.getDataFor(model.world, p);
-//				Debug.msg("Changing waitTicks " + data.waitTicks + " to " + waitTicksByLayerIndex.get(layerIndex) + " on layerIndex: " + layerIndex);
-//				data.waitTicks = waitTicksByLayerIndex.get(layerIndex);
-//			}
-//		}
-
-
-		//TODO: replace all the TimedBedrock stuff by having animator be responsible update all 4 layers of wave blocks in both directions
-		//	layerIndex and next/prev 3 layers
-		//remember to clean up old and skip new bedrock wave if skipAnimation
-
-//		TimedBedrock.revert(model.world, Wall.flattenLayers(model.animationLayers)); //TODO: delete this line
+		//TODO: delete this method once I decide I really don't need it
 	}
 
 
@@ -301,6 +224,28 @@ public class CoreAnimator {
 			core.onGeneratedChanged();
 		} else {
 			Debug.error("CoreAnimator.onGeneratedChanged(): Core at " + model.anchorPoint + " is null.");
+		}
+	}
+
+	private void convertWaveLayer(Set<Point> layerPoints) {
+		//add new layer
+		Set<BlockRevertData> newLayerData = new HashSet<>();
+		for (Point p : layerPoints) {
+			newLayerData.add(new BlockRevertData(model.world, p));
+			p.getBlock(model.world).setType(Material.QUARTZ_BLOCK); //TODO: change to BEDROCK
+		}
+		model.waveLayers.add(newLayerData);
+
+		//consider removing old layer
+		if (model.waveLayers.size() > model.maxWaveLayers) {
+			Set<BlockRevertData> oldLayer = model.waveLayers.removeFirst();
+			revertWaveLayer(oldLayer);
+		}
+	}
+
+	private void revertWaveLayer(Set<BlockRevertData> layer) {
+		for (BlockRevertData revertData : layer) {
+			revertData.revert();
 		}
 	}
 
@@ -324,6 +269,12 @@ public class CoreAnimator {
 			if (updatedCount < model.maxBlocksPerFrame) {
 				model.curIndex++;
 			}
+		}
+
+		if (!updatedToNextFrame && !model.waveLayers.isEmpty()) {
+			revertWaveLayer(model.waveLayers.getFirst());
+			updatedToNextFrame = true;
+			Debug.msg("finishing wave");
 		}
 
 		return updatedToNextFrame;
@@ -372,14 +323,19 @@ public class CoreAnimator {
 //		Debug.msg("layer " + layerIndex + " blockUpdates: " + updatedPoints.size());
 
 		if (!model.skipAnimation) {
-			int durationTicks = 4 * model.ticksPerFrame;
 			if (model.isGeneratingWall) {
-				TimedBedrock.at(model.world, updatedProtectedPoints, durationTicks);
+				if (!updatedProtectedPoints.isEmpty()) {
+					Debug.msg("-> convert layerIndex: " + layerIndex);
+					convertWaveLayer(updatedProtectedPoints);
+				}
 			} else {
 				Set<Point> updatedPoints = new HashSet<>();
 				updatedPoints.addAll(updatedAlteredPoints);
 				updatedPoints.addAll(updatedProtectedPoints);
-				TimedBedrock.at(model.world, updatedPoints, durationTicks);
+				if (!updatedPoints.isEmpty()) {
+					Debug.msg("<- convert layerIndex: " + layerIndex);
+					convertWaveLayer(updatedPoints);
+				}
 			}
 		}
 

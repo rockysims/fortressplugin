@@ -1,8 +1,6 @@
 package me.newyith.fortress.generator.core;
 
 import me.newyith.fortress.generator.GenPrepData;
-import me.newyith.fortress.generator.TimedBedrock;
-import me.newyith.fortress.generator.TimedBedrockData;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Cuboid;
