@@ -272,7 +272,7 @@ public class CoreAnimator {
 		}
 
 		if (!updatedToNextFrame && !model.waveLayers.isEmpty()) {
-			revertWaveLayer(model.waveLayers.getFirst());
+			revertWaveLayer(model.waveLayers.removeFirst());
 			updatedToNextFrame = true;
 			Debug.msg("finishing wave");
 		}
