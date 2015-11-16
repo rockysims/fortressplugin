@@ -273,14 +273,12 @@ public class CoreAnimator {
 		if (!model.skipAnimation) {
 			int durationTicks = 4 * model.ticksPerFrame;
 			if (model.isGeneratingWall) {
-//				timedBedrock(updatedProtectedPoints, ms);
 				TimedBedrock.at(model.world, updatedProtectedPoints, durationTicks);
 			} else {
-				Set<Point> updatedPoints = new HashSet<>();
-				updatedPoints.addAll(updatedAlteredPoints);
-				updatedPoints.addAll(updatedProtectedPoints);
-//				timedBedrock(updatedPoints, ms);
-				TimedBedrock.at(model.world, updatedPoints, durationTicks);
+//				Set<Point> updatedPoints = new HashSet<>();
+//				updatedPoints.addAll(updatedAlteredPoints);
+//				updatedPoints.addAll(updatedProtectedPoints);
+//				TimedBedrock.at(model.world, updatedPoints, durationTicks);
 			}
 		}
 

@@ -1,10 +1,10 @@
 package me.newyith.fortress.generator.core;
 
-import me.newyith.fortress.generator.TimedBedrock;
 import me.newyith.fortress.generator.GenPrepData;
-import me.newyith.fortress.generator.TimedBedrockData;
+import me.newyith.fortress.generator.TimedBedrock;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
+import me.newyith.fortress.util.Cuboid;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Wall;
@@ -314,6 +314,7 @@ public class BaseCore {
 
 
 
+		//TODO: also add wave remains to protected points (if origMaterial is protectable)
 //		//add bedrock wave remains to official altered points (if origMaterial is alterable)
 //		Set<Point> points = new HashSet<>(model.claimedWallPoints);
 //		points.removeAll(getGeneratedPoints());
@@ -334,6 +335,7 @@ public class BaseCore {
 //			}
 //		}
 
+		TimedBedrock.revert(model.world, model.claimedWallPoints);
 
 
 
@@ -347,7 +349,7 @@ public class BaseCore {
 
 		CompletableFuture<GenPrepData> future = CompletableFuture.supplyAsync(() -> {
 //			Debug.msg("getGenPrepDataFuture() start");
-			List<Set<Point>> generatableLayers = getGeneratableWallLayers().join();
+			List<Set<Point>> generatableLayers = getGeneratableWallLayers();
 
 			//set layerAroundWall
 			List<Set<Point>> wallLayers = Wall.merge(generatableLayers, model.animator.getGeneratedLayers());
@@ -355,9 +357,7 @@ public class BaseCore {
 			Set<Point> layerAroundWall = getLayerAround(wallPoints).join();
 
 			Set<Point> layerOutside = getLayerOutside(wallPoints, layerAroundWall);
-			Debug.msg("layerOutside.size(): " + layerOutside.size());
 			Set<Point> pointsInside = getPointsInside(layerOutside, layerAroundWall, wallPoints);
-			Debug.msg("prep done");
 
 //			Debug.msg("getGenPrepDataFuture() returning");
 			return new GenPrepData(generatableLayers, layerAroundWall, pointsInside, layerOutside);
@@ -413,35 +413,31 @@ public class BaseCore {
 	private Set<Point> getPointsInside(Set<Point> layerOutside, Set<Point> layerAroundWall, Set<Point> wallPoints) {
 		Set<Point> pointsInside = new HashSet<>();
 
-		Debug.msg("getPointsInside() 0");
 		if (!layerAroundWall.isEmpty()) {
 			//get layerInside
 			Set<Point> layerInside = new HashSet<>(layerAroundWall);
 			layerInside.removeAll(layerOutside);
 
-			Debug.msg("getPointsInside() 1");
-
 			//fill pointsInside
-			if (layerInside.size() > 0) {
-				Debug.msg("getPointsInside() 2");
+			if (!layerInside.isEmpty()) {
 				Point origin = layerInside.iterator().next();
 				Set<Point> originLayer = layerInside;
 				Set<Material> traverseMaterials = null; //traverse all block types
 				Set<Material> returnMaterials = null; //all block types
+				int maxReturns = (new Cuboid(model.world, layerInside)).countBlocks() + 1; //set maxReturns as anti near infinite search (just in case)
 				int rangeLimit = 2 * model.generationRangeLimit;
 				Set<Point> ignorePoints = wallPoints;
 				Set<Point> searchablePoints = null; //search all points
-				Debug.msg("getPointsInside() 3");
 				pointsInside = Wall.getPointsConnected(model.world, origin, originLayer,
-						traverseMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints).join();
-				Debug.msg("getPointsInside() 4");
+						traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints, searchablePoints).join();
+				if (pointsInside.size() == maxReturns) {
+					Debug.error("BaseCore::getPointsInside() tried to do infinite search.");
+				}
 				pointsInside.addAll(originLayer);
-				Debug.msg("getPointsInside() 5");
 			}
 		}
 
 //		Debug.msg("pointsInside.size(): " + pointsInside.size());
-		Debug.msg("getPointsInside() 6");
 		return pointsInside;
 	}
 
@@ -463,19 +459,34 @@ public class BaseCore {
 		model.claimedPoints.addAll(layerAroundOrigins);
 	}
 
-	private CompletableFuture<List<Set<Point>>> getGeneratableWallLayers() {
+	private List<Set<Point>> getGeneratableWallLayers() {
 		CoreMaterials coreMats = model.animator.getCoreMats();
 		coreMats.refresh(); //refresh protectable blocks list based on chest contents
 
-		Set<Point> claimedPoints = getClaimedPointsOfNearbyCores();
+		Set<Point> nearbyClaimedPoints = getClaimedPointsOfNearbyCores();
 
 		//return all connected wall points ignoring (and not traversing) claimedPoints (generationRangeLimit search range)
-		Set<Material> traverseMaterials = coreMats.getWallMaterials();
+		Point origin = model.anchorPoint;
+		Set<Point> originLayer = new HashSet<>(getOriginPoints());
+		originLayer.addAll(getGeneratedPoints());
+		Set<Material> traverseMaterials = coreMats.getGeneratableWallMaterials();
 		Set<Material> returnMaterials = coreMats.getGeneratableWallMaterials();
 		int maxReturns = Math.max(0, FortressPlugin.config_generationBlockLimit - getGeneratedPoints().size());
 		int rangeLimit = model.generationRangeLimit;
-		Set<Point> ignorePoints = claimedPoints;
-		return getPointsConnectedAsLayers(traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints);
+		Set<Point> ignorePoints = nearbyClaimedPoints;
+		List<Set<Point>> foundLayers = Wall.getPointsConnectedAsLayers(model.world, origin, originLayer, traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints).join();
+
+		//correct layer indexes (first non already generated layer is not always layer 0)
+		List<Set<Point>> layers = new ArrayList<>();
+		int dummyLayerCount = model.animator.getGeneratedLayers().stream()
+				.map((layer) -> (layer.isEmpty()) ? 0 : 1)
+				.reduce((a, b) -> a + b).orElse(0);
+		for (int i = 0; i < dummyLayerCount; i++) {
+			layers.add(new HashSet<>());
+		}
+		layers.addAll(foundLayers);
+
+		return layers;
 	}
 
 	private Set<Point> getClaimedPointsOfNearbyCores() {
@@ -551,12 +562,6 @@ public class BaseCore {
 //		Set<Point> originLayer = rune.getPattern().getPoints();
 //		return Wall.getPointsConnected(model.world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
 //	}
-
-	private CompletableFuture<List<Set<Point>>> getPointsConnectedAsLayers(Set<Material> traverseMaterials, Set<Material> returnMaterials, int maxReturns, int rangeLimit, Set<Point> ignorePoints) {
-		Point origin = model.anchorPoint;
-		Set<Point> originLayer = getOriginPoints();
-		return Wall.getPointsConnectedAsLayers(model.world, origin, originLayer, traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints);
-	}
 
 	private CompletableFuture<Set<Point>> getLayerAround(Set<Point> originLayer) {
 		Point origin = model.anchorPoint;

@@ -101,6 +101,45 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
 		this.maximumPoint = new Vector(xPos2, yPos2, zPos2);
 	}
 
+	public Cuboid(World world, Set<Point> points) {
+//		Debug.start("CuboidFromPoints");
+		if (points.isEmpty()) {
+			throw new RuntimeException("Failed to create cuboid because points.isEmpty().");
+		} else {
+			Point min = points.iterator().next();
+			Point max = new Point(min);
+			double xMin = min.x();
+			double yMin = min.y();
+			double zMin = min.z();
+			double xMax = max.x();
+			double yMax = max.y();
+			double zMax = max.z();
+			for (Point p : points) {
+				xMin = Math.min(xMin, p.x());
+				yMin = Math.min(yMin, p.y());
+				zMin = Math.min(zMin, p.z());
+				xMax = Math.max(xMax, p.x());
+				yMax = Math.max(yMax, p.y());
+				zMax = Math.max(zMax, p.z());
+			}
+			minimumPoint = new Vector(xMin, yMin, zMin);
+			maximumPoint = new Vector(xMax, yMax, zMax);
+			worldName = world.getName();
+		}
+//		Debug.end("CuboidFromPoints");
+	}
+
+	public int countBlocks() {
+		Point min = new Point(minimumPoint);
+		Point max = new Point(maximumPoint);
+		Point diff = min.difference(max);
+		int x = Math.abs(diff.xInt()) + 1;
+		int y = Math.abs(diff.yInt()) + 1;
+		int z = Math.abs(diff.zInt()) + 1;
+		int count = x * y * z;
+		return count;
+	}
+
 	public Point getMin() {
 		return new Point(minimumPoint);
 	}
@@ -235,5 +274,4 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
 			return null;
 		}
 	}
-
 }

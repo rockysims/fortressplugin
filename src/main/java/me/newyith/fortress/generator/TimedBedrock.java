@@ -1,7 +1,6 @@
 package me.newyith.fortress.generator;
 
 import me.newyith.fortress.main.FortressesManager;
-import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,7 +13,7 @@ public class TimedBedrock {
 	private static Map<Location, TimedBedrockData> dataByLocation = new HashMap<>();
 
 	public static void at(World world, Set<Point> points, int durationTicks) {
-		//*
+		/*
 		for (Point p : points) {
 			Location loc = p.toLocation(world);
 			fromTimedBedrock(loc); //if already timed bedrock, revert now
@@ -50,6 +49,14 @@ public class TimedBedrock {
 		//*/
 
 		return map;
+	}
+
+	public static void revert(World world, Set<Point> points) {
+		for (Point p : points) {
+			Location loc = p.toLocation(world);
+			fromTimedBedrock(loc);
+			dataByLocation.remove(loc);
+		}
 	}
 
 	public static void abandon(World world, Point p) {
@@ -93,16 +100,3 @@ public class TimedBedrock {
 		}
 	}
 }
-
-
-
-
-
-
-//	public static void revert(World world, Set<Point> points) {
-//		for (Point p : points) {
-//			Location loc = p.toLocation(world);
-//			fromTimedBedrock(loc);
-//			dataByLocation.remove(loc);
-//		}
-//	}

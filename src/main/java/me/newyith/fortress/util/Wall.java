@@ -118,6 +118,13 @@ public class Wall {
 		return mats;
 	}
 
+	public static CompletableFuture<Set<Point>> getPointsConnected(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int maxReturns, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
+		return CompletableFuture.supplyAsync(() -> {
+			List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints, searchablePoints, ConnectedThreshold.FACES).join();
+			return flattenLayers(layers);
+		});
+	}
+
 	public static CompletableFuture<Set<Point>> getPointsConnected(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
 		return CompletableFuture.supplyAsync(() -> {
 			List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, -1, rangeLimit, ignorePoints, searchablePoints, ConnectedThreshold.FACES).join();

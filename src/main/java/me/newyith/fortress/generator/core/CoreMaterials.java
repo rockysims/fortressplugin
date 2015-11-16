@@ -20,7 +20,6 @@ public class CoreMaterials {
 		private final Point chestPoint;
 		private final String worldName;
 		private final transient World world;
-		private final transient Set<Material> wallMaterials;
 		private final transient Set<Material> generatableWallMaterials;
 		private final transient Set<Material> protectableWallMaterials;
 		private final transient Set<Material> alterableWallMaterials;
@@ -33,7 +32,6 @@ public class CoreMaterials {
 
 			//rebuild transient fields
 			this.world = Bukkit.getWorld(worldName);
-			this.wallMaterials = new HashSet<>();
 			this.generatableWallMaterials = new HashSet<>();
 			this.protectableWallMaterials = new HashSet<>();
 			this.alterableWallMaterials = new HashSet<>();
@@ -55,10 +53,6 @@ public class CoreMaterials {
 	//-----------------------------------------------------------------------
 
 	// - Getters -
-
-	public Set<Material> getWallMaterials() {
-		return model.wallMaterials;
-	}
 
 	public Set<Material> getGeneratableWallMaterials() {
 		return model.generatableWallMaterials;
@@ -165,7 +159,6 @@ public class CoreMaterials {
 	private void addProtectable(Material mat) {
 		model.protectableWallMaterials.add(mat);
 		model.generatableWallMaterials.add(mat);
-		model.wallMaterials.add(mat);
 	}
 
 	private void resetToBaseBlockTypes() {
@@ -173,7 +166,6 @@ public class CoreMaterials {
 		model.protectableWallMaterials.clear();
 		model.alterableWallMaterials.clear();
 		model.generatableWallMaterials.clear();
-		model.wallMaterials.clear();
 
 		//fill alterableWallMaterials
 		model.alterableWallMaterials.add(Material.COBBLESTONE);
@@ -183,10 +175,5 @@ public class CoreMaterials {
 			model.generatableWallMaterials.add(m);
 		for (Material m : model.alterableWallMaterials)
 			model.generatableWallMaterials.add(m);
-
-		//fill wallMaterials
-		for (Material m : model.generatableWallMaterials)
-			model.wallMaterials.add(m);
-		model.wallMaterials.add(Material.BEDROCK);
 	}
 }
