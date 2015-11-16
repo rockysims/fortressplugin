@@ -244,7 +244,6 @@ public class FortressPlugin extends JavaPlugin {
 //	fortress.core
 //	fortress.rune.generator
 
-//TODO: add bedrock wave to protection animation
 //TODO: add whitelist signs on rune base feature (manual book is written as if it does)
 //TODO: look into why outside explosions can break inside chests (through protected glass)
 
@@ -268,7 +267,6 @@ public class FortressPlugin extends JavaPlugin {
 //--
 
 //TODO: consider splitting FortressesManager into CoresManager and RunesManager
-//TODO: consider, within cores, changing 'anchorPoint's to 'originPoint's to emphasize the disconnect
 
 
 
@@ -292,21 +290,17 @@ public class FortressPlugin extends JavaPlugin {
 //ways that make load slower: (because periodic saving means we care more about save time than load time)
 //	rebuild claims and insideOutside (instead of save/load)? seems to save/load fast but maybe try it and see if it helps
 //ways without downside:
-//	easy:
-//		don't save world in Point and save xyz as int instead of double (see Point class todo comment)
 //	hard:
 //		maybe add death by age for things that require a lot of memory and then rebuild JIT
 //	unknown:
-//		clear animationLayers after animation finishes
 //		stop particles when chunk is not loaded so we can free up the wallOutsidePairs memory
 
-//spread out periodic save over time to prevent any lag
+//spread out periodic save over time to prevent any lag? test new saving system under load and see how fast it is
 
 //------------------------------//
 //		first priority			//
 //------------------------------//
 
-//TODO: make generationBlockLimit limit search (not generation)
 
 //-------------------------------//
 //-------------------------------//
@@ -316,21 +310,12 @@ public class FortressPlugin extends JavaPlugin {
 //		next priority			//
 //------------------------------//
 
-//TODO: make existing runes reconfirm rune actually exists onEnable (in case its a whole new world but data.json still exists)
-
 //TODO: add potentialAlteredPoints and update + re-save it before generation (to make it robust enough to handle server crashes)
+//	probably will save onWorldSave (if possible) so no need for this
 
 //TODO: add mcStats: http://mcstats.org/learn-more/
 
-//TODO: make getPointsConnected() execute over time (to prevent lag) and after done collect results and start generating
-//	maybe add GenerationTask class to represent generating/degenerating action?
-//	while waiting for getPointsConnected(), leave wall as is (if generating. degenerating should still be allowed and cancel search)
-//	in java a promise is called a CompletableFuture
-
 //TODO: consider making it so when protected blocks are broken they turn to bedrock for between 2 and 4 seconds then back
-
-//TODO: test if building generator on bedrock causes wall search to travel through y <= 5 bedrock
-//	maybe getPointsConnected() should ignore bedrock at y <= 5?
 
 //-------------------------------//
 //-------------------------------//
@@ -342,8 +327,8 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: try to add NTB tag to disruptor fuel (creeper heads) so not all creeper heads can be used
 //TODO: maybe when running/paused it should display % generated (if not 0 nor 100)
+//	instead add easing function to animation speed so animation never takes all that long
 //TODO: consider tracking and updating manual books so that existing copies get updated when manual changes
-//TODO: indicate generator waiting for search with lots of anchor particles
 
 //-------------------------------//
 //-------------------------------//
@@ -383,28 +368,18 @@ public class FortressPlugin extends JavaPlugin {
 //Minor:
 //TODO: check if you can pick up protected water/lava with bucket
 //TODO: think of a way to protect stuff inside fortress from explosions on the outside (maybe already done?)
-//TODO: make door white list have to be above door (leave trap door as is)
 //TODO: try to track down why getPointsConnected is being called 4 times during generation (especially the 2 heavier calls)
+//	could just skip this one since now getGenPreData runs on another thread
 
 // --- MVP ---
 
-//Reducing lag:
-//animator should remember current layer
-//getConnected calculation over time (need to learn promises in java)
 //protect inside from explosions
 
-//TODO: make 'fort stuck' only work in range of generator (almost done but need to make it based on cuboid instead of range)
+//TODO: make 'fort stuck' only work in range of generator (almost done but need to make it based on cuboid instead of range) (maybe done?)
 //TODO: make signs on generator's base a global white list
 
-//TODO: onProtect, if (block is solid || glass) change block to bedrock for a second then back to original material
-//	do the same to protected blocks onGenerated and to generated blocks onDegenerated
-//first try idea above with bedrock else try idea below with particles
-//MAYBE MVP?: make generation display wave of particle to indicate generating wall blocks
-//	onGenerateBlock, show particles appearing for a few seconds at random points on all faces not touching solid block
-//		maybe use nether particle but make the nether particle be drawn toward block (like the particles are drawn to nether portal)
-
 //TODO: finish writing version of manual that includes all planned features before actually releasing MVP (just so I've thought it all out)
-//TODO: add potentialAlteredPoints and update + re-save it before generation (to make it robust enough to handle server crashes)
+//TODO: rebustness
 
 //TODO: add mcStats: http://mcstats.org/learn-more/
 
@@ -414,14 +389,7 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: consider saving wallOutsidePairs for particles instead of rebuilding it (or better spread out the recalculation)
 //TODO: consider fixing bug where if one type of slab is protected then all types of slabs are
 
-//TODO: consider adding flag block/item to make generate/degenerate animation run faster (ghast tear?)
-
-
 //TODO: allow wall particles to be disabled via config
-
-//	maybe make getPointsConnected send stream of layers to animator?
-//		problem: without foreknowledge of blocks that will be generated, how can we make it crash tolerant
-//		solution: buffer 10 layers at a time
 
 //TODO: think about making water/lava mote create impassible wall above it
 
