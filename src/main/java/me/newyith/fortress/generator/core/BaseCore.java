@@ -2,6 +2,7 @@ package me.newyith.fortress.generator.core;
 
 import me.newyith.fortress.generator.GenPrepData;
 import me.newyith.fortress.generator.TimedBedrock;
+import me.newyith.fortress.generator.TimedBedrockData;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Cuboid;
@@ -261,7 +262,7 @@ public class BaseCore {
 				model.layerOutsideFortress.clear();
 				model.layerOutsideFortress.addAll(data.layerOutside);
 
-				model.animator.generate(data.generatableLayers);
+				model.animator.generate(wallLayers);
 			} else {
 				model.coreParticles.displayAnchorParticle(this);
 			}
@@ -311,35 +312,7 @@ public class BaseCore {
 			model.genPrepDataFuture = null;
 		}
 
-
-
-
-		//TODO: also add wave remains to protected points (if origMaterial is protectable)
-//		//add bedrock wave remains to official altered points (if origMaterial is alterable)
-//		Set<Point> points = new HashSet<>(model.claimedWallPoints);
-//		points.removeAll(getGeneratedPoints());
-//		points.retainAll(TimedBedrock.getPoints());
-//		Map<Point, TimedBedrockData> data = TimedBedrock.getDataFor(model.world, points);
-//		for (Point p : points) {
-//			Material origMaterial = data.get(p).material;
-//			CoreMaterials coreMats = model.animator.getCoreMats();
-//			boolean isBedrock = p.is(Material.BEDROCK, model.world);
-//			boolean wasAlterable = coreMats.isAlterable(origMaterial);
-//			if (isBedrock) {
-//				if (wasAlterable) {
-//					TimedBedrock.abandon(model.world, p);
-//					model.animator.addAlteredPoint(p, origMaterial);
-//				}
-//			} else {
-//				Debug.msg("TimedBedrock.getPoints() returned non bedrock point!?");
-//			}
-//		}
-
-		TimedBedrock.revert(model.world, model.claimedWallPoints);
-
-
-
-
+		model.animator.onBeforeGenPrep(); //deal with TimedBedrock complexities of switching directions part way through animation
 		//start preparing for generation (tick() handles it when future completes)
 		model.genPrepDataFuture = getGenPrepDataFuture();
 	}

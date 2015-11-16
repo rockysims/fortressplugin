@@ -66,6 +66,10 @@ public class CoreMaterials {
 		return model.alterableWallMaterials.contains(b.getType());
 	}
 
+	public boolean isProtectable(Material m) {
+		return model.protectableWallMaterials.contains(m);
+	}
+
 	public boolean isAlterable(Material m) {
 		return model.alterableWallMaterials.contains(m);
 	}

@@ -13,7 +13,7 @@ public class TimedBedrock {
 	private static Map<Location, TimedBedrockData> dataByLocation = new HashMap<>();
 
 	public static void at(World world, Set<Point> points, int durationTicks) {
-		/*
+		//*
 		for (Point p : points) {
 			Location loc = p.toLocation(world);
 			fromTimedBedrock(loc); //if already timed bedrock, revert now
@@ -49,6 +49,10 @@ public class TimedBedrock {
 		//*/
 
 		return map;
+	}
+
+	public static TimedBedrockData getDataFor(World world, Point p) {
+		return dataByLocation.get(p.toLocation(world));
 	}
 
 	public static void revert(World world, Set<Point> points) {
@@ -88,7 +92,7 @@ public class TimedBedrock {
 		Block b = loc.getBlock();
 		TimedBedrockData data = new TimedBedrockData(loc, durationTicks);
 		dataByLocation.put(loc, data);
-		b.setType(Material.QUARTZ_BLOCK); //TODO: change back to BEDROCK
+		b.setType(Material.BEDROCK);
 	}
 
 	private static void fromTimedBedrock(Location loc) {
