@@ -238,6 +238,8 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+//TODO: keep working on bedrock wave (works except when switching for degeneration to generation part way through)
+
 //TODO: move 'core' package up a level and swap names of package 'generator' with package 'rune'
 //	fortress.core
 //	fortress.rune.generator
