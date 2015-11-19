@@ -270,6 +270,49 @@ public class FortressesManager {
 				it.remove();
 			}
 		}
+
+		/*
+
+		Debug.start("onExplode1");
+
+
+		//TODO: don't recalculate this so often
+		Set<Point> insidePoints = new HashSet<>();
+		runeInstances.forEach(rune -> {
+			insidePoints.addAll(rune.getPointsInsideFortress());
+		});
+
+
+		Debug.stop("onExplode1", false);
+		Debug.duration("onExplode1");
+		Debug.clear("onExplode1");
+
+
+		Debug.start("onExplode2");
+
+
+		Iterator<Block> it = explodeBlocks.iterator();
+		while (it.hasNext()) {
+			Point p = new Point(it.next().getLocation());
+
+			boolean remove = false;
+			remove = remove || protectedPoints.contains(p);
+			remove = remove || (
+					insidePoints.contains(p) && !insidePoints.contains(origin)
+			);
+			if (remove) {
+				Debug.msg("explode removed at " + p);
+				it.remove();
+			}
+		}
+
+
+		Debug.stop("onExplode2", false);
+		Debug.duration("onExplode2");
+		Debug.clear("onExplode2");
+
+
+		//*/
 	}
 
 	public static void onPlayerOpenCloseDoor(PlayerInteractEvent event) {
