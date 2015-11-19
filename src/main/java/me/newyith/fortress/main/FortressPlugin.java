@@ -239,12 +239,13 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 //TODO: keep working on bedrock wave (works except when switching for degeneration to generation part way through)
+//	also need to save more block revert data (stair orientation for example)
+//	and need to change top and bottom of doors at the same time (when either should change, change both)
 
 //TODO: move 'core' package up a level and swap names of package 'generator' with package 'rune'
 //	fortress.core
 //	fortress.rune.generator
 
-//TODO: add whitelist signs on rune base feature (manual book is written as if it does)
 //TODO: look into why outside explosions can break inside chests (through protected glass)
 
 //TODO: make it robust enough to handle server crashes
@@ -510,6 +511,21 @@ generatorCore:
 maybe instead of requiring piston be protected before it can work as a mini generator just require that a pistonCore has been created
 	also create pistonCore if block piston is extended to touch is generated
 */
+
+
+
+
+
+//for beginning for post on bukkit.org once I'm ready to release:
+/*
+Fortress is a whole new approach to self-service protection. Instead of claiming chunks, players build a fortress out
+of ordinary blocks then protect the structure itself by building a rune (pattern of blocks). The blocks that make up
+the structure are detected automatically and protected. Runes are fueled by glowstone.
+For details, obsidian + book = fortress manual.
+//*/
+
+
+
 
 
 

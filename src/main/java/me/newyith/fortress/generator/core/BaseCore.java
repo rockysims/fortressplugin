@@ -91,6 +91,29 @@ public class BaseCore {
 
 	public boolean playerCanOpenDoor(Player player, Point doorPoint) {
 		String playerName = player.getName();
+		Set<Point> actualSigns = getDoorWhitelistSignPoints(doorPoint);
+		if (actualSigns.isEmpty()) {
+			actualSigns = getFallbackWhitelistSignPoints();
+		}
+
+		Set<String> names = new HashSet<>();
+		for (Point p : actualSigns) {
+			if (Wall.isSign(p.getBlock(model.world).getType())) {
+				Block signBlock = p.getBlock(model.world);
+				Sign sign = (Sign)signBlock.getState();
+				names.addAll(getNamesFromSign(sign));
+			}
+		}
+
+		return names.contains(playerName);
+	}
+
+	protected Set<Point> getFallbackWhitelistSignPoints() {
+		//this method exists so GeneratorCore can override it
+		return new HashSet<>();
+	}
+
+	private Set<Point> getDoorWhitelistSignPoints(Point doorPoint) {
 		Set<Point> potentialSigns = new HashSet<>();
 		boolean isTrapDoor = Wall.isTrapDoor(doorPoint.getBlock(model.world).getType());
 
@@ -128,16 +151,7 @@ public class BaseCore {
 				traverseMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints).join();
 		actualSigns.addAll(connectedSigns);
 
-		Set<String> names = new HashSet<>();
-		for (Point p : actualSigns) {
-			if (Wall.isSign(p.getBlock(model.world).getType())) {
-				Block signBlock = p.getBlock(model.world);
-				Sign sign = (Sign)signBlock.getState();
-				names.addAll(getNamesFromSign(sign));
-			}
-		}
-
-		return names.contains(playerName);
+		return actualSigns;
 	}
 
 	private boolean signMustBeInside(Point doorPoint) {
@@ -325,7 +339,7 @@ public class BaseCore {
 			//set layerAroundWall
 			List<Set<Point>> wallLayers = Wall.merge(generatableLayers, model.animator.getGeneratedLayers());
 			Set<Point> wallPoints = Wall.flattenLayers(wallLayers);
-			Set<Point> layerAroundWall = getLayerAround(wallPoints).join();
+			Set<Point> layerAroundWall = getLayerAround(wallPoints, Wall.ConnectedThreshold.POINTS).join();
 
 			Set<Point> layerOutside = getLayerOutside(wallPoints, layerAroundWall);
 			Set<Point> pointsInside = getPointsInside(layerOutside, layerAroundWall, wallPoints);
@@ -425,7 +439,7 @@ public class BaseCore {
 
 		//claim originPoints and layer around
 		Set<Point> originPoints = getOriginPoints();
-		Set<Point> layerAroundOrigins = getLayerAround(originPoints).join(); //should be nearly instant so ok to wait
+		Set<Point> layerAroundOrigins = getLayerAround(originPoints, Wall.ConnectedThreshold.POINTS).join(); //should be nearly instant so ok to wait
 		model.claimedPoints.addAll(originPoints);
 		model.claimedPoints.addAll(layerAroundOrigins);
 	}
@@ -534,13 +548,13 @@ public class BaseCore {
 //		return Wall.getPointsConnected(model.world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
 //	}
 
-	private CompletableFuture<Set<Point>> getLayerAround(Set<Point> originLayer) {
+	protected CompletableFuture<Set<Point>> getLayerAround(Set<Point> originLayer, Wall.ConnectedThreshold threshold) {
 		Point origin = model.anchorPoint;
 		Set<Material> traverseMaterials = new HashSet<>(); //no blocks are traversed
 		Set<Material> returnMaterials = null; //all blocks are returned
 		int rangeLimit = model.generationRangeLimit + 1;
 		Set<Point> ignorePoints = null; //no points ignored
-		return Wall.getPointsConnected(model.world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints, Wall.ConnectedThreshold.POINTS);
+		return Wall.getPointsConnected(model.world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints, threshold);
 	}
 
 //	will be used for emergency key
