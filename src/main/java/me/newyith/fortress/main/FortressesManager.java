@@ -275,8 +275,10 @@ public class FortressesManager {
 
 		Debug.start("onExplode1");
 
+		Point origin = explosion source (should be passed in)
 
-		//TODO: don't recalculate this so often
+
+		//TODO: don't recalculate this so often (test to see if its fast. it might be)
 		Set<Point> insidePoints = new HashSet<>();
 		runeInstances.forEach(rune -> {
 			insidePoints.addAll(rune.getPointsInsideFortress());
