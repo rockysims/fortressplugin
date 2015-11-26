@@ -46,4 +46,12 @@ public class BlockRevertData {
 		Block b = model.point.getBlock(model.world);
 		b.setType(model.material);
 	}
+
+	public Point getPoint() {
+		return model.point;
+	}
+
+	public Material getMaterial() {
+		return model.material;
+	}
 }

@@ -67,11 +67,17 @@ public class CoreMaterials {
 	}
 
 	public boolean isProtectable(Material m) {
-		return model.protectableWallMaterials.contains(m);
+		if (m != null) {
+			return model.protectableWallMaterials.contains(m);
+		}
+		return false;
 	}
 
 	public boolean isAlterable(Material m) {
-		return model.alterableWallMaterials.contains(m);
+		if (m != null) {
+			return model.alterableWallMaterials.contains(m);
+		}
+		return false;
 	}
 
 	// - Refreshing -

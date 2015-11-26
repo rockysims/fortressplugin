@@ -324,7 +324,6 @@ public class BaseCore {
 			model.genPrepDataFuture = null;
 		}
 
-		model.animator.onBeforeGenPrep(); //deal with TimedBedrock complexities of switching directions part way through animation
 		//start preparing for generation (tick() handles it when future completes)
 		model.genPrepDataFuture = getGenPrepDataFuture();
 	}
@@ -459,7 +458,8 @@ public class BaseCore {
 		int maxReturns = Math.max(0, FortressPlugin.config_generationBlockLimit - getGeneratedPoints().size());
 		int rangeLimit = model.generationRangeLimit;
 		Set<Point> ignorePoints = nearbyClaimedPoints;
-		List<Set<Point>> foundLayers = Wall.getPointsConnectedAsLayers(model.world, origin, originLayer, traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints).join();
+		Map<Point, Material> pretendPoints = model.animator.getWaveMaterialMap();
+		List<Set<Point>> foundLayers = Wall.getPointsConnectedAsLayers(model.world, origin, originLayer, traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints, pretendPoints).join();
 
 		//correct layer indexes (first non already generated layer is not always layer 0)
 		List<Set<Point>> layers = new ArrayList<>();

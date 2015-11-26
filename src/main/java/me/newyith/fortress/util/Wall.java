@@ -120,31 +120,31 @@ public class Wall {
 
 	public static CompletableFuture<Set<Point>> getPointsConnected(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int maxReturns, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
 		return CompletableFuture.supplyAsync(() -> {
-			List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints, searchablePoints, ConnectedThreshold.FACES).join();
+			List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints, searchablePoints, null, ConnectedThreshold.FACES).join();
 			return flattenLayers(layers);
 		});
 	}
 
 	public static CompletableFuture<Set<Point>> getPointsConnected(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
 		return CompletableFuture.supplyAsync(() -> {
-			List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, -1, rangeLimit, ignorePoints, searchablePoints, ConnectedThreshold.FACES).join();
+			List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, -1, rangeLimit, ignorePoints, searchablePoints, null, ConnectedThreshold.FACES).join();
 			return flattenLayers(layers);
 		});
 	}
 
 	public static CompletableFuture<Set<Point>> getPointsConnected(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, ConnectedThreshold connectedThreshold) {
 		return CompletableFuture.supplyAsync(() -> {
-			List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, -1, rangeLimit, ignorePoints, null, connectedThreshold).join();
+			List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, -1, rangeLimit, ignorePoints, null, null, connectedThreshold).join();
 			return flattenLayers(layers);
 		});
 	}
 
-	public static CompletableFuture<List<Set<Point>>> getPointsConnectedAsLayers(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int maxReturns, int rangeLimit, Set<Point> ignorePoints) {
+	public static CompletableFuture<List<Set<Point>>> getPointsConnectedAsLayers(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int maxReturns, int rangeLimit, Set<Point> ignorePoints, Map<Point, Material> pretendPoints) {
 		if (originLayer == null) {
 			originLayer = new HashSet<>();
 			originLayer.add(origin);
 		}
-		return getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints, null, ConnectedThreshold.FACES);
+		return getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints, null, pretendPoints, ConnectedThreshold.FACES);
 	}
 
 	/**
@@ -158,14 +158,19 @@ public class Wall {
 	 * @param rangeLimit The maximum distance away from origin to search.
 	 * @param ignorePoints When searching, these points will be ignored (not traversed or returned). If null, no points ignored.
 	 * @param searchablePoints When searching, only these points will be visited (traversed and/or returned). If null, all points searchable.
+	 * @param pretendPoints Points to pretend are a different material. If null, no points will be pretend.
 	 * @param connectedThreshold Whether connected means 3x3x3 area or only the 6 blocks connected by faces.
 	 * @return List of all points (blocks) connected to the originLayer by traverseMaterials and matching a block type in returnMaterials.
 	 */
-	public static CompletableFuture<List<Set<Point>>> getPointsConnectedAsLayers(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int maxReturns, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints, ConnectedThreshold connectedThreshold) {
+	public static CompletableFuture<List<Set<Point>>> getPointsConnectedAsLayers(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int maxReturns, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints, Map<Point, Material> pretendPoints, ConnectedThreshold connectedThreshold) {
 		//make ignorePoints default to empty
 		if (ignorePoints == null)
 			ignorePoints = new HashSet<>();
 		final Set<Point> finalIgnorePoints = ignorePoints;
+
+		if (pretendPoints == null)
+			pretendPoints = new HashMap<>();
+		final Map<Point, Material> finalPretendPoints = pretendPoints;
 
 		return CompletableFuture.supplyAsync(() -> {
 			List<Set<Point>> matchesAsLayers = new ArrayList<>();
@@ -259,7 +264,11 @@ public class Wall {
 							if (!isInRange(p, origin, rangeLimit))
 								continue;
 
-							mat = p.getBlock(world).getType();
+							if (finalPretendPoints.containsKey(p)) {
+								mat = finalPretendPoints.get(p);
+							} else {
+								mat = p.getBlock(world).getType();
+							}
 
 							//add to matchesAsLayers if it matches a returnMaterials type
 							if (returnMaterials == null || returnMaterials.contains(mat)) {

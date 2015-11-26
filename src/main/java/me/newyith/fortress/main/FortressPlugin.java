@@ -238,6 +238,10 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+
+//TODO: consider making alteredPoints store BlockRevertData instead of Material
+
+
 //TODO: keep working on bedrock wave (works except when switching directions part way through (each direction has bug))
 //	work on direction changing bugs
 //	save more block revert data (stair orientation for example)
