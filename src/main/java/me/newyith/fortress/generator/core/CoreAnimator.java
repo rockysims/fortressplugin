@@ -1,7 +1,6 @@
 package me.newyith.fortress.generator.core;
 
 import me.newyith.fortress.event.TickTimer;
-import me.newyith.fortress.generator.BlockRevertData;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
@@ -32,7 +31,7 @@ public class CoreAnimator {
 		private Set<Point> protectedPoints = null;
 		private List<Set<Point>> generatedLayers = null;
 		private List<Set<Point>> animationLayers = null;
-		private LinkedList<Map<Point, BlockRevertData>> waveLayers = null;
+		private CoreWave wave = null;
 		private CoreMaterials coreMats = null;
 		private boolean skipAnimation = false;
 		private boolean animationInProgress = false;
@@ -40,7 +39,6 @@ public class CoreAnimator {
 		private int instantLayersRemaining = 0;
 		private String worldName = null;
 		private transient World world = null;
-		private final transient int maxWaveLayers;
 		private final transient int maxBlocksPerFrame;
 		private final transient int ticksPerFrame;
 		private transient int animationWaitTicks = 0;
@@ -52,7 +50,7 @@ public class CoreAnimator {
 					 @JsonProperty("protectedPoints") Set<Point> protectedPoints,
 					 @JsonProperty("generatedLayers") List<Set<Point>> generatedLayers,
 					 @JsonProperty("animationLayers") List<Set<Point>> animationLayers,
-					 @JsonProperty("waveLayers") LinkedList<Map<Point, BlockRevertData>> waveLayers,
+					 @JsonProperty("wave") CoreWave wave,
 					 @JsonProperty("coreMats") CoreMaterials coreMats,
 					 @JsonProperty("skipAnimation") boolean skipAnimation,
 					 @JsonProperty("animationInProgress") boolean animationInProgress,
@@ -64,7 +62,7 @@ public class CoreAnimator {
 			this.protectedPoints = protectedPoints;
 			this.generatedLayers = generatedLayers;
 			this.animationLayers = animationLayers;
-			this.waveLayers = waveLayers;
+			this.wave = wave;
 			this.coreMats = coreMats;
 			this.skipAnimation = skipAnimation;
 			this.animationInProgress = animationInProgress;
@@ -74,7 +72,6 @@ public class CoreAnimator {
 
 			//rebuild transient fields
 			this.world = Bukkit.getWorld(worldName);
-			this.maxWaveLayers = 4;
 			this.maxBlocksPerFrame = 500;
 			this.ticksPerFrame = 150 / TickTimer.msPerTick; // msPerFrame / msPerTick
 			this.animationWaitTicks = 0;
@@ -93,13 +90,13 @@ public class CoreAnimator {
 		Set<Point> protectedPoints = new HashSet<>();
 		List<Set<Point>> generatedLayers = new ArrayList<>();
 		List<Set<Point>> animationLayers = new ArrayList<>();
-		LinkedList<Map<Point, BlockRevertData>> waveLayers = new LinkedList<>();
+		CoreWave wave = new CoreWave(world);
 		boolean skipAnimation = false;
 		boolean animationInProgress = false;
 		boolean isGeneratingWall = false;
 		int instantLayersRemaining = 0;
 		String worldName = world.getName();
-		model = new Model(anchorPoint, alteredPoints, protectedPoints, generatedLayers, animationLayers, waveLayers,
+		model = new Model(anchorPoint, alteredPoints, protectedPoints, generatedLayers, animationLayers, wave,
 				coreMats, skipAnimation, animationInProgress, isGeneratingWall, instantLayersRemaining, worldName);
 	}
 
@@ -110,16 +107,7 @@ public class CoreAnimator {
 	}
 
 	public Map<Point, Material> getWaveMaterialMap() {
-		Map<Point, Material> map = new HashMap<>();
-
-		for (Map<Point, BlockRevertData> waveLayer : model.waveLayers) {
-			for (Point p : waveLayer.keySet()) {
-				BlockRevertData data = waveLayer.get(p);
-				map.put(p, data.getMaterial());
-			}
-		}
-
-		return map;
+		return model.wave.getMaterialMap();
 	}
 
 	public void generate(List<Set<Point>> layers) {
@@ -127,16 +115,16 @@ public class CoreAnimator {
 		model.curIndex = 0;
 		model.isGeneratingWall = true;
 		model.animationInProgress = true;
-		Collections.reverse(model.waveLayers);
-		model.instantLayersRemaining = model.waveLayers.size();
+		model.wave.onBeforeGenerate();
+		model.instantLayersRemaining = model.wave.layerCount();
 	}
 
 	public void degenerate(boolean skipAnimation) {
 		model.curIndex = 0; //starting from end if degenerating is handled elsewhere
 		model.isGeneratingWall = false;
 		model.animationInProgress = true;
-		Collections.reverse(model.waveLayers);
-		model.instantLayersRemaining = model.waveLayers.size();
+		model.wave.onBeforeDegenerate();
+		model.instantLayersRemaining = model.wave.layerCount();
 
 		if (skipAnimation) {
 			model.skipAnimation = true;
@@ -229,63 +217,6 @@ public class CoreAnimator {
 		}
 	}
 
-
-
-
-
-
-	private void convertWaveLayer(Set<Point> layerPoints) {
-		//consider removing old layer
-		if (model.waveLayers.size() + 1 > model.maxWaveLayers) {
-			Map<Point, BlockRevertData> oldLayer = model.waveLayers.removeFirst();
-			revertWaveLayer(oldLayer);
-		}
-
-		//add new layer
-		Map<Point, BlockRevertData> newLayerData = new HashMap<>();
-		for (Point p : layerPoints) {
-			newLayerData.put(p, new BlockRevertData(model.world, p));
-			p.getBlock(model.world).setType(Material.QUARTZ_BLOCK); //TODO: change to BEDROCK
-		}
-		model.waveLayers.add(newLayerData);
-	}
-
-	private void revertWaveLayer(Map<Point, BlockRevertData> layer) {
-		for (Point p : layer.keySet()) {
-			layer.get(p).revert(model.world, p);
-		}
-	}
-
-	private Material getWaveMaterial(Point p) {
-		Material material = null;
-
-		for (Map<Point, BlockRevertData> waveLayer : model.waveLayers) {
-			BlockRevertData data = waveLayer.get(p);
-			if (data != null) {
-				material = data.getMaterial();
-				break;
-			}
-		}
-
-		return material;
-	}
-
-	private void tryRevertWavePoint(Point p) {
-		for (Map<Point, BlockRevertData> waveLayer : model.waveLayers) {
-			BlockRevertData data = waveLayer.get(p);
-			if (data != null) {
-				data.revert(model.world, p);
-				waveLayer.remove(p);
-				break;
-			}
-		}
-	}
-
-
-
-
-
-
 	private boolean updateToNextFrame() {
 		boolean updatedToNextFrame = false;
 
@@ -314,9 +245,8 @@ public class CoreAnimator {
 			}
 		}
 
-		if (!updatedToNextFrame && !model.waveLayers.isEmpty()) {
-			revertWaveLayer(model.waveLayers.removeFirst());
-			updatedToNextFrame = true;
+		if (!updatedToNextFrame) {
+			updatedToNextFrame = model.wave.revertLayer(); //returns true if reverted wave layer
 			Debug.msg("finishing wave");
 		}
 
@@ -362,7 +292,7 @@ public class CoreAnimator {
 
 		if (!model.skipAnimation && !updatedPoints.isEmpty()) {
 //			Debug.msg("<-> convert layerIndex: " + layerIndex);
-			convertWaveLayer(updatedPoints);
+			model.wave.convertLayer(updatedPoints);
 		}
 
 		return updatedPoints.size();
@@ -374,9 +304,9 @@ public class CoreAnimator {
 		Block b = p.getBlock(model.world);
 		boolean alterable = false;
 		alterable = alterable || model.coreMats.isAlterable(b);
-		alterable = alterable || model.coreMats.isAlterable(getWaveMaterial(p));
+		alterable = alterable || model.coreMats.isAlterable(model.wave.getMaterial(p));
 		if (alterable) {
-			tryRevertWavePoint(p);
+			model.wave.revertPoint(p);
 			addAlteredPoint(p, b.getType());
 			b.setType(Material.BEDROCK);
 			altered = true;
@@ -389,7 +319,7 @@ public class CoreAnimator {
 		boolean unaltered = false;
 
 		if (model.alteredPoints.containsKey(p)) {
-			tryRevertWavePoint(p);
+			model.wave.revertPoint(p);
 			Material material = removeAlteredPoint(p);
 			if (p.getBlock(model.world).getType() == Material.BEDROCK) {
 				p.getBlock(model.world).setType(material);
@@ -406,9 +336,9 @@ public class CoreAnimator {
 		Block b = p.getBlock(model.world);
 		boolean protectable = false;
 		protectable = protectable || model.coreMats.isProtectable(b);
-		protectable = protectable || model.coreMats.isProtectable(getWaveMaterial(p));
+		protectable = protectable || model.coreMats.isProtectable(model.wave.getMaterial(p));
 		if (!model.protectedPoints.contains(p) && protectable) {
-			tryRevertWavePoint(p);
+			model.wave.revertPoint(p);
 			addProtectedPoint(p);
 			pointProtected = true;
 		}
@@ -420,7 +350,7 @@ public class CoreAnimator {
 		boolean unprotected = false;
 
 		if (model.protectedPoints.contains(p)) {
-			tryRevertWavePoint(p);
+			model.wave.revertPoint(p);
 			removeProtectedPoint(p);
 			unprotected = true;
 		}
