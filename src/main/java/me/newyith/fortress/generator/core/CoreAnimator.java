@@ -325,19 +325,16 @@ public class CoreAnimator {
 	}
 
 	private int updateLayer(int layerIndex) {
-		Set<Point> updatedAlteredPoints = new HashSet<>();
-		Set<Point> updatedProtectedPoints = new HashSet<>();
+		Set<Point> updatedPoints = new HashSet<>();
 
 		Set<Point> layer = new HashSet<>(model.animationLayers.get(layerIndex)); //make copy to avoid concurrent modification errors (recheck this is needed)
 		for (Point p : layer) {
 			if (model.isGeneratingWall) {
 				//try to generate block at p
-				boolean pAltered = alter(p);
-				boolean pProtected = !pAltered && protect(p);
-				if (pAltered) updatedAlteredPoints.add(p);
-				if (pProtected) updatedProtectedPoints.add(p);
+				boolean pGenerated = alter(p) || protect(p);
+				if (pGenerated) {
+					updatedPoints.add(p);
 
-				if (pAltered || pProtected) {
 					//add p to generatedLayers
 					while (layerIndex >= model.generatedLayers.size()) {
 						model.generatedLayers.add(new HashSet<>());
@@ -346,12 +343,10 @@ public class CoreAnimator {
 				}
 			} else {
 				//try to degenerate block at p
-				boolean pUnaltered = unalter(p);
-				boolean pUnprotected = !pUnaltered && unprotect(p);
-				if (pUnaltered) updatedAlteredPoints.add(p);
-				if (pUnprotected) updatedProtectedPoints.add(p);
+				boolean pDegenerated = unalter(p) || unprotect(p);
+				if (pDegenerated) {
+					updatedPoints.add(p);
 
-				if (pUnaltered || pUnprotected) {
 					//remove p from generatedLayers
 					if (layerIndex < model.generatedLayers.size()) {
 						model.generatedLayers.get(layerIndex).remove(p);
@@ -359,24 +354,19 @@ public class CoreAnimator {
 				}
 			}
 
-			if (updatedAlteredPoints.size() + updatedProtectedPoints.size() >= model.maxBlocksPerFrame) {
+			if (updatedPoints.size() >= model.maxBlocksPerFrame) {
 				break;
 			}
 		} // end for (Point p : layer)
 
 //		Debug.msg("layer " + layerIndex + " blockUpdates: " + updatedPoints.size());
 
-		if (!model.skipAnimation) {
-			Set<Point> updatedPoints = new HashSet<>();
-			updatedPoints.addAll(updatedAlteredPoints);
-			updatedPoints.addAll(updatedProtectedPoints);
-			if (!updatedPoints.isEmpty()) {
-				Debug.msg("<-> convert layerIndex: " + layerIndex);
-				convertWaveLayer(updatedPoints);
-			}
+		if (!model.skipAnimation && !updatedPoints.isEmpty()) {
+//			Debug.msg("<-> convert layerIndex: " + layerIndex);
+			convertWaveLayer(updatedPoints);
 		}
 
-		return updatedAlteredPoints.size() + updatedProtectedPoints.size();
+		return updatedPoints.size();
 	}
 
 	private boolean alter(Point p) {
