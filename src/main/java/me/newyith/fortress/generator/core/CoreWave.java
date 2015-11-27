@@ -67,7 +67,7 @@ public class CoreWave {
 		Map<Point, BlockRevertData> newLayerData = new HashMap<>();
 		for (Point p : layerPoints) {
 			newLayerData.put(p, new BlockRevertData(model.world, p));
-			p.getBlock(model.world).setType(Material.QUARTZ_BLOCK); //TODO: change to BEDROCK
+			p.getBlock(model.world).setType(Material.BEDROCK);
 		}
 		model.waveLayers.add(newLayerData);
 	}
