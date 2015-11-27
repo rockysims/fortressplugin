@@ -1,7 +1,6 @@
 package me.newyith.fortress.generator;
 
 import me.newyith.fortress.util.Point;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -10,21 +9,13 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 public class BlockRevertData {
 	private static class Model {
-		private final Point point;
 		private final Material material;
-		private final String worldName;
-		private final transient World world;
 
 		@JsonCreator
-		public Model(@JsonProperty("point") Point point,
-					 @JsonProperty("material") Material material,
-					 @JsonProperty("worldName") String worldName) {
-			this.point = point;
+		public Model(@JsonProperty("material") Material material) {
 			this.material = material;
-			this.worldName = worldName;
 
 			//rebuild transient fields
-			this.world = Bukkit.getWorld(worldName);
 		}
 	}
 	private Model model = null;
@@ -36,19 +27,14 @@ public class BlockRevertData {
 
 	public BlockRevertData(World world, Point p) {
 		Material material = p.getBlock(world).getType();
-		String worldName = world.getName();
-		model = new Model(p, material, worldName);
+		model = new Model(material);
 	}
 
 	//-----------------------------------------------------------------------
 
-	public void revert() {
-		Block b = model.point.getBlock(model.world);
+	public void revert(World world, Point p) {
+		Block b = p.getBlock(world);
 		b.setType(model.material);
-	}
-
-	public Point getPoint() {
-		return model.point;
 	}
 
 	public Material getMaterial() {

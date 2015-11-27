@@ -32,7 +32,7 @@ public class CoreAnimator {
 		private Set<Point> protectedPoints = null;
 		private List<Set<Point>> generatedLayers = null;
 		private List<Set<Point>> animationLayers = null;
-		private LinkedList<Set<BlockRevertData>> waveLayers = null;
+		private LinkedList<Map<Point, BlockRevertData>> waveLayers = null;
 		private CoreMaterials coreMats = null;
 		private boolean skipAnimation = false;
 		private boolean animationInProgress = false;
@@ -52,7 +52,7 @@ public class CoreAnimator {
 					 @JsonProperty("protectedPoints") Set<Point> protectedPoints,
 					 @JsonProperty("generatedLayers") List<Set<Point>> generatedLayers,
 					 @JsonProperty("animationLayers") List<Set<Point>> animationLayers,
-					 @JsonProperty("waveLayers") LinkedList<Set<BlockRevertData>> waveLayers,
+					 @JsonProperty("waveLayers") LinkedList<Map<Point, BlockRevertData>> waveLayers,
 					 @JsonProperty("coreMats") CoreMaterials coreMats,
 					 @JsonProperty("skipAnimation") boolean skipAnimation,
 					 @JsonProperty("animationInProgress") boolean animationInProgress,
@@ -93,7 +93,7 @@ public class CoreAnimator {
 		Set<Point> protectedPoints = new HashSet<>();
 		List<Set<Point>> generatedLayers = new ArrayList<>();
 		List<Set<Point>> animationLayers = new ArrayList<>();
-		LinkedList<Set<BlockRevertData>> waveLayers = new LinkedList<>();
+		LinkedList<Map<Point, BlockRevertData>> waveLayers = new LinkedList<>();
 		boolean skipAnimation = false;
 		boolean animationInProgress = false;
 		boolean isGeneratingWall = false;
@@ -112,9 +112,10 @@ public class CoreAnimator {
 	public Map<Point, Material> getWaveMaterialMap() {
 		Map<Point, Material> map = new HashMap<>();
 
-		for (Set<BlockRevertData> waveLayer : model.waveLayers) {
-			for (BlockRevertData data : waveLayer) {
-				map.put(data.getPoint(), data.getMaterial());
+		for (Map<Point, BlockRevertData> waveLayer : model.waveLayers) {
+			for (Point p : waveLayer.keySet()) {
+				BlockRevertData data = waveLayer.get(p);
+				map.put(p, data.getMaterial());
 			}
 		}
 
@@ -236,51 +237,49 @@ public class CoreAnimator {
 	private void convertWaveLayer(Set<Point> layerPoints) {
 		//consider removing old layer
 		if (model.waveLayers.size() + 1 > model.maxWaveLayers) {
-			Set<BlockRevertData> oldLayer = model.waveLayers.removeFirst();
+			Map<Point, BlockRevertData> oldLayer = model.waveLayers.removeFirst();
 			revertWaveLayer(oldLayer);
 		}
 
 		//add new layer
-		Set<BlockRevertData> newLayerData = new HashSet<>();
+		Map<Point, BlockRevertData> newLayerData = new HashMap<>();
 		for (Point p : layerPoints) {
-			newLayerData.add(new BlockRevertData(model.world, p));
+			newLayerData.put(p, new BlockRevertData(model.world, p));
 			p.getBlock(model.world).setType(Material.QUARTZ_BLOCK); //TODO: change to BEDROCK
 		}
 		model.waveLayers.add(newLayerData);
 	}
 
-	private void revertWaveLayer(Set<BlockRevertData> layer) {
-		for (BlockRevertData data : layer) {
-			data.revert();
+	private void revertWaveLayer(Map<Point, BlockRevertData> layer) {
+		for (Point p : layer.keySet()) {
+			layer.get(p).revert(model.world, p);
 		}
 	}
 
 	private Material getWaveMaterial(Point p) {
 		Material material = null;
 
-		//TODO: do this more efficiently
-		material = getWaveMaterialMap().get(p);
+		for (Map<Point, BlockRevertData> waveLayer : model.waveLayers) {
+			BlockRevertData data = waveLayer.get(p);
+			if (data != null) {
+				material = data.getMaterial();
+				break;
+			}
+		}
 
 		return material;
 	}
 
 	private void tryRevertWavePoint(Point p) {
-		//TODO: do this more efficiently
-		for (Set<BlockRevertData> waveLayer : model.waveLayers) {
-			Iterator<BlockRevertData> it = waveLayer.iterator();
-			while (it.hasNext()) {
-				BlockRevertData data = it.next();
-				if (data.getPoint().equals(p)) {
-					data.revert();
-					it.remove();
-				}
+		for (Map<Point, BlockRevertData> waveLayer : model.waveLayers) {
+			BlockRevertData data = waveLayer.get(p);
+			if (data != null) {
+				data.revert(model.world, p);
+				waveLayer.remove(p);
+				break;
 			}
 		}
 	}
-
-
-
-
 
 
 
