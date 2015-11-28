@@ -75,7 +75,11 @@ public class Wall {
 	}
 
 	public static boolean isDoor(Material mat) {
-		boolean isDoor = false;
+		return isTrapDoor(mat) || isTallDoor(mat);
+	}
+
+	public static boolean isTallDoor(Material mat) {
+		boolean isTallDoor = false;
 		switch (mat) {
 			case IRON_DOOR_BLOCK:
 			case WOODEN_DOOR:
@@ -84,11 +88,9 @@ public class Wall {
 			case DARK_OAK_DOOR:
 			case JUNGLE_DOOR:
 			case SPRUCE_DOOR:
-			case TRAP_DOOR:
-			case IRON_TRAPDOOR:
-				isDoor = true;
+				isTallDoor = true;
 		}
-		return isDoor;
+		return isTallDoor;
 	}
 
 	public static boolean isTrapDoor(Material mat) {

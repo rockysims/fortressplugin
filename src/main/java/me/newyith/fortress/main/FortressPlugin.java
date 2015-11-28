@@ -239,6 +239,18 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
+
+//possible cause of door bug:
+//both halves of door are added to first layer that included the door
+//but then (maybe) other half of door is still added to the other wave layer
+//solution:
+//make convertDoor(p) and revertDoor(p) ignore other half of door (if waveLayers.contains(p))
+//don't add other half of doors if its already in wave layers
+
+
+
+
+
 //TODO: consider making alteredPoints store BlockRevertData instead of Material
 
 

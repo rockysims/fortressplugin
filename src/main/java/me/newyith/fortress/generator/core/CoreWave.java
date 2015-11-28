@@ -1,7 +1,10 @@
 package me.newyith.fortress.generator.core;
 
+import javafx.util.Pair;
 import me.newyith.fortress.generator.BlockRevertData;
+import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
+import me.newyith.fortress.util.Wall;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -64,28 +67,107 @@ public class CoreWave {
 		}
 
 		//add new layer
+		World world = model.world;
 		Map<Point, BlockRevertData> newLayerData = new HashMap<>();
 		for (Point p : layerPoints) {
-			newLayerData.put(p, new BlockRevertData(model.world, p));
-			p.getBlock(model.world).setType(Material.BEDROCK);
+			Material mat = p.getBlock(world).getType();
+			if (Wall.isTallDoor(mat)) {
+				convertDoor(p, newLayerData);
+			} else {
+				newLayerData.put(p, new BlockRevertData(world, p));
+				p.getBlock(model.world).setType(Material.BEDROCK);
+			}
 		}
 		model.waveLayers.add(newLayerData);
 	}
 
-	public boolean revertPoint(Point p) {
-		boolean reverted = false;
-
+	public void revertPoint(Point p) {
 		for (Map<Point, BlockRevertData> waveLayer : model.waveLayers) {
 			BlockRevertData data = waveLayer.get(p);
 			if (data != null) {
-				data.revert(model.world, p);
-				waveLayer.remove(p);
-				reverted = true;
+				if (Wall.isTallDoor(data.getMaterial())) {
+					revertDoor(p, waveLayer);
+				} else {
+					data.revert(model.world, p);
+					waveLayer.remove(p);
+				}
 				break;
 			}
 		}
+	}
 
-		return reverted;
+	private void convertDoor(Point p, Map<Point, BlockRevertData> layer) {
+		//assumes p is a door block (2 block tall doors)
+		Pair<Point, Point> doorTopBottom = getDoorTopBottom(p, layer);
+		if (doorTopBottom != null) {
+			World world = model.world;
+			Point top = doorTopBottom.getKey();
+			Point bottom = doorTopBottom.getValue();
+
+			layer.put(top, new BlockRevertData(world, top));
+			layer.put(bottom, new BlockRevertData(world, bottom));
+
+			bottom.setType(Material.AIR, world);
+			top.setType(Material.AIR, world);
+
+			bottom.setType(Material.BEDROCK, world);
+			top.setType(Material.BEDROCK, world);
+		}
+	}
+
+	private void revertDoor(Point p, Map<Point, BlockRevertData> layer) {
+		//assumes p is a door block
+		Pair<Point, Point> doorTopBottom = getDoorTopBottom(p, layer);
+		if (doorTopBottom != null) {
+			World world = model.world;
+			Point top = doorTopBottom.getKey();
+			Point bottom = doorTopBottom.getValue();
+			BlockRevertData topData = layer.get(top);
+			BlockRevertData bottomData = layer.get(bottom);
+
+			if (topData != null && bottomData != null) {
+				bottom.setType(Material.AIR, world);
+				top.setType(Material.AIR, world);
+
+				bottomData.revert(world, bottom);
+				topData.revert(world, top);
+
+				layer.remove(top);
+				layer.remove(bottom);
+			} else {
+				Debug.error("CoreWave::revertDoor() failed to find revert data for door's top and bottom.");
+			}
+		}
+	}
+
+	private Pair<Point, Point> getDoorTopBottom(Point p, Map<Point, BlockRevertData> layer) {
+		//assumes p is a door block
+		Point top = null;
+		Point bottom = null;
+		Point a = p.add(0, 1, 0);
+		Point b = p.add(0, -1, 0);
+		Material above = a.getType(model.world);
+		Material below = b.getType(model.world);
+		Material middle = p.getType(model.world);
+
+		if (layer.containsKey(a)) above = layer.get(a).getMaterial();
+		if (layer.containsKey(b)) below = layer.get(b).getMaterial();
+		if (layer.containsKey(p)) middle = layer.get(p).getMaterial();
+
+		if (above == middle) {
+			top = a;
+			bottom = p;
+		} else if (below == middle) {
+			top = p;
+			bottom = b;
+		}
+
+		if (top == null) {
+			Debug.error("getDoorTopBottom() failed.");
+			return null;
+		} else {
+			return new Pair<>(top, bottom);
+		}
 	}
 
 	public Material getMaterial(Point p) {

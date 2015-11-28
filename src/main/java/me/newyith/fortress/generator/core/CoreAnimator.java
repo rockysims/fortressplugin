@@ -241,13 +241,13 @@ public class CoreAnimator {
 			if (updatedCount > 0 && model.instantLayersRemaining > 0) {
 				model.instantLayersRemaining--;
 				updatedToNextFrame = false;
-				Debug.msg("instant");
+//				Debug.msg("instant");
 			}
 		}
 
 		if (!updatedToNextFrame) {
 			updatedToNextFrame = model.wave.revertLayer(); //returns true if reverted wave layer
-			Debug.msg("finishing wave");
+//			if (updatedToNextFrame) Debug.msg("finishing wave");
 		}
 
 		return updatedToNextFrame;

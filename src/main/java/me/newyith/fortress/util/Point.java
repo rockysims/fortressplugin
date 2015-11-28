@@ -148,6 +148,14 @@ public class Point {
 		return world.getBlockAt(xInt(), yInt(), zInt());
 	}
 
+	public Material getType(World world) {
+		return getBlock(world).getType();
+	}
+
+	public void setType(Material mat, World world) {
+		getBlock(world).setType(mat);
+	}
+
 	public double distance(Point p) {
 		Vector v1 = this.toVector();
 		Vector v2 = p.toVector();
