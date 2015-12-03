@@ -338,7 +338,6 @@ public class CoreAnimator {
 		protectable = protectable || model.coreMats.isProtectable(b);
 		protectable = protectable || model.coreMats.isProtectable(model.wave.getMaterial(p));
 		if (!model.protectedPoints.contains(p) && protectable) {
-			model.wave.revertPoint(p);
 			addProtectedPoint(p);
 			pointProtected = true;
 		}
@@ -350,7 +349,6 @@ public class CoreAnimator {
 		boolean unprotected = false;
 
 		if (model.protectedPoints.contains(p)) {
-			model.wave.revertPoint(p);
 			removeProtectedPoint(p);
 			unprotected = true;
 		}
