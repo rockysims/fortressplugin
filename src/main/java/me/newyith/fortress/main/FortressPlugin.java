@@ -240,6 +240,8 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //TODO: fix bug where saving during bedrock wave causes exception (jackson can't load)
+//	maybe have model save the matData.getData() then on load: new MaterialData(mat, byte)
+//	or, maybe just create MaterialDataWrapper class and then I can add jackson annotations so it can find the proper constructor
 
 //TODO: consider making alteredPoints store BlockRevertData instead of Material
 
