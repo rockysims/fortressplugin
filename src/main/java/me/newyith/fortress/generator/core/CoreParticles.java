@@ -4,7 +4,7 @@ import javafx.util.Pair;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.particle.ParticleEffect;
 import me.newyith.fortress.event.TickTimer;
-import me.newyith.fortress.util.Wall;
+import me.newyith.fortress.util.Blocks;
 import org.bukkit.Material;
 import org.bukkit.World;
 
@@ -43,7 +43,7 @@ public class CoreParticles {
 					Set<Point> layerOutsideFortress = core.getLayerOutsideFortress();
 
 					layerOutsideFortress.stream().forEach((outsidePoint) -> {
-						Set<Point> adjacents = Wall.getAdjacent6(outsidePoint);
+						Set<Point> adjacents = Blocks.getAdjacent6(outsidePoint);
 						adjacents.stream().forEach((adj) -> {
 							if (generated.contains(adj) && adj.getBlock(core.model.world).getType() != Material.AIR) {
 								wallOutsidePairs.add(new Pair<>(adj, outsidePoint));

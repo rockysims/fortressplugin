@@ -5,9 +5,8 @@ import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Cuboid;
 import me.newyith.fortress.util.Point;
-import me.newyith.fortress.util.Wall;
+import me.newyith.fortress.util.Blocks;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -196,7 +195,7 @@ public class StuckPlayer {
 			int maxHeight = world.getMaxHeight();
 			for (int y = maxHeight-2; y >= 0; y--) {
 				p = new Point(p.xInt(), y, p.zInt());
-				if (!Wall.isAiry(p, world)) {
+				if (!Blocks.isAiry(p, world)) {
 					//first non airy block
 					break;
 				}
@@ -206,7 +205,7 @@ public class StuckPlayer {
 			if (p.getBlock(world).getType().isSolid()) {
 				Point dest = p.add(0, 1, 0);
 				Point aboveDest = dest.add(0, 1, 0);
-				if (Wall.isAiry(dest, world) && Wall.isAiry(aboveDest, world)) {
+				if (Blocks.isAiry(dest, world) && Blocks.isAiry(aboveDest, world)) {
 					validDest = dest;
 				}
 			}

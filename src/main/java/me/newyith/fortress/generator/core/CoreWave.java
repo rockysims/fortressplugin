@@ -4,7 +4,7 @@ import javafx.util.Pair;
 import me.newyith.fortress.generator.BlockRevertData;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
-import me.newyith.fortress.util.Wall;
+import me.newyith.fortress.util.Blocks;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -71,7 +71,7 @@ public class CoreWave {
 		Map<Point, BlockRevertData> newLayerData = new HashMap<>();
 		for (Point p : layerPoints) {
 			Material mat = p.getBlock(world).getType();
-			if (Wall.isTallDoor(mat)) {
+			if (Blocks.isTallDoor(mat)) {
 				convertDoor(p, newLayerData);
 			} else {
 				newLayerData.put(p, new BlockRevertData(world, p));
@@ -85,7 +85,8 @@ public class CoreWave {
 		for (Map<Point, BlockRevertData> waveLayer : model.waveLayers) {
 			BlockRevertData data = waveLayer.get(p);
 			if (data != null) {
-				if (Wall.isTallDoor(data.getMaterial())) {
+				if (Blocks.isTallDoor(data.getMaterial())) {
+					Debug.msg("revertPoint() calling revertDoor() at " + p);
 					revertDoor(p, waveLayer);
 				} else {
 					data.revert(model.world, p);
@@ -95,6 +96,32 @@ public class CoreWave {
 			}
 		}
 	}
+	
+
+
+
+	//TODO: delete (or use)
+	private BlockRevertData get(Point p) {
+		BlockRevertData data = null;
+		for (Map<Point, BlockRevertData> waveLayer : model.waveLayers) {
+			data = waveLayer.get(p);
+			if (data != null) break;
+		}
+		return data;
+	}
+
+	//TODO: delete (or use)
+	private boolean contains(Point p) {
+		for (Map<Point, BlockRevertData> waveLayer : model.waveLayers) {
+			if (waveLayer.containsKey(p)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+
 
 	private void convertDoor(Point p, Map<Point, BlockRevertData> layer) {
 		//assumes p is a door block (2 block tall doors)

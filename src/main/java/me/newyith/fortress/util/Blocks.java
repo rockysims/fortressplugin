@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 //fully written again
-public class Wall {
+public class Blocks {
 	public enum ConnectedThreshold {
 		POINTS,
 		//LINES,

@@ -3,7 +3,7 @@ package me.newyith.fortress.generator.core;
 import me.newyith.fortress.generator.rune.GeneratorRune;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Point;
-import me.newyith.fortress.util.Wall;
+import me.newyith.fortress.util.Blocks;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.codehaus.jackson.annotate.JsonCreator;
@@ -60,12 +60,12 @@ public class GeneratorCore extends BaseCore {
 
 		GeneratorRune rune = FortressesManager.getRune(model.anchorPoint);
 		if (rune != null) {
-			Set<Point> potentialSigns = getLayerAround(rune.getPattern().getPoints(), Wall.ConnectedThreshold.FACES).join();
+			Set<Point> potentialSigns = getLayerAround(rune.getPattern().getPoints(), Blocks.ConnectedThreshold.FACES).join();
 
 			//fill fallbackSigns (from potentialSigns)
 			for (Point potentialSign : potentialSigns) {
 				Material mat = potentialSign.getBlock(model.world).getType();
-				if (Wall.isSign(mat)) {
+				if (Blocks.isSign(mat)) {
 					fallbackSigns.add(potentialSign);
 				}
 			}
@@ -74,12 +74,12 @@ public class GeneratorCore extends BaseCore {
 				//fallbackSigns.addAll(connected signs)
 				Point origin = model.anchorPoint;
 				Set<Point> originLayer = fallbackSigns;
-				Set<Material> traverseMaterials = Wall.getSignMaterials();
-				Set<Material> returnMaterials = Wall.getSignMaterials();
+				Set<Material> traverseMaterials = Blocks.getSignMaterials();
+				Set<Material> returnMaterials = Blocks.getSignMaterials();
 				int rangeLimit = model.generationRangeLimit * 2;
 				Set<Point> ignorePoints = null;
 				Set<Point> searchablePoints = null;
-				Set<Point> connectedSigns = Wall.getPointsConnected(model.world, origin, originLayer,
+				Set<Point> connectedSigns = Blocks.getPointsConnected(model.world, origin, originLayer,
 						traverseMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints).join();
 				fallbackSigns.addAll(connectedSigns);
 			}

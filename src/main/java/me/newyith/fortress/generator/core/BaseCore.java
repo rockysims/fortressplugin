@@ -6,7 +6,7 @@ import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Cuboid;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
-import me.newyith.fortress.util.Wall;
+import me.newyith.fortress.util.Blocks;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -98,7 +98,7 @@ public class BaseCore {
 
 		Set<String> names = new HashSet<>();
 		for (Point p : actualSigns) {
-			if (Wall.isSign(p.getBlock(model.world).getType())) {
+			if (Blocks.isSign(p.getBlock(model.world).getType())) {
 				Block signBlock = p.getBlock(model.world);
 				Sign sign = (Sign)signBlock.getState();
 				names.addAll(getNamesFromSign(sign));
@@ -115,14 +115,14 @@ public class BaseCore {
 
 	private Set<Point> getDoorWhitelistSignPoints(Point doorPoint) {
 		Set<Point> potentialSigns = new HashSet<>();
-		boolean isTrapDoor = Wall.isTrapDoor(doorPoint.getBlock(model.world).getType());
+		boolean isTrapDoor = Blocks.isTrapDoor(doorPoint.getBlock(model.world).getType());
 
 		if (isTrapDoor) {
-			potentialSigns.addAll(Wall.getAdjacent6(doorPoint));
+			potentialSigns.addAll(Blocks.getAdjacent6(doorPoint));
 		} else {
 			//potentialSigns.addAll(point above door and points adjacent to it)
 			Point aboveDoorPoint = new Point(doorPoint).add(0, 1, 0);
-			potentialSigns.addAll(Wall.getAdjacent6(aboveDoorPoint));
+			potentialSigns.addAll(Blocks.getAdjacent6(aboveDoorPoint));
 			potentialSigns.add(aboveDoorPoint);
 		}
 
@@ -134,7 +134,7 @@ public class BaseCore {
 		Set<Point> actualSigns = new HashSet<>();
 		for (Point potentialSign : potentialSigns) {
 			Material mat = potentialSign.getBlock(model.world).getType();
-			if (Wall.isSign(mat)) {
+			if (Blocks.isSign(mat)) {
 				actualSigns.add(potentialSign);
 			}
 		}
@@ -142,12 +142,12 @@ public class BaseCore {
 		//potentialSigns.addAll(connected signs)
 		Point origin = doorPoint;
 		Set<Point> originLayer = actualSigns;
-		Set<Material> traverseMaterials = Wall.getSignMaterials();
-		Set<Material> returnMaterials = Wall.getSignMaterials();
+		Set<Material> traverseMaterials = Blocks.getSignMaterials();
+		Set<Material> returnMaterials = Blocks.getSignMaterials();
 		int rangeLimit = model.generationRangeLimit * 2;
 		Set<Point> ignorePoints = null;
 		Set<Point> searchablePoints = null;
-		Set<Point> connectedSigns = Wall.getPointsConnected(model.world, origin, originLayer,
+		Set<Point> connectedSigns = Blocks.getPointsConnected(model.world, origin, originLayer,
 				traverseMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints).join();
 		actualSigns.addAll(connectedSigns);
 
@@ -161,12 +161,12 @@ public class BaseCore {
 		Set<Point> adjacentToDoor = new HashSet<>();
 		Set<Point> doorPoints = new HashSet<>();
 		doorPoints.add(doorPoint);
-		boolean doorIsTrapDoor = Wall.isTrapDoor(doorPoint.getBlock(model.world).getType());
+		boolean doorIsTrapDoor = Blocks.isTrapDoor(doorPoint.getBlock(model.world).getType());
 		if (!doorIsTrapDoor) {
 			doorPoints.add(new Point(doorPoint).add(0, -1, 0));
 		}
 		for (Point p : doorPoints) {
-			adjacentToDoor.addAll(Wall.getAdjacent6(p));
+			adjacentToDoor.addAll(Blocks.getAdjacent6(p));
 		}
 		adjacentToDoor.removeAll(doorPoints);
 
@@ -220,8 +220,8 @@ public class BaseCore {
 		if (canPlace) {
 			getGenPrepDataFuture().thenAccept((data) -> {
 				//update claimed points
-				List<Set<Point>> wallLayers = Wall.merge(data.generatableLayers, model.animator.getGeneratedLayers());
-				Set<Point> wallPoints = Wall.flattenLayers(wallLayers);
+				List<Set<Point>> wallLayers = Blocks.merge(data.generatableLayers, model.animator.getGeneratedLayers());
+				Set<Point> wallPoints = Blocks.flattenLayers(wallLayers);
 				updateClaimedPoints(wallPoints, data.layerAroundWall);
 
 				//update inside & outside
@@ -264,8 +264,8 @@ public class BaseCore {
 				model.genPrepDataFuture = null;
 
 				//update claimed points
-				List<Set<Point>> wallLayers = Wall.merge(data.generatableLayers, model.animator.getGeneratedLayers());
-				Set<Point> wallPoints = Wall.flattenLayers(wallLayers);
+				List<Set<Point>> wallLayers = Blocks.merge(data.generatableLayers, model.animator.getGeneratedLayers());
+				Set<Point> wallPoints = Blocks.flattenLayers(wallLayers);
 				updateClaimedPoints(wallPoints, data.layerAroundWall);
 
 				//update inside & outside
@@ -336,9 +336,9 @@ public class BaseCore {
 			List<Set<Point>> generatableLayers = getGeneratableWallLayers();
 
 			//set layerAroundWall
-			List<Set<Point>> wallLayers = Wall.merge(generatableLayers, model.animator.getGeneratedLayers());
-			Set<Point> wallPoints = Wall.flattenLayers(wallLayers);
-			Set<Point> layerAroundWall = getLayerAround(wallPoints, Wall.ConnectedThreshold.POINTS).join();
+			List<Set<Point>> wallLayers = Blocks.merge(generatableLayers, model.animator.getGeneratedLayers());
+			Set<Point> wallPoints = Blocks.flattenLayers(wallLayers);
+			Set<Point> layerAroundWall = getLayerAround(wallPoints, Blocks.ConnectedThreshold.POINTS).join();
 
 			Set<Point> layerOutside = getLayerOutside(wallPoints, layerAroundWall);
 			Set<Point> pointsInside = getPointsInside(layerOutside, layerAroundWall, wallPoints);
@@ -379,7 +379,7 @@ public class BaseCore {
 			Set<Point> ignorePoints = wallPoints;
 			Set<Point> searchablePoints = new HashSet<>(layerAroundWall);
 			searchablePoints.addAll(getOriginPoints());
-			layerOutside = Wall.getPointsConnected(model.world, origin, originLayer,
+			layerOutside = Blocks.getPointsConnected(model.world, origin, originLayer,
 					traverseMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints).join();
 			layerOutside.addAll(originLayer);
 			layerOutside.retainAll(layerAroundWall); //this is needed because we add origin points to searchablePoints
@@ -412,7 +412,7 @@ public class BaseCore {
 				int rangeLimit = 2 * model.generationRangeLimit;
 				Set<Point> ignorePoints = wallPoints;
 				Set<Point> searchablePoints = null; //search all points
-				pointsInside = Wall.getPointsConnected(model.world, origin, originLayer,
+				pointsInside = Blocks.getPointsConnected(model.world, origin, originLayer,
 						traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints, searchablePoints).join();
 				if (pointsInside.size() == maxReturns) {
 					Debug.error("BaseCore::getPointsInside() tried to do infinite search.");
@@ -438,7 +438,7 @@ public class BaseCore {
 
 		//claim originPoints and layer around
 		Set<Point> originPoints = getOriginPoints();
-		Set<Point> layerAroundOrigins = getLayerAround(originPoints, Wall.ConnectedThreshold.POINTS).join(); //should be nearly instant so ok to wait
+		Set<Point> layerAroundOrigins = getLayerAround(originPoints, Blocks.ConnectedThreshold.POINTS).join(); //should be nearly instant so ok to wait
 		model.claimedPoints.addAll(originPoints);
 		model.claimedPoints.addAll(layerAroundOrigins);
 	}
@@ -459,7 +459,7 @@ public class BaseCore {
 		int rangeLimit = model.generationRangeLimit;
 		Set<Point> ignorePoints = nearbyClaimedPoints;
 		Map<Point, Material> pretendPoints = model.animator.getWaveMaterialMap();
-		List<Set<Point>> foundLayers = Wall.getPointsConnectedAsLayers(model.world, origin, originLayer, traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints, pretendPoints).join();
+		List<Set<Point>> foundLayers = Blocks.getPointsConnectedAsLayers(model.world, origin, originLayer, traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints, pretendPoints).join();
 
 		//correct layer indexes (first non already generated layer is not always layer 0)
 		List<Set<Point>> layers = new ArrayList<>();
@@ -548,13 +548,13 @@ public class BaseCore {
 //		return Wall.getPointsConnected(model.world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
 //	}
 
-	protected CompletableFuture<Set<Point>> getLayerAround(Set<Point> originLayer, Wall.ConnectedThreshold threshold) {
+	protected CompletableFuture<Set<Point>> getLayerAround(Set<Point> originLayer, Blocks.ConnectedThreshold threshold) {
 		Point origin = model.anchorPoint;
 		Set<Material> traverseMaterials = new HashSet<>(); //no blocks are traversed
 		Set<Material> returnMaterials = null; //all blocks are returned
 		int rangeLimit = model.generationRangeLimit + 1;
 		Set<Point> ignorePoints = null; //no points ignored
-		return Wall.getPointsConnected(model.world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints, threshold);
+		return Blocks.getPointsConnected(model.world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints, threshold);
 	}
 
 //	will be used for emergency key

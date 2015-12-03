@@ -239,13 +239,14 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
+//TODO: try when un/protecting, instead of reverting wave just look up block type and remove point from wave (but leave block as is)
+//	so long as the point gets added to the wave again, it shouldn't matter that we're leaving bedrock behind
 
 //possible cause of door bug:
 //both halves of door are added to first layer that included the door
 //but then (maybe) other half of door is still added to the other wave layer
 //solution:
 //make convertDoor(p) and revertDoor(p) ignore other half of door (if waveLayers.contains(p))
-//don't add other half of doors if its already in wave layers
 
 
 

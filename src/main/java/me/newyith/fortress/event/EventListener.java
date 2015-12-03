@@ -3,7 +3,7 @@ package me.newyith.fortress.event;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Point;
-import me.newyith.fortress.util.Wall;
+import me.newyith.fortress.util.Blocks;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -110,7 +110,7 @@ public class EventListener implements Listener {
 		Block clicked = event.getClickedBlock();
 
 		if (action == Action.RIGHT_CLICK_BLOCK) {
-			if (Wall.isDoor(clicked.getType())) {
+			if (Blocks.isDoor(clicked.getType())) {
 				FortressesManager.onPlayerOpenCloseDoor(event);
 			}
 		}

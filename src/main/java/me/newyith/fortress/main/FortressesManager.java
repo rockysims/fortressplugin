@@ -5,7 +5,7 @@ import me.newyith.fortress.generator.rune.GeneratorRune;
 import me.newyith.fortress.generator.rune.GeneratorRunePattern;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
-import me.newyith.fortress.util.Wall;
+import me.newyith.fortress.util.Blocks;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -251,7 +251,7 @@ public class FortressesManager {
 		}
 
 		//if door is protected, ignore redstone event
-		if (Wall.isDoor(block.getType()) && instance.model.protectedPoints.contains(p)) {
+		if (Blocks.isDoor(block.getType()) && instance.model.protectedPoints.contains(p)) {
 			Openable openableDoor = (Openable)block.getState().getData();
 			if (openableDoor.isOpen()) {
 				event.setNewCurrent(1);
