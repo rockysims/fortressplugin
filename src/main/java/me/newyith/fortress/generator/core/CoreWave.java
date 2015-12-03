@@ -50,10 +50,33 @@ public class CoreWave {
 		boolean reverted = false;
 
 		if (!model.waveLayers.isEmpty()) {
-			Map<Point, BlockRevertData> layer = model.waveLayers.removeFirst();
-			for (Point p : layer.keySet()) {
-				layer.get(p).revert(model.world, p);
+			Map<Point, BlockRevertData> layer = model.waveLayers.getFirst();
+			Set<Point> doorPointsReverted = new HashSet<>();
+			Set<Point> layerKeySet = new HashSet<>(layer.keySet());
+			for (Point p : layerKeySet) {
+				if (doorPointsReverted.contains(p)) continue;
+
+				Material pMat = getMaterial(p);
+				if (pMat == null) pMat = p.getType(model.world);
+				if (Blocks.isTallDoor(pMat)) {
+					doorPointsReverted.addAll(revertTallDoor(p, layer));
+				} else {
+					layer.get(p).revert(model.world, p);
+				}
 			}
+			model.waveLayers.removeFirst();
+
+			//remove doorPointsReverted from waveLayers
+			for (Map<Point, BlockRevertData> waveLayer : model.waveLayers) {
+				Iterator<Point> it = waveLayer.keySet().iterator();
+				while (it.hasNext()) {
+					Point p = it.next();
+					if (doorPointsReverted.contains(p)) {
+						it.remove();;
+					}
+				}
+			}
+
 			reverted = true;
 		}
 
@@ -70,9 +93,12 @@ public class CoreWave {
 		World world = model.world;
 		Map<Point, BlockRevertData> newLayerData = new HashMap<>();
 		for (Point p : layerPoints) {
+			if (contains(p)) continue;
+
+			//convert p
 			Material mat = p.getBlock(world).getType();
 			if (Blocks.isTallDoor(mat)) {
-				convertDoor(p, newLayerData);
+				convertTallDoor(p, newLayerData);
 			} else {
 				newLayerData.put(p, new BlockRevertData(world, p));
 				p.getBlock(model.world).setType(Material.BEDROCK);
@@ -86,8 +112,7 @@ public class CoreWave {
 			BlockRevertData data = waveLayer.get(p);
 			if (data != null) {
 				if (Blocks.isTallDoor(data.getMaterial())) {
-					Debug.msg("revertPoint() calling revertDoor() at " + p);
-					revertDoor(p, waveLayer);
+					revertTallDoor(p, waveLayer);
 				} else {
 					data.revert(model.world, p);
 					waveLayer.remove(p);
@@ -96,22 +121,8 @@ public class CoreWave {
 			}
 		}
 	}
-	
 
-
-
-	//TODO: delete (or use)
-	private BlockRevertData get(Point p) {
-		BlockRevertData data = null;
-		for (Map<Point, BlockRevertData> waveLayer : model.waveLayers) {
-			data = waveLayer.get(p);
-			if (data != null) break;
-		}
-		return data;
-	}
-
-	//TODO: delete (or use)
-	private boolean contains(Point p) {
+	public boolean contains(Point p) {
 		for (Map<Point, BlockRevertData> waveLayer : model.waveLayers) {
 			if (waveLayer.containsKey(p)) {
 				return true;
@@ -120,10 +131,7 @@ public class CoreWave {
 		return false;
 	}
 
-
-
-
-	private void convertDoor(Point p, Map<Point, BlockRevertData> layer) {
+	private void convertTallDoor(Point p, Map<Point, BlockRevertData> layer) {
 		//assumes p is a door block (2 block tall doors)
 		Pair<Point, Point> doorTopBottom = getDoorTopBottom(p, layer);
 		if (doorTopBottom != null) {
@@ -142,7 +150,9 @@ public class CoreWave {
 		}
 	}
 
-	private void revertDoor(Point p, Map<Point, BlockRevertData> layer) {
+	private Set<Point> revertTallDoor(Point p, Map<Point, BlockRevertData> layer) {
+		Set<Point> revertedPoints = new HashSet<>();
+
 		//assumes p is a door block
 		Pair<Point, Point> doorTopBottom = getDoorTopBottom(p, layer);
 		if (doorTopBottom != null) {
@@ -161,10 +171,15 @@ public class CoreWave {
 
 				layer.remove(top);
 				layer.remove(bottom);
+
+				revertedPoints.add(top);
+				revertedPoints.add(bottom);
 			} else {
-				Debug.error("CoreWave::revertDoor() failed to find revert data for door's top and bottom.");
+				Debug.error("CoreWave::revertTallDoor() failed to find revert data for door's top and bottom.");
 			}
 		}
+
+		return revertedPoints;
 	}
 
 	private Pair<Point, Point> getDoorTopBottom(Point p, Map<Point, BlockRevertData> layer) {
