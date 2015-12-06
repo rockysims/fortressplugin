@@ -92,7 +92,7 @@ public class CoreMaterials {
 				Material mat = item.getType();
 				switch (mat) {
 					//non protectable
-					//* //TODO: leave this block uncomment (except for debugging)
+					//* //TODO: leave this block uncommented (except for debugging)
 					case GRASS:
 					case DIRT:
 					case STONE:

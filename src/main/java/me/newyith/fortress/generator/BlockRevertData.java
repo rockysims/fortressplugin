@@ -12,15 +12,17 @@ import org.codehaus.jackson.annotate.JsonProperty;
 public class BlockRevertData {
 	private static class Model {
 		private final Material material;
-		private final MaterialData materialData;
+		private final MaterialDataWrapper materialDataWrapper;
+		private final transient MaterialData materialData;
 
 		@JsonCreator
 		public Model(@JsonProperty("material") Material material,
-					 @JsonProperty("materialData") MaterialData materialData) {
+					 @JsonProperty("materialDataWrapper") MaterialDataWrapper materialDataWrapper) {
 			this.material = material;
-			this.materialData = materialData;
+			this.materialDataWrapper = materialDataWrapper;
 
 			//rebuild transient fields
+			this.materialData = materialDataWrapper.unwrap();
 		}
 	}
 	private Model model = null;
@@ -33,8 +35,8 @@ public class BlockRevertData {
 	public BlockRevertData(World world, Point p) {
 		Block b = p.getBlock(world);
 		Material material = b.getType();
-		MaterialData materialData = b.getState().getData();
-		model = new Model(material, materialData);
+		MaterialDataWrapper materialDataWrapper = new MaterialDataWrapper(b.getState().getData());
+		model = new Model(material, materialDataWrapper);
 	}
 
 	//-----------------------------------------------------------------------
