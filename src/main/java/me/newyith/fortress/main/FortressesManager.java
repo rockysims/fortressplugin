@@ -261,15 +261,48 @@ public class FortressesManager {
 		}
 	}
 
-	public static void onExplode(List<Block> explodeBlocks) {
+	public static boolean onExplode(List<Block> explodeBlocks, Location loc, float yield) {
+		boolean cancel = false;
+
+		Set<Point> pointsToShield = new HashSet<>();
 		Iterator<Block> it = explodeBlocks.iterator();
 		while (it.hasNext()) {
 			Point p = new Point(it.next());
-			if (instance.model.protectedPoints.contains(p)) {
-				Debug.msg("explode removed at " + p);
-				it.remove();
+			if (isGenerated(p) && !p.is(Material.BEDROCK, loc.getWorld())) {
+				pointsToShield.add(p);
 			}
 		}
+
+		if (!pointsToShield.isEmpty()) {
+
+
+
+
+
+			//TODO: change exploded generated points to bedrock.
+			// write shieldPoint() method/class to place temporary bedrock and keep everything else like wave informed of original material
+			for (Point p : pointsToShield) {
+				p.setType(Material.BEDROCK, loc.getWorld());
+			}
+
+			//TODO: create new explosion
+			loc.getWorld().createExplosion(loc, yield);
+			Debug.msg("created new explosion at " + (new Point(loc)));
+
+
+
+
+
+			cancel = true;
+		}
+
+		Debug.msg("onExplode() returning " + String.valueOf(cancel));
+		return cancel;
+
+		//maybe:
+		//cancel explosion, changed exploded wall blocks to bedrock, then set off another explosion
+		//don't cancel if all exploded generated blocks are already bedrock
+		//	maybe this part isn't needed (except for efficiency)
 
 		/*
 

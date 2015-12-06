@@ -4,6 +4,7 @@ import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Blocks;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -15,6 +16,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 //fully written again
@@ -101,7 +103,14 @@ public class EventListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void onExplode(EntityExplodeEvent event) {
-		FortressesManager.onExplode(event.blockList());
+		List<Block> explodeBlocks = event.blockList();
+		Location loc = event.getLocation();
+		float yield = event.getYield();
+
+		boolean cancel = FortressesManager.onExplode(explodeBlocks, loc, yield);
+		if (cancel) {
+			event.setCancelled(true);
+		}
 	}
 
 	@EventHandler(ignoreCancelled = true)

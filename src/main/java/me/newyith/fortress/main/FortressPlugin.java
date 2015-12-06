@@ -238,11 +238,19 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+//TODO: finish shield bedrock feature (onExplode, turn exploded, generated points to bedrock for 2-4 seconds)
+//	currently, just to test out the idea, it turns to bedrock permanently
+
+//TODO: make everything multi-world safe
+//	explosion canceling
+//	break protection in particular
+//	basically everything in FortressesManager (I seem to recall the rest of the code should be ok already)
+
+//maybe:
+//cancel explosion, changed exploded wall blocks to bedrock, then set off another explosion
+//don't cancel if all exploded generated blocks are already bedrock
 
 
-//TODO: move 'core' package up a level and swap names of package 'generator' with package 'rune'
-//	fortress.core
-//	fortress.rune.generator
 
 //TODO: look into why outside explosions can break inside chests (through protected glass)
 //	see explosionInOrOut branch
