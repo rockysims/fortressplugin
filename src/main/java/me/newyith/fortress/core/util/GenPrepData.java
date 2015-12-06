@@ -1,4 +1,4 @@
-package me.newyith.fortress.generator;
+package me.newyith.fortress.core.util;
 
 import me.newyith.fortress.util.Point;
 

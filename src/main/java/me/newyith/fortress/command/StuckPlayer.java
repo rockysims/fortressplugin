@@ -1,6 +1,6 @@
 package me.newyith.fortress.command;
 
-import me.newyith.fortress.generator.rune.GeneratorRune;
+import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Cuboid;

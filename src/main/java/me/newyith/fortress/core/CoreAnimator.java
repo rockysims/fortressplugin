@@ -1,4 +1,4 @@
-package me.newyith.fortress.generator.core;
+package me.newyith.fortress.core;
 
 import me.newyith.fortress.event.TickTimer;
 import me.newyith.fortress.main.FortressesManager;

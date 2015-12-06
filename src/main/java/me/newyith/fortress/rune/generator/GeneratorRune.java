@@ -1,8 +1,8 @@
-package me.newyith.fortress.generator.rune;
+package me.newyith.fortress.rune.generator;
 
+import me.newyith.fortress.core.GeneratorCore;
 import me.newyith.fortress.event.TickTimer;
-import me.newyith.fortress.generator.core.CoreMaterials;
-import me.newyith.fortress.generator.core.GeneratorCore;
+import me.newyith.fortress.core.CoreMaterials;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Cuboid;

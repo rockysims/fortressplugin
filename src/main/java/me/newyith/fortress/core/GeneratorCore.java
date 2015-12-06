@@ -1,7 +1,10 @@
-package me.newyith.fortress.generator.core;
+package me.newyith.fortress.core;
 
-import me.newyith.fortress.generator.rune.GeneratorRune;
+import me.newyith.fortress.core.BaseCore;
+import me.newyith.fortress.core.CoreAnimator;
+import me.newyith.fortress.core.CoreMaterials;
 import me.newyith.fortress.main.FortressesManager;
+import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Blocks;
 import org.bukkit.Material;
@@ -15,7 +18,7 @@ import java.util.UUID;
 
 public class GeneratorCore extends BaseCore {
 	private static class Model extends BaseCore.Model {
-		private String datum = null;
+		private String datum = null; //placeholder since GeneratorCore doesn't need its own data (at least not yet)
 
 		@JsonCreator
 		public Model(@JsonProperty("anchorPoint") Point anchorPoint,

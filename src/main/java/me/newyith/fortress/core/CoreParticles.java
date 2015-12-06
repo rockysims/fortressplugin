@@ -1,4 +1,4 @@
-package me.newyith.fortress.generator.core;
+package me.newyith.fortress.core;
 
 import javafx.util.Pair;
 import me.newyith.fortress.util.Point;

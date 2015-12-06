@@ -1,7 +1,7 @@
-package me.newyith.fortress.generator.core;
+package me.newyith.fortress.core;
 
 import javafx.util.Pair;
-import me.newyith.fortress.generator.BlockRevertData;
+import me.newyith.fortress.core.util.BlockRevertData;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Blocks;

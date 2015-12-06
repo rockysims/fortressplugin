@@ -239,17 +239,6 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
-//TODO: fix bug where saving during bedrock wave causes exception (jackson can't load)
-//	maybe have model save the matData.getData() then on load: new MaterialData(mat, byte)
-//	or, maybe just create MaterialDataWrapper class and then I can add jackson annotations so it can find the proper constructor
-
-//TODO: consider making alteredPoints store BlockRevertData instead of Material
-
-
-//TODO: keep working on bedrock wave (works except when switching directions part way through (each direction has bug))
-//	work on direction changing bugs
-//	save more block revert data (stair orientation for example)
-//	change top and bottom of doors at the same time (when changing either, change both)
 
 //TODO: move 'core' package up a level and swap names of package 'generator' with package 'rune'
 //	fortress.core
@@ -279,6 +268,7 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: consider splitting FortressesManager into CoresManager and RunesManager
 
+//TODO: consider making alteredPoints store BlockRevertData instead of Material
 
 
 

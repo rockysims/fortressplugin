@@ -1,4 +1,4 @@
-package me.newyith.fortress.generator.rune;
+package me.newyith.fortress.rune.generator;
 
 import me.newyith.fortress.util.Point;
 import org.bukkit.Bukkit;

@@ -1,6 +1,6 @@
-package me.newyith.fortress.generator.core;
+package me.newyith.fortress.core;
 
-import me.newyith.fortress.generator.GenPrepData;
+import me.newyith.fortress.core.util.GenPrepData;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Cuboid;

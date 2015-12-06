@@ -1,8 +1,8 @@
 package me.newyith.fortress.main;
 
-import me.newyith.fortress.generator.core.BaseCore;
-import me.newyith.fortress.generator.rune.GeneratorRune;
-import me.newyith.fortress.generator.rune.GeneratorRunePattern;
+import me.newyith.fortress.core.BaseCore;
+import me.newyith.fortress.rune.generator.GeneratorRune;
+import me.newyith.fortress.rune.generator.GeneratorRunePattern;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Blocks;
