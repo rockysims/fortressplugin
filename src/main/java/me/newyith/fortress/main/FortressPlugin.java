@@ -238,6 +238,39 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+
+
+
+
+
+
+
+
+//onExplodeOrDestroyProtectedPoint:
+//if (p not bedrock) BedrockShield.shield(p)
+//	this means points in bedrock wave are ignored
+
+//class BedrockShield
+//	shield(p)
+//		materialByLocation.put(p, material)
+//		p.setType(BEDROCK)
+//		2 - 4 seconds later:
+//			if (still bedrock) revert
+
+//CoreWave needs to be aware of shieldPoints so it can save (and so revert to) its original material
+
+//CoreAnimator needs to be aware of shieldPoints so it can pretend they are their original material (for isProtectable check, etc?)
+//	also getGenablePoints() needs to pretend as well
+
+
+
+
+
+
+
+
+
+
 //TODO: finish shield bedrock feature (onExplode, turn exploded, generated points to bedrock for 2-4 seconds)
 //	currently, just to test out the idea, it turns to bedrock permanently
 
