@@ -1,5 +1,6 @@
 package me.newyith.fortress.main;
 
+import me.newyith.fortress.core.BedrockManager;
 import me.newyith.fortress.util.Debug;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -29,12 +30,15 @@ public class SaveLoadManager {
 	private void saveToMap(Map<String, Object> data) {
 		//save FortressesManager
 		data.put("FortressesManager", FortressesManager.getInstance());
+		data.put("BedrockManager", BedrockManager.getInstance());
 		Debug.msg("Saved " + FortressesManager.getRuneCount() + " rune(s)."); //TODO: delete this line
 	}
 
 	private void loadFromMap(Map<String, Object> data) {
+		Object obj;
+
 		//load FortressesManager
-		Object obj = data.get("FortressesManager");
+		obj = data.get("FortressesManager");
 		if (obj == null) {
 			FortressesManager.setInstance(new FortressesManager());
 		} else {
@@ -43,6 +47,17 @@ public class SaveLoadManager {
 			FortressesManager.setInstance(fortressesManager);
 			FortressesManager.secondStageLoad();
 		}
+
+		//load BedrockManager
+		obj = data.get("BedrockManager");
+		if (obj == null) {
+			BedrockManager.setInstance(new BedrockManager());
+		} else {
+			Debug.msg("load obj (BM) type: " + obj.getClass().getName());
+			BedrockManager bedrockManager = mapper.convertValue(obj, BedrockManager.class);
+			BedrockManager.setInstance(bedrockManager);
+		}
+		
 		Debug.msg("Loaded " + FortressesManager.getRuneCount() + " rune(s)."); //TODO: delete this line
 	}
 
