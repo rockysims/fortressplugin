@@ -242,27 +242,35 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
+//class BedrockManager
+//convert(Point) //save block revert data and setType
+//revert(Point) //revert point and clear revert data
+//BedrockManager can store all block revert data
+//TODO: anytime we change a point to/from bedrock, do it through BedrockManager
+//CoreWave can be simplified by using BedrockManager
+//BedrockManager should also simplify saving materialByPoint data (safety to prevent abandoned bedrock)
+//make de/generate use BedrockManager for altered points (instead of saving altered material)
+//	saving MaterialData for altered points comes free that way
 
 
 
 
 //onExplodeOrDestroyProtectedPoint:
 //if (p not bedrock) BedrockShield.shield(p)
-//	this means points in bedrock wave are ignored
+//	this means points in bedrock wave are ignored (and generated bedrock)
 
 //class BedrockShield
 //	shield(p)
-//		materialByLocation.put(p, material)
-//		p.setType(BEDROCK)
+//		BedrockManager.convert(p)
 //		2 - 4 seconds later:
-//			if (still bedrock) revert
+//			BedrockManager.revert(p)
+//maybe make it only allow shield revert if not in wave (so wave can't be reverted by shield expiration)
 
 //CoreWave needs to be aware of shieldPoints so it can save (and so revert to) its original material
+//	fixed by refactoring to use BedrockManager?
 
 //CoreAnimator needs to be aware of shieldPoints so it can pretend they are their original material (for isProtectable check, etc?)
-//	also getGenablePoints() needs to pretend as well
-
-
+//	also getGenablePoints() needs to pretend as well. make it ask BedrockManager for material map
 
 
 
@@ -367,6 +375,8 @@ public class FortressPlugin extends JavaPlugin {
 //			optional			//
 //------------------------------//
 
+//TODO: consider making redstone power mean run not pause (now that redstone is part of the pattern it might be ok?)
+//	still seems like it would make it harder to get generator to work at first
 //TODO: try to add NTB tag to disruptor fuel (creeper heads) so not all creeper heads can be used
 //TODO: maybe when running/paused it should display % generated (if not 0 nor 100)
 //	instead add easing function to animation speed so animation never takes all that long
