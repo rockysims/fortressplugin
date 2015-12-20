@@ -57,7 +57,7 @@ public class SaveLoadManager {
 			BedrockManager bedrockManager = mapper.convertValue(obj, BedrockManager.class);
 			BedrockManager.setInstance(bedrockManager);
 		}
-		
+
 		Debug.msg("Loaded " + FortressesManager.getRuneCount() + " rune(s)."); //TODO: delete this line
 	}
 

@@ -241,7 +241,6 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-
 //class BedrockManager
 //convert(Point) //save block revert data and setType
 //revert(Point) //revert point and clear revert data
@@ -274,6 +273,7 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
+//TODO: make any container work as generator fuel chest (trapped chest especially)
 
 
 

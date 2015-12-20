@@ -458,7 +458,7 @@ public class BaseCore {
 		int maxReturns = Math.max(0, FortressPlugin.config_generationBlockLimit - getGeneratedPoints().size());
 		int rangeLimit = model.generationRangeLimit;
 		Set<Point> ignorePoints = nearbyClaimedPoints;
-		Map<Point, Material> pretendPoints = model.animator.getWaveMaterialMap();
+		Map<Point, Material> pretendPoints = BedrockManager.getMaterialByPointMapForWorld(model.world);
 		List<Set<Point>> foundLayers = Blocks.getPointsConnectedAsLayers(model.world, origin, originLayer, traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints, pretendPoints).join();
 
 		//correct layer indexes (first non already generated layer is not always layer 0)

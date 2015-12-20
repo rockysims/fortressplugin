@@ -106,10 +106,6 @@ public class CoreAnimator {
 		return model.generatedLayers;
 	}
 
-	public Map<Point, Material> getWaveMaterialMap() {
-		return model.wave.getMaterialMap();
-	}
-
 	public void generate(List<Set<Point>> layers) {
 		model.animationLayers = layers;
 		model.curIndex = 0;
@@ -304,7 +300,7 @@ public class CoreAnimator {
 		Block b = p.getBlock(model.world);
 		boolean alterable = false;
 		alterable = alterable || model.coreMats.isAlterable(b);
-		alterable = alterable || model.coreMats.isAlterable(model.wave.getMaterial(p));
+		alterable = alterable || model.coreMats.isAlterable(BedrockManager.getMaterial(model.world, p));
 		if (alterable) {
 			model.wave.revertPoint(p);
 			addAlteredPoint(p, b.getType());
@@ -336,7 +332,7 @@ public class CoreAnimator {
 		Block b = p.getBlock(model.world);
 		boolean protectable = false;
 		protectable = protectable || model.coreMats.isProtectable(b);
-		protectable = protectable || model.coreMats.isProtectable(model.wave.getMaterial(p));
+		protectable = protectable || model.coreMats.isProtectable(BedrockManager.getMaterial(model.world, p));
 		if (!model.protectedPoints.contains(p) && protectable) {
 			addProtectedPoint(p);
 			pointProtected = true;

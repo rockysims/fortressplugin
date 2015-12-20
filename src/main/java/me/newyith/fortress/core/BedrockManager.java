@@ -73,7 +73,7 @@ public class BedrockManager {
 		boolean isReverted = false;
 
 		Map<Point, BlockRevertData> revertData = getDataForWorld(world);
-		BlockRevertData revertDatum = revertData.remove(p);
+		BlockRevertData revertDatum = revertData.get(p);
 		if (revertDatum != null) {
 			Material mat = revertDatum.getMaterial();
 			if (Blocks.isTallDoor(mat)) {
@@ -85,6 +85,7 @@ public class BedrockManager {
 		} else {
 			isReverted = true;
 		}
+		revertData.remove(p);
 
 		return isReverted;
 	}
@@ -179,7 +180,40 @@ public class BedrockManager {
 		}
 	}
 
+	public static Material getMaterial(World world, Point p) {
+		Material mat = null;
+
+		Map<Point, BlockRevertData> dataForWorld = getDataForWorld(world);
+		if (dataForWorld != null) {
+			BlockRevertData revertData = dataForWorld.get(p);
+			if (revertData != null) {
+				mat = revertData.getMaterial();
+			}
+		}
+
+		return mat;
+	}
+
+	public static Map<Point, Material> getMaterialByPointMapForWorld(World world) {
+		Map<Point, Material> map = new HashMap<>();
+
+		Map<Point, BlockRevertData> dataForWorld = getDataForWorld(world);
+		for (Point p : dataForWorld.keySet()) {
+			BlockRevertData revertData = dataForWorld.get(p);
+			Material mat = revertData.getMaterial();
+			map.put(p, mat);
+		}
+
+		return map;
+	}
+
 	private static Map<Point, BlockRevertData> getDataForWorld(World world) {
-		return instance.model.revertDataMapByWorld.get(world.getName());
+		Map<String, Map<Point, BlockRevertData>> revertDataMapByWorld = instance.model.revertDataMapByWorld;
+		Map<Point, BlockRevertData> data = revertDataMapByWorld.get(world.getName());
+		if (data == null) {
+			data = new HashMap<>();
+			revertDataMapByWorld.put(world.getName(), data);
+		}
+		return data;
 	}
 }
