@@ -1,12 +1,7 @@
 package me.newyith.fortress.core;
 
-import javafx.util.Pair;
-import me.newyith.fortress.core.util.BlockRevertData;
-import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
-import me.newyith.fortress.util.Blocks;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;

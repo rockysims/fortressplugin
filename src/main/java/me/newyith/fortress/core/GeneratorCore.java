@@ -1,5 +1,6 @@
 package me.newyith.fortress.core;
 
+import com.google.common.collect.Sets;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.util.Point;
@@ -9,9 +10,8 @@ import org.bukkit.World;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class GeneratorCore extends BaseCore {
 	private static class Model extends BaseCore.Model {
@@ -88,6 +88,45 @@ public class GeneratorCore extends BaseCore {
 		return fallbackSigns;
 	}
 
+/* Yona's version
+	protected Set<Point> getFallbackWhitelistSignPoints() {
+		GeneratorRune rune = FortressesManager.getRune(model.anchorPoint);
+		if (rune != null) {
+			Set<Point> potentialSigns = getLayerAround(rune.getPattern().getPoints(), Blocks.ConnectedThreshold.FACES).join();
+
+			final Set<Point> fallbackSigns = potentialSigns.stream()
+					.filter(sign -> Blocks.isSign(sign.getBlock(model.world).getType()))
+					.collect(Collectors.toSet());
+
+			//fill fallbackSigns (from potentialSigns)
+			for (Point potentialSign : potentialSigns) {
+				Material mat = potentialSign.getBlock(model.world).getType();
+				if (Blocks.isSign(mat)) {
+					fallbackSigns.add(potentialSign);
+				}
+			}
+
+			if (!fallbackSigns.isEmpty()) {
+				//fallbackSigns.addAll(connected signs)
+				Point origin = model.anchorPoint;
+				Set<Point> originLayer = fallbackSigns;
+				Set<Material> traverseMaterials = Blocks.getSignMaterials();
+				Set<Material> returnMaterials = Blocks.getSignMaterials();
+				int rangeLimit = model.generationRangeLimit * 2;
+				Set<Point> ignorePoints = null;
+				Set<Point> searchablePoints = null;
+				Set<Point> connectedSigns = Blocks.getPointsConnected(model.world, origin, originLayer,
+						traverseMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints).join();
+
+				return Sets.union(fallbackSigns, connectedSigns);
+			}
+
+			return fallbackSigns;
+		} else {
+			return Collections.emptySet();
+		}
+	}
+//*/
 	@Override
 	protected void onSearchingChanged(boolean searching) {
 		GeneratorRune rune = FortressesManager.getRune(model.anchorPoint);

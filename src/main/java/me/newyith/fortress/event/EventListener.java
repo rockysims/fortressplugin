@@ -2,6 +2,7 @@ package me.newyith.fortress.event;
 
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
+import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Blocks;
 import org.bukkit.Location;
@@ -14,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.world.WorldSaveEvent;
 
 import java.util.HashSet;
 import java.util.List;
@@ -30,6 +32,22 @@ public class EventListener implements Listener {
 	}
 
 	// - - - //
+
+
+
+
+
+	//TODO: delete or use this method (need to think about how saving will work)
+	@EventHandler
+	public void onWorldSave(WorldSaveEvent e) {
+		Debug.msg("onWorldSave: " + e.getWorld().getName());
+	}
+
+
+
+
+
+
 
 	//ignoreCancelled adds a virtual "if (event.isCancelled()) { return; }" to the method
 	@EventHandler(ignoreCancelled = true)

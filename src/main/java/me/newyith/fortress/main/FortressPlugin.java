@@ -242,17 +242,20 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //class BedrockManager
-//convert(Point) //save block revert data and setType
-//revert(Point) //revert point and clear revert data
 //BedrockManager can store all block revert data
 //TODO: anytime we change a point to/from bedrock, do it through BedrockManager
-//CoreWave can be simplified by using BedrockManager
-//BedrockManager should also simplify saving materialByPoint data (safety to prevent abandoned bedrock)
+//DONE: CoreWave can be simplified by using BedrockManager
 //make de/generate use BedrockManager for altered points (instead of saving altered material)
-//	saving MaterialData for altered points comes free that way
+//	then BedrockManager should make saving materialByPoint data easy (safety to prevent abandoned bedrock)
+//	saving MaterialData for altered points comes free that way unfortunately
+//		maybe only save MaterialData in BlockRevertData if not saving cobblestone?
+//		or just do it anyway since its probably not much extra disk space / saving duration
+//			check what json for BlockRevertData looks like now
+//	TODO: look into onWorldSave event since saving with world would mean no need for bedrock material backup saving
 
 
 
+//TODO: change "/fort stuck" back to "/stuck"
 
 //onExplodeOrDestroyProtectedPoint:
 //if (p not bedrock) BedrockShield.shield(p)
