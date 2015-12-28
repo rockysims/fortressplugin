@@ -1,5 +1,6 @@
 package me.newyith.fortress.core;
 
+import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -42,6 +43,9 @@ public class CoreWave {
 	//------------------------------------------------------------------------------------------------------------------
 
 	public void convertLayer(Set<Point> layerPoints) {
+		/*
+		Debug.msg("ignoring convertLayer() call");
+		/*/
 		//consider removing old layer
 		if (model.waveLayers.size() + 1 > model.maxWaveLayers) {
 			revertLayer();
@@ -55,9 +59,14 @@ public class CoreWave {
 			newLayer.add(p);
 		}
 		model.waveLayers.add(newLayer);
+		//*/
 	}
 
 	public boolean revertLayer() {
+		/*
+		Debug.msg("ignoring revertLayer() call");
+		return false;
+		/*/
 		boolean reverted = false;
 
 		if (!model.waveLayers.isEmpty()) {
@@ -70,6 +79,7 @@ public class CoreWave {
 		}
 
 		return reverted;
+		//*/
 	}
 
 	public void revertPoint(Point p) {

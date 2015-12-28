@@ -19,3 +19,6 @@ commands:
   test3:
     description: Test3 command for debugging
     usage: /<command>
+  test4:
+    description: Test4 command for debugging
+    usage: /<command>

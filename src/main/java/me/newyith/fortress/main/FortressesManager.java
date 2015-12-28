@@ -1,6 +1,7 @@
 package me.newyith.fortress.main;
 
 import me.newyith.fortress.core.BaseCore;
+import me.newyith.fortress.core.BedrockManager;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.rune.generator.GeneratorRunePattern;
 import me.newyith.fortress.util.Debug;
@@ -274,80 +275,32 @@ public class FortressesManager {
 		}
 
 		if (!pointsToShield.isEmpty()) {
-
-
-
-
-
-			//TODO: change exploded generated points to bedrock.
-			// write shieldPoint() method/class to place temporary bedrock and keep everything else like wave informed of original material
+			//pointsToShield excludes bedrock so we know points are not already converted
+			World world = loc.getWorld();
 			for (Point p : pointsToShield) {
-				p.setType(Material.BEDROCK, loc.getWorld());
+				BedrockManager.convert(world, p);
 			}
 
-			//TODO: create new explosion
 			loc.getWorld().createExplosion(loc, yield);
-			Debug.msg("created new explosion at " + (new Point(loc)));
 
-
-
-
+			/*
+			Random random = new Random();
+			for (Point p : pointsToShield) {
+			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
+				BedrockManager.revert(world, p);
+			}, 25 + random.nextInt(12)); //20 ticks per second
+			}
+			/*/
+			for (Point p : pointsToShield) {
+				BedrockManager.revert(world, p);
+			}
+			//*/
 
 			cancel = true;
 		}
 
-		Debug.msg("onExplode() returning " + String.valueOf(cancel));
+//		Debug.msg("onExplode() returning " + String.valueOf(cancel));
 		return cancel;
-
-		//maybe:
-		//cancel explosion, changed exploded wall blocks to bedrock, then set off another explosion
-		//don't cancel if all exploded generated blocks are already bedrock
-		//	maybe this part isn't needed (except for efficiency)
-
-		/*
-
-		Debug.start("onExplode1");
-
-		Point origin = explosion source (should be passed in)
-
-
-		//TODO: don't recalculate this so often (test to see if its fast. it might be)
-		Set<Point> insidePoints = new HashSet<>();
-		runeInstances.forEach(rune -> {
-			insidePoints.addAll(rune.getPointsInsideFortress());
-		});
-
-
-		Debug.stop("onExplode1", false);
-		Debug.duration("onExplode1");
-		Debug.clear("onExplode1");
-
-
-		Debug.start("onExplode2");
-
-
-		Iterator<Block> it = explodeBlocks.iterator();
-		while (it.hasNext()) {
-			Point p = new Point(it.next().getLocation());
-
-			boolean remove = false;
-			remove = remove || protectedPoints.contains(p);
-			remove = remove || (
-					insidePoints.contains(p) && !insidePoints.contains(origin)
-			);
-			if (remove) {
-				Debug.msg("explode removed at " + p);
-				it.remove();
-			}
-		}
-
-
-		Debug.stop("onExplode2", false);
-		Debug.duration("onExplode2");
-		Debug.clear("onExplode2");
-
-
-		//*/
 	}
 
 	public static void onPlayerOpenCloseDoor(PlayerInteractEvent event) {

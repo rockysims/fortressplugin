@@ -8,6 +8,7 @@ import me.newyith.fortress.sandbox.jackson.SandboxSaveLoadManager;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -205,6 +206,18 @@ public class FortressPlugin extends JavaPlugin {
 				}
 				commandHandled = true;
 			}
+
+			// /test4
+			if (cmd.getName().equalsIgnoreCase("test4")) {
+				if (sender instanceof Player) {
+					Debug.msg("executing test4 command...");
+
+					Player player = (Player)sender;
+					Location loc = player.getLocation();
+					loc.getWorld().createExplosion(loc, 3.0f);
+				}
+				commandHandled = true;
+			}
 		}
 
 		return commandHandled;
@@ -256,17 +269,6 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //TODO: change "/fort stuck" back to "/stuck"
-
-//onExplodeOrDestroyProtectedPoint:
-//if (p not bedrock) BedrockShield.shield(p)
-//	this means points in bedrock wave are ignored (and generated bedrock)
-
-//class BedrockShield
-//	shield(p)
-//		BedrockManager.convert(p)
-//		2 - 4 seconds later:
-//			BedrockManager.revert(p)
-//maybe make it only allow shield revert if not in wave (so wave can't be reverted by shield expiration)
 
 //CoreWave needs to be aware of shieldPoints so it can save (and so revert to) its original material
 //	fixed by refactoring to use BedrockManager?

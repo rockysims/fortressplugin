@@ -9,6 +9,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Explosive;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -121,9 +123,22 @@ public class EventListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void onExplode(EntityExplodeEvent event) {
+//		Debug.msg("EventListener::onExplode(EntityExplodeEvent event) called");
 		List<Block> explodeBlocks = event.blockList();
 		Location loc = event.getLocation();
-		float yield = event.getYield();
+		float yield = 3.0f;
+		if (event.getEntity() instanceof Explosive) {
+			Explosive e = (Explosive) event.getEntity();
+			yield = e.getYield();
+		} else if (event.getEntity() instanceof Creeper) {
+			Creeper c = (Creeper) event.getEntity();
+			if(c.isPowered()) {
+				yield = 6.0f;
+			} else {
+				yield = 3.0f;
+			}
+		}
+//		Debug.msg("calculated yield: " + yield);
 
 		boolean cancel = FortressesManager.onExplode(explodeBlocks, loc, yield);
 		if (cancel) {
