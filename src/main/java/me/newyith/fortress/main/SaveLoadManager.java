@@ -5,15 +5,21 @@ import me.newyith.fortress.util.Debug;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.WorldSaveEvent;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.*;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class SaveLoadManager {
+public class SaveLoadManager implements Listener {
+	private final int saveWithWorldsCooldownMs = 500;
+	private long lastSaveTimestamp = 0;
 	private File dataFile;
 	private ObjectMapper mapper = new ObjectMapper();
 
@@ -25,6 +31,21 @@ public class SaveLoadManager {
 				.withGetterVisibility(JsonAutoDetect.Visibility.NONE)
 				.withIsGetterVisibility(JsonAutoDetect.Visibility.NONE)
 				.withCreatorVisibility(JsonAutoDetect.Visibility.NONE));
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
+	}
+
+	@EventHandler
+	public void onWorldSave(WorldSaveEvent e) {
+		long now = new Date().getTime();
+		long elapsed = now - lastSaveTimestamp;
+		Debug.msg("elapsed: " + elapsed);
+		if (elapsed > saveWithWorldsCooldownMs) {
+			Debug.msg("save is cooled");
+			lastSaveTimestamp = now;
+			save();
+		} else {
+			Debug.msg("save is still cooling down");
+		}
 	}
 
 	private void saveToMap(Map<String, Object> data) {
@@ -42,7 +63,7 @@ public class SaveLoadManager {
 		if (obj == null) {
 			FortressesManager.setInstance(new FortressesManager());
 		} else {
-			Debug.msg("load obj (FM) type: " + obj.getClass().getName());
+//			Debug.msg("load obj (FM) type: " + obj.getClass().getName());
 			FortressesManager fortressesManager = mapper.convertValue(obj, FortressesManager.class);
 			FortressesManager.setInstance(fortressesManager);
 			FortressesManager.secondStageLoad();
@@ -53,7 +74,7 @@ public class SaveLoadManager {
 		if (obj == null) {
 			BedrockManager.setInstance(new BedrockManager());
 		} else {
-			Debug.msg("load obj (BM) type: " + obj.getClass().getName());
+//			Debug.msg("load obj (BM) type: " + obj.getClass().getName());
 			BedrockManager bedrockManager = mapper.convertValue(obj, BedrockManager.class);
 			BedrockManager.setInstance(bedrockManager);
 		}

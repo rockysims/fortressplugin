@@ -74,7 +74,8 @@ public class BedrockManager {
 
 		Map<Point, BlockRevertData> revertData = getDataForWorld(world);
 		BlockRevertData revertDatum = revertData.get(p);
-		if (revertDatum != null) {
+		//isBedrock condition is to prevent any chance of duplicating blocks if plugin save gets out of sync with world save
+		if (revertDatum != null && p.is(Material.BEDROCK, world)) {
 			Material mat = revertDatum.getMaterial();
 			if (Blocks.isTallDoor(mat)) {
 				isReverted = revertTallDoor(world, p);

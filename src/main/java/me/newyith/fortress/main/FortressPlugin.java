@@ -97,7 +97,7 @@ public class FortressPlugin extends JavaPlugin {
 
 	public static void onTick() {
 		if (saveWaitTicks == 0) {
-			saveLoadManager.save();
+//			saveLoadManager.save(); //TODO: uncomment out this line later (or decide not to save periodically)
 			saveWaitTicks = (int) (saveDelayMs / TickTimer.msPerTick);
 		} else {
 			saveWaitTicks--;
@@ -252,6 +252,17 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
+//TODO: add back PearlGlitchFix
+
+//ensure there will be no abandoned bedrock by keeping a map of materialByPoint for all wallPoints
+//	and then onLoad any bedrock in materialByPoint that is not supposed to be bedrock can be reverted
+//		supposed to be bedrock if BedrockManager has data for point or if it's an altered point
+//Note: keep periodic save and saveWithWorld
+//Note: save to bedrockSafety.json onGenerate
+
+
+
+
 
 
 //MAYBE: make de/generate use BedrockManager for altered points (instead of saving altered material)
@@ -259,7 +270,7 @@ public class FortressPlugin extends JavaPlugin {
 //		maybe handle saving by:
 // 			having full save every 5 min
 // 			onWorldSave
-//			onGenerate save potential bedrock points to file
+//			onGenerate save potential bedrock points to bedrockSafety.json
 //	saving MaterialData for altered points comes free that way unfortunately
 //		maybe only save MaterialData in BlockRevertData if not saving cobblestone?
 //		or just do it anyway since its probably not much extra disk space / saving duration
@@ -300,6 +311,7 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: make any container work as generator fuel chest (trapped chest especially)
 
+//TODO: do something to fix issue where protected things like torches can be broken repeatedly very fast if you hold down left click
 
 
 

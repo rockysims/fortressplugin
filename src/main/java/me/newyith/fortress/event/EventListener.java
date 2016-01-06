@@ -35,22 +35,6 @@ public class EventListener implements Listener {
 
 	// - - - //
 
-
-
-
-
-	//TODO: delete or use this method (need to think about how saving will work)
-	@EventHandler
-	public void onWorldSave(WorldSaveEvent e) {
-		Debug.msg("onWorldSave: " + e.getWorld().getName());
-	}
-
-
-
-
-
-
-
 	//ignoreCancelled adds a virtual "if (event.isCancelled()) { return; }" to the method
 	@EventHandler(ignoreCancelled = true)
 	public void onSignChange(SignChangeEvent event) {
