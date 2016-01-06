@@ -2,9 +2,6 @@ package me.newyith.fortress.main;
 
 import me.newyith.fortress.core.BedrockManager;
 import me.newyith.fortress.util.Debug;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldSaveEvent;
@@ -20,11 +17,11 @@ import java.util.Map;
 public class SaveLoadManager implements Listener {
 	private final int saveWithWorldsCooldownMs = 500;
 	private long lastSaveTimestamp = 0;
-	private File dataFile;
-	private ObjectMapper mapper = new ObjectMapper();
+	private File dataFile = new File(FortressPlugin.getInstance().getDataFolder(), "data.json");
+	private static File bedrockSafetyFile = new File(FortressPlugin.getInstance().getDataFolder(), "bedrockSafety.json");
+	private static ObjectMapper mapper = new ObjectMapper();
 
 	public SaveLoadManager(FortressPlugin plugin) {
-		dataFile = new File(plugin.getDataFolder(), "data.json");
 		mapper.setVisibilityChecker(mapper.getSerializationConfig().getDefaultVisibilityChecker()
 				.withFieldVisibility(JsonAutoDetect.Visibility.ANY)
 				.withSetterVisibility(JsonAutoDetect.Visibility.NONE)
@@ -58,6 +55,16 @@ public class SaveLoadManager implements Listener {
 	private void loadFromMap(Map<String, Object> data) {
 		Object obj;
 
+		//load BedrockManager
+		obj = data.get("BedrockManager");
+		if (obj == null) {
+			BedrockManager.setInstance(new BedrockManager());
+		} else {
+//			Debug.msg("load obj (BM) type: " + obj.getClass().getName());
+			BedrockManager bedrockManager = mapper.convertValue(obj, BedrockManager.class);
+			BedrockManager.setInstance(bedrockManager);
+		}
+
 		//load FortressesManager
 		obj = data.get("FortressesManager");
 		if (obj == null) {
@@ -67,16 +74,6 @@ public class SaveLoadManager implements Listener {
 			FortressesManager fortressesManager = mapper.convertValue(obj, FortressesManager.class);
 			FortressesManager.setInstance(fortressesManager);
 			FortressesManager.secondStageLoad();
-		}
-
-		//load BedrockManager
-		obj = data.get("BedrockManager");
-		if (obj == null) {
-			BedrockManager.setInstance(new BedrockManager());
-		} else {
-//			Debug.msg("load obj (BM) type: " + obj.getClass().getName());
-			BedrockManager bedrockManager = mapper.convertValue(obj, BedrockManager.class);
-			BedrockManager.setInstance(bedrockManager);
 		}
 
 		Debug.msg("Loaded " + FortressesManager.getRuneCount() + " rune(s)."); //TODO: delete this line
@@ -112,6 +109,8 @@ public class SaveLoadManager implements Listener {
 		}
 		Debug.end("load");
 
+		onAfterLoad();
+
 		if (!FortressPlugin.releaseBuild) {
 			//do mock save so needed classes are loaded (new classes can't be loaded after I rebuild jar)
 			try {
@@ -126,5 +125,51 @@ public class SaveLoadManager implements Listener {
 		Map<String, Object> data = new HashMap<>();
 		saveToMap(data);
 		mapper.writeValue(stream, data);
+	}
+
+	// Bedrock Safety //
+
+	public static void saveBedrockSafety() {
+		try {
+			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+			Map<String, Object> data = new HashMap<>();
+			data.put("BedrockSafety", BedrockSafety.getInstance());
+			Debug.msg("Saved BedrockSafety"); //TODO: delete this line
+
+			mapper.writeValue(buffer, data);
+
+			//write buffer to file
+			FileOutputStream fos = new FileOutputStream(bedrockSafetyFile);
+			fos.write(buffer.toByteArray(), 0, buffer.size());
+			fos.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void onAfterLoad() {
+		try {
+			//if (bedrockSafety.json doesn't exist) make an empty bedrockSafety.json
+			if (! bedrockSafetyFile.exists()) {
+				(new ObjectMapper()).writeValue(bedrockSafetyFile, new LinkedHashMap<String, Object>());
+			}
+
+			Map<String, Object> data = mapper.readValue(bedrockSafetyFile, Map.class);
+
+			//load BedrockSafety
+			Object obj = data.get("BedrockSafety");
+			if (obj == null) {
+				BedrockSafety.setInstance(new BedrockSafety());
+			} else {
+//				Debug.msg("load obj (BS) type: " + obj.getClass().getName());
+				BedrockSafety bedrockSafety = mapper.convertValue(obj, BedrockSafety.class);
+				BedrockSafety.setInstance(bedrockSafety);
+			}
+
+			BedrockSafety.safetySync();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

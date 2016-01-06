@@ -252,6 +252,14 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
+
+
+//TODO: figure out how to reproduce abandoned bedrock issue reliably
+//	then see if BedrockSafety (once no longer ignored) fixes the issue
+
+//TODO: make FortressesManager multi-world safe!!!
+//TODO: make altered points use BedrockManager or change BedrockSafety::doRecord() to also look up real material for altered points
+
 //TODO: add back PearlGlitchFix
 
 //ensure there will be no abandoned bedrock by keeping a map of materialByPoint for all wallPoints

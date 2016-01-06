@@ -1,6 +1,7 @@
 package me.newyith.fortress.core;
 
 import me.newyith.fortress.core.util.GenPrepData;
+import me.newyith.fortress.main.BedrockSafety;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Cuboid;
@@ -263,6 +264,8 @@ public class BaseCore {
 			if (data != null) {
 				model.genPrepDataFuture = null;
 
+				//* Generate
+
 				//update claimed points
 				List<Set<Point>> wallLayers = Blocks.merge(data.generatableLayers, model.animator.getGeneratedLayers());
 				Set<Point> wallPoints = Blocks.flattenLayers(wallLayers);
@@ -274,7 +277,12 @@ public class BaseCore {
 				model.layerOutsideFortress.clear();
 				model.layerOutsideFortress.addAll(data.layerOutside);
 
+				//bedrock safety
+				BedrockSafety.record(model.world, wallPoints);
+
 				model.animator.generate(wallLayers);
+
+				//*/
 			} else {
 				model.coreParticles.displayAnchorParticle(this);
 			}
