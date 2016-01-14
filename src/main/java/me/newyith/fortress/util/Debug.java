@@ -12,7 +12,11 @@ import java.util.Map;
 
 public class Debug {
 	public static void msg(String s) {
+		/*
 		Bukkit.broadcastMessage(s);
+		/*/
+		System.out.println(s);
+		//*/
 	}
 
 	public static void error(String s) {

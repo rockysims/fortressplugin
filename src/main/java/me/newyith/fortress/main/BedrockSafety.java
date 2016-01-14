@@ -51,26 +51,27 @@ public class BedrockSafety {
 	//-----------------------------------------------------------------------
 
 	public static void safetySync() {
-		Debug.msg("ignoring call to safetySync()");
-		//getInstance().doSafetySync(); //TODO: uncomment this out
+		//Debug.msg("ignoring call to safetySync()");
+		getInstance().doSafetySync(); //TODO: uncomment this out
 	}
 	public void doSafetySync() {
-		Debug.msg("doSafetySync() called");
 		//revert any bedrock in materialByPoint that is not supposed to be bedrock
 		//	supposed to be bedrock if BedrockManager has data for point or if it's an altered point
+
+		//Debug.msg("doSafetySync() called");
 
 		for (String worldName : model.materialMapByWorld.keySet()) {
 			Map<Point, Material> materialByPoint = model.materialMapByWorld.remove(worldName);
 			World world = Bukkit.getWorld(worldName);
 			for (Point p : materialByPoint.keySet()) {
 				if (p.is(Material.BEDROCK, world)) {
-					boolean isAltered = FortressesManager.isAltered(p);
+					boolean isAltered = FortressesManager.isAltered(p); //TODO: remove isAltered condition if/when altered points use BedrockManager
 					boolean isKnown = BedrockManager.getMaterial(world, p) != null;
 					boolean safeBedrock = isAltered || isKnown;
 					if (!safeBedrock) {
 						Material mat = materialByPoint.get(p);
 						p.setType(mat, world);
-						Debug.msg("set !safeBedrock at " + p + " back to " + mat); //TODO: delete this line
+						Debug.msg("set !safeBedrock at " + p + " back to " + mat); //TODO: delete this line later?
 					}
 				}
 			}
