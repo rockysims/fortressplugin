@@ -254,8 +254,11 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-//TODO: figure out how to reproduce abandoned bedrock issue reliably
+//DONE: figure out how to reproduce abandoned bedrock issue reliably
 //	then see if BedrockSafety (once no longer ignored) fixes the issue
+//		it does. now just need to make alteredPoints use BedrockManager and retest
+//			TODO: try to produce altered point bug where BedrockSafety saves bedrock as original material
+//				generate fully, then toggle switch twice to produce bedrock saved warning message
 
 //TODO: make FortressesManager multi-world safe!!!
 //TODO: make altered points use BedrockManager or change BedrockSafety::doRecord() to also look up real material for altered points

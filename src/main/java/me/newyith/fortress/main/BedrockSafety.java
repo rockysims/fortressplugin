@@ -92,6 +92,10 @@ public class BedrockSafety {
 				model.materialMapByWorld.put(worldName, new HashMap<>());
 			}
 			model.materialMapByWorld.get(worldName).put(p, mat);
+			//TODO: delete debug if statement
+			if (mat == Material.BEDROCK) {
+				Debug.msg("WARNING: BedrockSafety recorded bedrock as original material at " + p);
+			}
 		}
 
 		SaveLoadManager.saveBedrockSafety();
