@@ -98,6 +98,7 @@ public class CoreMaterials {
 					case STONE:
 					case GRAVEL:
 					case SAND:
+					case NETHERRACK:
 					//*/
 					case BEDROCK:
 						break;

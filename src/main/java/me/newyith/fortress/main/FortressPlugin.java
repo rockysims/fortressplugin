@@ -265,6 +265,8 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: add back PearlGlitchFix
 
+//TODO: make BlockRevertData store material as int not string
+
 //ensure there will be no abandoned bedrock by keeping a map of materialByPoint for all wallPoints
 //	and then onLoad any bedrock in materialByPoint that is not supposed to be bedrock can be reverted
 //		supposed to be bedrock if BedrockManager has data for point or if it's an altered point
@@ -360,6 +362,7 @@ public class FortressPlugin extends JavaPlugin {
 //	DONE at least for BaseCore, CoreAnimator, CoreMaterials, CoreParticles
 
 //good plugin review and maker asks for more plugins to review. https://www.youtube.com/watch?v=u6MbqUbcp6Q
+//another plugin reviewer SgtCaze https://www.youtube.com/channel/UCWjOFfpRybxLSYRCxPOqZ4Q
 
 //--
 
