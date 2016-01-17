@@ -251,7 +251,10 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+//TODO: make altered points use BedrockManager or change BedrockSafety::doRecord() to also look up real material for altered points
+//	try making FortressesManager store material of altered points so doRecord() can look up material?
 
+//TODO: look into bug where switching generator on then off again after exactly 3 layers of wave have converted causes protected points to skip wave returning animation
 
 //DONE: figure out how to reproduce abandoned bedrock issue reliably
 //	then see if BedrockSafety (once no longer ignored) fixes the issue
@@ -260,7 +263,6 @@ public class FortressPlugin extends JavaPlugin {
 //				generate fully, then toggle switch twice to produce bedrock saved warning message
 
 //TODO: make FortressesManager multi-world safe!!!
-//TODO: make altered points use BedrockManager or change BedrockSafety::doRecord() to also look up real material for altered points
 
 //TODO: add back PearlGlitchFix
 
