@@ -61,7 +61,7 @@ public class BedrockSafety {
 		//Debug.msg("doSafetySync() called");
 
 		for (String worldName : model.materialMapByWorld.keySet()) {
-			Map<Point, Material> materialByPoint = model.materialMapByWorld.remove(worldName);
+			Map<Point, Material> materialByPoint = model.materialMapByWorld.get(worldName);
 			World world = Bukkit.getWorld(worldName);
 			for (Point p : materialByPoint.keySet()) {
 				if (p.is(Material.BEDROCK, world)) {
@@ -76,6 +76,7 @@ public class BedrockSafety {
 				}
 			}
 		}
+		model.materialMapByWorld.clear();
 	}
 
 	public static void record(World world, Set<Point> wallPoints) {

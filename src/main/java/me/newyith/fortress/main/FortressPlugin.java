@@ -253,7 +253,6 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-
 //DONE: figure out how to reproduce abandoned bedrock issue reliably
 //	then see if BedrockSafety (once no longer ignored) fixes the issue
 //		it does. now just need to make alteredPoints use BedrockManager and retest
@@ -432,6 +431,7 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: maybe when running/paused it should display % generated (if not 0 nor 100)
 //	instead add easing function to animation speed so animation never takes all that long
 //TODO: consider tracking and updating manual books so that existing copies get updated when manual changes
+//TODO: make unprotectable materials list configurable
 
 //-------------------------------//
 //-------------------------------//
