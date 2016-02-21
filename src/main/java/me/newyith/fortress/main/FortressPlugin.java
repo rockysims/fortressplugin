@@ -251,17 +251,11 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
-
-//TODO: consider refactoring so all point data is stored in AllPointData (maybe?)
-//	so I can do stuff like
-//	PointData pd = AllPointData.forWorld(worldName).get(p);
-//	pd.setAltered(true);
-//		//which would {
-//			this.altered = altered;
-//			this.update()
-//		}
-//	pd.setWave(true);
-
+//TODO: look into "WARNING: BedrockSafety recorded bedrock as original material" bug
+//	seems to happen when switching directions of generation part way through
+//	not sure if I introduced it with fix for waveReverse<4layers bug
+//	SOLUTION: figured out its the altered points behind the wave that are getting saved as bedrock because their not altered via BedrockManager.convert()
+//		make altered points use BedrockManager instead of altering manually
 
 //TODO: make altered points use BedrockManager or change BedrockSafety::doRecord() to also look up real material for altered points
 //	try making FortressesManager store material of altered points so doRecord() can look up material?
@@ -683,6 +677,21 @@ For details, obsidian + book = manual.
 
 
 
+//class Variance {
+//	static class Vehicle {}
+//	static class WaterVehicle extends Vehicle {}
+//	static class Boat extends WaterVehicle {}
+//	static class Submarine extends WaterVehicle {}
+//	static class LandVehicle extends Vehicle {}
+//	static class Car extends LandVehicle {}
+//	static class Bike extends LandVehicle {}
+//
+//	void foo() {
+//		this.<LandVehicle>bar(new Car());
+//	}
+//
+//	<T> void bar(T t) {}
+//}
 
 
 

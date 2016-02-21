@@ -4,6 +4,7 @@ import me.newyith.fortress.core.BedrockManager;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.codehaus.jackson.annotate.JsonCreator;
@@ -93,9 +94,11 @@ public class BedrockSafety {
 				model.materialMapByWorld.put(worldName, new HashMap<>());
 			}
 			model.materialMapByWorld.get(worldName).put(p, mat);
-			//TODO: delete debug if statement
+			//TODO: delete debug if statement later?
 			if (mat == Material.BEDROCK) {
-				Debug.msg("WARNING: BedrockSafety recorded bedrock as original material at " + p);
+				String ANSI_RESET = "\u001B[0m";
+				String ANSI_RED = "\u001B[31m";
+				Debug.msg(ANSI_RED + "WARNING: BedrockSafety recorded bedrock as original material at " + p + ANSI_RESET);
 			}
 		}
 

@@ -288,7 +288,7 @@ public class CoreAnimator {
 
 		if (!model.skipAnimation && !updatedPoints.isEmpty()) {
 //			Debug.msg("<-> convert layerIndex: " + layerIndex);
-			model.wave.convertLayer(updatedPoints, layerIndex);
+			model.wave.convertLayer(layerIndex, updatedPoints);
 		}
 
 		return updatedPoints.size();
