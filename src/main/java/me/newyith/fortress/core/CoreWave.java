@@ -42,27 +42,69 @@ public class CoreWave {
 
 	//------------------------------------------------------------------------------------------------------------------
 
-	public void convertLayer(Set<Point> layerPoints) {
+	public void convertLayer(Set<Point> layerPoints, int layerIndex) {
+		Debug.msg("++++++++++++++++ convertLayer() start");
 		/*
 		Debug.msg("ignoring convertLayer() call");
 		/*/
 		//consider removing old layer
 		if (model.waveLayers.size() + 1 > model.maxWaveLayers) {
+			Debug.msg("convertLayer() calling revertLayer()");
 			revertLayer();
 		}
+		else {
+			//TODO: remove from model.waveLayers all in layerPoints
+//			Point layerPoint = layerPoints.stream().findAny().orElse(null);
+//			if (layerPoint != null) {
+//				Iterator<Set<Point>> it = model.waveLayers.iterator();
+//				while (it.hasNext()) {
+//					Set<Point> waveLayer = it.next();
+//					if (waveLayer.contains(layerPoint)) {
+//						//found waveLayer containing a point from layerPoints so revert waveLayer
+//						revertLayerPoints(waveLayer);
+//						it.remove();
+//						Debug.msg("waveLayers not full but before converting found and reverted matching layer");
+//					}
+//				}
+//			}
+		}
+
+
+
+
+
+
+
+
+		//TODO: fix reverse at < 4 bug: make new layer replace old layer if it exists (search for waveLayer with all matching points)
+
+
+
+
+
+
+
+
+
 
 		//add new layer
 		Set<Point> newLayer = new HashSet<>();
 		for (Point p : layerPoints) {
-			if (this.contains(p)) continue;
+			if (this.contains(p)) {
+				Debug.msg("ignoring: wave contains(p) so don't add p to newLayer. p: " + p);
+//				continue;
+			}
 			BedrockManager.convert(model.world, p);
 			newLayer.add(p);
 		}
 		model.waveLayers.add(newLayer);
+		Debug.msg("newLayer.size(): " + newLayer.size());
 		//*/
+		Debug.msg("---------------- convertLayer() end");
 	}
 
 	public boolean revertLayer() {
+		Debug.msg("revertLayer() called");
 		/*
 		Debug.msg("ignoring revertLayer() call");
 		return false;
@@ -73,6 +115,7 @@ public class CoreWave {
 			Set<Point> layer = model.waveLayers.removeFirst();
 			for (Point p : layer) {
 				BedrockManager.revert(model.world, p);
+				Debug.msg("reverting " + p);
 			}
 
 			reverted = true;
@@ -81,6 +124,17 @@ public class CoreWave {
 		return reverted;
 		//*/
 	}
+
+	private void revertLayerPoints(Set<Point> layer) {
+		for (Point p : layer) {
+			BedrockManager.revert(model.world, p);
+			Debug.msg("reverting " + p);
+		}
+	}
+
+//	public void revertLayers() {
+//		while (revertLayer());
+//	}
 
 	public void revertPoint(Point p) {
 		for (Set<Point> waveLayer : model.waveLayers) {
@@ -103,13 +157,40 @@ public class CoreWave {
 
 	public void onBeforeGenerate() {
 		Collections.reverse(model.waveLayers);
+//		addDummyWaveLayers();
 	}
 
 	public void onBeforeDegenerate() {
 		Collections.reverse(model.waveLayers);
+//		addDummyWaveLayers();
 	}
+
+	//doesn't solve the problem because introduces bugs such as instantLayersRemaining getting set too high
+//	private void addDummyWaveLayers() {
+//		while (model.waveLayers.size() < model.maxWaveLayers) {
+//			model.waveLayers.add(new HashSet<>());
+//			Debug.msg("DUMMY LAYER ADDED");
+//		}
+//	}
 
 	public int layerCount() {
 		return model.waveLayers.size();
 	}
 }
+
+
+//class Variance {
+//	static class Vehicle {}
+//	static class WaterVehicle extends Vehicle {}
+//	static class Boat extends WaterVehicle {}
+//	static class Submarine extends WaterVehicle {}
+//	static class LandVehicle extends Vehicle {}
+//	static class Car extends LandVehicle {}
+//	static class Bike extends LandVehicle {}
+//
+//	void foo() {
+//		this.<LandVehicle>bar(new Car());
+//	}
+//
+//	<T> void bar(T t) {}
+//}

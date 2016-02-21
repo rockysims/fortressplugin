@@ -73,7 +73,7 @@ public class CoreAnimator {
 			//rebuild transient fields
 			this.world = Bukkit.getWorld(worldName);
 			this.maxBlocksPerFrame = 500;
-			this.ticksPerFrame = 150 / TickTimer.msPerTick; // msPerFrame / msPerTick
+			this.ticksPerFrame = 1 * (150 / TickTimer.msPerTick); // msPerFrame / msPerTick
 			this.animationWaitTicks = 0;
 			this.curIndex = 0;
 		}
@@ -237,7 +237,7 @@ public class CoreAnimator {
 			if (updatedCount > 0 && model.instantLayersRemaining > 0) {
 				model.instantLayersRemaining--;
 				updatedToNextFrame = false;
-//				Debug.msg("instant");
+				Debug.msg("instant layer finished");
 			}
 		}
 
@@ -288,7 +288,7 @@ public class CoreAnimator {
 
 		if (!model.skipAnimation && !updatedPoints.isEmpty()) {
 //			Debug.msg("<-> convert layerIndex: " + layerIndex);
-			model.wave.convertLayer(updatedPoints);
+			model.wave.convertLayer(updatedPoints, layerIndex);
 		}
 
 		return updatedPoints.size();

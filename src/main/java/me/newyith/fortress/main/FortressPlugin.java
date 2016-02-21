@@ -251,6 +251,18 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+
+//TODO: consider refactoring so all point data is stored in AllPointData (maybe?)
+//	so I can do stuff like
+//	PointData pd = AllPointData.forWorld(worldName).get(p);
+//	pd.setAltered(true);
+//		//which would {
+//			this.altered = altered;
+//			this.update()
+//		}
+//	pd.setWave(true);
+
+
 //TODO: make altered points use BedrockManager or change BedrockSafety::doRecord() to also look up real material for altered points
 //	try making FortressesManager store material of altered points so doRecord() can look up material?
 
@@ -665,3 +677,19 @@ For details, obsidian + book = manual.
 //			Bukkit.getServer().getScheduler().cancelTask(taskId);
 //			Bukkit.broadcastMessage("canceling taskId: " + taskId);
 //		}, 20*120);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
