@@ -251,7 +251,23 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
-//TODO: look into "WARNING: BedrockSafety recorded bedrock as original material" bug
+//TODO: look into bug where when maxBlocksPerFrame limit is encountered, bedrock gets left behind
+//	think it has something to do with the layerIndex being passed to wave (same layerIndex so old layer gets cleaned up?)
+//	also protected points get left out of wave (though they still can't be broken in survival)
+//	also BedrockManager seems to forget to revert some points (different issue?)
+//	to reproduce:
+//		make 4x4 glass wall next to generator
+//		stop server
+//		delete all json data files for plugin
+//		start server
+//		turn on generator (some points will be left as bedrock)
+//		note: make sure maxBlocksPerFrame = 3 for this test
+
+//TODO: make sure breaking generator doesn't leave wave behind
+//TODO: remove from BedrockManager any bedrock points broken (via creative) or make BedrockManager check when returning material that actual material is bedrock
+//TODO: retest bedrock safety works
+
+//TODO: look into "WARNING: BedrockSafety recorded bedrock as original material" bug (done?)
 //	seems to happen when switching directions of generation part way through
 //	not sure if I introduced it with fix for waveReverse<4layers bug
 //	SOLUTION: figured out its the altered points behind the wave that are getting saved as bedrock because their not altered via BedrockManager.convert()
