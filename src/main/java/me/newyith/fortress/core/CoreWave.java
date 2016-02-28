@@ -61,7 +61,7 @@ public class CoreWave {
 
 		//add new layer and convert (and revert oldLayer where needed)
 		WaveLayer newLayer = new WaveLayer(model.world, layerIndex, layerPoints);
-		newLayer.convertAndCleanup(oldLayer);
+		newLayer.convertAndCleanup(oldLayer, alteredPoints);
 		model.waveLayers.add(newLayer);
 	}
 

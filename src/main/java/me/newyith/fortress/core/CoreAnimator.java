@@ -236,7 +236,7 @@ public class CoreAnimator {
 			if (updatedCount > 0 && model.instantLayersRemaining > 0) {
 				model.instantLayersRemaining--;
 				updatedToNextFrame = false;
-				Debug.msg("instant layer finished");
+//				Debug.msg("instant layer finished");
 			}
 		}
 
