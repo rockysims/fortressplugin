@@ -5,7 +5,6 @@ import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.codehaus.jackson.annotate.JsonCreator;
@@ -27,7 +26,7 @@ claimed:
 public class CoreAnimator {
 	private static class Model {
 		private Point anchorPoint = null;
-		private HashMap<Point, Material> alteredPoints = null;
+		private Set<Point> alteredPoints = null;
 		private Set<Point> protectedPoints = null;
 		private List<Set<Point>> generatedLayers = null;
 		private List<Set<Point>> animationLayers = null;
@@ -46,7 +45,7 @@ public class CoreAnimator {
 
 		@JsonCreator
 		public Model(@JsonProperty("anchorPoint") Point anchorPoint,
-					 @JsonProperty("alteredPoints") HashMap<Point, Material> alteredPoints,
+					 @JsonProperty("alteredPoints") Set<Point> alteredPoints,
 					 @JsonProperty("protectedPoints") Set<Point> protectedPoints,
 					 @JsonProperty("generatedLayers") List<Set<Point>> generatedLayers,
 					 @JsonProperty("animationLayers") List<Set<Point>> animationLayers,
@@ -86,7 +85,7 @@ public class CoreAnimator {
 	}
 
 	public CoreAnimator(World world, Point anchorPoint, CoreMaterials coreMats) {
-		HashMap<Point, Material> alteredPoints = new HashMap<>();
+		Set<Point> alteredPoints = new HashSet<>();
 		Set<Point> protectedPoints = new HashSet<>();
 		List<Set<Point>> generatedLayers = new ArrayList<>();
 		List<Set<Point>> animationLayers = new ArrayList<>();
@@ -165,7 +164,7 @@ public class CoreAnimator {
 	}
 
 	public Set<Point> getAlteredPoints() {
-		return model.alteredPoints.keySet();
+		return model.alteredPoints;
 	}
 
 	public Set<Point> getProtectedPoints() {
@@ -175,7 +174,7 @@ public class CoreAnimator {
 	public Set<Point> getGeneratedPoints() {
 		Set<Point> generatedPoints = new HashSet<>();
 		generatedPoints.addAll(model.protectedPoints);
-		generatedPoints.addAll(model.alteredPoints.keySet());
+		generatedPoints.addAll(model.alteredPoints);
 		return generatedPoints;
 	}
 
@@ -242,7 +241,7 @@ public class CoreAnimator {
 		}
 
 		if (!updatedToNextFrame) {
-			updatedToNextFrame = model.wave.revertLayer(); //returns true if reverted wave layer
+			updatedToNextFrame = model.wave.revertLayerIgnoring(model.alteredPoints); //returns true if reverted wave layer
 //			if (updatedToNextFrame) Debug.msg("finishing wave");
 		}
 
@@ -288,7 +287,7 @@ public class CoreAnimator {
 
 		if (!model.skipAnimation && !updatedPoints.isEmpty()) {
 //			Debug.msg("<-> convert layerIndex: " + layerIndex);
-			model.wave.convertLayer(layerIndex, updatedPoints);
+			model.wave.convertLayer(layerIndex, updatedPoints, model.alteredPoints);
 		}
 
 		return updatedPoints.size();
@@ -301,10 +300,10 @@ public class CoreAnimator {
 		boolean alterable = false;
 		alterable = alterable || model.coreMats.isAlterable(b);
 		alterable = alterable || model.coreMats.isAlterable(BedrockManager.getMaterial(model.world, p));
-		if (alterable) {
-			model.wave.revertPoint(p);
-			addAlteredPoint(p, b.getType());
-			b.setType(Material.BEDROCK);
+		boolean alreadyAltered = model.alteredPoints.contains(p);
+		if (alterable && !alreadyAltered) {
+			BedrockManager.convert(model.world, p);
+			addAlteredPoint(p);
 			altered = true;
 		}
 
@@ -314,12 +313,9 @@ public class CoreAnimator {
 	private boolean unalter(Point p) {
 		boolean unaltered = false;
 
-		if (model.alteredPoints.containsKey(p)) {
-			model.wave.revertPoint(p);
-			Material material = removeAlteredPoint(p);
-			if (p.getBlock(model.world).getType() == Material.BEDROCK) {
-				p.getBlock(model.world).setType(material);
-			}
+		if (model.alteredPoints.contains(p)) {
+			BedrockManager.revert(model.world, p);
+			removeAlteredPoint(p);
 			unaltered = true;
 		}
 
@@ -363,13 +359,13 @@ public class CoreAnimator {
 	}
 
 
-	private void addAlteredPoint(Point p, Material m) {
-		model.alteredPoints.put(p, m);
+	private void addAlteredPoint(Point p) {
+		model.alteredPoints.add(p);
 		FortressesManager.addAlteredPoint(p);
 	}
 
-	private Material removeAlteredPoint(Point p) {
+	private void removeAlteredPoint(Point p) {
 		FortressesManager.removeAlteredPoint(p);
-		return model.alteredPoints.remove(p);
+		model.alteredPoints.remove(p);
 	}
 }

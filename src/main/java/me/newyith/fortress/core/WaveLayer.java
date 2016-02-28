@@ -42,13 +42,14 @@ public class WaveLayer {
 
 	//-----------------------------------------------------------------------
 
-	public void convert(WaveLayer oldLayer) {
+	public void convertAndCleanup(WaveLayer oldLayer, Set<Point> alteredPoints) {
 		Set<Point> oldPoints;
 		if (oldLayer == null) oldPoints = new HashSet<>();
 		else oldPoints = oldLayer.getLayerPoints();
 
 		//revert any oldPoints not in new points
 		oldPoints.removeAll(model.layerPoints);
+		oldPoints.removeAll(alteredPoints);
 		for (Point p : oldPoints) {
 			revertPoint(p);
 		}

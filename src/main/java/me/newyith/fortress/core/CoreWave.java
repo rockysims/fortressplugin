@@ -41,10 +41,10 @@ public class CoreWave {
 
 	//------------------------------------------------------------------------------------------------------------------
 
-	public void convertLayer(int layerIndex, Set<Point> layerPoints) {
+	public void convertLayer(int layerIndex, Set<Point> layerPoints, Set<Point> alteredPoints) {
 		//consider removing old layer
 		if (model.waveLayers.size() + 1 > model.maxWaveLayers) {
-			revertLayer();
+			revertLayerIgnoring(alteredPoints);
 		}
 
 		//look for oldLayer and remove from waveLayers if found
@@ -61,35 +61,25 @@ public class CoreWave {
 
 		//add new layer and convert (and revert oldLayer where needed)
 		WaveLayer newLayer = new WaveLayer(model.world, layerIndex, layerPoints);
-		newLayer.convert(oldLayer);
+		newLayer.convertAndCleanup(oldLayer);
 		model.waveLayers.add(newLayer);
 	}
 
-	public boolean revertLayer() {
+	public boolean revertLayerIgnoring(Set<Point> ignorePoints) {
 		boolean reverted = false;
 
 		if (!model.waveLayers.isEmpty()) {
 			WaveLayer layer = model.waveLayers.removeFirst();
 			for (Point p : layer.getLayerPoints()) {
-				BedrockManager.revert(model.world, p);
+				if (!ignorePoints.contains(p)) {
+					BedrockManager.revert(model.world, p);
+				}
 			}
 
 			reverted = true;
 		}
 
 		return reverted;
-	}
-
-	private void revertLayerPoints(Set<Point> layer) {
-		for (Point p : layer) {
-			BedrockManager.revert(model.world, p);
-		}
-	}
-
-	public void revertPoint(Point p) {
-		for (WaveLayer waveLayer : model.waveLayers) {
-			waveLayer.revertPoint(p);
-		}
 	}
 
 	public void onBeforeGenerate() {
