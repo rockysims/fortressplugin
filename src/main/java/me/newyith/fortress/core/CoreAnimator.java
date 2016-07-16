@@ -71,8 +71,8 @@ public class CoreAnimator {
 
 			//rebuild transient fields
 			this.world = Bukkit.getWorld(worldName);
-			this.maxBlocksPerFrame = 500;
-			this.ticksPerFrame = 1 * (150 / TickTimer.msPerTick); // msPerFrame / msPerTick
+			this.maxBlocksPerFrame = 500; //2; //500; //TODO: change back to 500
+			this.ticksPerFrame = 1 * (150 / TickTimer.msPerTick); // msPerFrame / msPerTick //TODO: change back to 1* instead of 10*
 			this.animationWaitTicks = 0;
 			this.curIndex = 0;
 		}
@@ -251,7 +251,8 @@ public class CoreAnimator {
 	private int updateLayer(int layerIndex) {
 		Set<Point> updatedPoints = new HashSet<>();
 
-		Set<Point> layer = new HashSet<>(model.animationLayers.get(layerIndex)); //make copy to avoid concurrent modification errors (recheck this is needed)
+		boolean partialLayer = false;
+		Set<Point> layer = new HashSet<>(model.animationLayers.get(layerIndex)); //make copy to avoid concurrent modification errors
 		for (Point p : layer) {
 			if (model.isGeneratingWall) {
 				//try to generate block at p
@@ -285,9 +286,11 @@ public class CoreAnimator {
 
 //		Debug.msg("layer " + layerIndex + " blockUpdates: " + updatedPoints.size());
 
+		partialLayer = layer.size() > updatedPoints.size();
+
 		if (!model.skipAnimation && !updatedPoints.isEmpty()) {
 //			Debug.msg("<-> convert layerIndex: " + layerIndex);
-			model.wave.convertLayer(layerIndex, updatedPoints, model.alteredPoints);
+			model.wave.convertLayer(layerIndex, updatedPoints, model.alteredPoints, partialLayer);
 		}
 
 		return updatedPoints.size();

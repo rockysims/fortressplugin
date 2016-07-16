@@ -8,6 +8,7 @@ import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 public class WaveLayer {
@@ -43,19 +44,21 @@ public class WaveLayer {
 	//-----------------------------------------------------------------------
 
 	public void convertAndCleanup(WaveLayer oldLayer, Set<Point> alteredPoints) {
-		Set<Point> oldPoints;
-		if (oldLayer == null) oldPoints = new HashSet<>();
-		else oldPoints = oldLayer.getLayerPoints();
+		Debug.msg("convertAndCleanup() model.layerPoints.size(): " + model.layerPoints.size());
 
-		//revert any oldPoints not in new points
-		oldPoints.removeAll(model.layerPoints);
-		oldPoints.removeAll(alteredPoints);
-		for (Point p : oldPoints) {
-			revertPoint(p);
+		if (oldLayer != null) {
+			//revert any oldPoints not in new points
+			Set<Point> oldPoints = new HashSet<>(oldLayer.getLayerPoints());
+			oldPoints.removeAll(model.layerPoints);
+			oldPoints.removeAll(alteredPoints);
+			for (Point p : oldPoints) {
+				oldLayer.revertPoint(p);
+			}
 		}
 
 		for (Point p : model.layerPoints) {
-			BedrockManager.convert(model.world, p);
+			boolean temp = BedrockManager.convert(model.world, p);
+			Debug.msg("convertAndCleanup() converted " + p + " (now converted?: " + temp + ")");
 		}
 	}
 
@@ -64,8 +67,10 @@ public class WaveLayer {
 	}
 
 	public void revertPoint(Point p) {
+		Debug.msg("revertPoint() called " + p);
 		if (model.layerPoints.contains(p)) {
 			BedrockManager.revert(model.world, p);
+			Debug.msg("reverting Point() " + p);
 			model.layerPoints.remove(p);
 		}
 	}

@@ -1,5 +1,6 @@
 package me.newyith.fortress.core;
 
+import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -41,7 +42,12 @@ public class CoreWave {
 
 	//------------------------------------------------------------------------------------------------------------------
 
-	public void convertLayer(int layerIndex, Set<Point> layerPoints, Set<Point> alteredPoints) {
+	public void convertLayer(int layerIndex, Set<Point> layerPoints, Set<Point> alteredPoints, boolean partialLayer) {
+		Debug.msg("convertLayer() layerIndex: " + layerIndex);
+		Debug.msg("convertLayer() layerPoints.size(): " + layerPoints.size());
+		Debug.msg("convertLayer() alteredPoints.size(): " + alteredPoints.size());
+
+		//TODO: maybe when considering reverting because > 4 layers, only count ...
 		//consider removing old layer
 		if (model.waveLayers.size() + 1 > model.maxWaveLayers) {
 			revertLayerIgnoring(alteredPoints);
@@ -57,6 +63,11 @@ public class CoreWave {
 				it.remove();
 				break;
 			}
+		}
+
+		if (oldLayer != null && partialLayer) {
+			layerPoints.addAll(oldLayer.getLayerPoints());
+			oldLayer = null;
 		}
 
 		//add new layer and convert (and revert oldLayer where needed)
