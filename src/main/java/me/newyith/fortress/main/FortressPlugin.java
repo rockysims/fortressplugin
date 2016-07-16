@@ -251,6 +251,54 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+
+//TODO: upgrade to minecraft 1.9?
+
+//TODO: prioritize the full todo list
+
+
+
+//------------------------------//
+//		first priority			//
+//------------------------------//
+
+//tasks here
+
+//-------------------------------//
+//-------------------------------//
+
+
+
+//------------------------------//
+//		next priority			//
+//------------------------------//
+
+//tasks here
+
+//-------------------------------//
+//-------------------------------//
+
+
+
+//------------------------------//
+//		safety checks			//
+//------------------------------//
+
+//TODO: make sure BedrockSafety reverts points not claimed by generator even if BedrockManager knows about the point
+
+//TODO: retest bedrock safety works
+
+//-------------------------------//
+//-------------------------------//
+
+
+
+//------------------------------//
+//			bugs				//
+//------------------------------//
+
+//TODO: look into why only ever other layer of water gets protected
+
 //TODO: look into bug where when maxBlocksPerFrame limit is encountered, bedrock gets left behind
 //	think it has something to do with the layerIndex being passed to wave (same layerIndex so old layer gets cleaned up?)
 //	also protected points get left out of wave (though they still can't be broken in survival)
@@ -263,9 +311,55 @@ public class FortressPlugin extends JavaPlugin {
 //		turn on generator (some points will be left as bedrock)
 //		note: make sure maxBlocksPerFrame = 3 for this test
 
-//TODO: make sure breaking generator doesn't leave wave behind
-//TODO: remove from BedrockManager any bedrock points broken (via creative) or make BedrockManager check when returning material that actual material is bedrock
-//TODO: retest bedrock safety works
+
+//-------------------------------//
+//-------------------------------//
+
+
+
+//------------------------------//
+//			optional			//
+//------------------------------//
+
+//TODO: remove from BedrockManager any bedrock points broken (via creative)
+// or make BedrockManager check when returning material that actual material is bedrock
+
+//-------------------------------//
+//-------------------------------//
+
+
+
+//------------------------------//
+//			ideas				//
+//------------------------------//
+
+//PROBLEM: torches fall off the wall when protection wave passes over (happens when torches are a protected block)
+//	also water can break protected torches
+//	so maybe don't allow protected torches?
+//SOLUTION: for now, anything that can be broken by water should not be protectable
+//	see if there's a generic way to check if a block can be broken by water
+
+//DISRUPTOR NOT NEEDED?
+//inorder for a fortress to change, the generator must be turned off for a little while
+//does that provide enough of a way in already?
+//probably still want disruptor to encourage army vs army fights
+
+//-------------------------------//
+//-------------------------------//
+
+
+
+
+
+
+
+//TODO: fix bug where blowing up sign with tnt doesn't cause fortress rune to break
+//TODO: make protection prevent blocks from burning (currently other blocks can be placed and become protected)
+
+
+
+
+
 
 //TODO: look into "WARNING: BedrockSafety recorded bedrock as original material" bug (done?)
 //	seems to happen when switching directions of generation part way through
@@ -287,8 +381,11 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: make FortressesManager multi-world safe!!!
 
 //TODO: add back PearlGlitchFix
+//TODO: add vehicle glitch fix
 
 //TODO: make BlockRevertData store material as int not string
+
+//TODO: consider displaying message to players trying to break protected block like "Fortress wall cannot be destroyed without fortress disruptor."
 
 //ensure there will be no abandoned bedrock by keeping a map of materialByPoint for all wallPoints
 //	and then onLoad any bedrock in materialByPoint that is not supposed to be bedrock can be reverted
@@ -506,7 +603,7 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: make signs on generator's base a global white list
 
 //TODO: finish writing version of manual that includes all planned features before actually releasing MVP (just so I've thought it all out)
-//TODO: rebustness
+//TODO: robustness
 
 //TODO: add mcStats: http://mcstats.org/learn-more/
 
@@ -658,7 +755,7 @@ For details, obsidian + book = manual.
 //TODO: consider writing another plugin that adds remote shop rune
 //obsidian pillar (2+ tall) with item in item frame on side of pillar and sign(s) on side of pillar
 //the sign(s) populate with sign shop text and let you buy/sell
-//	change sign text color to indicate when shop can't fulfil a buy/sell order
+//	change sign text color to indicate when shop can't fulfill a buy/sell order
 //choose which shop comes up based on best price
 //	which price (buy/sell) based on item frame being on top or bottom of pillar
 //	always prioritize shops that can fulfil buy/sell order over shops that can't
