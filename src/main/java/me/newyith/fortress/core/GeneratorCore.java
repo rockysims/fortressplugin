@@ -58,7 +58,7 @@ public class GeneratorCore extends BaseCore {
 	protected Set<Point> getFallbackWhitelistSignPoints() {
 		Set<Point> fallbackSigns = new HashSet<>();
 
-		GeneratorRune rune = FortressesManager.getRune(model.anchorPoint);
+		GeneratorRune rune = FortressesManager.getRune(model.world, model.anchorPoint);
 		if (rune != null) {
 			Set<Point> potentialSigns = getLayerAround(rune.getPattern().getPoints(), Blocks.ConnectedThreshold.FACES).join();
 
@@ -129,7 +129,7 @@ public class GeneratorCore extends BaseCore {
 //*/
 	@Override
 	protected void onSearchingChanged(boolean searching) {
-		GeneratorRune rune = FortressesManager.getRune(model.anchorPoint);
+		GeneratorRune rune = FortressesManager.getRune(model.world, model.anchorPoint);
 		if (rune != null) {
 			rune.onSearchingChanged(searching);
 		}
@@ -137,7 +137,7 @@ public class GeneratorCore extends BaseCore {
 
 	@Override
 	protected Set<Point> getOriginPoints() {
-		GeneratorRune rune = FortressesManager.getRune(model.anchorPoint);
+		GeneratorRune rune = FortressesManager.getRune(model.world, model.anchorPoint);
 		return rune.getPattern().getPoints();
 	}
 }

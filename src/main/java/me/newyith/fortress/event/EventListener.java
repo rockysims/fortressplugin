@@ -7,6 +7,7 @@ import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Blocks;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Creeper;
@@ -76,6 +77,7 @@ public class EventListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockPistonExtendEvent(BlockPistonExtendEvent event) {
+		World w = event.getBlock().getWorld();
 		Point p = new Point(event.getBlock());
 
 		BlockFace d = event.getDirection();
@@ -87,7 +89,7 @@ public class EventListener implements Listener {
 		Set<Block> movedBlocks = new HashSet<>(event.getBlocks());
 		boolean isSticky = event.isSticky();
 
-		boolean cancel = FortressesManager.onPistonEvent(isSticky, p, t, movedBlocks);
+		boolean cancel = FortressesManager.onPistonEvent(isSticky, w, p, t, movedBlocks);
 		if (cancel) {
 			event.setCancelled(true);
 		}
@@ -95,11 +97,12 @@ public class EventListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockPistonRetractEvent(BlockPistonRetractEvent event) {
+		World w = event.getBlock().getWorld();
 		Point p = new Point(event.getBlock());
 		boolean isSticky = event.isSticky();
 		Set<Block> movedBlocks = new HashSet<>(event.getBlocks());
 
-		boolean cancel = FortressesManager.onPistonEvent(isSticky, p, null, movedBlocks);
+		boolean cancel = FortressesManager.onPistonEvent(isSticky, w, p, null, movedBlocks);
 		if (cancel) {
 			event.setCancelled(true);
 		}

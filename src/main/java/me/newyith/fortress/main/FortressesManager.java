@@ -21,8 +21,6 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.*;
 
-//TODO: consider combining protectedPoints and generatorRuneByProtectedPoint to save memory?
-
 //fully written again
 public class FortressesManager {
 	private static FortressesManager instance = null;
@@ -40,24 +38,26 @@ public class FortressesManager {
 
 	private static class Model {
 		private Set<GeneratorRune> generatorRunes = null;
-		private transient Map<Point, GeneratorRune> generatorRuneByPoint = null;
-		private transient Map<Point, GeneratorRune> generatorRuneByProtectedPoint = null;
-		private transient Set<Point> protectedPoints = null;
-		private transient Set<Point> alteredPoints = null;
+		private transient Map<String, Map<Point, GeneratorRune>> generatorRuneByPatternPointByWorld = null;
+		private transient Map<String, Map<Point, GeneratorRune>> generatorRuneByProtectedPointByWorld = null;
+		private transient Set<Point> protectedPoints = null; //TODO: make multiworld safe
+		private transient Set<Point> alteredPoints = null; //TODO: make multiworld safe
 
 		@JsonCreator
 		public Model(@JsonProperty("generatorRunes") Set<GeneratorRune> generatorRunes) {
 			this.generatorRunes = generatorRunes;
 
 			//rebuild transient fields
-			generatorRuneByPoint = new HashMap<>();
-			generatorRuneByProtectedPoint = new HashMap<>();
+			generatorRuneByPatternPointByWorld = new HashMap<>();
+			generatorRuneByProtectedPointByWorld = new HashMap<>();
 			protectedPoints = new HashSet<>();
 			alteredPoints = new HashSet<>();
 			for (GeneratorRune rune : generatorRunes) {
+				World world = rune.getPattern().getWorld();
+
 				//rebuild runeByPoint map
 				for (Point p : rune.getPattern().getPoints()) {
-					generatorRuneByPoint.put(p, rune);
+					getGeneratorRuneByPatternPointMap(world).put(p, rune);
 				}
 
 				//rebuild alteredPoints
@@ -70,9 +70,25 @@ public class FortressesManager {
 
 				//rebuild runeByProtectedPoint
 				for (Point p : protecteds) {
-					generatorRuneByProtectedPoint.put(p, rune);
+					getGeneratorRuneByProtectedPointMap(world).put(p, rune);
 				}
 			}
+		}
+
+		public Map<Point, GeneratorRune> getGeneratorRuneByPatternPointMap(World w) {
+			String worldName = w.getName();
+			if (!generatorRuneByPatternPointByWorld.containsKey(worldName)) {
+				generatorRuneByPatternPointByWorld.put(worldName, new HashMap<>());
+			}
+			return generatorRuneByPatternPointByWorld.get(worldName);
+		}
+
+		public Map<Point, GeneratorRune> getGeneratorRuneByProtectedPointMap(World w) {
+			String worldName = w.getName();
+			if (!generatorRuneByProtectedPointByWorld.containsKey(worldName)) {
+				generatorRuneByProtectedPointByWorld.put(worldName, new HashMap<>());
+			}
+			return generatorRuneByProtectedPointByWorld.get(worldName);
 		}
 	}
 	private Model model = null;
@@ -108,15 +124,15 @@ public class FortressesManager {
 	//TODO: fix PROBLEM: we need to know the world too and there can be multiple runes per point
 	//	maybe not a big deal since that just means you can't create a rune at a point if point is already taken in another world
 	//	should still fix it (maybe something like runeByPoint[world].get(p) instead of runeByPoint.get(p)?)
-	public static GeneratorRune getRune(Point p) {
-		return instance.model.generatorRuneByPoint.get(p);
+	public static GeneratorRune getRune(World w, Point p) {
+		return instance.model.getGeneratorRuneByPatternPointMap(w).get(p);
 	}
 
 	//this helps separate Rune and Core (kind of a hack to find core through rune. fix later)
-	public static BaseCore getCore(Point p) {
+	public static BaseCore getCore(World w, Point p) {
 		BaseCore core = null;
 
-		GeneratorRune rune = getRune(p);
+		GeneratorRune rune = getRune(w, p);
 		if (rune != null) {
 			core = rune.getGeneratorCore();
 		}
@@ -143,14 +159,16 @@ public class FortressesManager {
 	}
 
 	//during generation, we need all potentially conflicting generators (not just known ones) so search by range
-	public static Set<BaseCore> getOtherCoresInRange(Point center, int range) {
+	public static Set<BaseCore> getOtherCoresInRange(World world, Point center, int range) {
 		Set<BaseCore> coresInRange = new HashSet<>();
 
 		//fill runesInRange
 		for (GeneratorRune rune : instance.model.generatorRunes) {
 			//set inRange
 			boolean inRange = true;
+			World w = rune.getPattern().getWorld();
 			Point p = rune.getPattern().getAnchorPoint();
+			inRange = inRange && w.getName() == world.getName();
 			inRange = inRange && Math.abs(p.xInt() - center.xInt()) <= range;
 			inRange = inRange && Math.abs(p.yInt() - center.yInt()) <= range;
 			inRange = inRange && Math.abs(p.zInt() - center.zInt()) <= range;
@@ -159,18 +177,18 @@ public class FortressesManager {
 				coresInRange.add(rune.getGeneratorCore());
 			}
 		}
-		coresInRange.remove(getRune(center).getGeneratorCore());
+		coresInRange.remove(getRune(world, center).getGeneratorCore());
 		return coresInRange;
 	}
 
-	public static void addProtectedPoint(Point p, Point anchor) {
+	public static void addProtectedPoint(World w, Point p, Point anchor) {
 		instance.model.protectedPoints.add(p);
-		instance.model.generatorRuneByProtectedPoint.put(p, getRune(anchor));
+		instance.model.getGeneratorRuneByProtectedPointMap(w).put(p, getRune(w, anchor));
 	}
 
-	public static void removeProtectedPoint(Point p) {
+	public static void removeProtectedPoint(World w, Point p) {
 		instance.model.protectedPoints.remove(p);
-		instance.model.generatorRuneByProtectedPoint.remove(p);
+		instance.model.getGeneratorRuneByProtectedPointMap(w).remove(p);
 	}
 
 	public static void addAlteredPoint(Point p) {
@@ -219,14 +237,15 @@ public class FortressesManager {
 
 		GeneratorRunePattern runePattern = GeneratorRunePattern.tryReadyPattern(signBlock);
 		if (runePattern != null) {
-			boolean runeAlreadyCreated = instance.model.generatorRuneByPoint.containsKey(new Point(signBlock));
+			World world = runePattern.getWorld();
+			boolean runeAlreadyCreated = instance.model.getGeneratorRuneByPatternPointMap(world).containsKey(new Point(signBlock));
 			if (!runeAlreadyCreated) {
 				GeneratorRune rune = new GeneratorRune(runePattern);
 				instance.model.generatorRunes.add(rune);
 
 				//add new rune to generatorRuneByPoint map
 				for (Point p : runePattern.getPoints()) {
-					instance.model.generatorRuneByPoint.put(p, rune);
+					instance.model.getGeneratorRuneByPatternPointMap(world).put(p, rune);
 				}
 
 				rune.onCreated(player);
@@ -243,11 +262,12 @@ public class FortressesManager {
 	public static void onBlockRedstoneEvent(BlockRedstoneEvent event) {
 		int signal = event.getNewCurrent();
 		Block block = event.getBlock();
+		World world = block.getWorld();
 		Point p = new Point(block);
 
 		//if the redstone that changed is part of the rune, update rune state
-		if (instance.model.generatorRuneByPoint.containsKey(p)) {
-			GeneratorRune rune = instance.model.generatorRuneByPoint.get(p);
+		if (instance.model.getGeneratorRuneByPatternPointMap(world).containsKey(p)) {
+			GeneratorRune rune = instance.model.getGeneratorRuneByPatternPointMap(world).get(p);
 			rune.setPowered(signal > 0);
 		}
 
@@ -308,7 +328,7 @@ public class FortressesManager {
 		Point doorPoint = new Point(doorBlock.getLocation());
 		World world = doorBlock.getWorld();
 
-		GeneratorRune rune = instance.model.generatorRuneByProtectedPoint.get(doorPoint);
+		GeneratorRune rune = instance.model.getGeneratorRuneByProtectedPointMap(world).get(doorPoint);
 		if (rune != null) {
 			Player player = event.getPlayer();
 			Point aboveDoorPoint = new Point(doorPoint).add(0, 1, 0);
@@ -416,9 +436,10 @@ public class FortressesManager {
 		return cancel;
 	}
 	private static void onRuneMightHaveBeenBrokenBy(Block block) {
+		World world = block.getWorld();
 		Point p = new Point(block);
-		if (instance.model.generatorRuneByPoint.containsKey(p)) {
-			GeneratorRune rune = instance.model.generatorRuneByPoint.get(p);
+		if (instance.model.getGeneratorRuneByPatternPointMap(world).containsKey(p)) {
+			GeneratorRune rune = instance.model.getGeneratorRuneByPatternPointMap(world).get(p);
 
 			if (rune.getPattern().contains(p)) {
 				breakRune(rune);
@@ -426,7 +447,7 @@ public class FortressesManager {
 		}
 	}
 
-	public static boolean onPistonEvent(boolean isSticky, Point piston, Point target, Set<Block> movedBlocks) {
+	public static boolean onPistonEvent(boolean isSticky, World world, Point piston, Point target, Set<Block> movedBlocks) {
 		boolean cancel = false;
 
 		if (movedBlocks != null) {
@@ -454,7 +475,7 @@ public class FortressesManager {
 			//build runesAffected
 			HashSet<GeneratorRune> runesAffected = new HashSet<>();
 			for (Point p : pointsAffected) {
-				GeneratorRune rune = getRune(p);
+				GeneratorRune rune = getRune(world, p);
 				if (rune != null) {
 					runesAffected.add(rune);
 				}
@@ -475,13 +496,14 @@ public class FortressesManager {
 	}
 
 	public static void breakRune(GeneratorRune rune) {
+		World world = rune.getPattern().getWorld();
 		Set<Point> patternPoints = rune.getPattern().getPoints();
 
 		rune.onBroken();
 		//breaking should naturally update: alteredPoints, protectedPoints, and generatorRuneByProtectedPoint
 
 		for (Point p : patternPoints) {
-			instance.model.generatorRuneByPoint.remove(p);
+			instance.model.getGeneratorRuneByPatternPointMap(world).remove(p);
 		}
 
 		instance.model.generatorRunes.remove(rune);

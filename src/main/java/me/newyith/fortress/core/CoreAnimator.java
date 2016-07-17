@@ -204,7 +204,7 @@ public class CoreAnimator {
 	// --------- Internal Methods ---------
 
 	private void onGeneratedChanged() {
-		BaseCore core = FortressesManager.getCore(model.anchorPoint);
+		BaseCore core = FortressesManager.getCore(model.world, model.anchorPoint);
 		if (core != null) {
 			core.onGeneratedChanged();
 		} else {
@@ -353,14 +353,13 @@ public class CoreAnimator {
 
 	private void addProtectedPoint(Point p) {
 		model.protectedPoints.add(p);
-		FortressesManager.addProtectedPoint(p, model.anchorPoint);
+		FortressesManager.addProtectedPoint(model.world, p, model.anchorPoint);
 	}
 
 	private void removeProtectedPoint(Point p) {
 		model.protectedPoints.remove(p);
-		FortressesManager.removeProtectedPoint(p);
+		FortressesManager.removeProtectedPoint(model.world, p);
 	}
-
 
 	private void addAlteredPoint(Point p) {
 		model.alteredPoints.add(p);

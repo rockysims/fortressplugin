@@ -44,7 +44,7 @@ public class WaveLayer {
 	//-----------------------------------------------------------------------
 
 	public void convertAndCleanup(WaveLayer oldLayer, Set<Point> alteredPoints) {
-		Debug.msg("convertAndCleanup() model.layerPoints.size(): " + model.layerPoints.size());
+		//Debug.msg("convertAndCleanup() model.layerPoints.size(): " + model.layerPoints.size());
 
 		if (oldLayer != null) {
 			//revert any oldPoints not in new points
@@ -58,7 +58,7 @@ public class WaveLayer {
 
 		for (Point p : model.layerPoints) {
 			boolean temp = BedrockManager.convert(model.world, p);
-			Debug.msg("convertAndCleanup() converted " + p + " (now converted?: " + temp + ")");
+			//Debug.msg("convertAndCleanup() converted " + p + " (now converted?: " + temp + ")");
 		}
 	}
 

@@ -43,9 +43,9 @@ public class CoreWave {
 	//------------------------------------------------------------------------------------------------------------------
 
 	public void convertLayer(int layerIndex, Set<Point> layerPoints, Set<Point> alteredPoints, boolean partialLayer) {
-		Debug.msg("convertLayer() layerIndex: " + layerIndex);
-		Debug.msg("convertLayer() layerPoints.size(): " + layerPoints.size());
-		Debug.msg("convertLayer() alteredPoints.size(): " + alteredPoints.size());
+//		Debug.msg("convertLayer() layerIndex: " + layerIndex);
+//		Debug.msg("convertLayer() layerPoints.size(): " + layerPoints.size());
+//		Debug.msg("convertLayer() alteredPoints.size(): " + alteredPoints.size());
 
 		//TODO: maybe when considering reverting because > 4 layers, only count ...
 		//consider removing old layer
