@@ -104,10 +104,6 @@ public class BedrockManager {
 			revertData.put(top, new BlockRevertData(world, top));
 			revertData.put(bottom, new BlockRevertData(world, bottom));
 
-			//TODO: check if changing to AIR first is actually needed
-			bottom.setType(Material.AIR, world);
-			top.setType(Material.AIR, world);
-
 			bottom.setType(Material.BEDROCK, world);
 			top.setType(Material.BEDROCK, world);
 
@@ -130,10 +126,6 @@ public class BedrockManager {
 			BlockRevertData bottomData = revertData.get(bottom);
 
 			if (topData != null && bottomData != null) {
-				//TODO: check if changing to AIR first is actually needed
-				bottom.setType(Material.AIR, world);
-				top.setType(Material.AIR, world);
-
 				bottomData.revert(world, bottom);
 				topData.revert(world, top);
 
