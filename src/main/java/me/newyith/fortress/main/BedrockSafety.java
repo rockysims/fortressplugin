@@ -66,7 +66,7 @@ public class BedrockSafety {
 			World world = Bukkit.getWorld(worldName);
 			for (Point p : materialByPoint.keySet()) {
 				if (p.is(Material.BEDROCK, world)) {
-					boolean isAltered = FortressesManager.isAltered(p); //TODO: remove isAltered condition if/when altered points use BedrockManager
+					boolean isAltered = FortressesManager.isAltered(world, p); //TODO: remove isAltered condition if/when altered points use BedrockManager
 					boolean isKnown = BedrockManager.getMaterial(world, p) != null;
 					boolean safeBedrock = isAltered || isKnown;
 					if (!safeBedrock) {

@@ -40,8 +40,8 @@ public class FortressesManager {
 		private Set<GeneratorRune> generatorRunes = null;
 		private transient Map<String, Map<Point, GeneratorRune>> generatorRuneByPatternPointByWorld = null;
 		private transient Map<String, Map<Point, GeneratorRune>> generatorRuneByProtectedPointByWorld = null;
-		private transient Set<Point> protectedPoints = null; //TODO: make multiworld safe
-		private transient Set<Point> alteredPoints = null; //TODO: make multiworld safe
+		private transient Map<String, Set<Point>> protectedPointsByWorld = null;
+		private transient Map<String, Set<Point>> alteredPointsByWorld = null;
 
 		@JsonCreator
 		public Model(@JsonProperty("generatorRunes") Set<GeneratorRune> generatorRunes) {
@@ -50,8 +50,8 @@ public class FortressesManager {
 			//rebuild transient fields
 			generatorRuneByPatternPointByWorld = new HashMap<>();
 			generatorRuneByProtectedPointByWorld = new HashMap<>();
-			protectedPoints = new HashSet<>();
-			alteredPoints = new HashSet<>();
+			protectedPointsByWorld = new HashMap<>();
+			alteredPointsByWorld = new HashMap<>();
 			for (GeneratorRune rune : generatorRunes) {
 				World world = rune.getPattern().getWorld();
 
@@ -62,11 +62,11 @@ public class FortressesManager {
 
 				//rebuild alteredPoints
 				Set<Point> altereds = rune.getGeneratorCore().getAlteredPoints();
-				alteredPoints.addAll(altereds);
+				getAlteredPoints(world).addAll(altereds);
 
 				//rebuild protectedPoints
 				Set<Point> protecteds = rune.getGeneratorCore().getProtectedPoints();
-				protectedPoints.addAll(protecteds);
+				getProtectedPoints(world).addAll(protecteds);
 
 				//rebuild runeByProtectedPoint
 				for (Point p : protecteds) {
@@ -89,6 +89,22 @@ public class FortressesManager {
 				generatorRuneByProtectedPointByWorld.put(worldName, new HashMap<>());
 			}
 			return generatorRuneByProtectedPointByWorld.get(worldName);
+		}
+
+		public Set<Point> getProtectedPoints(World w) {
+			String worldName = w.getName();
+			if (!protectedPointsByWorld.containsKey(worldName)) {
+				protectedPointsByWorld.put(worldName, new HashSet<>());
+			}
+			return protectedPointsByWorld.get(worldName);
+		}
+
+		public Set<Point> getAlteredPoints(World w) {
+			String worldName = w.getName();
+			if (!alteredPointsByWorld.containsKey(worldName)) {
+				alteredPointsByWorld.put(worldName, new HashSet<>());
+			}
+			return alteredPointsByWorld.get(worldName);
 		}
 	}
 	private Model model = null;
@@ -182,29 +198,29 @@ public class FortressesManager {
 	}
 
 	public static void addProtectedPoint(World w, Point p, Point anchor) {
-		instance.model.protectedPoints.add(p);
+		instance.model.getProtectedPoints(w).add(p);
 		instance.model.getGeneratorRuneByProtectedPointMap(w).put(p, getRune(w, anchor));
 	}
 
 	public static void removeProtectedPoint(World w, Point p) {
-		instance.model.protectedPoints.remove(p);
+		instance.model.getProtectedPoints(w).remove(p);
 		instance.model.getGeneratorRuneByProtectedPointMap(w).remove(p);
 	}
 
-	public static void addAlteredPoint(Point p) {
-		instance.model.alteredPoints.add(p);
+	public static void addAlteredPoint(World w, Point p) {
+		instance.model.getAlteredPoints(w).add(p);
 	}
 
-	public static void removeAlteredPoint(Point p) {
-		instance.model.alteredPoints.remove(p);
+	public static void removeAlteredPoint(World w, Point p) {
+		instance.model.getAlteredPoints(w).remove(p);
 	}
 
-	public static boolean isGenerated(Point p) {
-		return instance.model.protectedPoints.contains(p) || instance.model.alteredPoints.contains(p);
+	public static boolean isGenerated(World w, Point p) {
+		return instance.model.getProtectedPoints(w).contains(p) || instance.model.getAlteredPoints(w).contains(p);
 	}
 
-	public static boolean isAltered(Point p) {
-		return instance.model.alteredPoints.contains(p);
+	public static boolean isAltered(World w, Point p) {
+		return instance.model.getAlteredPoints(w).contains(p);
 	}
 
 	public static boolean isClaimed(Point p) {
@@ -272,7 +288,7 @@ public class FortressesManager {
 		}
 
 		//if door is protected, ignore redstone event
-		if (Blocks.isDoor(block.getType()) && instance.model.protectedPoints.contains(p)) {
+		if (Blocks.isDoor(block.getType()) && instance.model.getProtectedPoints(world).contains(p)) {
 			Openable openableDoor = (Openable)block.getState().getData();
 			if (openableDoor.isOpen()) {
 				event.setNewCurrent(1);
@@ -284,19 +300,19 @@ public class FortressesManager {
 
 	public static boolean onExplode(List<Block> explodeBlocks, Location loc, float yield) {
 		boolean cancel = false;
+		World world = loc.getWorld();
 
 		Set<Point> pointsToShield = new HashSet<>();
 		Iterator<Block> it = explodeBlocks.iterator();
 		while (it.hasNext()) {
 			Point p = new Point(it.next());
-			if (isGenerated(p) && !p.is(Material.BEDROCK, loc.getWorld())) {
+			if (isGenerated(world, p) && !p.is(Material.BEDROCK, loc.getWorld())) {
 				pointsToShield.add(p);
 			}
 		}
 
 		if (!pointsToShield.isEmpty()) {
 			//pointsToShield excludes bedrock so we know points are not already converted
-			World world = loc.getWorld();
 			for (Point p : pointsToShield) {
 				BedrockManager.convert(world, p);
 			}
@@ -385,7 +401,7 @@ public class FortressesManager {
 		Point brokenPoint = new Point(brokenBlock);
 		World world = brokenBlock.getWorld();
 
-		boolean isProtected = instance.model.protectedPoints.contains(brokenPoint);
+		boolean isProtected = instance.model.getProtectedPoints(world).contains(brokenPoint);
 		boolean inCreative = event.getPlayer().getGameMode() == GameMode.CREATIVE;
 		boolean cancel = false;
 		if (isProtected && !inCreative) {
@@ -397,7 +413,7 @@ public class FortressesManager {
 					PistonExtensionMaterial pem = (PistonExtensionMaterial) matData;
 					BlockFace face = pem.getFacing().getOppositeFace();
 					Point pistonPoint = new Point(brokenBlock.getRelative(face, 1));
-					if (instance.model.protectedPoints.contains(pistonPoint)) {
+					if (instance.model.getProtectedPoints(world).contains(pistonPoint)) {
 						cancel = true;
 					}
 				} else {
@@ -418,11 +434,12 @@ public class FortressesManager {
 	public static boolean onBlockPlaceEvent(Player player, Block placedBlock, Material replacedMaterial) {
 		boolean cancel = false;
 
+		World world = placedBlock.getWorld();
 		switch (replacedMaterial) {
 			case STATIONARY_WATER:
 			case STATIONARY_LAVA:
 				Point placedPoint = new Point(placedBlock);
-				boolean isProtected = instance.model.protectedPoints.contains(placedPoint);
+				boolean isProtected = instance.model.getProtectedPoints(world).contains(placedPoint);
 				boolean inCreative = player.getGameMode() == GameMode.CREATIVE;
 				if (isProtected && !inCreative) {
 					cancel = true;
@@ -453,7 +470,7 @@ public class FortressesManager {
 		if (movedBlocks != null) {
 			for (Block movedBlock : movedBlocks) {
 				Point movedPoint = new Point(movedBlock);
-				if (instance.model.protectedPoints.contains(movedPoint)) {
+				if (instance.model.getProtectedPoints(world).contains(movedPoint)) {
 					cancel = true;
 				}
 			}

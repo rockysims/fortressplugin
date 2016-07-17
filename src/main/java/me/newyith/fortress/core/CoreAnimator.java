@@ -363,11 +363,11 @@ public class CoreAnimator {
 
 	private void addAlteredPoint(Point p) {
 		model.alteredPoints.add(p);
-		FortressesManager.addAlteredPoint(p);
+		FortressesManager.addAlteredPoint(model.world, p);
 	}
 
 	private void removeAlteredPoint(Point p) {
-		FortressesManager.removeAlteredPoint(p);
+		FortressesManager.removeAlteredPoint(model.world, p);
 		model.alteredPoints.remove(p);
 	}
 }
