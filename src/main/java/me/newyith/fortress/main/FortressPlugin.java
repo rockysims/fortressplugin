@@ -257,6 +257,8 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: prioritize the full todo list
 
 
+//TODO: search for "consider adding the other points in pattern too" in BaseCore
+
 
 //------------------------------//
 //		first priority			//

@@ -399,6 +399,7 @@ public class BaseCore {
 	protected Set<Point> getOriginPoints() {
 		Set<Point> originPoints = new HashSet<>();
 		originPoints.add(model.anchorPoint);
+		//TODO: consider adding the other points in pattern too (seems like that's how it should work but not sure)
 		return originPoints;
 	}
 
