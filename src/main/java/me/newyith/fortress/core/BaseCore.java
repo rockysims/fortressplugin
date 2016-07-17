@@ -86,10 +86,6 @@ public abstract class BaseCore {
 
 	//------------------------------------------------------------------------------------------------------------------
 
-	public Player getOwner() {
-		return Bukkit.getPlayer(model.placedByPlayerId);
-	}
-
 	public boolean playerCanOpenDoor(Player player, Point doorPoint) {
 		String playerName = player.getName();
 		Set<Point> actualSigns = getDoorWhitelistSignPoints(doorPoint);
@@ -361,10 +357,16 @@ public abstract class BaseCore {
 		return future;
 	}
 
-	protected void onSearchingChanged(boolean searching) {
-		//this method exists so GeneratorCore can override it
+	protected abstract void onSearchingChanged(boolean searching);
+
+	public World getWorld() {
+		return model.world;
 	}
 
+	public Player getOwner() {
+		return Bukkit.getPlayer(model.placedByPlayerId);
+	}
+	
 	private Set<Point> getLayerOutside(Set<Point> wallPoints, Set<Point> layerAroundWall) {
 		Set<Point> layerOutside = new HashSet<>();
 

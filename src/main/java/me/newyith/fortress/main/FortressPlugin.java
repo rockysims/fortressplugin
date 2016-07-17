@@ -252,13 +252,13 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
+
 //TODO: upgrade to minecraft 1.9?
 
 //TODO: prioritize the full todo list
 
 
 //TODO: search for "consider adding the other points in pattern too" in BaseCore
-
 
 //------------------------------//
 //		first priority			//

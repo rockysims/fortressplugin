@@ -71,8 +71,8 @@ public class CoreAnimator {
 
 			//rebuild transient fields
 			this.world = Bukkit.getWorld(worldName);
-			this.maxBlocksPerFrame = 500; //2; //500; //TODO: change back to 500
-			this.ticksPerFrame = 1 * (150 / TickTimer.msPerTick); // msPerFrame / msPerTick //TODO: change back to 1* instead of 10*
+			this.maxBlocksPerFrame = 500;
+			this.ticksPerFrame = (150 / TickTimer.msPerTick); // msPerFrame / msPerTick
 			this.animationWaitTicks = 0;
 			this.curIndex = 0;
 		}
