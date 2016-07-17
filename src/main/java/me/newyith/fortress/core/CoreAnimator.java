@@ -128,37 +128,6 @@ public class CoreAnimator {
 		}
 	}
 
-	public void degenerate(Set<Point> pointsToDegenerate) {
-		List<Set<Point>> layersToDegenerate = new ArrayList<>();
-		layersToDegenerate.add(pointsToDegenerate);
-
-		List<Set<Point>> origAnimationLayers = model.animationLayers;
-		boolean origIsGeneratingWall = model.isGeneratingWall;
-		boolean origAnimationInProgress = model.animationInProgress;
-		model.animationLayers = layersToDegenerate;
-		model.isGeneratingWall = false;
-		model.animationInProgress = true;
-		model.skipAnimation = true;
-		tick();
-		model.skipAnimation = false;
-		model.animationLayers = origAnimationLayers;
-		model.isGeneratingWall = origIsGeneratingWall;
-		model.animationInProgress = origAnimationInProgress;
-
-		//TODO: remove commented out block after everything seems to be working again without it
-		/////// or maybe not since this method would be called for instant degeneration of disconnected points? not sure
-		//	shouldn't be needed since tick() naturally updates generatedLayers and calls onGeneratedChanged()
-//		//remove pointsToDegenerate from generatedLayers
-//		for (Iterator<Set<Point>> it = model.generatedLayers.iterator(); it.hasNext(); ) {
-//			Set<Point> layer = it.next();
-//			layer.removeAll(pointsToDegenerate);
-//			if (layer.size() == 0) {
-//				it.remove();
-//			}
-//		}
-//		onGeneratedChanged();
-	}
-
 	public CoreMaterials getCoreMats() {
 		return model.coreMats;
 	}
