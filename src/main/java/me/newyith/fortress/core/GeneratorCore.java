@@ -1,6 +1,5 @@
 package me.newyith.fortress.core;
 
-import com.google.common.collect.Sets;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.util.Point;
@@ -11,7 +10,6 @@ import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class GeneratorCore extends BaseCore {
 	private static class Model extends BaseCore.Model {

@@ -21,7 +21,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-public class BaseCore {
+public abstract class BaseCore {
 	public static class Model {
 		protected final Point anchorPoint;
 		protected final Set<Point> claimedPoints;
@@ -396,12 +396,7 @@ public class BaseCore {
 //		Debug.msg("layerOutside.size(): " + layerOutside.size());
 		return layerOutside;
 	}
-	protected Set<Point> getOriginPoints() {
-		Set<Point> originPoints = new HashSet<>();
-		originPoints.add(model.anchorPoint);
-		//TODO: consider adding the other points in pattern too (seems like that's how it should work but not sure)
-		return originPoints;
-	}
+	protected abstract Set<Point> getOriginPoints();
 
 	private Set<Point> getPointsInside(Set<Point> layerOutside, Set<Point> layerAroundWall, Set<Point> wallPoints) {
 		Set<Point> pointsInside = new HashSet<>();
