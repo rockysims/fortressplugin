@@ -10,10 +10,7 @@ import org.bukkit.World;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class BedrockSafety {
 	private static BedrockSafety instance = null;
@@ -82,7 +79,8 @@ public class BedrockSafety {
 				safeBedrockPoints = new HashSet<>();
 			}
 			World world = Bukkit.getWorld(worldName);
-			for (Point p : materialByPoint.keySet()) {
+			Set<Point> materialByPointKeys = new HashSet<>(materialByPoint.keySet()); //copy to avoid concurrent modification
+			for (Point p : materialByPointKeys) {
 				if (p.is(Material.BEDROCK, world)) {
 					boolean safeBedrock = safeBedrockPoints.contains(p);
 					if (!safeBedrock) {
