@@ -616,6 +616,7 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: consider fixing bug where if one type of slab is protected then all types of slabs are
 
 //TODO: allow wall particles to be disabled via config
+//TODO: allow debug messages to be disabled via config (maybe default to disabled but only if releaseBuild)
 
 //TODO: think about making water/lava mote create impassible wall above it
 

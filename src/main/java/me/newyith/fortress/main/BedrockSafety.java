@@ -58,31 +58,32 @@ public class BedrockSafety {
 
 		//Debug.msg("doSafetySync() called");
 
-		//fill safeBedrockPointsByWorld
-		Map<String, Set<Point>> safeBedrockPointsByWorld = new HashMap<>();
+		//fill claimedWallPointsByWorld
+		Map<String, Set<Point>> claimedWallPointsByWorld = new HashMap<>();
 		Set<GeneratorRune> runes = FortressesManager.getRunes();
 		for (GeneratorRune rune : runes) {
 			String worldName = rune.getPattern().getWorld().getName();
-			if (!safeBedrockPointsByWorld.containsKey(worldName)) {
-				safeBedrockPointsByWorld.put(worldName, new HashSet<>());
+			if (!claimedWallPointsByWorld.containsKey(worldName)) {
+				claimedWallPointsByWorld.put(worldName, new HashSet<>());
 			}
 
 			Set<Point> claimedWallPoints = rune.getGeneratorCore().getClaimedWallPoints();
-			safeBedrockPointsByWorld.get(worldName).addAll(claimedWallPoints);
+			claimedWallPointsByWorld.get(worldName).addAll(claimedWallPoints);
 		}
 
 		//revert any unsafe bedrock
 		for (String worldName : model.materialMapByWorld.keySet()) {
 			Map<Point, Material> materialByPoint = model.materialMapByWorld.get(worldName);
-			Set<Point> safeBedrockPoints = safeBedrockPointsByWorld.get(worldName);
-			if (safeBedrockPoints == null) {
-				safeBedrockPoints = new HashSet<>();
+			Set<Point> claimedWallPoints = claimedWallPointsByWorld.get(worldName);
+			if (claimedWallPoints == null) {
+				claimedWallPoints = new HashSet<>();
 			}
 			World world = Bukkit.getWorld(worldName);
 			Set<Point> materialByPointKeys = new HashSet<>(materialByPoint.keySet()); //copy to avoid concurrent modification
 			for (Point p : materialByPointKeys) {
 				if (p.is(Material.BEDROCK, world)) {
-					boolean safeBedrock = safeBedrockPoints.contains(p);
+					boolean managedBedrock = BedrockManager.getMaterial(world, p) != null;
+					boolean safeBedrock = claimedWallPoints.contains(p) && managedBedrock;
 					if (!safeBedrock) {
 						BedrockManager.forget(world, p);
 						Material mat = materialByPoint.remove(p);
