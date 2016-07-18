@@ -320,7 +320,7 @@ public class FortressesManager {
 			for (Point p : pointsToShield) {
 			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
 				BedrockManager.revert(world, p);
-			}, 25 + random.nextInt(12)); //20 ticks per second
+			}, 15 + random.nextInt(15)); //20 ticks per second
 			}
 			/*/
 			for (Point p : pointsToShield) {
