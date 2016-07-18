@@ -269,7 +269,7 @@ public class GeneratorRune {
 
 	// - Utils -
 
-	public int countFuelItemsRemaining() { //TODO: time this and make sure its very fast (called several times a second)
+	public int countGlowstoneDustInChest() {
 		int count = 0;
 		Chest chest = getChest();
 		if (chest != null) {
@@ -298,7 +298,7 @@ public class GeneratorRune {
 	}
 
 	private void updateFuelRemainingDisplay(long ms) {
-		int glowstoneDustInChest = countFuelItemsRemaining();
+		int glowstoneDustInChest = countGlowstoneDustInChest();
 		ms += FortressPlugin.config_glowstoneDustBurnTimeMs * glowstoneDustInChest;
 
 		long s = ms / 1000;

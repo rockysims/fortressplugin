@@ -137,9 +137,6 @@ public class FortressesManager {
 
 	// - Getters / Setters -
 
-	//TODO: fix PROBLEM: we need to know the world too and there can be multiple runes per point
-	//	maybe not a big deal since that just means you can't create a rune at a point if point is already taken in another world
-	//	should still fix it (maybe something like runeByPoint[world].get(p) instead of runeByPoint.get(p)?)
 	public static GeneratorRune getRune(World w, Point p) {
 		return instance.model.getGeneratorRuneByPatternPointMap(w).get(p);
 	}
@@ -267,8 +264,7 @@ public class FortressesManager {
 				rune.onCreated(player);
 				cancel = true; //otherwise initial text on sign is replaced by what user wrote
 			} else {
-				//TODO: consider coloring this message or better yet abstracting sendMsg among all classes
-				player.sendMessage("Failed to create rune because rune already created here.");
+				player.sendMessage(ChatColor.AQUA + "Failed to create rune because rune already created here.");
 			}
 		}
 
