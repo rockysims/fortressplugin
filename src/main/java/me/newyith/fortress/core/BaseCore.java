@@ -509,6 +509,11 @@ public abstract class BaseCore {
 		return model.claimedPoints;
 	}
 
+	public Set<Point> getClaimedWallPoints() {
+		return model.claimedWallPoints;
+	}
+
+
 //	private void unclaimDisconnected() {
 //		//fill pointsToUnclaim
 //		Set<Point> pointsToUnclaim = new HashSet<>();

@@ -1,16 +1,17 @@
 package me.newyith.fortress.main;
 
 import me.newyith.fortress.core.BedrockManager;
+import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,27 +53,43 @@ public class BedrockSafety {
 	//-----------------------------------------------------------------------
 
 	public static void safetySync() {
-		//Debug.msg("ignoring call to safetySync()");
-		getInstance().doSafetySync(); //TODO: uncomment this out
+		getInstance().doSafetySync();
 	}
 	public void doSafetySync() {
 		//revert any bedrock in materialByPoint that is not supposed to be bedrock
-		//	supposed to be bedrock if BedrockManager has data for point or if it's an altered point
+		//	allowed to be bedrock if a generator claims point as claimed wall point
 
 		//Debug.msg("doSafetySync() called");
 
+		//fill safeBedrockPointsByWorld
+		Map<String, Set<Point>> safeBedrockPointsByWorld = new HashMap<>();
+		Set<GeneratorRune> runes = FortressesManager.getRunes();
+		for (GeneratorRune rune : runes) {
+			String worldName = rune.getPattern().getWorld().getName();
+			if (!safeBedrockPointsByWorld.containsKey(worldName)) {
+				safeBedrockPointsByWorld.put(worldName, new HashSet<>());
+			}
+
+			Set<Point> claimedWallPoints = rune.getGeneratorCore().getClaimedWallPoints();
+			safeBedrockPointsByWorld.get(worldName).addAll(claimedWallPoints);
+		}
+
+		//revert any unsafe bedrock
 		for (String worldName : model.materialMapByWorld.keySet()) {
 			Map<Point, Material> materialByPoint = model.materialMapByWorld.get(worldName);
+			Set<Point> safeBedrockPoints = safeBedrockPointsByWorld.get(worldName);
+			if (safeBedrockPoints == null) {
+				safeBedrockPoints = new HashSet<>();
+			}
 			World world = Bukkit.getWorld(worldName);
 			for (Point p : materialByPoint.keySet()) {
 				if (p.is(Material.BEDROCK, world)) {
-					boolean isAltered = FortressesManager.isAltered(world, p); //TODO: remove isAltered condition if/when altered points use BedrockManager
-					boolean isKnown = BedrockManager.getMaterial(world, p) != null;
-					boolean safeBedrock = isAltered || isKnown;
+					boolean safeBedrock = safeBedrockPoints.contains(p);
 					if (!safeBedrock) {
-						Material mat = materialByPoint.get(p);
+						BedrockManager.forget(world, p);
+						Material mat = materialByPoint.remove(p);
 						p.setType(mat, world);
-						Debug.msg("set !safeBedrock at " + p + " back to " + mat); //TODO: delete this line later?
+						Debug.msg("set !safeBedrock at " + p + " back to " + mat); //LATER: delete this line
 					}
 				}
 			}
@@ -84,7 +101,6 @@ public class BedrockSafety {
 		getInstance().doRecord(world, wallPoints);
 	}
 	public void doRecord(World world, Set<Point> wallPoints) {
-		//TODO: make altered points use BedrockManager or change BedrockSafety::doRecord() to also look up real material for altered points
 		for (Point p : wallPoints) {
 			Material mat = BedrockManager.getMaterial(world, p);
 			if (mat == null) mat = p.getType(world);
@@ -94,7 +110,8 @@ public class BedrockSafety {
 				model.materialMapByWorld.put(worldName, new HashMap<>());
 			}
 			model.materialMapByWorld.get(worldName).put(p, mat);
-			//TODO: delete debug if statement later?
+
+			//LATER: delete debug if statement later?
 			if (mat == Material.BEDROCK) {
 				String ANSI_RESET = "\u001B[0m";
 				String ANSI_RED = "\u001B[31m";

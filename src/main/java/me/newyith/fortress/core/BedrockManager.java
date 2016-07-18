@@ -91,6 +91,13 @@ public class BedrockManager {
 		return isReverted;
 	}
 
+	public static void forget(World world, Point p) {
+		Map<Point, BlockRevertData> revertDataMap = instance.model.revertDataMapByWorld.get(world.getName());
+		if (revertDataMap != null) {
+			revertDataMap.remove(p);
+		}
+	}
+
 	private static boolean convertTallDoor(World world, Point p) {
 		boolean converted = false;
 

@@ -47,7 +47,6 @@ public class CoreWave {
 //		Debug.msg("convertLayer() layerPoints.size(): " + layerPoints.size());
 //		Debug.msg("convertLayer() alteredPoints.size(): " + alteredPoints.size());
 
-		//TODO: maybe when considering reverting because > 4 layers, only count ...
 		//consider removing old layer
 		if (model.waveLayers.size() + 1 > model.maxWaveLayers) {
 			revertLayerIgnoring(alteredPoints);
