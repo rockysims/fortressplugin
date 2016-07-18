@@ -366,7 +366,7 @@ public abstract class BaseCore {
 	public Player getOwner() {
 		return Bukkit.getPlayer(model.placedByPlayerId);
 	}
-	
+
 	private Set<Point> getLayerOutside(Set<Point> wallPoints, Set<Point> layerAroundWall) {
 		Set<Point> layerOutside = new HashSet<>();
 

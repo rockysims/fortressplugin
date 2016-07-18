@@ -81,16 +81,7 @@ public class CoreParticles {
 
 //					Debug.msg("wallOutsideIndex: " + wallOutsideIndex);
 
-					//* //TODO: delete alternate block (or decide its efficient enough)
 					showParticleForWallOutsidePair(core.getWorld(), wallOutsidePairs.get(wallOutsideIndex));
-					/*/
-					//this version doesn't display particles for blocks broken in creative mode
-					Pair<Point, Point> wallOutsidePair = wallOutsidePairs.get(wallOutsideIndex);
-					Point wall = wallOutsidePair.getKey();
-					if (wall.getBlock(core.getWorld()).getType() != Material.AIR) {
-						showParticleForWallOutsidePair(core.getWorld(), wallOutsidePair);
-					}
-					//*/
 				}
 			}
 
