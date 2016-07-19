@@ -258,8 +258,6 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: prioritize the full todo list
 
 
-//TODO: make generator recheck powered status on load
-
 //------------------------------//
 //		first priority			//
 //------------------------------//

@@ -71,6 +71,8 @@ public class GeneratorRune {
 		model.core.updateInsideOutside(); //updateInsideOutside() needs to be called before onGeneratedChanged() so layerOutside is full
 		//*/
 		model.core.onGeneratedChanged(); //update which particles should be displayed (requires layerOutside already be filled)
+
+		updatePoweredFromWorld(); //powered state may have changed if server crashed so recheck
 	}
 
 	//-----------------------------------------------------------------------
@@ -140,12 +142,7 @@ public class GeneratorRune {
 		moveBlockTo(Material.GOLD_BLOCK, model.pattern.getRunningPoint());
 		moveBlockTo(Material.DIAMOND_BLOCK, model.pattern.getAnchorPoint());
 
-		//initialize model.powered
-		Point wirePoint = model.pattern.getWirePoint();
-		if (wirePoint != null) {
-			model.powered = wirePoint.getBlock(model.pattern.getWorld()).getBlockPower() > 0;
-		}
-
+		updatePoweredFromWorld(); //initialize model.powered
 		updateState();
 
 		boolean placed = model.core.onCreated(player);
@@ -160,6 +157,15 @@ public class GeneratorRune {
 		setSignText("Broken", "", "");
 
 		model.core.onBroken();
+	}
+
+	private void updatePoweredFromWorld() {
+		boolean powered = false;
+		Point wirePoint = model.pattern.getWirePoint();
+		if (wirePoint != null) {
+			powered = wirePoint.getBlock(model.pattern.getWorld()).getBlockPower() > 0;
+		}
+		setPowered(powered);
 	}
 
 	public void setPowered(boolean powered) {

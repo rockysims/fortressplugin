@@ -135,7 +135,7 @@ public class SaveLoadManager implements Listener {
 
 			Map<String, Object> data = new HashMap<>();
 			data.put("BedrockSafety", BedrockSafety.getInstance());
-			Debug.msg("Saved BedrockSafety"); //TODO: delete this line
+			Debug.msg("Saved BedrockSafety"); //LATER: delete this line?
 
 			mapper.writeValue(buffer, data);
 
