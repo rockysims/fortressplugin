@@ -220,7 +220,7 @@ public class FortressesManager {
 		return instance.model.getAlteredPoints(w).contains(p);
 	}
 
-	public static boolean isClaimed(Point p) {
+	public static boolean isClaimed(World w, Point p) {
 		boolean claimed = false;
 
 		Iterator<GeneratorRune> it = instance.model.generatorRunes.iterator();

@@ -3,6 +3,7 @@ package me.newyith.fortress.main;
 import me.newyith.fortress.command.Commands;
 import me.newyith.fortress.event.EventListener;
 import me.newyith.fortress.event.TickTimer;
+import me.newyith.fortress.fix.PearlGlitchFix;
 import me.newyith.fortress.manual.ManualCraftManager;
 import me.newyith.fortress.sandbox.jackson.SandboxSaveLoadManager;
 import me.newyith.fortress.util.Debug;
@@ -69,7 +70,7 @@ public class FortressPlugin extends JavaPlugin {
 		EventListener.onEnable(this);
 		TickTimer.onEnable(this);
 		ManualCraftManager.onEnable(this);
-//		PearlGlitchFix.onEnable(this);
+		PearlGlitchFix.onEnable(this);
 
 		sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
 		sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
@@ -258,6 +259,8 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: prioritize the full todo list
 
 
+//TODO: add world param to FortressesManager::isClaimed()
+
 //------------------------------//
 //		first priority			//
 //------------------------------//
@@ -297,10 +300,10 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: make protection prevent enderman picking up block
 
-//TODO: look into why only ever other layer of water gets protected
+//TODO: look into why only every other layer of water gets protected
 //	should probably just disable water/lava protection for now
 
-//TODO: look into bug where when maxBlocksPerFrame limit is encountered, bedrock gets left behind
+//TODO: look into bug where when maxBlocksPerFrame limit is encountered, bedrock gets left behind (think this is fixed but need to recheck)
 //	think it has something to do with the layerIndex being passed to wave (same layerIndex so old layer gets cleaned up?)
 //	also protected points get left out of wave (though they still can't be broken in survival)
 //	also BedrockManager seems to forget to revert some points (different issue?)
