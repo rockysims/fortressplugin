@@ -297,6 +297,8 @@ public class FortressPlugin extends JavaPlugin {
 //			bugs				//
 //------------------------------//
 
+//TODO: make protection prevent enderman picking up block
+
 //TODO: look into why only ever other layer of water gets protected
 //	should probably just disable water/lava protection for now
 
