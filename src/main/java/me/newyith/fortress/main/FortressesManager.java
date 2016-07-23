@@ -37,42 +37,53 @@ public class FortressesManager {
 	//-----------------------------------------------------------------------
 
 	private static class Model {
-		private Set<GeneratorRune> generatorRunes = null;
+		private Map<String, Set<GeneratorRune>> generatorRunesByWorld = null;
 		private transient Map<String, Map<Point, GeneratorRune>> generatorRuneByPatternPointByWorld = null;
 		private transient Map<String, Map<Point, GeneratorRune>> generatorRuneByProtectedPointByWorld = null;
 		private transient Map<String, Set<Point>> protectedPointsByWorld = null;
 		private transient Map<String, Set<Point>> alteredPointsByWorld = null;
 
 		@JsonCreator
-		public Model(@JsonProperty("generatorRunes") Set<GeneratorRune> generatorRunes) {
-			this.generatorRunes = generatorRunes;
+		public Model(@JsonProperty("generatorRunesByWorld") Map<String, Set<GeneratorRune>> generatorRunesByWorld) {
+			this.generatorRunesByWorld = generatorRunesByWorld;
 
 			//rebuild transient fields
 			generatorRuneByPatternPointByWorld = new HashMap<>();
 			generatorRuneByProtectedPointByWorld = new HashMap<>();
 			protectedPointsByWorld = new HashMap<>();
 			alteredPointsByWorld = new HashMap<>();
-			for (GeneratorRune rune : generatorRunes) {
-				World world = rune.getPattern().getWorld();
+			for (String worldName : generatorRunesByWorld.keySet()) {
+				Set<GeneratorRune> generatorRunes = generatorRunesByWorld.get(worldName);
 
-				//rebuild runeByPoint map
-				for (Point p : rune.getPattern().getPoints()) {
-					getGeneratorRuneByPatternPointMap(world).put(p, rune);
-				}
+				for (GeneratorRune rune : generatorRunes) {
+					World world = rune.getPattern().getWorld();
 
-				//rebuild alteredPoints
-				Set<Point> altereds = rune.getGeneratorCore().getAlteredPoints();
-				getAlteredPoints(world).addAll(altereds);
+					//rebuild runeByPatternPoint map
+					for (Point p : rune.getPattern().getPoints()) {
+						getGeneratorRuneByPatternPointMap(world).put(p, rune);
+					}
 
-				//rebuild protectedPoints
-				Set<Point> protecteds = rune.getGeneratorCore().getProtectedPoints();
-				getProtectedPoints(world).addAll(protecteds);
+					//rebuild alteredPoints
+					Set<Point> altereds = rune.getGeneratorCore().getAlteredPoints();
+					getAlteredPoints(world).addAll(altereds);
 
-				//rebuild runeByProtectedPoint
-				for (Point p : protecteds) {
-					getGeneratorRuneByProtectedPointMap(world).put(p, rune);
+					//rebuild protectedPoints
+					Set<Point> protecteds = rune.getGeneratorCore().getProtectedPoints();
+					getProtectedPoints(world).addAll(protecteds);
+
+					//rebuild runeByProtectedPoint
+					for (Point p : protecteds) {
+						getGeneratorRuneByProtectedPointMap(world).put(p, rune);
+					}
 				}
 			}
+		}
+
+		public Set<GeneratorRune> getGeneratorRunesByWorldName(String worldName) {
+			if (!generatorRunesByWorld.containsKey(worldName)) {
+				generatorRunesByWorld.put(worldName, new HashSet<>());
+			}
+			return generatorRunesByWorld.get(worldName);
 		}
 
 		public Map<Point, GeneratorRune> getGeneratorRuneByPatternPointMap(World w) {
@@ -115,20 +126,24 @@ public class FortressesManager {
 	}
 
 	public FortressesManager() {
-		model = new Model(new HashSet<>());
+		model = new Model(new HashMap<>());
 	}
 
 	public static void secondStageLoad() {
-		//pass along secondStageLoad event to runes
-		for (GeneratorRune rune : instance.model.generatorRunes) {
-			rune.secondStageLoad();
-		}
+		for (String worldName : instance.model.generatorRunesByWorld.keySet()) {
+			Set<GeneratorRune> generatorRunes = instance.model.getGeneratorRunesByWorldName(worldName);
 
-		//break any invalid runes
-		Set<GeneratorRune> generatorRunesCopy = new HashSet<>(instance.model.generatorRunes);
-		for (GeneratorRune rune : generatorRunesCopy) {
-			if (!rune.getPattern().isValid()) {
-				breakRune(rune);
+			//pass along secondStageLoad event to runes
+			for (GeneratorRune rune : generatorRunes) {
+				rune.secondStageLoad();
+			}
+
+			//break any invalid runes
+			Set<GeneratorRune> generatorRunesCopy = new HashSet<>(generatorRunes);
+			for (GeneratorRune rune : generatorRunesCopy) {
+				if (!rune.getPattern().isValid()) {
+					breakRune(rune);
+				}
 			}
 		}
 	}
@@ -153,16 +168,17 @@ public class FortressesManager {
 		return core;
 	}
 
-	public static Set<GeneratorRune> getRunes() {
-		return instance.model.generatorRunes;
+	public static Set<GeneratorRune> getRunes(World world) {
+		return instance.model.getGeneratorRunesByWorldName(world.getName());
 	}
 
 	//during /fort stuck, we need all generators player might be inside so we can search by fortress cuboids
-	public static Set<GeneratorRune> getGeneratorRunesNear(Point center) {
+	public static Set<GeneratorRune> getGeneratorRunesNear(World world, Point center) {
 		Set<GeneratorRune> overlapRunes = new HashSet<>();
 
 		//overlapRunes = runes where fortress cuboid contains 'center' point
-		for (GeneratorRune rune : instance.model.generatorRunes) {
+		Set<GeneratorRune> generatorRunes = instance.model.getGeneratorRunesByWorldName(world.getName());
+		for (GeneratorRune rune : generatorRunes) {
 			if (rune.getFortressCuboid().contains(center)) {
 				overlapRunes.add(rune);
 			}
@@ -176,12 +192,11 @@ public class FortressesManager {
 		Set<BaseCore> coresInRange = new HashSet<>();
 
 		//fill runesInRange
-		for (GeneratorRune rune : instance.model.generatorRunes) {
+		Set<GeneratorRune> generatorRunes = instance.model.getGeneratorRunesByWorldName(world.getName());
+		for (GeneratorRune rune : generatorRunes) {
 			//set inRange
 			boolean inRange = true;
-			World w = rune.getPattern().getWorld();
 			Point p = rune.getPattern().getAnchorPoint();
-			inRange = inRange && w.getName() == world.getName();
 			inRange = inRange && Math.abs(p.xInt() - center.xInt()) <= range;
 			inRange = inRange && Math.abs(p.yInt() - center.yInt()) <= range;
 			inRange = inRange && Math.abs(p.zInt() - center.zInt()) <= range;
@@ -223,7 +238,8 @@ public class FortressesManager {
 	public static boolean isClaimed(World w, Point p) {
 		boolean claimed = false;
 
-		Iterator<GeneratorRune> it = instance.model.generatorRunes.iterator();
+		Set<GeneratorRune> generatorRunes = instance.model.getGeneratorRunesByWorldName(w.getName());
+		Iterator<GeneratorRune> it = generatorRunes.iterator();
 		while (it.hasNext()) {
 			GeneratorRune rune = it.next();
 			claimed = rune.getGeneratorCore().getClaimedPoints().contains(p);
@@ -235,14 +251,24 @@ public class FortressesManager {
 		return claimed;
 	}
 
-	public static int getRuneCount() {
-		return instance.model.generatorRunes.size();
+	public static int getRuneCountAllWorlds() {
+		int runeCount = 0;
+
+		for (String worldName : instance.model.generatorRunesByWorld.keySet()) {
+			Set<GeneratorRune> generatorRunes = instance.model.getGeneratorRunesByWorldName(worldName);
+			runeCount += generatorRunes.size();
+		}
+
+		return runeCount;
 	}
 
 	// - Events -
 
 	public static void onTick() {
-		instance.model.generatorRunes.forEach(GeneratorRune::onTick);
+		for (String worldName : instance.model.generatorRunesByWorld.keySet()) {
+			Set<GeneratorRune> generatorRunes = instance.model.getGeneratorRunesByWorldName(worldName);
+			generatorRunes.forEach(GeneratorRune::onTick);
+		}
 	}
 
 	public static boolean onSignChange(Player player, Block signBlock) {
@@ -254,7 +280,8 @@ public class FortressesManager {
 			boolean runeAlreadyCreated = instance.model.getGeneratorRuneByPatternPointMap(world).containsKey(new Point(signBlock));
 			if (!runeAlreadyCreated) {
 				GeneratorRune rune = new GeneratorRune(runePattern);
-				instance.model.generatorRunes.add(rune);
+				Set<GeneratorRune> generatorRunes = instance.model.getGeneratorRunesByWorldName(world.getName());
+				generatorRunes.add(rune);
 
 				//add new rune to generatorRuneByPoint map
 				for (Point p : runePattern.getPoints()) {
@@ -519,6 +546,7 @@ public class FortressesManager {
 			instance.model.getGeneratorRuneByPatternPointMap(world).remove(p);
 		}
 
-		instance.model.generatorRunes.remove(rune);
+		Set<GeneratorRune> generatorRunes = instance.model.getGeneratorRunesByWorldName(world.getName());
+		generatorRunes.remove(rune);
 	}
 }

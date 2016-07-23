@@ -86,7 +86,7 @@ public class GeneratorRunesManager {
 		return claimed;
 	}
 
-	public static int getRuneCount() {
+	public static int getRuneCountAllWorlds() {
 		return runes.size();
 	}
 

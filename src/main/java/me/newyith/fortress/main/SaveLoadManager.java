@@ -49,7 +49,7 @@ public class SaveLoadManager implements Listener {
 		//save FortressesManager
 		data.put("FortressesManager", FortressesManager.getInstance());
 		data.put("BedrockManager", BedrockManager.getInstance());
-		Debug.msg("Saved " + FortressesManager.getRuneCount() + " rune(s)."); //TODO: delete this line
+		Debug.msg("Saved " + FortressesManager.getRuneCountAllWorlds() + " rune(s)."); //TODO: delete this line
 	}
 
 	private void loadFromMap(Map<String, Object> data) {
@@ -76,7 +76,7 @@ public class SaveLoadManager implements Listener {
 			FortressesManager.secondStageLoad();
 		}
 
-		Debug.msg("Loaded " + FortressesManager.getRuneCount() + " rune(s)."); //TODO: delete this line
+		Debug.msg("Loaded " + FortressesManager.getRuneCountAllWorlds() + " rune(s)."); //TODO: delete this line
 	}
 
 	public void save() {
