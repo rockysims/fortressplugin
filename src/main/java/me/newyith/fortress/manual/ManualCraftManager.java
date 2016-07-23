@@ -51,7 +51,8 @@ public class ManualCraftManager {
 	private static String readManualFile() {
 		String manualStr = "Failed to read manual.txt";
 
-		InputStream stream = ManualCraftManager.class.getResourceAsStream("/manual.txt"); //(work)?"/":"" + "manual.txt"
+		InputStream stream = ManualCraftManager.class.getResourceAsStream("/manual.txt"); //((work)?"/":"") + "manual.txt"
+		//recompile + /reload -> stream == null
 		if (stream != null) {
 			InputStreamReader streamReader = new InputStreamReader(stream);
 			BufferedReader br = new BufferedReader(streamReader);
@@ -72,7 +73,7 @@ public class ManualCraftManager {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
+		} else Debug.msg("readManualFile() steam == null");
 
 		return manualStr;
 	}

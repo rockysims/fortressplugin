@@ -62,7 +62,7 @@ public class CoreParticles {
 			if (!wallOutsidePairs.isEmpty()) {
 				long startNs = System.nanoTime();
 
-				int limit = 1 + (int)((double)wallOutsidePairs.size() * 0.03);
+				int limit = 1 + (int)((double)wallOutsidePairs.size() * 0.02);
 				while (true) {
 					if (limit-- <= 0) {
 //						Debug.msg("particle LIMIT break");

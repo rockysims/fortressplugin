@@ -267,6 +267,26 @@ public class FortressPlugin extends JavaPlugin {
 
 //tasks here
 
+//Problem: It's really hard/dangerous to edit a fortress
+//Solution: right click generator with book to create editToken.
+//	player with valid editToken in inventory can edit generated blocks (left click with pick to break altered block)
+//	expiration += 5 minutes for each right click of book on generator
+//	editToken should be a book much like the manual
+//		first page has plain english info about token
+//		rest of book is encrypted token data (AES encrypted and salted by server. only ever read by server)
+//		token data: Point generatorAnchor, DateTime created
+//	maybe rename editToken to Fortress Build Rights at least in game
+//	ISSUE: anyone with editToken could break through to generator (still better than bare handed because editToken expiration is controlled)
+//		solution: even with editToken, you can't break into rooms you don't have access to
+//			allow player with editToken to break generatedBlock if:
+//				for all fortress rooms connected by a face to generatedBlock
+//					player has permission to open at least one of the room's doors
+//			merge rooms when first hole between rooms is made
+//		solution (old): walls of room with generator in it cannot be destroyed even with editToken unless the player is inside the room
+//			try to generalize so it works for all private rooms?
+//				a room is private if all doors only have white list signs inside the room
+//	need to think about risk of block duplication on crash that probably comes with allowing editToken to work
+
 //-------------------------------//
 //-------------------------------//
 
