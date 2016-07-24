@@ -66,7 +66,7 @@ public class StuckPlayer {
 			}
 		}
 
-		nearbyGeneratorRunes = FortressesManager.getGeneratorRunesNear(startPoint);
+		nearbyGeneratorRunes = FortressesManager.getGeneratorRunesNear(world, startPoint);
 	}
 
 	public void considerSendingMessage() {

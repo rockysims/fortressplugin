@@ -1,0 +1,486 @@
+package me.newyith.fortress.main;
+
+import me.newyith.fortress.core.BaseCore;
+import me.newyith.fortress.core.BedrockManager;
+import me.newyith.fortress.rune.generator.GeneratorRune;
+import me.newyith.fortress.rune.generator.GeneratorRunePattern;
+import me.newyith.fortress.util.Debug;
+import me.newyith.fortress.util.Point;
+import me.newyith.fortress.util.Blocks;
+import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockRedstoneEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.material.*;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
+
+import java.util.*;
+
+public class FortressesManagerForWorld {
+	private static FortressesManager instance = null;
+	public static FortressesManager getInstance() {
+		if (instance == null) {
+			instance = new FortressesManager();
+		}
+		return instance;
+	}
+	public static void setInstance(FortressesManager newInstance) {
+		instance = newInstance;
+	}
+
+	//-----------------------------------------------------------------------
+
+	private static class Model {
+		private Set<GeneratorRune> generatorRunes = null;
+		private transient Map<Point, GeneratorRune> generatorRuneByPatternPoint = null;
+		private transient Map<Point, GeneratorRune> generatorRuneByProtectedPoint = null;
+		private transient Set<Point> protectedPoints = null;
+		private transient Set<Point> alteredPoints = null;
+
+		@JsonCreator
+		public Model(@JsonProperty("generatorRunes") Set<GeneratorRune> generatorRunes) {
+			this.generatorRunes = generatorRunes;
+
+			//rebuild transient fields
+			generatorRuneByPatternPoint = new HashMap<>();
+			generatorRuneByProtectedPoint = new HashMap<>();
+			protectedPoints = new HashSet<>();
+			alteredPoints = new HashSet<>();
+			for (GeneratorRune rune : generatorRunes) {
+				World world = rune.getPattern().getWorld();
+
+				//rebuild runeByPoint map
+				for (Point p : rune.getPattern().getPoints()) {
+					generatorRuneByPatternPoint.put(p, rune);
+				}
+
+				//rebuild alteredPoints
+				Set<Point> altereds = rune.getGeneratorCore().getAlteredPoints();
+				alteredPoints.addAll(altereds);
+
+				//rebuild protectedPoints
+				Set<Point> protecteds = rune.getGeneratorCore().getProtectedPoints();
+				protectedPoints.addAll(protecteds);
+
+				//rebuild runeByProtectedPoint
+				for (Point p : protecteds) {
+					generatorRuneByProtectedPoint.put(p, rune);
+				}
+			}
+		}
+	}
+	private Model model = null;
+
+	@JsonCreator
+	public FortressesManagerForWorld(@JsonProperty("model") Model model) {
+		this.model = model;
+	}
+
+	public FortressesManagerForWorld(World world) {
+		model = new Model(new HashSet<>());
+	}
+
+	public void secondStageLoad() {
+		//pass along secondStageLoad event to runes
+		for (GeneratorRune rune : model.generatorRunes) {
+			rune.secondStageLoad();
+		}
+
+		//break any invalid runes
+		Set<GeneratorRune> generatorRunesCopy = new HashSet<>(model.generatorRunes);
+		for (GeneratorRune rune : generatorRunesCopy) {
+			if (!rune.getPattern().isValid()) {
+				breakRune(rune);
+			}
+		}
+	}
+
+	//-----------------------------------------------------------------------
+
+	// - Getters / Setters -
+
+	public GeneratorRune getRune(Point p) {
+		return model.generatorRuneByPatternPoint.get(p);
+	}
+
+	//this helps separate Rune and Core (kind of a hack to find core through rune. fix later)
+	public BaseCore getCore(Point p) {
+		BaseCore core = null;
+
+		GeneratorRune rune = getRune(p);
+		if (rune != null) {
+			core = rune.getGeneratorCore();
+		}
+
+		return core;
+	}
+
+	public Set<GeneratorRune> getRunes() {
+		return model.generatorRunes;
+	}
+
+	//during /fort stuck, we need all generators player might be inside so we can search by fortress cuboids
+	public Set<GeneratorRune> getGeneratorRunesNear(Point center) {
+		Set<GeneratorRune> overlapRunes = new HashSet<>();
+
+		//overlapRunes = runes where fortress cuboid contains 'center' point
+		for (GeneratorRune rune : model.generatorRunes) {
+			if (rune.getFortressCuboid().contains(center)) {
+				overlapRunes.add(rune);
+			}
+		}
+
+		return overlapRunes;
+	}
+
+	//during generation, we need all potentially conflicting generators (not just known ones) so search by range
+	public Set<BaseCore> getOtherCoresInRange(Point center, int range) {
+		Set<BaseCore> coresInRange = new HashSet<>();
+
+		//fill runesInRange
+		for (GeneratorRune rune : model.generatorRunes) {
+			//set inRange
+			boolean inRange = true;
+			World w = rune.getPattern().getWorld();
+			Point p = rune.getPattern().getAnchorPoint();
+			inRange = inRange && Math.abs(p.xInt() - center.xInt()) <= range;
+			inRange = inRange && Math.abs(p.yInt() - center.yInt()) <= range;
+			inRange = inRange && Math.abs(p.zInt() - center.zInt()) <= range;
+
+			if (inRange) {
+				coresInRange.add(rune.getGeneratorCore());
+			}
+		}
+		coresInRange.remove(getRune(center).getGeneratorCore());
+		return coresInRange;
+	}
+
+	public void addProtectedPoint(Point p, Point anchor) {
+		model.protectedPoints.add(p);
+		model.generatorRuneByProtectedPoint.put(p, getRune(anchor));
+	}
+
+	public void removeProtectedPoint(Point p) {
+		model.protectedPoints.remove(p);
+		model.generatorRuneByProtectedPoint.remove(p);
+	}
+
+	public void addAlteredPoint(Point p) {
+		model.alteredPoints.add(p);
+	}
+
+	public void removeAlteredPoint(Point p) {
+		model.alteredPoints.remove(p);
+	}
+
+	public boolean isGenerated(Point p) {
+		return model.protectedPoints.contains(p) || model.alteredPoints.contains(p);
+	}
+
+	public boolean isAltered(Point p) {
+		return model.alteredPoints.contains(p);
+	}
+
+	public boolean isClaimed(Point p) {
+		boolean claimed = false;
+
+		Iterator<GeneratorRune> it = model.generatorRunes.iterator();
+		while (it.hasNext()) {
+			GeneratorRune rune = it.next();
+			claimed = rune.getGeneratorCore().getClaimedPoints().contains(p);
+			if (claimed) {
+				break;
+			}
+		}
+
+		return claimed;
+	}
+
+	public int getRuneCount() {
+		return model.generatorRunes.size();
+	}
+
+	// - Events -
+
+	public void onTick() {
+		model.generatorRunes.forEach(GeneratorRune::onTick);
+	}
+
+	public boolean onSignChange(Player player, Block signBlock) {
+		boolean cancel = false;
+
+		GeneratorRunePattern runePattern = GeneratorRunePattern.tryReadyPattern(signBlock);
+		if (runePattern != null) {
+			boolean runeAlreadyCreated = model.generatorRuneByPatternPoint.containsKey(new Point(signBlock));
+			if (!runeAlreadyCreated) {
+				GeneratorRune rune = new GeneratorRune(runePattern);
+				model.generatorRunes.add(rune);
+
+				//add new rune to generatorRuneByPoint map
+				for (Point p : runePattern.getPoints()) {
+					model.generatorRuneByPatternPoint.put(p, rune);
+				}
+
+				rune.onCreated(player);
+				cancel = true; //otherwise initial text on sign is replaced by what user wrote
+			} else {
+				player.sendMessage(ChatColor.AQUA + "Failed to create rune because rune already created here.");
+			}
+		}
+
+		return cancel;
+	}
+
+	public void onBlockRedstoneEvent(BlockRedstoneEvent event) {
+		int signal = event.getNewCurrent();
+		Block block = event.getBlock();
+		Point p = new Point(block);
+
+		//if the redstone that changed is part of the rune, update rune state
+		if (model.generatorRuneByPatternPoint.containsKey(p)) {
+			GeneratorRune rune = model.generatorRuneByPatternPoint.get(p);
+			rune.setPowered(signal > 0);
+		}
+
+		//if door is protected, ignore redstone event
+		if (Blocks.isDoor(block.getType()) && model.protectedPoints.contains(p)) {
+			Openable openableDoor = (Openable)block.getState().getData();
+			if (openableDoor.isOpen()) {
+				event.setNewCurrent(1);
+			} else {
+				event.setNewCurrent(0);
+			}
+		}
+	}
+
+	public boolean onExplode(List<Block> explodeBlocks, Location loc, float yield) {
+		boolean cancel = false;
+		World world = loc.getWorld();
+
+		Set<Point> pointsToShield = new HashSet<>();
+		Iterator<Block> it = explodeBlocks.iterator();
+		while (it.hasNext()) {
+			Point p = new Point(it.next());
+			if (isGenerated(p) && !p.is(Material.BEDROCK, world)) {
+				pointsToShield.add(p);
+			}
+		}
+
+		if (!pointsToShield.isEmpty()) {
+			//pointsToShield excludes bedrock so we know points are not already converted
+			for (Point p : pointsToShield) {
+				BedrockManager.convert(world, p);
+			}
+
+			world.createExplosion(loc, yield);
+
+			/*
+			Random random = new Random();
+			for (Point p : pointsToShield) {
+			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
+				BedrockManager.revert(world, p);
+			}, 15 + random.nextInt(15)); //20 ticks per second
+			}
+			/*/
+			for (Point p : pointsToShield) {
+				BedrockManager.revert(world, p);
+			}
+			//*/
+
+			cancel = true;
+		}
+
+//		Debug.msg("onExplode() returning " + String.valueOf(cancel));
+		return cancel;
+	}
+
+	public void onPlayerOpenCloseDoor(PlayerInteractEvent event) {
+		Block doorBlock = event.getClickedBlock();
+		Point doorPoint = new Point(doorBlock.getLocation());
+		World world = doorBlock.getWorld();
+
+		GeneratorRune rune = model.generatorRuneByProtectedPoint.get(doorPoint);
+		if (rune != null) {
+			Player player = event.getPlayer();
+			Point aboveDoorPoint = new Point(doorPoint).add(0, 1, 0);
+			switch (aboveDoorPoint.getBlock(world).getType()) {
+				case IRON_DOOR_BLOCK:
+				case WOODEN_DOOR:
+				case ACACIA_DOOR:
+				case BIRCH_DOOR:
+				case DARK_OAK_DOOR:
+				case JUNGLE_DOOR:
+				case SPRUCE_DOOR:
+					//ignore trap doors since they're only 1 high
+					doorPoint = aboveDoorPoint;
+			}
+			boolean canOpen = rune.getGeneratorCore().playerCanOpenDoor(player, doorPoint);
+			if (!canOpen) {
+				event.setCancelled(true);
+			} else {
+				//if iron door, open for player
+				Material doorType = doorPoint.getBlock(world).getType();
+				boolean isIronDoor = doorType == Material.IRON_DOOR_BLOCK;
+				boolean isIronTrap = doorType == Material.IRON_TRAPDOOR;
+				if (isIronDoor || isIronTrap) {
+					BlockState state = doorBlock.getState();
+					boolean nowOpen;
+					if (isIronDoor) {
+						Door door = (Door) state.getData();
+						if (door.isTopHalf()) {
+							Block bottomDoorBlock = (new Point(doorPoint).add(0, -1, 0)).getBlock(world);
+							state = bottomDoorBlock.getState();
+							door = (Door) state.getData();
+						}
+						door.setOpen(!door.isOpen());
+						state.update();
+						nowOpen = door.isOpen();
+					} else {
+						TrapDoor door = (TrapDoor) state.getData();
+						door.setOpen(!door.isOpen());
+						state.update();
+						nowOpen = door.isOpen();
+					}
+					if (nowOpen) {
+						player.playSound(doorPoint.toLocation(world), Sound.DOOR_OPEN, 1.0F, 1.0F);
+					} else {
+						player.playSound(doorPoint.toLocation(world), Sound.DOOR_CLOSE, 1.0F, 1.0F);
+					}
+				}
+			}
+		}
+	}
+
+	public void onBlockBreakEvent(BlockBreakEvent event) {
+		Block brokenBlock = event.getBlock();
+		Point brokenPoint = new Point(brokenBlock);
+		World world = brokenBlock.getWorld();
+
+		boolean isProtected = model.protectedPoints.contains(brokenPoint);
+		boolean inCreative = event.getPlayer().getGameMode() == GameMode.CREATIVE;
+		boolean cancel = false;
+		if (isProtected && !inCreative) {
+			cancel = true;
+		} else {
+			if (brokenPoint.is(Material.PISTON_EXTENSION, world) || brokenPoint.is(Material.PISTON_MOVING_PIECE, world)) {
+				MaterialData matData = brokenBlock.getState().getData();
+				if (matData instanceof PistonExtensionMaterial) {
+					PistonExtensionMaterial pem = (PistonExtensionMaterial) matData;
+					BlockFace face = pem.getFacing().getOppositeFace();
+					Point pistonPoint = new Point(brokenBlock.getRelative(face, 1));
+					if (model.protectedPoints.contains(pistonPoint)) {
+						cancel = true;
+					}
+				} else {
+					Debug.error("matData not instanceof PistonExtensionMaterial");
+				}
+			}
+		}
+
+		if (cancel) {
+			event.setCancelled(true);
+		} else {
+			onRuneMightHaveBeenBrokenBy(brokenBlock);
+		}
+	}
+	public void onEnvironmentBreaksRedstoneWireEvent(Block brokenBlock) {
+		onRuneMightHaveBeenBrokenBy(brokenBlock);
+	}
+	public boolean onBlockPlaceEvent(Player player, Block placedBlock, Material replacedMaterial) {
+		boolean cancel = false;
+
+		switch (replacedMaterial) {
+			case STATIONARY_WATER:
+			case STATIONARY_LAVA:
+				Point placedPoint = new Point(placedBlock);
+				boolean isProtected = model.protectedPoints.contains(placedPoint);
+				boolean inCreative = player.getGameMode() == GameMode.CREATIVE;
+				if (isProtected && !inCreative) {
+					cancel = true;
+				}
+		}
+
+		if (!cancel) {
+			onRuneMightHaveBeenBrokenBy(placedBlock);
+		}
+
+		return cancel;
+	}
+	private void onRuneMightHaveBeenBrokenBy(Block block) {
+		Point p = new Point(block);
+		if (model.generatorRuneByPatternPoint.containsKey(p)) {
+			GeneratorRune rune = model.generatorRuneByPatternPoint.get(p);
+
+			if (rune.getPattern().contains(p)) {
+				breakRune(rune);
+			}
+		}
+	}
+
+	public boolean onPistonEvent(boolean isSticky, World world, Point piston, Point target, Set<Block> movedBlocks) {
+		boolean cancel = false;
+
+		if (movedBlocks != null) {
+			for (Block movedBlock : movedBlocks) {
+				Point movedPoint = new Point(movedBlock);
+				if (model.protectedPoints.contains(movedPoint)) {
+					cancel = true;
+				}
+			}
+		}
+
+		if (!cancel) {
+			//build pointsAffected
+			HashSet<Point> pointsAffected = new HashSet<>();
+			pointsAffected.add(piston);
+			if (target != null) {
+				pointsAffected.add(target);
+			}
+			if (movedBlocks != null) {
+				for (Block b : movedBlocks) {
+					pointsAffected.add(new Point(b));
+				}
+			}
+
+			//build runesAffected
+			HashSet<GeneratorRune> runesAffected = new HashSet<>();
+			for (Point p : pointsAffected) {
+				GeneratorRune rune = getRune(p);
+				if (rune != null) {
+					runesAffected.add(rune);
+				}
+			}
+
+			//break affected runes
+			for (GeneratorRune rune : runesAffected) {
+				breakRune(rune);
+			}
+
+			//Debug.msg("piston: " + piston);
+			//Debug.msg("target: " + target);
+			//Debug.msg("target type: " + target.getBlock().getType());
+			Debug.msg("movedBlocks.size(): " + movedBlocks.size());
+		}
+
+		return cancel;
+	}
+
+	public void breakRune(GeneratorRune rune) {
+		World world = rune.getPattern().getWorld();
+		Set<Point> patternPoints = rune.getPattern().getPoints();
+
+		rune.onBroken();
+		//breaking should naturally update: alteredPoints, protectedPoints, and generatorRuneByProtectedPoint
+
+		for (Point p : patternPoints) {
+			model.generatorRuneByPatternPoint.remove(p);
+		}
+
+		model.generatorRunes.remove(rune);
+	}
+}

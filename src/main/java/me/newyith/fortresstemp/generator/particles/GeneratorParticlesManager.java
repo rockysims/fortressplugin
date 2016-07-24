@@ -58,7 +58,7 @@ public class GeneratorParticlesManager {
 			}
 
 			if (!wallOutsidePairs.isEmpty()) {
-				int runeCount = FortressPlugin.generatorRunesManager.getRuneCount();
+				int runeCount = FortressPlugin.generatorRunesManager.getRuneCountForAllWorlds();
 				if (runeCount == 0) runeCount++;
 
 				long timeAllottedNs = maxTimeNsPerParticleTick / runeCount;

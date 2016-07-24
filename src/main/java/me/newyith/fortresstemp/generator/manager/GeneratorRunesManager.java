@@ -16,7 +16,7 @@ public class GeneratorRunesManager {
 		return runeByRunePoint.get(p);
 	}
 
-	public static List<GeneratorRune> getRunes() {
+	public static List<GeneratorRune> getRunesInAllWorlds() {
 		return runes;
 	}
 
@@ -86,7 +86,7 @@ public class GeneratorRunesManager {
 		return claimed;
 	}
 
-	public static int getRuneCount() {
+	public static int getRuneCountForAllWorlds() {
 		return runes.size();
 	}
 

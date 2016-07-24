@@ -258,7 +258,6 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: prioritize the full todo list
 
-
 //TODO: add world param to FortressesManager::isClaimed()
 
 //------------------------------//

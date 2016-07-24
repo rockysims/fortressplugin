@@ -60,7 +60,7 @@ public class BedrockSafety {
 
 		//fill claimedWallPointsByWorld
 		Map<String, Set<Point>> claimedWallPointsByWorld = new HashMap<>();
-		Set<GeneratorRune> runes = FortressesManager.getRunes();
+		Set<GeneratorRune> runes = FortressesManager.getRunesInAllWorlds();
 		for (GeneratorRune rune : runes) {
 			String worldName = rune.getPattern().getWorld().getName();
 			if (!claimedWallPointsByWorld.containsKey(worldName)) {
