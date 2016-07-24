@@ -280,12 +280,16 @@ public class FortressPlugin extends JavaPlugin {
 //		solution: even with editToken, you can't break into rooms you don't have access to
 //			allow player with editToken to break generatedBlock if:
 //				for all fortress rooms connected by a face to generatedBlock
-//					player has permission to open at least one of the room's doors
+//					player has permission to open at least one of that room's doors
 //			merge rooms when first hole between rooms is made
-//		solution (old): walls of room with generator in it cannot be destroyed even with editToken unless the player is inside the room
-//			try to generalize so it works for all private rooms?
-//				a room is private if all doors only have white list signs inside the room
-//	need to think about risk of block duplication on crash that probably comes with allowing editToken to work
+
+//	problem: risk of block duplication on crash due to allowing editToken to work
+//		scenario: protect block, save fortress data, break block, save map, crash while degeneration wave passing over block
+//		onLoad: bedrock safety reverts wave to original block? (broken block still in player inventory)
+//			because wave is passing over, bedrock safety will revert it
+//				solution: editToken doesn't work while de/generation in progress
+//					then bedrock safety won't revert broken block because its not bedrock anymore
+
 
 //-------------------------------//
 //-------------------------------//
