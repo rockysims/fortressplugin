@@ -197,6 +197,7 @@ public class GeneratorRunePattern {
 		}
 		valid = valid && goldCount == 1;
 		valid = valid && ironCount == 2;
+
 		return valid;
 	}
 }

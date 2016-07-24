@@ -253,6 +253,12 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
+//explosion problem:
+//	cancelling explosion and creating another explosion programmatically means no event goes off for second explosion so can't break rune
+//		poll runes[].isValid() every 2 seconds?
+//		cancel then programmatically place and set off new tnt (store pre authorization for second tnt to go off)?
+
+
 
 //TODO: upgrade to minecraft 1.9 or even 1.10?
 

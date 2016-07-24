@@ -353,7 +353,8 @@ public class GeneratorRune {
 						return true;
 					}
 				} else {
-					Debug.error("setSignText() failed to find sign at " + signPoint);
+					//this can happen when a sign is exploded (generator broken check has to delay while explosion to finishes)
+					Debug.warn("setSignText() failed to find sign at " + signPoint);
 				}
 			}
 		}

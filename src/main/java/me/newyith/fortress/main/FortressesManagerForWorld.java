@@ -1,7 +1,9 @@
 package me.newyith.fortress.main;
 
+import com.sun.tools.javac.jvm.Gen;
 import me.newyith.fortress.core.BaseCore;
 import me.newyith.fortress.core.BedrockManager;
+import me.newyith.fortress.core.GeneratorCore;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.rune.generator.GeneratorRunePattern;
 import me.newyith.fortress.util.Debug;
@@ -138,8 +140,8 @@ public class FortressesManagerForWorld {
 		return overlapRunes;
 	}
 
-	//during generation, we need all potentially conflicting generators (not just known ones) so search by range
-	public Set<BaseCore> getOtherCoresInRange(Point center, int range) {
+	//during generation, we need all potentially conflicting generators (not just known ones) so search by radius
+	public Set<BaseCore> getOtherCoresInRadius(Point center, int radius) {
 		Set<BaseCore> coresInRange = new HashSet<>();
 
 		//fill runesInRange
@@ -148,9 +150,9 @@ public class FortressesManagerForWorld {
 			boolean inRange = true;
 			World w = rune.getPattern().getWorld();
 			Point p = rune.getPattern().getAnchorPoint();
-			inRange = inRange && Math.abs(p.xInt() - center.xInt()) <= range;
-			inRange = inRange && Math.abs(p.yInt() - center.yInt()) <= range;
-			inRange = inRange && Math.abs(p.zInt() - center.zInt()) <= range;
+			inRange = inRange && Math.abs(p.xInt() - center.xInt()) <= radius;
+			inRange = inRange && Math.abs(p.yInt() - center.yInt()) <= radius;
+			inRange = inRange && Math.abs(p.zInt() - center.zInt()) <= radius;
 
 			if (inRange) {
 				coresInRange.add(rune.getGeneratorCore());
@@ -284,7 +286,7 @@ public class FortressesManagerForWorld {
 			for (Point p : pointsToShield) {
 			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
 				BedrockManager.revert(world, p);
-			}, 15 + random.nextInt(15)); //20 ticks per second
+			}, 25 + random.nextInt(15)); //20 ticks per second
 			}
 			/*/
 			for (Point p : pointsToShield) {
@@ -294,6 +296,24 @@ public class FortressesManagerForWorld {
 
 			cancel = true;
 		}
+
+
+
+//		//wait for explosion block updates
+//		Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
+//			//TODO: check pattern.isValid() for all nearby generators (instead of all generators with block exploded by first explosion)
+//
+//			Set<BaseCore> cores = FortressesManager.getOtherCoresInRadius(world, new Point(loc), 32);
+//			cores.forEach(core -> {
+//				core.getP
+//			});
+//
+////			explodeBlocks.forEach((explodeBlock) -> {
+////				onRuneMightHaveBeenBrokenBy(explodeBlock); //TODO: SKIP: make onRuneMightHaveBeenBrokenBy check to see if passed block mismatches pattern before breaking rune
+////			});
+//		}, 10); //20 ticks per second
+
+
 
 //		Debug.msg("onExplode() returning " + String.valueOf(cancel));
 		return cancel;
@@ -416,7 +436,9 @@ public class FortressesManagerForWorld {
 		if (model.generatorRuneByPatternPoint.containsKey(p)) {
 			GeneratorRune rune = model.generatorRuneByPatternPoint.get(p);
 
+			Debug.msg("onRuneMightHaveBeenBrokenBy() " + p + " " + p.getType(Bukkit.getWorld("world")));
 			if (rune.getPattern().contains(p)) {
+				Debug.msg("onRuneMightHaveBeenBrokenBy() calling breakRune()");
 				breakRune(rune);
 			}
 		}

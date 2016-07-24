@@ -481,7 +481,8 @@ public abstract class BaseCore {
 	}
 
 	private Set<Point> getClaimedPointsOfNearbyCores() {
-		Set<BaseCore> nearbyCores = FortressesManager.getOtherCoresInRange(model.world, model.anchorPoint, model.generationRangeLimit * 2 + 1); //not sure if the + 1 is needed
+		int radius = model.generationRangeLimit * 2 + 1; //not sure if the + 1 is needed
+		Set<BaseCore> nearbyCores = FortressesManager.getOtherCoresInRadius(model.world, model.anchorPoint, radius);
 
 		Set<Point> nearbyClaimedPoints = new HashSet<>();
 		for (BaseCore core : nearbyCores) {

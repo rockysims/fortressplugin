@@ -1,21 +1,14 @@
 package me.newyith.fortress.main;
 
 import me.newyith.fortress.core.BaseCore;
-import me.newyith.fortress.core.BedrockManager;
 import me.newyith.fortress.rune.generator.GeneratorRune;
-import me.newyith.fortress.rune.generator.GeneratorRunePattern;
-import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
-import me.newyith.fortress.util.Blocks;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.material.*;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -104,8 +97,8 @@ public class FortressesManager {
 	}
 
 	//during generation, we need all potentially conflicting generators (not just known ones) so search by range
-	public static Set<BaseCore> getOtherCoresInRange(World w, Point center, int range) {
-		return getManager(w).getOtherCoresInRange(center, range);
+	public static Set<BaseCore> getOtherCoresInRadius(World w, Point center, int radius) {
+		return getManager(w).getOtherCoresInRadius(center, radius);
 	}
 
 	public static void addProtectedPoint(World w, Point p, Point anchor) {

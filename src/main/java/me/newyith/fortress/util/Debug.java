@@ -23,6 +23,10 @@ public class Debug {
 		Bukkit.broadcastMessage(ChatColor.RED + "Error: " + s);
 	}
 
+	public static void warn(String s) {
+		Bukkit.broadcastMessage(ChatColor.YELLOW + "Warning: " + s);
+	}
+
 	public static void particleAt(Point point, ParticleEffect particleEffect) {
 		Player player = getPlayer();
 		if (player != null) {
