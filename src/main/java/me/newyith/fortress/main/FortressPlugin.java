@@ -333,6 +333,15 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: remove from BedrockManager any bedrock points broken (via creative)
 // or make BedrockManager check when returning material that actual material is bedrock
 
+//TODO: add back moment of bedrock onBurn, onIgnite, and onExplode once issue where /reload causes delayed task to be forgotten is fixed
+//	solution 1: onLoad, search protected points for managed bedrock that isn't wave then revert it
+//	how does wave not have this problem? go look... it counts down ticks instead of using scheduled tasks
+//		solution 2:
+//			something like:
+//			BedrockManager::revertTimed(world, point, ticks)
+//				model.timedBedrocks.push(new TimedBedrock(world, point, ticks));
+//					then TimedBedrock uses onTick() event to count
+
 //-------------------------------//
 //-------------------------------//
 

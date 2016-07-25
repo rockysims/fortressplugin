@@ -164,6 +164,16 @@ public class FortressesManager {
 		return getManager(w).onExplode(explodeBlocks, loc);
 	}
 
+	public static boolean onIgnite(Block block) {
+		World w = block.getWorld();
+		return getManager(w).onIgnite(block);
+	}
+
+	public static boolean onBurn(Block block) {
+		World w = block.getWorld();
+		return getManager(w).onBurn(block);
+	}
+
 	public static void onPlayerOpenCloseDoor(PlayerInteractEvent event) {
 		World w = event.getPlayer().getWorld();
 		getManager(w).onPlayerOpenCloseDoor(event);

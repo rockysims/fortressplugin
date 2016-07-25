@@ -307,20 +307,21 @@ public class FortressesManagerForWorld {
 				}
 			}
 
-			//show bedrock for a moment then revert back over short time
-			if (!pointsToShield.isEmpty()) {
-				//pointsToShield excludes bedrock so we know points are not already converted
-				for (Point p : pointsToShield) {
-					BedrockManager.convert(world, p);
-				}
-
-				Random random = new Random();
-				for (Point p : pointsToShield) {
-					Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
-						BedrockManager.revert(world, p);
-					}, 25 + random.nextInt(15)); //20 ticks per second
-				}
-			}
+			//TODO: uncomment out once issue where /reload causes delayed task to be forgotten is fixed
+//			//show bedrock for a moment then revert back over short time
+//			if (!pointsToShield.isEmpty()) {
+//				//pointsToShield excludes bedrock so we know points are not already converted
+//				for (Point p : pointsToShield) {
+//					BedrockManager.convert(world, p);
+//				}
+//
+//				Random random = new Random();
+//				for (Point p : pointsToShield) {
+//					Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
+//						BedrockManager.revert(world, p);
+//					}, 25 + random.nextInt(15)); //20 ticks per second
+//				}
+//			}
 		}
 
 		//break runes if needed
@@ -367,6 +368,52 @@ public class FortressesManagerForWorld {
 
 
 //		Debug.msg("onExplode() returning " + String.valueOf(cancel));
+		return cancel;
+	}
+
+	public boolean onIgnite(Block b) {
+		boolean cancel = false;
+
+		Point p = new Point(b);
+		boolean igniteProof = isClaimed(p);
+		if (igniteProof) {
+			//TODO: uncomment out once issue where /reload causes delayed task to be forgotten is fixed
+//			BedrockManager.convert(w, p);
+//			Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
+//				BedrockManager.revert(w, p);
+//			}, 25 + 15);
+
+//			Debug.msg("cancel ignite at " + p);
+//			Bukkit.getOnlinePlayers().forEach(player -> {
+//				player.sendMessage("cancel ignite at " + p);
+//			});
+
+			cancel = true;
+		}
+
+		return cancel;
+	}
+
+	public boolean onBurn(Block b) {
+		boolean cancel = false;
+
+		World w = b.getWorld();
+		Point p = new Point(b);
+		boolean burnProof = FortressesManager.isGenerated(w, p);
+		if (burnProof) {
+			//TODO: uncomment out once issue where /reload causes delayed task to be forgotten is fixed
+//			BedrockManager.convert(w, p);
+//			Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
+//				BedrockManager.revert(w, p);
+//			}, 25 + 15);
+
+//			Debug.msg("cancel burn at " + p);
+//			Bukkit.getOnlinePlayers().forEach(player -> {
+//				player.sendMessage("cancel burn at " + p);
+//			});
+			cancel = true;
+		}
+
 		return cancel;
 	}
 

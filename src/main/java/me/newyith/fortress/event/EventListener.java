@@ -9,8 +9,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Explosive;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -127,6 +125,22 @@ public class EventListener implements Listener {
 //		Debug.msg("calculated yield: " + yield);
 
 		boolean cancel = FortressesManager.onExplode(explodeBlocks, loc);
+		if (cancel) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onBlockIgnite(BlockIgniteEvent event) {
+		boolean cancel = FortressesManager.onIgnite(event.getBlock());
+		if (cancel) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onBlockBurn(BlockBurnEvent event) {
+		boolean cancel = FortressesManager.onBurn(event.getBlock());
 		if (cancel) {
 			event.setCancelled(true);
 		}
