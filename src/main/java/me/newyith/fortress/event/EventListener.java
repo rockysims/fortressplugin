@@ -2,7 +2,6 @@ package me.newyith.fortress.event;
 
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
-import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Blocks;
 import org.bukkit.Location;
@@ -18,7 +17,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.world.WorldSaveEvent;
 
 import java.util.HashSet;
 import java.util.List;
@@ -113,21 +111,22 @@ public class EventListener implements Listener {
 //		Debug.msg("EventListener::onExplode(EntityExplodeEvent event) called");
 		List<Block> explodeBlocks = event.blockList();
 		Location loc = event.getLocation();
-		float yield = 3.0f;
-		if (event.getEntity() instanceof Explosive) {
-			Explosive e = (Explosive) event.getEntity();
-			yield = e.getYield();
-		} else if (event.getEntity() instanceof Creeper) {
-			Creeper c = (Creeper) event.getEntity();
-			if(c.isPowered()) {
-				yield = 6.0f;
-			} else {
-				yield = 3.0f;
-			}
-		}
+
+//		float yield = 3.0f;
+//		if (event.getEntity() instanceof Explosive) {
+//			Explosive e = (Explosive) event.getEntity();
+//			yield = e.getYield();
+//		} else if (event.getEntity() instanceof Creeper) {
+//			Creeper c = (Creeper) event.getEntity();
+//			if(c.isPowered()) {
+//				yield = 6.0f;
+//			} else {
+//				yield = 3.0f;
+//			}
+//		}
 //		Debug.msg("calculated yield: " + yield);
 
-		boolean cancel = FortressesManager.onExplode(explodeBlocks, loc, yield);
+		boolean cancel = FortressesManager.onExplode(explodeBlocks, loc);
 		if (cancel) {
 			event.setCancelled(true);
 		}

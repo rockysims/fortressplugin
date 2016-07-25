@@ -256,7 +256,8 @@ public class FortressPlugin extends JavaPlugin {
 //explosion problem:
 //	cancelling explosion and creating another explosion programmatically means no event goes off for second explosion so can't break rune
 //		poll runes[].isValid() every 2 seconds?
-//		cancel then programmatically place and set off new tnt (store pre authorization for second tnt to go off)?
+//		cancel then programmatically place and set off new tnt (store pre authorization for second tnt to go off)? no. won't always be tnt
+//		maybe I can do actual ray tracing to see which blocks cover which others?
 
 
 

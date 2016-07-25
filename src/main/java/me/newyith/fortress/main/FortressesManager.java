@@ -159,9 +159,9 @@ public class FortressesManager {
 		getManager(w).onBlockRedstoneEvent(event);
 	}
 
-	public static boolean onExplode(List<Block> explodeBlocks, Location loc, float yield) {
+	public static boolean onExplode(List<Block> explodeBlocks, Location loc) {
 		World w = loc.getWorld();
-		return getManager(w).onExplode(explodeBlocks, loc, yield);
+		return getManager(w).onExplode(explodeBlocks, loc);
 	}
 
 	public static void onPlayerOpenCloseDoor(PlayerInteractEvent event) {

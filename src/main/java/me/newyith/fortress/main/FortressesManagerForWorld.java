@@ -1,9 +1,7 @@
 package me.newyith.fortress.main;
 
-import com.sun.tools.javac.jvm.Gen;
 import me.newyith.fortress.core.BaseCore;
 import me.newyith.fortress.core.BedrockManager;
-import me.newyith.fortress.core.GeneratorCore;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.rune.generator.GeneratorRunePattern;
 import me.newyith.fortress.util.Debug;
@@ -18,6 +16,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.material.*;
+import org.bukkit.util.*;
+import org.bukkit.util.Vector;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -148,7 +148,6 @@ public class FortressesManagerForWorld {
 		for (GeneratorRune rune : model.generatorRunes) {
 			//set inRange
 			boolean inRange = true;
-			World w = rune.getPattern().getWorld();
 			Point p = rune.getPattern().getAnchorPoint();
 			inRange = inRange && Math.abs(p.xInt() - center.xInt()) <= radius;
 			inRange = inRange && Math.abs(p.yInt() - center.yInt()) <= radius;
@@ -260,58 +259,108 @@ public class FortressesManagerForWorld {
 		}
 	}
 
-	public boolean onExplode(List<Block> explodeBlocks, Location loc, float yield) {
+	public boolean onExplode(List<Block> explodeBlocks, Location loc) {
 		boolean cancel = false;
 		World world = loc.getWorld();
 
-		Set<Point> pointsToShield = new HashSet<>();
+		boolean generatedBlockExploded = false;
 		Iterator<Block> it = explodeBlocks.iterator();
 		while (it.hasNext()) {
 			Point p = new Point(it.next());
 			if (isGenerated(p) && !p.is(Material.BEDROCK, world)) {
-				pointsToShield.add(p);
+				generatedBlockExploded = true;
+				break;
 			}
 		}
 
-		if (!pointsToShield.isEmpty()) {
-			//pointsToShield excludes bedrock so we know points are not already converted
-			for (Point p : pointsToShield) {
-				BedrockManager.convert(world, p);
+		if (generatedBlockExploded) {
+			Set<Point> pointsToShield = new HashSet<>();
+			Vector explosionOrigin = loc.toVector();
+			it = explodeBlocks.iterator();
+			while (it.hasNext()) {
+				Point explodePoint = new Point(it.next());
+
+				//if (generated block between explosion and explodePoint)
+				//	add generated block to pointsToShield
+				//	remove explodePoint from explodeBlocks
+				Vector direction = explodePoint.add(0.5, 0.5, 0.5).toVector().subtract(explosionOrigin);
+				int distance = Math.max(1, (int) explosionOrigin.distance(explodePoint.toVector()));
+				BlockIterator rayBlocks = new BlockIterator(world, explosionOrigin, direction, 0, distance);
+				while (rayBlocks.hasNext()) {
+					Block rayBlock = rayBlocks.next();
+					Point rayPoint = new Point(rayBlock);
+					boolean rayBlockIsShield = isGenerated(rayPoint) && !rayPoint.is(Material.BEDROCK, world);
+					if (rayBlockIsShield) {
+						pointsToShield.add(rayPoint);
+						it.remove(); //remove explodePoint from explodeBlocks since rayBlockIsShield
+						break;
+					}
+				}
 			}
 
-			world.createExplosion(loc, yield);
-
-			/*
-			Random random = new Random();
-			for (Point p : pointsToShield) {
-			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
-				BedrockManager.revert(world, p);
-			}, 25 + random.nextInt(15)); //20 ticks per second
+			//remove generated blocks from explodeBlocks
+			it = explodeBlocks.iterator();
+			while (it.hasNext()) {
+				Point p = new Point(it.next());
+				if (isGenerated(p) && !p.is(Material.BEDROCK, world)) {
+					it.remove(); //remove generated block from explodeBlocks
+				}
 			}
-			/*/
-			for (Point p : pointsToShield) {
-				BedrockManager.revert(world, p);
+
+			//show bedrock for a moment then revert back over short time
+			if (false && !pointsToShield.isEmpty()) {
+				//pointsToShield excludes bedrock so we know points are not already converted
+				for (Point p : pointsToShield) {
+					BedrockManager.convert(world, p);
+				}
+
+				Random random = new Random();
+				for (Point p : pointsToShield) {
+					Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
+						BedrockManager.revert(world, p);
+					}, 25 + random.nextInt(15)); //20 ticks per second
+				}
+			}
+		}
+
+
+
+		if (false) {
+			/* OLD WAY
+			Set<Point> pointsToShield = new HashSet<>();
+			Iterator<Block> it = explodeBlocks.iterator();
+			while (it.hasNext()) {
+				Point p = new Point(it.next());
+				if (isGenerated(p) && !p.is(Material.BEDROCK, world)) {
+					pointsToShield.add(p);
+				}
+			}
+
+			if (!pointsToShield.isEmpty()) {
+				//pointsToShield excludes bedrock so we know points are not already converted
+				for (Point p : pointsToShield) {
+					BedrockManager.convert(world, p);
+				}
+
+				world.createExplosion(loc, yield);
+
+				/*
+				Random random = new Random();
+				for (Point p : pointsToShield) {
+				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
+					BedrockManager.revert(world, p);
+				}, 25 + random.nextInt(15)); //20 ticks per second
+				}
+				/ * /
+				for (Point p : pointsToShield) {
+					BedrockManager.revert(world, p);
+				}
+				// * /
+
+				cancel = true;
 			}
 			//*/
-
-			cancel = true;
 		}
-
-
-
-//		//wait for explosion block updates
-//		Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
-//			//TODO: check pattern.isValid() for all nearby generators (instead of all generators with block exploded by first explosion)
-//
-//			Set<BaseCore> cores = FortressesManager.getOtherCoresInRadius(world, new Point(loc), 32);
-//			cores.forEach(core -> {
-//				core.getP
-//			});
-//
-////			explodeBlocks.forEach((explodeBlock) -> {
-////				onRuneMightHaveBeenBrokenBy(explodeBlock); //TODO: SKIP: make onRuneMightHaveBeenBrokenBy check to see if passed block mismatches pattern before breaking rune
-////			});
-//		}, 10); //20 ticks per second
 
 
 
