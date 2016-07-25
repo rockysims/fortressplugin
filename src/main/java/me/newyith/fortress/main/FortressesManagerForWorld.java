@@ -308,7 +308,7 @@ public class FortressesManagerForWorld {
 			}
 
 			//show bedrock for a moment then revert back over short time
-			if (false && !pointsToShield.isEmpty()) {
+			if (!pointsToShield.isEmpty()) {
 				//pointsToShield excludes bedrock so we know points are not already converted
 				for (Point p : pointsToShield) {
 					BedrockManager.convert(world, p);
@@ -323,6 +323,8 @@ public class FortressesManagerForWorld {
 			}
 		}
 
+		//break runes if needed
+		explodeBlocks.forEach(this::onRuneMightHaveBeenBrokenBy);
 
 
 		if (false) {

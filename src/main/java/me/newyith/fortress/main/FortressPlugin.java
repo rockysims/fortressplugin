@@ -253,12 +253,11 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
-//explosion problem:
+//explosion problem: (fixed at the cost of not protecting players from explosions even if generated block in the way)
 //	cancelling explosion and creating another explosion programmatically means no event goes off for second explosion so can't break rune
 //		poll runes[].isValid() every 2 seconds?
 //		cancel then programmatically place and set off new tnt (store pre authorization for second tnt to go off)? no. won't always be tnt
 //		maybe I can do actual ray tracing to see which blocks cover which others?
-
 
 
 //TODO: upgrade to minecraft 1.9 or even 1.10?
@@ -270,29 +269,9 @@ public class FortressPlugin extends JavaPlugin {
 //------------------------------//
 
 //tasks here
-
-//Problem: It's really hard/dangerous to edit a fortress
-//Solution: right click generator with book to create editToken.
-//	player with valid editToken in inventory can edit generated blocks (left click with pick to break altered block)
-//	expiration += 5 minutes for each right click of book on generator
-//	editToken should be a book much like the manual
-//		first page has plain english info about token
-//		rest of book is encrypted token data (AES encrypted and salted by server. only ever read by server)
-//		token data: Point generatorAnchor, DateTime created
-//	maybe rename editToken to Fortress Build Rights at least in game
-//	ISSUE: anyone with editToken could break through to generator (still better than bare handed because editToken expiration is controlled)
-//		solution: even with editToken, you can't break into rooms you don't have access to
-//			allow player with editToken to break generatedBlock if:
-//				for all fortress rooms connected by a face to generatedBlock
-//					player has permission to open at least one of that room's doors
-//			merge rooms when first hole between rooms is made
-
-//	problem: risk of block duplication on crash due to allowing editToken to work
-//		scenario: protect block, save fortress data, break block, save map, crash while degeneration wave passing over block
-//		onLoad: bedrock safety reverts wave to original block? (broken block still in player inventory)
-//			because wave is passing over, bedrock safety will revert it
-//				solution: editToken doesn't work while de/generation in progress
-//					then bedrock safety won't revert broken block because its not bedrock anymore
+//TODO: add vehicle glitch fix
+//TODO: make protection prevent blocks from burning
+//TODO: make protection prevent endermen picking up block
 
 
 //-------------------------------//
@@ -325,8 +304,6 @@ public class FortressPlugin extends JavaPlugin {
 //------------------------------//
 //			bugs				//
 //------------------------------//
-
-//TODO: make protection prevent enderman picking up block
 
 //TODO: look into why only every other layer of water gets protected
 //	should probably just disable water/lava protection for now
@@ -365,6 +342,31 @@ public class FortressPlugin extends JavaPlugin {
 //			ideas				//
 //------------------------------//
 
+
+//PROBLEM: It's really hard/dangerous to edit a fortress
+//SOLUTION: right click generator with book to create editToken.
+//	player with valid editToken in inventory can edit generated blocks (left click with pick to break altered block)
+//	expiration += 5 minutes for each right click of book on generator
+//	editToken should be a book much like the manual
+//		first page has plain english info about token
+//		rest of book is encrypted token data (AES encrypted and salted by server. only ever read by server)
+//		token data: Point generatorAnchor, DateTime created
+//	maybe rename editToken to Fortress Build Rights at least in game
+//	ISSUE: anyone with editToken could break through to generator (still better than bare handed because editToken expiration is controlled)
+//		solution: even with editToken, you can't break into rooms you don't have access to
+//			allow player with editToken to break generatedBlock if:
+//				for all fortress rooms connected by a face to generatedBlock
+//					player has permission to open at least one of that room's doors
+//			merge rooms when first hole between rooms is made
+
+//	problem: risk of block duplication on crash due to allowing editToken to work
+//		scenario: protect block, save fortress data, break block, save map, crash while degeneration wave passing over block
+//		onLoad: bedrock safety reverts wave to original block? (broken block still in player inventory)
+//			because wave is passing over, bedrock safety will revert it
+//				solution: editToken doesn't work while de/generation in progress
+//					then bedrock safety won't revert broken block because its not bedrock anymore
+
+
 //PROBLEM: torches fall off the wall when protection wave passes over (happens when torches are a protected block)
 //	also water can break protected torches
 //	so maybe don't allow protected torches?
@@ -385,9 +387,6 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-//TODO: fix bug where blowing up sign with tnt doesn't cause fortress rune to break
-//TODO: make protection prevent blocks from burning (currently other blocks can be placed and become protected)
-
 
 
 
@@ -402,8 +401,6 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: look into bug where switching generator on then off again after exactly 3 layers of wave have converted causes protected points to skip wave returning animation
 //	fixed?
 
-//TODO: add back PearlGlitchFix
-//TODO: add vehicle glitch fix
 
 //TODO: make BlockRevertData store material as int not string
 
