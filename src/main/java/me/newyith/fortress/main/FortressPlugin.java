@@ -267,12 +267,24 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: make redstone off mean paused (because generator has a sign that says paused, people will think to power redstone)
 //	remember to update manual
 
+//TODO: consider removing EventListener and having FortressesManagerForWorld register events directly
+
 //------------------------------//
 //		first priority			//
 //------------------------------//
 
 //tasks here
 //TODO: add vehicle glitch fix
+//Vehicle Glitch Solution:
+//	cancel pearls thrown while player is in generated point(s) (so that when in vehicle and in generated point they can't throw pearls)
+//	on player exits vehicle
+//		if player is in generated point
+//			teleport away immediately using /stuck algorithm
+//			display "You got stuck in fortress wall."
+
+//	Assumption: Vehicle glitch only gets player inside a block not the vehicle itself (so tnt can't be used to shoot player in mine cart up through fortress floor)
+//		SKIP: test if this is a valid assumption
+//		even if perfectly timed use of minecart + tnt gets player into fortress its an extreme enough case that I don't think it matters
 
 
 //-------------------------------//
@@ -434,13 +446,6 @@ public class FortressPlugin extends JavaPlugin {
 //	also getGenablePoints() needs to pretend as well. make it ask BedrockManager for material map
 
 
-//Vehicle Glitch Solution:
-//	cancel pearls thrown while player is in vehicle and in generated point(s)
-//	on player exits vehicle
-//		if player is in generated point
-//			teleport away immediately using /stuck algorithm
-//Assumption: Vehicle glitch only gets player inside a block not the vehicle itself (so tnt can't be used to shoot player in mine cart up through fortress floor)
-//	TODO: test if this is a valid assumption
 
 
 //TODO: make any container work as generator fuel chest (trapped chest especially)

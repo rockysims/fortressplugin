@@ -2,6 +2,7 @@ package me.newyith.fortress.event;
 
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
+import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Blocks;
 import org.bukkit.Location;
@@ -10,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Enderman;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,6 +19,7 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.vehicle.VehicleExitEvent;
 
 import java.util.HashSet;
 import java.util.List;
@@ -175,4 +178,30 @@ public class EventListener implements Listener {
 
 		return cancel;
 	}
+
+
+
+
+	@EventHandler(ignoreCancelled = true)
+	public void onExitVehicle(VehicleExitEvent event) {
+		LivingEntity exitingEntity = event.getExited();
+		if (exitingEntity instanceof Player) {
+			Player player = (Player) exitingEntity;
+			Point p = new Point(player.getLocation());
+			Debug.msg("Vehicle exited by " + player.getName() + " at " + p);
+
+			//TODO: pass event through to FortressesManager instead of handling here then
+			//TODO: finish writing this (vehicle glitch fix)
+//				on player exits vehicle
+//					if player is in generated point
+//						teleport away immediately using /stuck algorithm
+//						display "You got stuck in fortress wall."
+
+
+		}
+	}
+
+
+
+
 }
