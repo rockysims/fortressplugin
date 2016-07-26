@@ -355,6 +355,18 @@ public class FortressPlugin extends JavaPlugin {
 //				model.timedBedrocks.push(new TimedBedrock(world, point, ticks));
 //					then TimedBedrock uses onTick() event to count
 
+//maybe show in my plugin review video go over all the attacks the fortress withstands
+//fortress wall vs:
+//	pickaxe
+//	redstone (open door)
+//	fire
+//	explosion
+//	piston
+//	pearl
+//	vehicle
+//	endermen
+
+
 //-------------------------------//
 //-------------------------------//
 
