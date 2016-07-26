@@ -1,7 +1,6 @@
 package me.newyith.fortress.main;
 
 import me.newyith.fortress.core.BaseCore;
-import me.newyith.fortress.core.BedrockManager;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.rune.generator.GeneratorRunePattern;
 import me.newyith.fortress.util.Debug;
@@ -534,9 +533,7 @@ public class FortressesManagerForWorld {
 		if (model.generatorRuneByPatternPoint.containsKey(p)) {
 			GeneratorRune rune = model.generatorRuneByPatternPoint.get(p);
 
-			Debug.msg("onRuneMightHaveBeenBrokenBy() " + p + " " + p.getType(Bukkit.getWorld("world")));
 			if (rune.getPattern().contains(p)) {
-				Debug.msg("onRuneMightHaveBeenBrokenBy() calling breakRune()");
 				breakRune(rune);
 			}
 		}
@@ -585,6 +582,17 @@ public class FortressesManagerForWorld {
 			//Debug.msg("target: " + target);
 			//Debug.msg("target type: " + target.getBlock().getType());
 			Debug.msg("movedBlocks.size(): " + movedBlocks.size());
+		}
+
+		return cancel;
+	}
+
+	public boolean onEndermanPickupBlock(Block block) {
+		boolean cancel = false;
+
+		Point p = new Point(block);
+		if (isGenerated(p)) {
+			cancel = true;
 		}
 
 		return cancel;

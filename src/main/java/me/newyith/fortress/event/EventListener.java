@@ -9,10 +9,12 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -156,5 +158,21 @@ public class EventListener implements Listener {
 				FortressesManager.onPlayerOpenCloseDoor(event);
 			}
 		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public boolean onEntityChangeBlock(EntityChangeBlockEvent event) {
+		if (!(event.getEntity() instanceof Enderman)) return false; //if enderman
+		boolean cancel = false;
+
+		if (event.getTo() == Material.AIR) {
+			//picking up block
+			cancel = FortressesManager.onEndermanPickupBlock(event.getBlock());
+			if (cancel) {
+				event.setCancelled(true);
+			}
+		}
+
+		return cancel;
 	}
 }

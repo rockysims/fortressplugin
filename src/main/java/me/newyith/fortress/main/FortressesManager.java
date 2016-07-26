@@ -196,6 +196,11 @@ public class FortressesManager {
 		return getManager(world).onPistonEvent(isSticky, world, piston, target, movedBlocks);
 	}
 
+	public static boolean onEndermanPickupBlock(Block block) {
+		World w = block.getWorld();
+		return getManager(w).onEndermanPickupBlock(block);
+	}
+
 	public static void breakRune(GeneratorRune rune) {
 		World w = rune.getPattern().getWorld();
 		getManager(w).breakRune(rune);

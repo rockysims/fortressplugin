@@ -264,14 +264,15 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: prioritize the full todo list
 
+//TODO: make redstone off mean paused (because generator has a sign that says paused, people will think to power redstone)
+//	remember to update manual
+
 //------------------------------//
 //		first priority			//
 //------------------------------//
 
 //tasks here
 //TODO: add vehicle glitch fix
-//TODO: make protection prevent blocks from burning
-//TODO: make protection prevent endermen picking up block
 
 
 //-------------------------------//
