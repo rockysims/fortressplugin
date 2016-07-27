@@ -2,7 +2,6 @@ package me.newyith.fortress.event;
 
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
-import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Blocks;
 import org.bukkit.Location;
@@ -11,7 +10,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Enderman;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -181,30 +179,19 @@ public class EventListener implements Listener {
 
 
 
+	Set<Player> playersExitingVehicle = new HashSet<>();
 
 	@EventHandler(ignoreCancelled = true)
 	public void onExitVehicle(VehicleExitEvent event) {
-		LivingEntity exitingEntity = event.getExited();
-		if (exitingEntity instanceof Player) {
-			Player player = (Player) exitingEntity;
-			Point p = new Point(player.getLocation());
-			Debug.msg("Vehicle exited by " + player.getName() + " at " + p);
+		if (!(event.getExited() instanceof Player)) return; //if player
 
-			//TODO: pass event through to FortressesManager instead of handling here then
-
-
-
-			//TODO: finish writing this (vehicle glitch fix) in FortressesManager(ForWorld?)
-//				on player exits vehicle
-//					if player is in generated point
-//						teleport away immediately using /stuck algorithm
-//						display "You got stuck in fortress wall."
-
-
+		//holding shift to exit vehicle calls this event many times very fast
+		//so wait for handler method to finish before allowing it to be called again (per player)
+		Player player = (Player) event.getExited();
+		if (!playersExitingVehicle.contains(player)) {
+			playersExitingVehicle.add(player);
+			FortressesManager.onPlayerExitVehicle(player);
+			playersExitingVehicle.remove(player);
 		}
 	}
-
-
-
-
 }

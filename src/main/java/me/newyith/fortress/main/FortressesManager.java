@@ -201,6 +201,11 @@ public class FortressesManager {
 		return getManager(w).onEndermanPickupBlock(block);
 	}
 
+	public static void onPlayerExitVehicle(Player player) {
+		World w = player.getWorld();
+		getManager(w).onPlayerExitVehicle(player);
+	}
+
 	public static void breakRune(GeneratorRune rune) {
 		World w = rune.getPattern().getWorld();
 		getManager(w).breakRune(rune);

@@ -253,6 +253,10 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
+//onExitVehicle, consider canceling exit if teleport fails
+//also consider upgrading algorithm for finding teleport destination (its not very efficient currently)
+
+
 //explosion problem: (fixed at the cost of not protecting players from explosions even if generated block in the way)
 //	cancelling explosion and creating another explosion programmatically means no event goes off for second explosion so can't break rune
 //		poll runes[].isValid() every 2 seconds?
@@ -264,6 +268,8 @@ public class FortressPlugin extends JavaPlugin {
 //	see https://www.youtube.com/watch?v=F3yNVw_22sQ&t=36s
 
 //TODO: prioritize the full todo list
+
+//TODO: make stuck teleport leave player looking at where they teleported from
 
 //TODO: make redstone off mean paused (because generator has a sign that says paused, people will think to power redstone)
 //	remember to update manual

@@ -7,6 +7,7 @@ import me.newyith.fortress.util.Cuboid;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Blocks;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -170,12 +171,12 @@ public class StuckPlayer {
 	public void stuckTeleport() {
 		Point p;
 		boolean teleported = false;
-		int attemptLimit = 20;
+		int attemptLimit = 50;
 		while (!teleported && attemptLimit > 0) {
 			attemptLimit--;
 
-			p = getRandomNearbyPoint(startPoint);
-			p = getValidTeleportDest(p);
+			p = getRandomNearbyPoint();
+			p = getValidTeleportDest(world, p);
 			if (p != null) {
 				p = p.add(0.5F, 0, 0.5F);
 				player.teleport(p.toLocation(world));
@@ -187,34 +188,7 @@ public class StuckPlayer {
 		}
 	}
 
-	private Point getValidTeleportDest(Point p) {
-		Point validDest = null;
-
-		if (p != null) {
-			//p = highest non air block at p.x, p.zkk
-			int maxHeight = world.getMaxHeight();
-			for (int y = maxHeight-2; y >= 0; y--) {
-				p = new Point(p.xInt(), y, p.zInt());
-				if (!Blocks.isAiry(p, world)) {
-					//first non airy block
-					break;
-				}
-			}
-
-			//check if valid teleport destination
-			if (p.getBlock(world).getType().isSolid()) {
-				Point dest = p.add(0, 1, 0);
-				Point aboveDest = dest.add(0, 1, 0);
-				if (Blocks.isAiry(dest, world) && Blocks.isAiry(aboveDest, world)) {
-					validDest = dest;
-				}
-			}
-		}
-
-		return validDest;
-	}
-
-	private Point getRandomNearbyPoint(Point p) {
+	private Point getRandomNearbyPoint() {
 		Point nearbyPoint = null;
 
 		if (nearbyGeneratorRunes.size() > 0) {
@@ -247,5 +221,74 @@ public class StuckPlayer {
 		}
 
 		return nearbyPoint;
+	}
+
+	// static //
+
+	public static boolean teleport(Player player) {
+		World world = player.getWorld();
+		Point playerPoint = new Point(player.getLocation());
+
+		Point p;
+		int radius = 16;
+		boolean teleported = false;
+		int attemptLimit = 20;
+		while (!teleported && attemptLimit > 0) {
+			attemptLimit--;
+
+			p = getRandomPointNear(world, playerPoint, radius);
+			p = getValidTeleportDest(world, p);
+			if (p != null) {
+				p = p.add(0.5F, 0, 0.5F);
+				Location loc = p.toLocation(world);
+				player.teleport(loc);
+				teleported = true;
+			}
+		}
+
+		return teleported;
+	}
+
+	private static Point getRandomPointNear(World world, Point origin, int radius) {
+		Point nearbyPoint = null;
+
+		int r = radius;
+		Point a = origin.add(r, r, r);
+		Point b = origin.add(-1 * r, -1 * r, -1 * r);
+		Cuboid cuboid = new Cuboid(a, b, world);
+		List<Point> nearbyPointsList = new ArrayList<>(cuboid.getPoints());
+		if (nearbyPointsList.size() > 0) {
+			Collections.shuffle(nearbyPointsList);
+			nearbyPoint = nearbyPointsList.get(0);
+		}
+
+		return nearbyPoint;
+	}
+
+	private static Point getValidTeleportDest(World world, Point p) {
+		Point validDest = null;
+
+		if (p != null) {
+			//p = highest non air block at p.x, p.zkk
+			int maxHeight = world.getMaxHeight();
+			for (int y = maxHeight-2; y >= 0; y--) {
+				p = new Point(p.xInt(), y, p.zInt());
+				if (!Blocks.isAiry(p, world)) {
+					//first non airy block
+					break;
+				}
+			}
+
+			//check if valid teleport destination
+			if (p.getBlock(world).getType().isSolid()) {
+				Point dest = p.add(0, 1, 0);
+				Point aboveDest = dest.add(0, 1, 0);
+				if (Blocks.isAiry(dest, world) && Blocks.isAiry(aboveDest, world)) {
+					validDest = dest;
+				}
+			}
+		}
+
+		return validDest;
 	}
 }

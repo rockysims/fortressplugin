@@ -8,6 +8,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.util.Vector;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Block> {
 	protected final String worldName;
@@ -174,19 +175,27 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
 		return vector != null && vector.isInAABB(this.minimumPoint, this.maximumPoint);
 	}
 
-	public List<Block> getBlocks() {
-		List<Block> blockList = new ArrayList<>();
+	public Set<Point> getPoints() {
+		Set<Point> points = new HashSet<>();
+
 		World world = this.getWorld();
 		if (world != null) {
 			for (int x = this.minimumPoint.getBlockX(); x <= this.maximumPoint.getBlockX(); x++) {
 				for (int y = this.minimumPoint.getBlockY(); y <= this.maximumPoint.getBlockY() && y <= world.getMaxHeight(); y++) {
 					for (int z = this.minimumPoint.getBlockZ(); z <= this.maximumPoint.getBlockZ(); z++) {
-						blockList.add(world.getBlockAt(x, y, z));
+						points.add(new Point(x, y, z));
 					}
 				}
 			}
 		}
-		return blockList;
+
+		return points;
+	}
+
+	public List<Block> getBlocks() {
+		return getPoints().stream().map(p -> {
+			return world.getBlockAt(p.xInt(), p.yInt(), p.zInt());
+		}).collect(Collectors.toList());
 	}
 
 	public Location getLowerLocation() {
