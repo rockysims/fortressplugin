@@ -255,6 +255,7 @@ public class FortressPlugin extends JavaPlugin {
 
 //onExitVehicle, consider canceling exit if teleport fails
 //also consider upgrading algorithm for finding teleport destination (its not very efficient currently)
+//TODO: make stuck teleport leave player looking at where they teleported from
 
 
 //explosion problem: (fixed at the cost of not protecting players from explosions even if generated block in the way)
@@ -269,7 +270,6 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: prioritize the full todo list
 
-//TODO: make stuck teleport leave player looking at where they teleported from
 
 //TODO: make redstone off mean paused (because generator has a sign that says paused, people will think to power redstone)
 //	remember to update manual
