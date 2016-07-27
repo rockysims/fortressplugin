@@ -260,7 +260,8 @@ public class FortressPlugin extends JavaPlugin {
 //		maybe I can do actual ray tracing to see which blocks cover which others?
 
 
-//TODO: upgrade to minecraft 1.9 or even 1.10?
+//TODO: upgrade to minecraft 1.9 or even 1.10? (yes but on other branches so 1.8, 1.9, and 1.10 can all be supported)
+//	see https://www.youtube.com/watch?v=F3yNVw_22sQ&t=36s
 
 //TODO: prioritize the full todo list
 

@@ -191,7 +191,10 @@ public class EventListener implements Listener {
 			Debug.msg("Vehicle exited by " + player.getName() + " at " + p);
 
 			//TODO: pass event through to FortressesManager instead of handling here then
-			//TODO: finish writing this (vehicle glitch fix)
+
+
+
+			//TODO: finish writing this (vehicle glitch fix) in FortressesManager(ForWorld?)
 //				on player exits vehicle
 //					if player is in generated point
 //						teleport away immediately using /stuck algorithm
