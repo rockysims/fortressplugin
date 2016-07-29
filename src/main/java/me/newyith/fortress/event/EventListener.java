@@ -10,11 +10,14 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Enderman;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
@@ -112,20 +115,23 @@ public class EventListener implements Listener {
 //		Debug.msg("EventListener::onExplode(EntityExplodeEvent event) called");
 		List<Block> explodeBlocks = event.blockList();
 		Location loc = event.getLocation();
-
-//		float yield = 3.0f;
-//		if (event.getEntity() instanceof Explosive) {
-//			Explosive e = (Explosive) event.getEntity();
-//			yield = e.getYield();
-//		} else if (event.getEntity() instanceof Creeper) {
-//			Creeper c = (Creeper) event.getEntity();
-//			if(c.isPowered()) {
-//				yield = 6.0f;
-//			} else {
-//				yield = 3.0f;
-//			}
-//		}
-//		Debug.msg("calculated yield: " + yield);
+		//*
+		float yield = event.getYield();
+		/*/
+		float yield = 3.0f;
+		if (event.getEntity() instanceof Explosive) {
+			Explosive e = (Explosive) event.getEntity();
+			yield = e.getYield();
+		} else if (event.getEntity() instanceof Creeper) {
+			Creeper c = (Creeper) event.getEntity();
+			if(c.isPowered()) {
+				yield = 6.0f;
+			} else {
+				yield = 3.0f;
+			}
+		}
+		Debug.msg("calculated yield: " + yield);
+		//*/
 
 		boolean cancel = FortressesManager.onExplode(explodeBlocks, loc);
 		if (cancel) {
@@ -192,6 +198,22 @@ public class EventListener implements Listener {
 			playersExitingVehicle.add(player);
 			FortressesManager.onPlayerExitVehicle(player);
 			playersExitingVehicle.remove(player);
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onEntityDamageFromExplosion(EntityDamageEvent event) {
+		if (!(event instanceof EntityDamageByEntityEvent)) return;
+
+		EntityDamageEvent.DamageCause cause = event.getCause();
+		if (cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION || cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION) {
+			EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
+			Entity damagee = e.getEntity();
+			Entity damager = e.getDamager();
+			boolean cancel = FortressesManager.onEntityDamageFromExplosion(damagee, damager);
+			if (cancel) {
+				event.setCancelled(true);
+			}
 		}
 	}
 }

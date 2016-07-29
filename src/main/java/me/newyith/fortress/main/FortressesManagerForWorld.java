@@ -11,6 +11,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
@@ -613,8 +614,38 @@ public class FortressesManagerForWorld {
 			player.sendMessage(ChatColor.AQUA + "You got stuck in fortress wall.");
 			if (!teleported) {
 				player.sendMessage(ChatColor.AQUA + "Stuck teleport failed because no suitable destination was found.");
-//				cancel = true; //canceling would allow trap minecarts (except /spawn should get you out, right?)
-				//					not canceling would allow forced fortress entry (if enemy can build freely above and below fortress)
+				cancel = true; //canceling would allow trap minecarts (except /spawn should get you out, right?)
+//									not canceling would allow forced fortress entry (if enemy can build freely above and below fortress)
+			}
+		}
+
+		return cancel;
+	}
+
+	public boolean onEntityDamageFromExplosion(Entity damagee, Entity damager) {
+		boolean cancel = false;
+
+		//SKIP?: once feet are safe from explosion, do same for eyes? no because this is for all entities which might not be 2 tall
+		//	consider doing point to bounding box check (see https://gist.github.com/aadnk/7123926)
+
+		//if (generated block between damagee and damager) cancel
+		World world = damagee.getWorld();
+		Point source = new Point(damager.getLocation()).add(0, 0.5, 0);
+		Point target = new Point(damagee.getLocation()).add(0, 0.5, 0);
+		Vector direction = target.toVector().subtract(source.toVector());
+		int distance = Math.max(1, (int) source.distance(target));
+		BlockIterator rayBlocks = new BlockIterator(world, source.toVector(), direction, 0, distance);
+		while (rayBlocks.hasNext()) {
+			Block rayBlock = rayBlocks.next();
+			Point rayPoint = new Point(rayBlock);
+
+			if (isGenerated(rayPoint)) {
+				cancel = true;
+//				Debug.msg("cancelled explosion damage due to generated rayPoint " + rayPoint);
+//				Debug.particleAtTimed(rayPoint, ParticleEffect.HEART);
+				break;
+			} else {
+//				Debug.particleAtTimed(rayPoint, ParticleEffect.FLAME);
 			}
 		}
 

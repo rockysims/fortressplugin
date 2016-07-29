@@ -5,6 +5,7 @@ import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.util.Point;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
@@ -204,6 +205,11 @@ public class FortressesManager {
 	public static void onPlayerExitVehicle(Player player) {
 		World w = player.getWorld();
 		getManager(w).onPlayerExitVehicle(player);
+	}
+
+	public static boolean onEntityDamageFromExplosion(Entity damagee, Entity damager) {
+		World w = damagee.getWorld();
+		return getManager(w).onEntityDamageFromExplosion(damagee, damager);
 	}
 
 	public static void breakRune(GeneratorRune rune) {

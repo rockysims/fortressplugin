@@ -1,5 +1,6 @@
 package me.newyith.fortress.util;
 
+import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.util.particle.ParticleEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -37,6 +38,16 @@ public class Debug {
 			Point p = new Point(point).add(0.5, 0.5, 0.5);
 			particleEffect.display(0.0F, 0.0F, 0.0F, speed, amount, p.toLocation(world), range);
 		}
+	}
+
+	public static void particleAtTimed(Point point, ParticleEffect particleEffect) {
+		int repeatingTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(FortressPlugin.getInstance(), () -> {
+			particleAt(point, particleEffect);
+		}, 0, 10); //delay, period
+
+		Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
+			Bukkit.getScheduler().cancelTask(repeatingTaskId);
+		}, 20*5); //20 ticks per second
 	}
 	
 	private static Player getPlayer() {

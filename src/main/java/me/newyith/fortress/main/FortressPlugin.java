@@ -253,11 +253,23 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
-//onExitVehicle, consider canceling exit if teleport fails
-//also consider upgrading algorithm for finding teleport destination (its not very efficient currently)
+
+
+
+
+//TODO: upgrade algorithm for finding teleport destination (it's not very efficient currently)
 //TODO: make stuck teleport leave player looking at where they teleported from
 
 
+//TODO: fix explosion issue where players take damage through protected blocks (go back to bedrock shield with delayed, eventless explosion?)
+//	SOLUTION: onPlayerExplosionDamage, do ray track between player and source and cancel if generated block in the way
+// 		Done except could improve bounding box check (currently ray trace is from explosion to player's feet block
+//		EntityDamageEvent cast to EntityDamageByEntityEvent allows us to get location of source of explosion
+//	issue: onPlayerExplosionDamage fires before onBlockExplosionDamage
+//	could make all runes recheck validity after explosion (really still eventless which could be bad but I'm not sure if it is)
+//	could try to delay player explosion damage event so block explosion damage event can cancel player damage
+//	could resort to a diff of before and after then fire explosion event manually with maybeExplosionPoints[]
+//		slow algorithm but need only fire when fortress blocks are involved... probably still not fast enough
 //explosion problem: (fixed at the cost of not protecting players from explosions even if generated block in the way)
 //	cancelling explosion and creating another explosion programmatically means no event goes off for second explosion so can't break rune
 //		poll runes[].isValid() every 2 seconds?
@@ -276,14 +288,17 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: consider removing EventListener and having FortressesManagerForWorld register events directly
 
+
 //------------------------------//
 //		first priority			//
 //------------------------------//
 
 //tasks here
-//TODO: add vehicle glitch fix
+//DONE (except performance improvements): add vehicle glitch fix
 //Vehicle Glitch Solution:
 //	cancel pearls thrown while player is in generated point(s) (so that when in vehicle and in generated point they can't throw pearls)
+//		turns out this is already done because throwing pearl while inside a block targets that block with pearl teleport and we already prevent that
+//			TODO: do explicitly anyway so removing pearl glitch fix doesn't break it
 //	on player exits vehicle
 //		if player is in generated point
 //			teleport away immediately using /stuck algorithm
@@ -293,6 +308,7 @@ public class FortressPlugin extends JavaPlugin {
 //		SKIP: test if this is a valid assumption
 //		even if perfectly timed use of minecart + tnt gets player into fortress its an extreme enough case that I don't think it matters
 
+//TODO: make use of world.getHighestBlockAt(x, z)
 
 //-------------------------------//
 //-------------------------------//
@@ -350,10 +366,12 @@ public class FortressPlugin extends JavaPlugin {
 //			optional			//
 //------------------------------//
 
+//TODO: maybe play sound when generator is created, enabled, disabled
+
 //TODO: remove from BedrockManager any bedrock points broken (via creative)
 // or make BedrockManager check when returning material that actual material is bedrock
 
-//TODO: add back moment of bedrock onBurn, onIgnite, and onExplode once issue where /reload causes delayed task to be forgotten is fixed
+//TODO: add back moment of bedrock onBurn (+ onBreak, onIgnite, and onExplode) once issue where /reload causes delayed task to be forgotten is fixed
 //	solution 1: onLoad, search protected points for managed bedrock that isn't wave then revert it
 //	how does wave not have this problem? go look... it counts down ticks instead of using scheduled tasks
 //		solution 2:
@@ -413,6 +431,7 @@ public class FortressPlugin extends JavaPlugin {
 //	so maybe don't allow protected torches?
 //SOLUTION: for now, anything that can be broken by water should not be protectable
 //	see if there's a generic way to check if a block can be broken by water
+//	or maybe see if there's a generic way to check if a block's collision size uses the full block volume and don't protect unless it does
 
 //DISRUPTOR NOT NEEDED?
 //inorder for a fortress to change, the generator must be turned off for a little while
