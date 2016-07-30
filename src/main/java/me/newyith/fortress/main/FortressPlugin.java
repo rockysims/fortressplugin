@@ -259,6 +259,9 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: upgrade algorithm for finding teleport destination (it's not very efficient currently)
 //TODO: make stuck teleport leave player looking at where they teleported from
+//TODO: change /fort stuck back to /stuck
+
+
 
 
 //TODO: fix explosion issue where players take damage through protected blocks (go back to bedrock shield with delayed, eventless explosion?)
@@ -390,6 +393,12 @@ public class FortressPlugin extends JavaPlugin {
 //	pearl
 //	vehicle
 //	endermen
+
+
+//glass, door, wood, melon, clear under area, chest inside
+
+//TODO: test generated blocks protect from creeper explosion
+
 
 
 //-------------------------------//
