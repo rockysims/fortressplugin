@@ -265,7 +265,6 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //TODO: upgrade algorithm for finding teleport destination (it's not very efficient currently)
-//TODO: make stuck teleport leave player looking at where they teleported from
 
 
 

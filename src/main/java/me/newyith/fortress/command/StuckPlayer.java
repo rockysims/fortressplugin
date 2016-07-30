@@ -179,7 +179,7 @@ public class StuckPlayer {
 			p = getValidTeleportDest(world, p);
 			if (p != null) {
 				p = p.add(0.5F, 0, 0.5F);
-				player.teleport(p.toLocation(world));
+				teleportPlayer(player, p);
 				teleported = true;
 			}
 		}
@@ -225,6 +225,14 @@ public class StuckPlayer {
 
 	// static //
 
+	private static void teleportPlayer(Player player, Point target) {
+		World world = player.getWorld();
+		Location playerLoc = player.getLocation();
+		Location targetLoc = target.toLocation(world);
+		targetLoc = faceLocationToward(targetLoc, playerLoc);
+		player.teleport(targetLoc);
+	}
+
 	public static boolean teleport(Player player) {
 		World world = player.getWorld();
 		Point playerPoint = new Point(player.getLocation());
@@ -240,8 +248,7 @@ public class StuckPlayer {
 			p = getValidTeleportDest(world, p);
 			if (p != null) {
 				p = p.add(0.5F, 0, 0.5F);
-				Location loc = p.toLocation(world);
-				player.teleport(loc);
+				teleportPlayer(player, p);
 				teleported = true;
 			}
 		}
@@ -290,5 +297,40 @@ public class StuckPlayer {
 		}
 
 		return validDest;
+	}
+
+	public static Location faceLocationToward(Location loc, Location lookat) {
+		//Clone the loc to prevent applied changes to the input loc
+		loc = loc.clone();
+
+		// Values of change in distance (make it relative)
+		double dx = lookat.getX() - loc.getX();
+		double dy = lookat.getY() - loc.getY();
+		double dz = lookat.getZ() - loc.getZ();
+
+		// Set yaw
+		if (dx != 0) {
+			// Set yaw start value based on dx
+			if (dx < 0) {
+				loc.setYaw((float) (1.5 * Math.PI));
+			} else {
+				loc.setYaw((float) (0.5 * Math.PI));
+			}
+			loc.setYaw((float) loc.getYaw() - (float) Math.atan(dz / dx));
+		} else if (dz < 0) {
+			loc.setYaw((float) Math.PI);
+		}
+
+		// Get the distance from dx/dz
+		double dxz = Math.sqrt(Math.pow(dx, 2) + Math.pow(dz, 2));
+
+		// Set pitch
+		loc.setPitch((float) -Math.atan(dy / dxz));
+
+		// Set values, convert to degrees (invert the yaw since Bukkit uses a different yaw dimension format)
+		loc.setYaw(-loc.getYaw() * 180f / (float) Math.PI);
+		loc.setPitch(loc.getPitch() * 180f / (float) Math.PI);
+
+		return loc;
 	}
 }
