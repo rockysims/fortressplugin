@@ -102,7 +102,15 @@ public abstract class BaseCore {
 			}
 		}
 
-		return names.contains(playerName);
+		boolean canOpenDoor = false;
+		for (String name : names) {
+			if (name.equalsIgnoreCase(playerName)) {
+				canOpenDoor = true;
+				break;
+			}
+		}
+
+		return canOpenDoor;
 	}
 
 	protected Set<Point> getFallbackWhitelistSignPoints() {
