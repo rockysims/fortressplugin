@@ -109,6 +109,13 @@ public class FortressPlugin extends JavaPlugin {
 		String commandName = cmd.getName();
 		boolean commandHandled = false;
 
+		// /stuck
+		if (commandName.equalsIgnoreCase("stuck") && sender instanceof Player) {
+			Player player = (Player)sender;
+			Commands.onStuckCommand(player);
+			commandHandled = true;
+		}
+
 		// /fort [subCommand]
 		if (commandName.equalsIgnoreCase("fort") && args.length > 0 && sender instanceof Player) {
 			String subCommand = args[0];
@@ -259,7 +266,6 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: upgrade algorithm for finding teleport destination (it's not very efficient currently)
 //TODO: make stuck teleport leave player looking at where they teleported from
-//TODO: change /fort stuck back to /stuck
 
 
 

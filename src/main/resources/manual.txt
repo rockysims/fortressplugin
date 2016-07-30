@@ -5,7 +5,7 @@ Fortress Manual
 3) Rune Pattern
 4) Redstone
 5) Doors
-6) /fort stuck
+6) /stuck
 =======
 Generator Rune
 
@@ -61,9 +61,9 @@ If door has no white
 list signs, it looks for
 signs on rune's base.
 =======
-/fort stuck
+/stuck
 
 If you get stuck, you
-can type /fort stuck
-to teleport to nearby
+can type /stuck to
+teleport to nearby
 after a delay.

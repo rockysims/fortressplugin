@@ -4,12 +4,9 @@ version: 0.1
 author: NewYith
   
 commands:
-  fort:
-    description: Commands to manage your fortress.
-    usage: /fort stuck - Teleports you away
-  fort stuck:
+  stuck:
     description: Teleports you away after a delay.
-    usage: /fort stuck
+    usage: /stuck
   test:
     description: Test command for debugging
     usage: /<command>
