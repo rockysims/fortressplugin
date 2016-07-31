@@ -268,7 +268,6 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-
 //TODO: fix explosion issue where players take damage through protected blocks (go back to bedrock shield with delayed, eventless explosion?)
 //	SOLUTION: onPlayerExplosionDamage, do ray track between player and source and cancel if generated block in the way
 // 		Done except could improve bounding box check (currently ray trace is from explosion to player's feet block
@@ -317,6 +316,7 @@ public class FortressPlugin extends JavaPlugin {
 //		even if perfectly timed use of minecart + tnt gets player into fortress its an extreme enough case that I don't think it matters
 
 //TODO: make use of world.getHighestBlockAt(x, z)
+//TODO: consider onWorldSave vs periodicSave vs noSave (except on enable/disable)
 
 //-------------------------------//
 //-------------------------------//

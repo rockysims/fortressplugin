@@ -183,6 +183,16 @@ public class StuckPlayer {
 				teleported = true;
 			}
 		}
+
+		if (!teleported) {
+			//fallback to player's bed
+			Location bedLoc = player.getBedSpawnLocation();
+			if (bedLoc != null) {
+				player.teleport(bedLoc);
+				teleported = true;
+			}
+		}
+
 		if (!teleported) {
 			this.sendMessage("/stuck failed because no suitable destination was found.");
 		}
@@ -240,7 +250,7 @@ public class StuckPlayer {
 		Point p;
 		int radius = 16;
 		boolean teleported = false;
-		int attemptLimit = 20;
+		int attemptLimit = 50;
 		while (!teleported && attemptLimit > 0) {
 			attemptLimit--;
 
@@ -249,6 +259,15 @@ public class StuckPlayer {
 			if (p != null) {
 				p = p.add(0.5F, 0, 0.5F);
 				teleportPlayer(player, p);
+				teleported = true;
+			}
+		}
+
+		if (!teleported) {
+			//fallback to player's bed
+			Location bedLoc = player.getBedSpawnLocation();
+			if (bedLoc != null) {
+				player.teleport(bedLoc);
 				teleported = true;
 			}
 		}
@@ -299,6 +318,7 @@ public class StuckPlayer {
 		return validDest;
 	}
 
+	//bergerkiller's method lookAt() (https://bukkit.org/threads/lookat-and-move-functions.26768/)
 	public static Location faceLocationToward(Location loc, Location lookat) {
 		//Clone the loc to prevent applied changes to the input loc
 		loc = loc.clone();
