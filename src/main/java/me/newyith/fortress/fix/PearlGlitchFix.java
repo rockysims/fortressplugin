@@ -25,7 +25,7 @@ public class PearlGlitchFix implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void onEnderPearlThrown(PlayerTeleportEvent event) {
-		if (event.getCause() == PlayerTeleportEvent.TeleportCause.ENDER_PEARL) {
+		if (!event.isCancelled() && event.getCause() == PlayerTeleportEvent.TeleportCause.ENDER_PEARL) {
 			Location loc = event.getTo();
 			World world = loc.getWorld();
 			Point target = new Point(loc);

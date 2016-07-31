@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.*;
 import org.bukkit.util.*;
 import org.bukkit.util.Vector;
@@ -647,6 +648,31 @@ public class FortressesManagerForWorld {
 			} else {
 //				Debug.particleAtTimed(rayPoint, ParticleEffect.FLAME);
 			}
+		}
+
+		return cancel;
+	}
+
+	public boolean onEnderPearlThrown(Player player, Point source, Point target) {
+		boolean cancel = false;
+
+		//cancel pearl if source is generated (feet and eyes)
+		World world = player.getWorld();
+		if (player.isInsideVehicle()) {
+			//player technically has eyes in vehicle but practically speaking player has feet in vehicle
+			source = source.add(0, 1, 0);
+		}
+		Point feet = source;
+		Point eyes = source.add(0, 1, 0);
+		boolean feetGenerated = FortressesManager.isGenerated(world, feet);
+		boolean eyesGenerated = FortressesManager.isGenerated(world, eyes);
+		if (feetGenerated || eyesGenerated) {
+			String msg = ChatColor.AQUA + "Pearling while inside a fortress wall is not allowed.";
+			player.sendMessage(msg);
+			cancel = true;
+
+			//give back ender pearl
+			player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
 		}
 
 		return cancel;

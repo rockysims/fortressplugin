@@ -269,16 +269,6 @@ public class FortressPlugin extends JavaPlugin {
 //	SOLUTION: onPlayerExplosionDamage, do ray track between player and source and cancel if generated block in the way
 // 		Done except could improve bounding box check (currently ray trace is from explosion to player's feet block
 //		EntityDamageEvent cast to EntityDamageByEntityEvent allows us to get location of source of explosion
-//	issue: onPlayerExplosionDamage fires before onBlockExplosionDamage
-//	could make all runes recheck validity after explosion (really still eventless which could be bad but I'm not sure if it is)
-//	could try to delay player explosion damage event so block explosion damage event can cancel player damage
-//	could resort to a diff of before and after then fire explosion event manually with maybeExplosionPoints[]
-//		slow algorithm but need only fire when fortress blocks are involved... probably still not fast enough
-//explosion problem: (fixed at the cost of not protecting players from explosions even if generated block in the way)
-//	cancelling explosion and creating another explosion programmatically means no event goes off for second explosion so can't break rune
-//		poll runes[].isValid() every 2 seconds?
-//		cancel then programmatically place and set off new tnt (store pre authorization for second tnt to go off)? no. won't always be tnt
-//		maybe I can do actual ray tracing to see which blocks cover which others?
 
 
 //TODO: upgrade to minecraft 1.9 or even 1.10? (yes but on other branches so 1.8, 1.9, and 1.10 can all be supported)
@@ -287,7 +277,7 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: prioritize the full todo list
 
 
-//TODO: make redstone off mean paused (because generator has a sign that says paused, people will think to power redstone)
+//SKIP: make redstone off mean paused (because generator has a sign that says paused, people will think to power redstone)
 //	remember to update manual
 
 //TODO: consider removing EventListener and having FortressesManagerForWorld register events directly
@@ -302,7 +292,7 @@ public class FortressPlugin extends JavaPlugin {
 //Vehicle Glitch Solution:
 //	cancel pearls thrown while player is in generated point(s) (so that when in vehicle and in generated point they can't throw pearls)
 //		turns out this is already done because throwing pearl while inside a block targets that block with pearl teleport and we already prevent that
-//			TODO: do explicitly anyway so removing pearl glitch fix doesn't break it
+//			DONE: do explicitly anyway so removing pearl glitch fix doesn't break it
 //	on player exits vehicle
 //		if player is in generated point
 //			teleport away immediately using /stuck algorithm

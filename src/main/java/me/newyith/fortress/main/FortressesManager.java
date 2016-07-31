@@ -212,6 +212,11 @@ public class FortressesManager {
 		return getManager(w).onEntityDamageFromExplosion(damagee, damager);
 	}
 
+	public static boolean onEnderPearlThrown(Player player, Point source, Point target) {
+		World w = player.getWorld();
+		return getManager(w).onEnderPearlThrown(player, source, target);
+	}
+
 	public static void breakRune(GeneratorRune rune) {
 		World w = rune.getPattern().getWorld();
 		getManager(w).breakRune(rune);

@@ -20,6 +20,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 
 import java.util.HashSet;
@@ -211,6 +212,19 @@ public class EventListener implements Listener {
 			Entity damagee = e.getEntity();
 			Entity damager = e.getDamager();
 			boolean cancel = FortressesManager.onEntityDamageFromExplosion(damagee, damager);
+			if (cancel) {
+				event.setCancelled(true);
+			}
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onEnderPearlThrown(PlayerTeleportEvent event) {
+		if (!event.isCancelled() && event.getCause() == PlayerTeleportEvent.TeleportCause.ENDER_PEARL) {
+			Player player = event.getPlayer();
+			Point source = new Point(event.getFrom());
+			Point target = new Point(event.getTo());
+			boolean cancel = FortressesManager.onEnderPearlThrown(player, source, target);
 			if (cancel) {
 				event.setCancelled(true);
 			}
