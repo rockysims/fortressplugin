@@ -169,18 +169,17 @@ public class StuckPlayer {
 	}
 
 	public void stuckTeleport() {
-		Point p;
 		boolean teleported = false;
 		int attemptLimit = 50;
-		while (!teleported && attemptLimit > 0) {
-			attemptLimit--;
 
-			p = getRandomNearbyPoint();
+		List<Point> nearbyPoints = getRandomNearbyPoints(attemptLimit);
+		for (Point p : nearbyPoints) {
 			p = getValidTeleportDest(world, p);
 			if (p != null) {
 				p = p.add(0.5F, 0, 0.5F);
 				teleportPlayer(player, p);
 				teleported = true;
+				break;
 			}
 		}
 
@@ -198,18 +197,18 @@ public class StuckPlayer {
 		}
 	}
 
-	private Point getRandomNearbyPoint() {
-		Point nearbyPoint = null;
+	private List<Point> getRandomNearbyPoints(int limit) {
+		List<Point> nearbyPoints = new ArrayList<>();
 
 		if (nearbyGeneratorRunes.size() > 0) {
-			//set combinedCuboid
+			//set combinedCuboid (cuboid enclosing all nearby generators)
 			List<Cuboid> runeCuboids = new ArrayList<>();
 			nearbyGeneratorRunes.stream().forEach(nearbyRune -> {
 				runeCuboids.add(nearbyRune.getFortressCuboid());
 			});
 			Cuboid combinedCuboid = Cuboid.fromCuboids(runeCuboids, world);
 
-			//set outerCuboid
+			//set outerCuboid (same as combinedCuboid except distBeyondFortress bigger in all directions)
 			Point outerMin = combinedCuboid.getMin().add(-1 * distBeyondFortress, -1 * distBeyondFortress, -1 * distBeyondFortress);
 			Point outerMax = combinedCuboid.getMax().add(distBeyondFortress, distBeyondFortress, distBeyondFortress);
 			Cuboid outerCuboid = new Cuboid(outerMin, outerMax, world);
@@ -220,17 +219,15 @@ public class StuckPlayer {
 			Set<Point> outerSheet = outerCuboid.getPointsAtHeight(y);
 
 			//set nearbyPoints
-			List<Point> nearbyPoints = new ArrayList<>();
 			nearbyPoints.addAll(outerSheet);
 			nearbyPoints.removeAll(combinedSheet);
+			Collections.shuffle(nearbyPoints);
 
-			if (nearbyPoints.size() > 0) {
-				Collections.shuffle(nearbyPoints);
-				nearbyPoint = nearbyPoints.get(0);
-			}
+			//nearbyPoints = first limit points in nearbyPoints
+			nearbyPoints = new ArrayList<>(nearbyPoints.subList(0, limit)); //creating new list allows garbage collection of old list
 		}
 
-		return nearbyPoint;
+		return nearbyPoints;
 	}
 
 	// static //
@@ -247,19 +244,17 @@ public class StuckPlayer {
 		World world = player.getWorld();
 		Point playerPoint = new Point(player.getLocation());
 
-		Point p;
 		int radius = 16;
 		boolean teleported = false;
 		int attemptLimit = 50;
-		while (!teleported && attemptLimit > 0) {
-			attemptLimit--;
-
-			p = getRandomPointNear(world, playerPoint, radius);
+		List<Point> nearbyPoints = getNearbyPoints(world, playerPoint, radius, attemptLimit);
+		for (Point p : nearbyPoints) {
 			p = getValidTeleportDest(world, p);
 			if (p != null) {
 				p = p.add(0.5F, 0, 0.5F);
 				teleportPlayer(player, p);
 				teleported = true;
+				break;
 			}
 		}
 
@@ -275,27 +270,24 @@ public class StuckPlayer {
 		return teleported;
 	}
 
-	private static Point getRandomPointNear(World world, Point origin, int radius) {
-		Point nearbyPoint = null;
-
+	private static List<Point> getNearbyPoints(World world, Point center, int radius, int attemptLimit) {
 		int r = radius;
-		Point a = origin.add(r, r, r);
-		Point b = origin.add(-1 * r, -1 * r, -1 * r);
+		Point a = center.add(r, r, r);
+		Point b = center.add(-1 * r, -1 * r, -1 * r);
 		Cuboid cuboid = new Cuboid(a, b, world);
-		List<Point> nearbyPointsList = new ArrayList<>(cuboid.getPoints());
-		if (nearbyPointsList.size() > 0) {
-			Collections.shuffle(nearbyPointsList);
-			nearbyPoint = nearbyPointsList.get(0);
-		}
+		List<Point> nearbyPoints = new ArrayList<>(cuboid.getPointsAtHeight(a.y()));
+		Collections.shuffle(nearbyPoints);
+		//nearbyPoints = first attemptLimit points in nearbyPoints
+		nearbyPoints = new ArrayList<>(nearbyPoints.subList(0, attemptLimit)); //creating new list allows garbage collection of old list
 
-		return nearbyPoint;
+		return nearbyPoints;
 	}
 
 	private static Point getValidTeleportDest(World world, Point p) {
 		Point validDest = null;
 
 		if (p != null) {
-			//p = highest non air block at p.x, p.zkk
+			//p = highest non air block at p.x, p.z
 			int maxHeight = world.getMaxHeight();
 			for (int y = maxHeight-2; y >= 0; y--) {
 				p = new Point(p.xInt(), y, p.zInt());

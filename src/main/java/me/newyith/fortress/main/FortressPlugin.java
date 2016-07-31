@@ -264,9 +264,6 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-//TODO: upgrade algorithm for finding teleport destination (it's not very efficient currently)
-
-
 
 //TODO: fix explosion issue where players take damage through protected blocks (go back to bedrock shield with delayed, eventless explosion?)
 //	SOLUTION: onPlayerExplosionDamage, do ray track between player and source and cancel if generated block in the way
@@ -315,7 +312,6 @@ public class FortressPlugin extends JavaPlugin {
 //		SKIP: test if this is a valid assumption
 //		even if perfectly timed use of minecart + tnt gets player into fortress its an extreme enough case that I don't think it matters
 
-//TODO: make use of world.getHighestBlockAt(x, z)
 //TODO: consider onWorldSave vs periodicSave vs noSave (except on enable/disable)
 
 //-------------------------------//
