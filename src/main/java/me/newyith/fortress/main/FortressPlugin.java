@@ -260,9 +260,19 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
-
-
-
+//problem: hard to tell once you've built and generated something new which blocks are actually generated
+//possible solution:
+//on right click generated point with nether quartz, add player to fortressObservers (for 5 minutes)
+//	show particle(s) at right click location (heart if inside, fire if outside)
+//fortressObservers change all protected points in radius to bedrock while player is holding nether quartz
+//	maybe: consider reworking BedrockManager so that a block converted n times would have to be reverted n times before it really reverts
+//another solution:
+//on right click generated point with nether quartz:
+//	show particle to indicate inside/outside
+//	send out wave of bedrock from right clicked block
+//		limit wave range to 8 blocks?
+//consider reworking BedrockManager so that a block converted n times would have to be reverted n times before it really reverts
+//	but have a forceRevert() method for degeneration?
 
 
 //TODO: fix explosion issue where players take damage through protected blocks (go back to bedrock shield with delayed, eventless explosion?)
@@ -388,7 +398,7 @@ public class FortressPlugin extends JavaPlugin {
 
 //glass, door, wood, melon, clear under area, chest inside
 
-//TODO: test generated blocks protect from creeper explosion
+//DONE: test generated blocks protect from creeper explosion
 
 
 
