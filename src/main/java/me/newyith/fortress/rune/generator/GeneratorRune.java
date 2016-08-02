@@ -8,8 +8,7 @@ import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Cuboid;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
@@ -251,14 +250,18 @@ public class GeneratorRune {
 
 	private void setState(GeneratorState state) {
 		if (model.state != state) {
+//			World world = model.pattern.getWorld();
+//			Location anchor = model.pattern.getAnchorPoint().toLocation(world);
 			switch (state) {
 				case RUNNING:
 					setSignText("Running", "", null);
 					moveBlockTo(Material.GOLD_BLOCK, model.pattern.getRunningPoint());
+//					world.playSound(anchor, Sound.SHEEP_SHEAR, 5, 1); //5 (volume), 1 (pitch) is hopefully normal
 					break;
 				case PAUSED:
 					setSignText("Paused", "", null);
 					moveBlockTo(Material.GOLD_BLOCK, model.pattern.getPausePoint());
+//					world.playSound(anchor, Sound.IRONGOLEM_THROW, 5, 1);
 					break;
 				case NEEDS_FUEL:
 					setSignText("Needs Fuel", "(glowstone dust)", "");
