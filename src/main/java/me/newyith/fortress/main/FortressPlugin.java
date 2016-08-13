@@ -260,19 +260,20 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
+//TODO: consider adding a small (2 blocks wide?) wave of bedrock when generator consumes another glowstone dust
+
+//TODO: consider making any newly discovered blocks to generate not be included in the 4 instant layers
+//	currently add line of 8 blocks near generator by cycling power results in wave animation skipping first 4
+
+
 //problem: hard to tell once you've built and generated something new which blocks are actually generated
-//possible solution:
-//on right click generated point with nether quartz, add player to fortressObservers (for 5 minutes)
-//	show particle(s) at right click location (heart if inside, fire if outside)
-//fortressObservers change all protected points in radius to bedrock while player is holding nether quartz
-//	maybe: consider reworking BedrockManager so that a block converted n times would have to be reverted n times before it really reverts
-//another solution:
+//solution:
 //on right click generated point with nether quartz:
-//	show particle to indicate inside/outside
+//	show particle to indicate inside/outside (heart/none?)
 //	send out wave of bedrock from right clicked block
 //		limit wave range to 8 blocks?
 //consider reworking BedrockManager so that a block converted n times would have to be reverted n times before it really reverts
-//	but have a forceRevert() method for degeneration?
+//	but have a forceRevert() method for degeneration
 
 
 //TODO: fix explosion issue where players take damage through protected blocks (go back to bedrock shield with delayed, eventless explosion?)
