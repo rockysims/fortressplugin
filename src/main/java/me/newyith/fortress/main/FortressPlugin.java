@@ -269,6 +269,7 @@ public class FortressPlugin extends JavaPlugin {
 //	replace wave with timed bedrock
 //	maybe: make all attempts to break protected blocks show timed bedrock
 //		currently explosions and breaking blocks by hand show timed bedrock
+//	make sure timed bedrock from breaking blocks and timed bedrock from wave interact correctly
 
 //TODO: on right click generated point with nether quartz:
 //	show particle to indicate inside/outside (heart/none)

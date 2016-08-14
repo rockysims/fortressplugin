@@ -60,7 +60,7 @@ public class TimedBedrockManager {
 		instance.doConvert(w, p, msDuration);
 	}
 	public static void convert(World w, Point p) {
-		int msDuration = 1250 + instance.model.random.nextInt(750);
+		int msDuration = 500 + instance.model.random.nextInt(750);
 		instance.doConvert(w, p, msDuration);
 	}
 	public void doConvert(World w, Point p, int msDuration) {
