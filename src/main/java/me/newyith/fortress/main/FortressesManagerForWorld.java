@@ -2,6 +2,7 @@ package me.newyith.fortress.main;
 
 import me.newyith.fortress.command.StuckPlayer;
 import me.newyith.fortress.core.BaseCore;
+import me.newyith.fortress.core.TimedBedrockManager;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.rune.generator.GeneratorRunePattern;
 import me.newyith.fortress.util.Debug;
@@ -309,21 +310,13 @@ public class FortressesManagerForWorld {
 				}
 			}
 
-			//TODO: uncomment out once issue where /reload causes delayed task to be forgotten is fixed
-//			//show bedrock for a moment then revert back over short time
-//			if (!pointsToShield.isEmpty()) {
-//				//pointsToShield excludes bedrock so we know points are not already converted
-//				for (Point p : pointsToShield) {
-//					BedrockManager.convert(world, p);
-//				}
-//
-//				Random random = new Random();
-//				for (Point p : pointsToShield) {
-//					Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
-//						BedrockManager.revert(world, p);
-//					}, 25 + random.nextInt(15)); //20 ticks per second
-//				}
-//			}
+			//show timed bedrock at pointsToShield
+			if (!pointsToShield.isEmpty()) {
+				//pointsToShield excludes bedrock so we know points are not already converted
+				for (Point p : pointsToShield) {
+					TimedBedrockManager.convert(world, p);
+				}
+			}
 		}
 
 		//break runes if needed
@@ -486,6 +479,7 @@ public class FortressesManagerForWorld {
 		boolean cancel = false;
 		if (isProtected && !inCreative) {
 			cancel = true;
+			TimedBedrockManager.convert(world, brokenPoint);
 		} else {
 			if (brokenPoint.is(Material.PISTON_EXTENSION, world) || brokenPoint.is(Material.PISTON_MOVING_PIECE, world)) {
 				MaterialData matData = brokenBlock.getState().getData();

@@ -1,6 +1,7 @@
 package me.newyith.fortress.main;
 
 import me.newyith.fortress.core.BedrockManager;
+import me.newyith.fortress.core.TimedBedrockManager;
 import me.newyith.fortress.util.Debug;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -46,14 +47,23 @@ public class SaveLoadManager implements Listener {
 	}
 
 	private void saveToMap(Map<String, Object> data) {
-		//save FortressesManager
 		data.put("FortressesManager", FortressesManager.getInstance());
 		data.put("BedrockManager", BedrockManager.getInstance());
+		data.put("TimedBedrockManager", TimedBedrockManager.getInstance());
 		Debug.msg("Saved " + FortressesManager.getRuneCountForAllWorlds() + " rune(s)."); //TODO: delete this line
 	}
 
 	private void loadFromMap(Map<String, Object> data) {
 		Object obj;
+
+		//load TimedBedrockManager
+		obj = data.get("TimedBedrockManager");
+		if (obj == null) {
+			TimedBedrockManager.setInstance(new TimedBedrockManager());
+		} else {
+			TimedBedrockManager timedBedrockManager = mapper.convertValue(obj, TimedBedrockManager.class);
+			TimedBedrockManager.setInstance(timedBedrockManager);
+		}
 
 		//load BedrockManager
 		obj = data.get("BedrockManager");

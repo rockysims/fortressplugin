@@ -260,6 +260,29 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
+
+
+//TODO: continue working on timed bedrock
+//	make BedrockManager.revert() undo 1 convert() call (not all convert() calls)
+//		maybe do forceRevert() when degenerating? not sure its needed
+//	test to make sure timed bedrock is /reload and ctrl+c safe
+//	replace wave with timed bedrock
+//	maybe: make all attempts to break protected blocks show timed bedrock
+//		currently explosions and breaking blocks by hand show timed bedrock
+
+//TODO: on right click generated point with nether quartz:
+//	show particle to indicate inside/outside (heart/none)
+//	send out wave of bedrock from right clicked block
+//		limit wave range to 8 blocks?
+//			make the wave fizzle out (last few layers of wave should have increasing chance of wave block being skipped)
+//consider reworking BedrockManager so that a block converted n times would have to be reverted n times before it really reverts
+//	but have a forceRevert() method for degeneration
+
+
+
+
+
+
 //TODO: consider adding a small (2 blocks wide?) wave of bedrock when generator consumes another glowstone dust
 
 //TODO: consider making any newly discovered blocks to generate not be included in the 4 instant layers
