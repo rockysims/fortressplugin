@@ -169,6 +169,16 @@ public class EventListener implements Listener {
 	}
 
 	@EventHandler(ignoreCancelled = true)
+	public void onPlayerRightClickBlock(PlayerInteractEvent event) {
+		Action action = event.getAction();
+		if (action == Action.RIGHT_CLICK_BLOCK) {
+			Player player = event.getPlayer();
+			Block block = event.getClickedBlock();
+			FortressesManager.onPlayerRightClickBlock(player, block);
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
 	public boolean onEntityChangeBlock(EntityChangeBlockEvent event) {
 		if (!(event.getEntity() instanceof Enderman)) return false; //if enderman
 		boolean cancel = false;

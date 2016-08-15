@@ -332,7 +332,7 @@ public class CoreAnimator {
 
 	private void addAlteredPoint(Point p) {
 		model.alteredPoints.add(p);
-		FortressesManager.addAlteredPoint(model.world, p);
+		FortressesManager.addAlteredPoint(model.world, p, model.anchorPoint);
 	}
 
 	private void removeAlteredPoint(Point p) {

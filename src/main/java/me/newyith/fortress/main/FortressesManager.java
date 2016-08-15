@@ -110,8 +110,8 @@ public class FortressesManager {
 		getManager(w).removeProtectedPoint(p);
 	}
 
-	public static void addAlteredPoint(World w, Point p) {
-		getManager(w).addAlteredPoint(p);
+	public static void addAlteredPoint(World w, Point p, Point anchor) {
+		getManager(w).addAlteredPoint(p, anchor);
 	}
 
 	public static void removeAlteredPoint(World w, Point p) {
@@ -179,6 +179,12 @@ public class FortressesManager {
 		World w = event.getPlayer().getWorld();
 		getManager(w).onPlayerOpenCloseDoor(event);
 	}
+
+	public static void onPlayerRightClickBlock(Player player, Block block) {
+		World w = block.getWorld();
+		getManager(w).onPlayerRightClickBlock(player, block);
+	}
+
 
 	public static void onBlockBreakEvent(BlockBreakEvent event) {
 		World w = event.getBlock().getWorld();

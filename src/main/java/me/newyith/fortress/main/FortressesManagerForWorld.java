@@ -5,9 +5,9 @@ import me.newyith.fortress.core.BaseCore;
 import me.newyith.fortress.core.TimedBedrockManager;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.rune.generator.GeneratorRunePattern;
+import me.newyith.fortress.util.Blocks;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
-import me.newyith.fortress.util.Blocks;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -19,12 +19,13 @@ import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.*;
-import org.bukkit.util.*;
+import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class FortressesManagerForWorld {
 	private static FortressesManager instance = null;
@@ -43,9 +44,11 @@ public class FortressesManagerForWorld {
 	private static class Model {
 		private Set<GeneratorRune> generatorRunes = null;
 		private transient Map<Point, GeneratorRune> generatorRuneByPatternPoint = null;
+		private transient Map<Point, GeneratorRune> generatorRuneByAlteredPoint = null;
 		private transient Map<Point, GeneratorRune> generatorRuneByProtectedPoint = null;
 		private transient Set<Point> protectedPoints = null;
 		private transient Set<Point> alteredPoints = null;
+		private transient final Random random;
 
 		@JsonCreator
 		public Model(@JsonProperty("generatorRunes") Set<GeneratorRune> generatorRunes) {
@@ -53,6 +56,7 @@ public class FortressesManagerForWorld {
 
 			//rebuild transient fields
 			generatorRuneByPatternPoint = new HashMap<>();
+			generatorRuneByAlteredPoint = new HashMap<>();
 			generatorRuneByProtectedPoint = new HashMap<>();
 			protectedPoints = new HashSet<>();
 			alteredPoints = new HashSet<>();
@@ -72,11 +76,17 @@ public class FortressesManagerForWorld {
 				Set<Point> protecteds = rune.getGeneratorCore().getProtectedPoints();
 				protectedPoints.addAll(protecteds);
 
-				//rebuild runeByProtectedPoint
+				//rebuild generatorRuneByAlteredPoint
+				for (Point p : altereds) {
+					generatorRuneByAlteredPoint.put(p, rune);
+				}
+
+				//rebuild generatorRuneByProtectedPoint
 				for (Point p : protecteds) {
 					generatorRuneByProtectedPoint.put(p, rune);
 				}
 			}
+			this.random = new Random();
 		}
 	}
 	private Model model = null;
@@ -174,12 +184,14 @@ public class FortressesManagerForWorld {
 		model.generatorRuneByProtectedPoint.remove(p);
 	}
 
-	public void addAlteredPoint(Point p) {
+	public void addAlteredPoint(Point p, Point anchor) {
 		model.alteredPoints.add(p);
+		model.generatorRuneByAlteredPoint.put(p, getRune(anchor));
 	}
 
 	public void removeAlteredPoint(Point p) {
 		model.alteredPoints.remove(p);
+		model.generatorRuneByAlteredPoint.remove(p);
 	}
 
 	public boolean isGenerated(Point p) {
@@ -467,6 +479,71 @@ public class FortressesManagerForWorld {
 				}
 			}
 		}
+	}
+
+	public void onPlayerRightClickBlock(Player player, Block block) {
+		Material materialInHand = player.getItemInHand().getType();
+		if (materialInHand == Material.QUARTZ) {
+			Point origin = new Point(block);
+
+			GeneratorRune rune = getRuneByPoint(origin);
+			if (rune != null) {
+				//get rippleLayers
+				World world = rune.getPattern().getWorld();
+				int layerLimit = 12;
+				Set<Point> searchablePoints = rune.getGeneratedPoints();
+				CompletableFuture<List<Set<Point>>> future = Blocks.getPointsConnectedAsLayers(world, origin, layerLimit - 1, searchablePoints);
+				future.join(); //wait for future to resolve
+				List<Set<Point>> rippleLayersFromFuture = future.getNow(null);
+
+				if (rippleLayersFromFuture != null) {
+					Set<Point> originLayer = new HashSet<>();
+					originLayer.add(origin);
+					List<Set<Point>> rippleLayers = new ArrayList<>();
+					rippleLayers.add(originLayer);
+					rippleLayers.addAll(rippleLayersFromFuture);
+
+					//remove some blocks from last 4 rippleLayers to create a fizzle out effect
+					for (int i = 0; i < 4; i++) {
+						int index = (layerLimit-1) - i;
+						if (index < rippleLayers.size()) {
+							Set<Point> rippleLayer = rippleLayers.get(index);
+							if (rippleLayer != null) {
+								Iterator<Point> it = rippleLayer.iterator();
+								while (it.hasNext()) {
+									it.next();
+									int percentSkipChance = 0;
+									if (i == 0) percentSkipChance = 75;
+									else if (i == 1) percentSkipChance = 60;
+									else if (i == 2) percentSkipChance = 45;
+									else if (i == 3) percentSkipChance = 30;
+									if (model.random.nextInt(99) < percentSkipChance) {
+										it.remove();
+									}
+								}
+							}
+						}
+					}
+
+					int layerIndex = 0;
+					for (Set<Point> layer : rippleLayers) {
+						Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
+							for (Point p : layer) {
+								TimedBedrockManager.convert(world, p, 500);
+							}
+						}, layerIndex * 3); //20 ticks per second
+
+						layerIndex++;
+					}
+				}
+			}
+		}
+	}
+
+	private GeneratorRune getRuneByPoint(Point p) {
+		GeneratorRune rune = model.generatorRuneByProtectedPoint.get(p);
+		if (rune == null) rune = model.generatorRuneByAlteredPoint.get(p);
+		return rune;
 	}
 
 	public void onBlockBreakEvent(BlockBreakEvent event) {
