@@ -483,7 +483,7 @@ public class FortressesManagerForWorld {
 
 	public void onPlayerRightClickBlock(Player player, Block block) {
 		Material materialInHand = player.getItemInHand().getType();
-		if (materialInHand == Material.QUARTZ) {
+		if (materialInHand == Material.AIR) {
 			Point origin = new Point(block);
 
 			GeneratorRune rune = getRuneByPoint(origin);

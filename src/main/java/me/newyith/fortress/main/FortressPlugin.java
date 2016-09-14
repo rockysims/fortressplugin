@@ -262,8 +262,8 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //PROBLEM: quartz ripple can be used to get through protected doors
-//maybe just exclude doors from ripple? (and also don't use timed bedrock to indicate attempt to break door (via any method of breaking)
-//	maybe only exclude doors if there is an entity too close?
+//SOLUTION: exclude doors from ripple (and also don't use timed bedrock to indicate attempt to break door (via any method of breaking))
+//	only exclude doors if there is an entity too close
 
 //TODO: make BedrockManager convert() and revert() count conversions/reversions (revert() vs forceRevert())
 //	currently quartz ripple reverts altered points but this should fix that
@@ -278,7 +278,7 @@ public class FortressPlugin extends JavaPlugin {
 //	make sure timed bedrock from breaking blocks and timed bedrock from wave interact correctly
 
 //TODO: on right click generated point with nether quartz:
-//	show particle to indicate inside/outside (heart/none)
+//	show particle to indicate inside/outside (heart / 3 portals)
 //	send out wave of bedrock from right clicked block
 //		limit wave range to 8 blocks?
 //			make the wave fizzle out (last few layers of wave should have increasing chance of wave block being skipped)
@@ -294,8 +294,15 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: consider adding a small (2 blocks wide?) wave of bedrock when generator consumes another glowstone dust
 
-//TODO: consider making any newly discovered blocks to generate not be included in the 4 instant layers
-//	currently add line of 8 blocks near generator by cycling power results in wave animation skipping first 4
+//PROBLEM: currently generating line of 8 blocks near generator by cycling power results in wave animation skipping first 4
+//SOLUTION: use timed bedrock for wave and remove 4 instant layers thing entirely along with managed 4 layers of wave
+
+
+
+
+
+
+
 
 
 //problem: hard to tell once you've built and generated something new which blocks are actually generated
