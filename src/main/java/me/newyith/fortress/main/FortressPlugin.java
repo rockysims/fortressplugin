@@ -263,6 +263,7 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: make BedrockManager convert() and revert() count conversions/reversions (revert() vs forceRevert())
 //	currently quartz ripple reverts altered points but this should fix that
+//	also remove managed bedrock wave and replace with TimedBedrock
 
 //TODO: continue working on timed bedrock
 //	make BedrockManager.revert() undo 1 convert() call (not all convert() calls)
