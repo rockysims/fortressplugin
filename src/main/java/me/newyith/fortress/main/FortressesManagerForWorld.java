@@ -529,7 +529,7 @@ public class FortressesManagerForWorld {
 					for (Set<Point> layer : rippleLayers) {
 						Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
 							for (Point p : layer) {
-								TimedBedrockManager.convert(world, p, 750);
+								TimedBedrockManager.convert(world, p, 1500);
 							}
 						}, layerIndex * 3); //20 ticks per second
 
