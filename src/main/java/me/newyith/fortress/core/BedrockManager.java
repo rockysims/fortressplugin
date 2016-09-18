@@ -5,8 +5,11 @@ import me.newyith.fortress.core.util.BlockRevertData;
 import me.newyith.fortress.util.Blocks;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
+import me.newyith.fortress.util.particle.ParticleEffect;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -57,18 +60,23 @@ public class BedrockManager {
 			isConverted = true;
 		} else {
 			Material mat = p.getBlock(world).getType();
-			if (Blocks.isTallDoor(mat)) {
-				isConverted = convertTallDoor(world, p);
+			boolean skip = Blocks.isDoor(mat) && livingEntitiesInRange(world, p, 1) > 0;
+			if (!skip) {
+				if (Blocks.isTallDoor(mat)) {
+					isConverted = convertTallDoor(world, p);
+				} else {
+					revertData.put(p, new BlockRevertData(world, p));
+					p.getBlock(world).setType(Material.BEDROCK);
+					isConverted = true;
+				}
 			} else {
-				revertData.put(p, new BlockRevertData(world, p));
-				p.getBlock(world).setType(Material.BEDROCK);
-				isConverted = true;
+				float rand = 0.25F;
+				ParticleEffect.PORTAL.display(rand, rand, rand, 0, 35, p.add(0.5, 0.0, 0.5).toLocation(world), 20);
 			}
 		}
 
 		return isConverted;
 	}
-
 	public static boolean revert(World world, Point p) {
 		boolean isReverted = false;
 
@@ -215,5 +223,11 @@ public class BedrockManager {
 			revertDataMapByWorld.put(world.getName(), data);
 		}
 		return data;
+	}
+
+	private static int livingEntitiesInRange(World world, Point p, double range) {
+		Collection<Entity> entities =  world.getNearbyEntities(p.add(0.5, 0.5, 0.5).toLocation(world), range, range, range);
+		entities.removeIf(entity -> !(entity instanceof LivingEntity));
+		return entities.size();
 	}
 }

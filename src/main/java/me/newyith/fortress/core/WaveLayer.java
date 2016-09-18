@@ -8,7 +8,6 @@ import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 public class WaveLayer {
@@ -57,8 +56,7 @@ public class WaveLayer {
 		}
 
 		for (Point p : model.layerPoints) {
-			boolean temp = BedrockManager.convert(model.world, p);
-			//Debug.msg("convertAndCleanup() converted " + p + " (now converted?: " + temp + ")");
+			BedrockManager.convert(model.world, p);
 		}
 	}
 

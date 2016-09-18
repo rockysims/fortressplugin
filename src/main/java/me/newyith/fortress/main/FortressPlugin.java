@@ -261,10 +261,6 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-//PROBLEM: quartz ripple can be used to get through protected doors
-//SOLUTION: exclude doors from ripple (and also don't use timed bedrock to indicate attempt to break door (via any method of breaking))
-//	only exclude doors if there is an entity too close
-
 //TODO: make BedrockManager convert() and revert() count conversions/reversions (revert() vs forceRevert())
 //	currently quartz ripple reverts altered points but this should fix that
 
