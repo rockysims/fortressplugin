@@ -49,7 +49,8 @@ public class CoreWave {
 
 		//consider removing old layer
 		if (model.waveLayers.size() + 1 > model.maxWaveLayers) {
-			revertLayerIgnoring(alteredPoints);
+//			revertLayerIgnoring(alteredPoints);
+			revertLayerIgnoring(new HashSet<>());
 		}
 
 		//look for oldLayer and remove from waveLayers if found

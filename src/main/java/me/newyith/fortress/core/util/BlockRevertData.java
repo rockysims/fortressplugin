@@ -1,5 +1,6 @@
 package me.newyith.fortress.core.util;
 
+import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -37,6 +38,7 @@ public class BlockRevertData {
 		Material material = b.getType();
 		byte data = b.getState().getData().getData();
 		model = new Model(material, data);
+		if (material == Material.BEDROCK) Debug.warn("Saved BEDROCK as revertData material at " + p);
 	}
 
 	//-----------------------------------------------------------------------

@@ -210,7 +210,8 @@ public class CoreAnimator {
 		}
 
 		if (!updatedToNextFrame) {
-			updatedToNextFrame = model.wave.revertLayerIgnoring(model.alteredPoints); //returns true if reverted wave layer
+//			updatedToNextFrame = model.wave.revertLayerIgnoring(model.alteredPoints); //returns true if reverted wave layer
+			updatedToNextFrame = model.wave.revertLayerIgnoring(new HashSet<>()); //returns true if reverted wave layer
 //			if (updatedToNextFrame) Debug.msg("finishing wave");
 		}
 
