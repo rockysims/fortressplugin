@@ -58,11 +58,15 @@ public class BedrockManager {
 	}
 
 	public static void revert(World world, Point p) {
+		revert(world, p, false);
+	}
+
+	public static void revert(World world, Point p, boolean fullRevert) {
 //		Debug.msg("--");
 //		Debug.msg("BedrockManager::revert() " + p);
 		ManagedBedrockBase managedBedrock = instance.getManagedBedrock(world, p);
 		if (managedBedrock != null) {
-			managedBedrock.revert(world);
+			managedBedrock.revert(world, fullRevert);
 			if (!managedBedrock.isConverted()) {
 				if (managedBedrock instanceof ManagedBedrockDoor) {
 					ManagedBedrockDoor managedBedrockDoor = (ManagedBedrockDoor) managedBedrock;
@@ -74,6 +78,14 @@ public class BedrockManager {
 					instance.removeManagedBedrock(world, p);
 				}
 			}
+		}
+	}
+
+	public static void forceRevert(World world, Point p) {
+		ManagedBedrockBase managedBedrock = instance.getManagedBedrock(world, p);
+		if (managedBedrock != null && managedBedrock.isConverted()) {
+			Debug.warn("forceRevert was needed at " + p);
+			revert(world, p, true); //true means full revert
 		}
 	}
 

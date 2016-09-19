@@ -62,15 +62,16 @@ public class ManagedBedrockDoor extends ManagedBedrockBase {
 
 	@Override
 	public void convert(World world) {
-		Debug.msg("ManagedBedrockDoor::convert() " + model.top + " ~ " + model.bottom);
+//		Debug.msg("ManagedBedrockDoor::convert() " + model.top + " ~ " + model.bottom);
 		model.converts++;
 		updateConverted(world);
 	}
 
 	@Override
-	public void revert(World world) {
-		Debug.msg("ManagedBedrockDoor::revert() " + model.top + " ~ " + model.bottom);
+	public void revert(World world, boolean fullRevert) {
+//		Debug.msg("ManagedBedrockDoor::revert() " + model.top + " ~ " + model.bottom);
 		model.converts--;
+		if (fullRevert) model.converts = 0;
 		updateConverted(world);
 	}
 

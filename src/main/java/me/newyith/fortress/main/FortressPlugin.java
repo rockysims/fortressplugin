@@ -259,9 +259,6 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
-//TODO: make destroying rune forceRevert bedrock
-//	do this before replacing bedrock wave with timed bedrock
-
 //TODO: make BedrockManager convert() and revert() count conversions/reversions (revert() vs forceRevert())
 //	currently quartz ripple reverts altered points but this should fix that
 //	also remove managed bedrock wave and replace with TimedBedrock

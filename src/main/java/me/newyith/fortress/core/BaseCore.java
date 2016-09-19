@@ -247,6 +247,11 @@ public abstract class BaseCore {
 
 	public void onBroken() {
 		degenerateWall(true); //true means skipAnimation
+
+		//enforce bedrock revert (to allow cleaning up bugged/abandoned bedrock)
+		for (Point p : model.claimedWallPoints) {
+			BedrockManager.forceRevert(model.world, p); //true means full revert
+		}
 	}
 
 	public void setActive(boolean active) {
