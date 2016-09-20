@@ -259,6 +259,16 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+
+//TODO: next remove micro managed bedrock wave
+
+//TODO: fix issue where you can get through fortress floor by pearling onto top part of ladder on block 2 blocks below floor
+//	maybe make PearlGlitchFix check if target or above 5 (plus shape) or higher 5 blocks are generated?
+//	maybe make PearlGlitchFix check if pearling player's bounding box would overlap with fortress wall
+
+//TODO: fix issue where right clicking door with empty hand doesn't cause bedrock ripple if player isn't white listed
+//TODO: make bedrock ripple ignore planned points if !generated
+
 //TODO: make BedrockManager convert() and revert() count conversions/reversions (revert() vs forceRevert())
 //	currently quartz ripple reverts altered points but this should fix that
 //	also remove managed bedrock wave and replace with TimedBedrock
@@ -288,10 +298,10 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //TODO: consider adding a small (2 blocks wide?) wave of bedrock when generator consumes another glowstone dust
+//	maybe 2 ripples where blocks between ripples indicates how many glowstone/fuel items are left
 
 //PROBLEM: currently generating line of 8 blocks near generator by cycling power results in wave animation skipping first 4
 //SOLUTION: use timed bedrock for wave and remove 4 instant layers thing entirely along with managed 4 layers of wave
-
 
 
 

@@ -155,17 +155,17 @@ public class BedrockManager {
 	}
 
 	private ManagedBedrockBase ensureManagedBedrockAt(World world, Point p) {
-		Debug.msg("ensureManagedBedrockAt() " + p);
+		//Debug.msg("ensureManagedBedrockAt() " + p);
 		ManagedBedrockBase managedBedrock = getManagedBedrock(world, p);
 		if (managedBedrock == null) {
 			//special cases (doors)
 			Material mat = getMaterial(world, p);
-			Debug.msg("ensureManagedBedrockAt() getMaterial(): " + mat);
+			//Debug.msg("ensureManagedBedrockAt() getMaterial(): " + mat);
 			if (mat == null) mat = p.getType(world);
 			boolean isTallDoor = Blocks.isTallDoor(mat);
 			boolean isTrapDoor = Blocks.isTrapDoor(mat);
 			if (isTallDoor || isTrapDoor) {
-				Debug.msg("ensuring door: " + mat);
+				//Debug.msg("ensuring door: " + mat);
 				if (isTallDoor) {
 					Pair<Point, Point> doorTopBottom = getDoorTopBottom(world, p);
 					if (doorTopBottom != null) {
@@ -175,16 +175,16 @@ public class BedrockManager {
 						managedBedrock = new ManagedBedrockDoor(world, top, bottom);
 						putManagedBedrock(world, top, managedBedrock);
 						putManagedBedrock(world, bottom, managedBedrock);
-						Debug.msg("ensureManagedBedrockAt() top: " + top + " (tall door)");
-						Debug.msg("ensureManagedBedrockAt() bottom: " + bottom);
+						//Debug.msg("ensureManagedBedrockAt() top: " + top + " (tall door)");
+						//Debug.msg("ensureManagedBedrockAt() bottom: " + bottom);
 					} //else fallback
 				} else { //isTrapDoor
 					managedBedrock = new ManagedBedrockDoor(world, p, null);
 					putManagedBedrock(world, p, managedBedrock);
-					Debug.msg("ensureManagedBedrockAt() p: " + p + " (trap door)");
+					//Debug.msg("ensureManagedBedrockAt() p: " + p + " (trap door)");
 				}
 			}
-			else Debug.msg("ensuring non door: " + mat);
+			//else Debug.msg("ensuring non door: " + mat);
 
 			//fallback
 			if (managedBedrock == null) {
@@ -207,7 +207,7 @@ public class BedrockManager {
 	}
 
 	private void putManagedBedrock(World world, Point p, ManagedBedrockBase managedBedrock) {
-		Debug.msg("putManagedBedrock() " + p);
+		//Debug.msg("putManagedBedrock() " + p);
 		Map<Point, ManagedBedrockBase> managedBedrockMap = instance.model.managedBedrockMapByWorld.get(world.getName());
 		if (managedBedrockMap == null) {
 			managedBedrockMap = new HashMap<>();
@@ -218,7 +218,7 @@ public class BedrockManager {
 	}
 
 	private void removeManagedBedrock(World world, Point p) {
-		Debug.msg("removeManagedBedrock() " + p);
+		//Debug.msg("removeManagedBedrock() " + p);
 		Map<Point, ManagedBedrockBase> managedBedrockMap = instance.model.managedBedrockMapByWorld.get(world.getName());
 		if (managedBedrockMap != null) {
 			managedBedrockMap.remove(p);
