@@ -263,15 +263,19 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: next remove micro managed bedrock wave
 
 //TODO: fix issue where you can get through fortress floor by pearling onto top part of ladder on block 2 blocks below floor
-//	maybe make PearlGlitchFix check if target or above 5 (plus shape) or higher 5 blocks are generated?
-//	maybe make PearlGlitchFix check if pearling player's bounding box would overlap with fortress wall
+//	maybe make PearlGlitchFix check if target or above 9 or higher 9 blocks are generated?
 
 //TODO: fix issue where right clicking door with empty hand doesn't cause bedrock ripple if player isn't white listed
-//TODO: make bedrock ripple ignore planned points if !generated
+//TODO: make bedrock ripple ignore planned points that are not generated
 
-//TODO: make BedrockManager convert() and revert() count conversions/reversions (revert() vs forceRevert())
-//	currently quartz ripple reverts altered points but this should fix that
-//	also remove managed bedrock wave and replace with TimedBedrock
+//TODO: better bedrock
+//	DONE: make BedrockManager convert() and revert() count conversions/reversions (revert() vs forceRevert())
+//	FIXED: currently quartz ripple reverts altered points
+//	TODO: remove managed bedrock wave and replace with TimedBedrock
+//	Problem: bedrock ripple doesn't show up when traversing generated cobblestone
+//		maybe show nether particles kind of like with doors?
+
+//TODO: consider moving bedrock ripple code from FortressesManagerForWorld to ? (maybe BaseCore?)
 
 //TODO: continue working on timed bedrock
 //	make BedrockManager.revert() undo 1 convert() call (not all convert() calls)
@@ -283,18 +287,16 @@ public class FortressPlugin extends JavaPlugin {
 //	make sure timed bedrock from breaking blocks and timed bedrock from wave interact correctly
 
 //TODO: on right click generated point with nether quartz:
-//	show particle to indicate inside/outside (heart / 3 portals)
-//	send out wave of bedrock from right clicked block
-//		limit wave range to 8 blocks?
+//	TODO: show particle to indicate inside/outside (heart / 3 portals)
+//	DONE: send out wave of bedrock from right clicked block
+//		limit wave range to 16 blocks?
 //			make the wave fizzle out (last few layers of wave should have increasing chance of wave block being skipped)
-//consider reworking BedrockManager so that a block converted n times would have to be reverted n times before it really reverts
-//	but have a forceRevert() method for degeneration
 
 
 
 
 //TODO: test zombie vs protected wooden door
-
+//	couldn't get zombie to attack wooden door. retest (maybe attack zombie to get his attention then close door?)
 
 
 //TODO: consider adding a small (2 blocks wide?) wave of bedrock when generator consumes another glowstone dust
