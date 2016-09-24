@@ -292,7 +292,8 @@ public class FortressPlugin extends JavaPlugin {
 //		limit wave range to 16 blocks?
 //			make the wave fizzle out (last few layers of wave should have increasing chance of wave block being skipped)
 
-
+//TODO: add new ubiquitous blocks like granite to ungeneratable list
+//	probably need to make it configurable
 
 
 //TODO: test zombie vs protected wooden door

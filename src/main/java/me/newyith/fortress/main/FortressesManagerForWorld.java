@@ -490,7 +490,7 @@ public class FortressesManagerForWorld {
 			if (rune != null) {
 				//get rippleLayers
 				World world = rune.getPattern().getWorld();
-				int layerLimit = 16;
+				int layerLimit = 20;
 				Set<Point> searchablePoints = rune.getGeneratedPoints();
 				CompletableFuture<List<Set<Point>>> future = Blocks.getPointsConnectedAsLayers(world, origin, layerLimit - 1, searchablePoints);
 				future.join(); //wait for future to resolve
@@ -529,7 +529,7 @@ public class FortressesManagerForWorld {
 					for (Set<Point> layer : rippleLayers) {
 						Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
 							for (Point p : layer) {
-								TimedBedrockManager.convert(world, p, 1500);
+								TimedBedrockManager.convert(world, p, 2000);
 							}
 						}, layerIndex * 3); //20 ticks per second
 

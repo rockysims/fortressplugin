@@ -125,7 +125,7 @@ public class ManagedBedrockDoor extends ManagedBedrockBase {
 				model.topRevertData = new BlockRevertData(world, model.top);
 				if (model.bottom != null) {
 					model.bottomRevertData = new BlockRevertData(world, model.bottom);
-					Debug.msg("saved bottomRevertData material: " + model.bottomRevertData.getMaterial() + " -------------------");
+					//Debug.msg("saved bottomRevertData material: " + model.bottomRevertData.getMaterial() + " -------------------");
 					model.bottom.setType(Material.BEDROCK, world);
 				}
 				model.top.setType(Material.BEDROCK, world);
