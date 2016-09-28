@@ -260,10 +260,31 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
-//TODO: next remove micro managed bedrock wave
-
 //TODO: fix issue where you can get through fortress floor by pearling onto top part of ladder on block 2 blocks below floor
 //	maybe make PearlGlitchFix check if target or above 9 or higher 9 blocks are generated?
+
+//TODO: fix issue where zombies on hard mode can break through wooden door (attack to get agro then close door and wait)
+
+//TODO: remove micro managed bedrock wave
+
+
+
+//forceRevert is needed when destroying rune during bedrock ripple. fix
+//	make GeneratorCore responsible for bedrock ripples then onDestroy revert the ripples
+
+
+//TODO: consider making all containers non generatable (or make changing block to bedrock not drop contents)
+
+//TODO: switch paused/running around so redstone on means running
+//	I think people will build the rune first then build the structure and try to protect it (when they're first learning)
+
+//TODO: give altered blocks same protection as protected blocks (make protected include altered?)
+//	then:
+//		maybe make bedrock ripple change altered blocks to cobblestone (mossy?) so user can see ripple
+//			maybe BedrockManager.addRevertLock(world, p)
+//		maybe display particles to indicate ripple (altered and protected)?
+//			probably this option because it will also make overlapping ripples visible
+
 
 //TODO: fix issue where right clicking door with empty hand doesn't cause bedrock ripple if player isn't white listed
 //TODO: make bedrock ripple ignore planned points that are not generated
@@ -286,7 +307,7 @@ public class FortressPlugin extends JavaPlugin {
 //		currently explosions and breaking blocks by hand show timed bedrock
 //	make sure timed bedrock from breaking blocks and timed bedrock from wave interact correctly
 
-//TODO: on right click generated point with nether quartz:
+//TODO: on right click generated point with empty hand:
 //	TODO: show particle to indicate inside/outside (heart / 3 portals)
 //	DONE: send out wave of bedrock from right clicked block
 //		limit wave range to 16 blocks?
@@ -295,9 +316,6 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: add new ubiquitous blocks like granite to ungeneratable list
 //	probably need to make it configurable
 
-
-//TODO: test zombie vs protected wooden door
-//	couldn't get zombie to attack wooden door. retest (maybe attack zombie to get his attention then close door?)
 
 
 //TODO: consider adding a small (2 blocks wide?) wave of bedrock when generator consumes another glowstone dust
