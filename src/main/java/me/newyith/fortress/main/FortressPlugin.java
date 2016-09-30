@@ -260,9 +260,6 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
-//TODO: fix issue where you can get through fortress floor by pearling onto top part of ladder on block 2 blocks below floor
-//	maybe make PearlGlitchFix check if target or above 9 or higher 9 blocks are generated?
-
 //TODO: fix issue where zombies on hard mode can break through wooden door (attack to get agro then close door and wait)
 
 //TODO: remove micro managed bedrock wave
@@ -271,6 +268,7 @@ public class FortressPlugin extends JavaPlugin {
 
 //forceRevert is needed when destroying rune during bedrock ripple. fix
 //	make GeneratorCore responsible for bedrock ripples then onDestroy revert the ripples
+//		will also need to make ripple refuse to change !generated to bedrock (otherwise ripple continues after generator destroyed)
 
 
 //TODO: consider making all containers non generatable (or make changing block to bedrock not drop contents)

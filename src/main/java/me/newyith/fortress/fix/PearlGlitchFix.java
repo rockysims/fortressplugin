@@ -2,6 +2,7 @@ package me.newyith.fortress.fix;
 
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
+import me.newyith.fortress.util.Blocks;
 import me.newyith.fortress.util.Point;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -29,28 +30,38 @@ public class PearlGlitchFix implements Listener {
 			Location loc = event.getTo();
 			World world = loc.getWorld();
 			Point target = new Point(loc);
+			Point above = target.add(0, 1, 0);
 
-			//cancel pearl if target or above is generated
-			boolean targetGenerated = FortressesManager.isGenerated(world, target);
-			boolean aboveGenerated = FortressesManager.isGenerated(world, target.add(0, 1, 0));
-			if (targetGenerated || aboveGenerated) {
-				String msg = ChatColor.AQUA + "Pearling into a fortress wall is not allowed.";
-				event.getPlayer().sendMessage(msg);
+			boolean validTarget = true;
+			validTarget = validTarget && !FortressesManager.isGenerated(world, target);
+			validTarget = validTarget && !FortressesManager.isGenerated(world, above);
+			if (validTarget) {
+				boolean safeTarget = true;
+				safeTarget = safeTarget && !FortressesManager.isClaimed(world, target);
+				safeTarget = safeTarget && !FortressesManager.isClaimed(world, above);
+				if (!safeTarget) {
+					boolean targetAiry = Blocks.isAiry(target, world);
+					if (targetAiry) {
+						//enforce 0.31 minimum distance from edge of block
+						loc = enforceMinEdgeDist(loc, 0.31);
+						loc.setY(loc.getBlockY()); //y = y - y % 1
+						event.setTo(loc);
+					} else {
+						//cancel because can't safely floor y (player could be standing on slab)
+						onCancelPearl(event.getPlayer(), "Pearl glitch via fortress wall is not allowed.");
+						event.setCancelled(true);
+					}
+				}
+			} else { //invalid target
+				onCancelPearl(event.getPlayer(), "Pearling into a fortress wall is not allowed.");
 				event.setCancelled(true);
-
-				//give back ender pearl
-				Player player = event.getPlayer();
-				player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
 			}
-
-			boolean targetClaimed = FortressesManager.isClaimed(world, target);
-			if (targetClaimed) {
-				//enforce 0.31 minimum distance from edge of block
-				loc = enforceMinEdgeDist(loc, 0.31);
-			}
-
-			event.setTo(loc);
 		}
+	}
+
+	private void onCancelPearl(Player player, String msg) {
+		player.sendMessage(ChatColor.AQUA + msg);
+		player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
 	}
 
 	private Location enforceMinEdgeDist(Location loc, double minDist) {
@@ -90,47 +101,4 @@ public class PearlGlitchFix implements Listener {
 
 		return loc;
 	}
-
-
-
-	private Location enforceMinEdgeDistOld(Location loc, double minDist) {
-//		Point target = new Point(loc);
-//
-//		Point targetDecimal = new Point(target);
-//		targetDecimal.x = targetDecimal.x % 1;
-//		targetDecimal.y = targetDecimal.y % 1;
-//		targetDecimal.z = targetDecimal.z % 1;
-//
-//		Point targetWhole = new Point(target);
-//		targetWhole.x = target.x - targetDecimal.x;
-//		targetWhole.y = target.y - targetDecimal.y;
-//		targetWhole.z = target.z - targetDecimal.z;
-//
-//		//enforce minDist minimum distance from edge
-//		double lowLimit = minDist;
-//		double highLimit = 1 - minDist;
-//		targetDecimal.x = Math.max(lowLimit, Math.abs(targetDecimal.x));
-//		targetDecimal.x = Math.min(highLimit, Math.abs(targetDecimal.x));
-//		targetDecimal.y = Math.max(lowLimit, Math.abs(targetDecimal.y));
-//		targetDecimal.y = Math.min(highLimit, Math.abs(targetDecimal.y));
-//		targetDecimal.z = Math.max(lowLimit, Math.abs(targetDecimal.z));
-//		targetDecimal.z = Math.min(highLimit, Math.abs(targetDecimal.z));
-//		if (target.x < 0) targetDecimal.x *= -1;
-//		if (target.y < 0) targetDecimal.y *= -1;
-//		if (target.z < 0) targetDecimal.z *= -1;
-//
-//		target.x = targetWhole.x + targetDecimal.x;
-//		target.y = targetWhole.y + targetDecimal.y;
-//		target.z = targetWhole.z + targetDecimal.z;
-//
-//		//update loc to new target (target.toLocation() doesn't preserve direction player is looking)
-//		loc.setX(target.x);
-//		loc.setY(target.y);
-//		loc.setZ(target.z);
-
-		return loc;
-	}
-
-
-
 }
