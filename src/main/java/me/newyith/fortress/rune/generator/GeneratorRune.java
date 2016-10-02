@@ -9,10 +9,7 @@ import me.newyith.fortress.util.Cuboid;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Chest;
-import org.bukkit.block.Sign;
+import org.bukkit.block.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -156,6 +153,10 @@ public class GeneratorRune {
 		setSignText("Broken", "", "");
 
 		model.core.onBroken();
+	}
+
+	public void onPlayerRightClickWall(Player player, Block block, BlockFace face) {
+		model.core.onPlayerRightClickWall(player, block, face);
 	}
 
 	private void updatePoweredFromWorld() {

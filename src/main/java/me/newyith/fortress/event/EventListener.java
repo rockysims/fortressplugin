@@ -174,7 +174,8 @@ public class EventListener implements Listener {
 		if (action == Action.RIGHT_CLICK_BLOCK) {
 			Player player = event.getPlayer();
 			Block block = event.getClickedBlock();
-			FortressesManager.onPlayerRightClickBlock(player, block);
+			BlockFace face = event.getBlockFace();
+			FortressesManager.onPlayerRightClickBlock(player, block, face);
 		}
 	}
 

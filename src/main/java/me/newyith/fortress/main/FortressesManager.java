@@ -5,6 +5,7 @@ import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.util.Point;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -180,9 +181,9 @@ public class FortressesManager {
 		getManager(w).onPlayerOpenCloseDoor(event);
 	}
 
-	public static void onPlayerRightClickBlock(Player player, Block block) {
+	public static void onPlayerRightClickBlock(Player player, Block block, BlockFace face) {
 		World w = block.getWorld();
-		getManager(w).onPlayerRightClickBlock(player, block);
+		getManager(w).onPlayerRightClickBlock(player, block, face);
 	}
 
 

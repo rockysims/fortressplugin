@@ -6,6 +6,9 @@ import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Blocks;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -86,7 +89,16 @@ public class GeneratorCore extends BaseCore {
 		return fallbackSigns;
 	}
 
-/* Yona's version
+
+	public void onPlayerRightClickWall(Player player, Block block, BlockFace face) {
+		Material materialInHand = player.getItemInHand().getType();
+		if (materialInHand == Material.AIR) {
+			model.coreParticles.showRipple(this, player, block, face);
+		}
+	}
+
+
+	/* Yona's version
 	protected Set<Point> getFallbackWhitelistSignPoints() {
 		GeneratorRune rune = FortressesManager.getRune(model.anchorPoint);
 		if (rune != null) {
