@@ -260,6 +260,7 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
+
 //TODO: fix issue where zombies on hard mode can break through wooden door (attack to get agro then close door and wait)
 
 //TODO: update fortress manual (add bedrock ripple)

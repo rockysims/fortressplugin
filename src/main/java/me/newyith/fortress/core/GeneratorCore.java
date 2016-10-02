@@ -1,9 +1,14 @@
 package me.newyith.fortress.core;
 
+import javafx.util.Pair;
+import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.rune.generator.GeneratorRune;
-import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Blocks;
+import me.newyith.fortress.util.Debug;
+import me.newyith.fortress.util.Point;
+import me.newyith.fortress.util.particle.ParticleEffect;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -13,10 +18,12 @@ import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class GeneratorCore extends BaseCore {
 	private static class Model extends BaseCore.Model {
 		private String datum = null; //placeholder since GeneratorCore doesn't need its own data (at least not yet)
+		private transient Random random;
 
 		@JsonCreator
 		public Model(@JsonProperty("anchorPoint") Point anchorPoint,
@@ -32,6 +39,7 @@ public class GeneratorCore extends BaseCore {
 			this.datum = datum;
 
 			//rebuild transient fields
+			this.random = new Random();
 		}
 
 		//should this be JsonCreator instead? if not, delete this comment
@@ -89,11 +97,94 @@ public class GeneratorCore extends BaseCore {
 		return fallbackSigns;
 	}
 
-
 	public void onPlayerRightClickWall(Player player, Block block, BlockFace face) {
 		Material materialInHand = player.getItemInHand().getType();
 		if (materialInHand == Material.AIR) {
-			model.coreParticles.showRipple(this, player, block, face);
+			Point origin = new Point(block);
+			Point towardFace = origin.add(face.getModX(), face.getModY(), face.getModZ());
+
+			//particleEffect = heart/flame/smoke (inside/outside/disabled)
+			boolean originGenerated = getGeneratedPoints().contains(origin);
+			ParticleEffect particleEffect = ParticleEffect.SMOKE_NORMAL;
+			if (originGenerated) {
+				boolean inside = getPointsInsideFortress().contains(towardFace);
+				if (inside) particleEffect = ParticleEffect.HEART;
+				else particleEffect = ParticleEffect.FLAME;
+			}
+
+			//display particleEffect
+			Pair<Point, Point> wallOutside = new Pair<>(origin, towardFace);
+			model.coreParticles.showParticleForWallOutsidePair(model.world, wallOutside, particleEffect, 3);
+
+			//show bedrock ripple
+			if (originGenerated) {
+				showRipple(origin);
+			}
+		}
+	}
+
+	private void showRipple(Point origin) {
+		//get rippleLayers
+		int layerLimit = 20;
+		Set<Point> searchablePoints = getGeneratedPoints();
+		CompletableFuture<List<Set<Point>>> future = Blocks.getPointsConnectedAsLayers(model.world, origin, layerLimit - 1, searchablePoints);
+		future.join(); //wait for future to resolve
+		List<Set<Point>> rippleLayersFromFuture = future.getNow(null);
+
+		if (rippleLayersFromFuture != null) {
+			Set<Point> originLayer = new HashSet<>();
+			originLayer.add(origin);
+			List<Set<Point>> rippleLayers = new ArrayList<>();
+			rippleLayers.add(originLayer);
+			rippleLayers.addAll(rippleLayersFromFuture);
+
+			//remove some blocks from last 4 rippleLayers to create a fizzle out effect
+			for (int i = 0; i < 4; i++) {
+				int index = (layerLimit-1) - i;
+				if (index < rippleLayers.size()) {
+					Set<Point> rippleLayer = rippleLayers.get(index);
+					if (rippleLayer != null) {
+						Iterator<Point> it = rippleLayer.iterator();
+						while (it.hasNext()) {
+							it.next();
+							int percentSkipChance = 0;
+							if (i == 0) percentSkipChance = 50;
+							else if (i == 1) percentSkipChance = 40;
+							else if (i == 2) percentSkipChance = 30;
+							else if (i == 3) percentSkipChance = 20;
+							if (model.random.nextInt(99) < percentSkipChance) {
+								it.remove();
+							}
+						}
+					}
+				}
+			}
+
+			int layerIndex = 0;
+			for (Set<Point> layer : rippleLayers) {
+				int min = 2000;
+				int max = 2000;
+
+				int layersRemaining = rippleLayers.size() - layerIndex;
+				if (layersRemaining < 4) {
+					min = 450 * layersRemaining;
+					max = Math.min(2000, min + 500);
+				}
+
+				final int msMin = min;
+				final int msMax = max;
+				Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
+					for (Point p : layer) {
+						int ms = msMin;
+						if (msMin < msMax) {
+							ms += model.random.nextInt(msMax - msMin);
+						}
+						TimedBedrockManager.convert(model.world, p, ms);
+					}
+				}, layerIndex * 3); //20 ticks per second
+
+				layerIndex++;
+			}
 		}
 	}
 

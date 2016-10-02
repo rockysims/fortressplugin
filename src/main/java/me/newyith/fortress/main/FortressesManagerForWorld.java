@@ -487,6 +487,7 @@ public class FortressesManagerForWorld {
 	}
 
 	private GeneratorRune getRuneByPoint(Point p) {
+		//TODO: remove generatorRuneByProtectedPoint and generatorRuneByAlteredPoint and replace with generatorRuneByClaimedWallPoint
 		GeneratorRune rune = model.generatorRuneByProtectedPoint.get(p);
 		if (rune == null) rune = model.generatorRuneByAlteredPoint.get(p);
 		return rune;

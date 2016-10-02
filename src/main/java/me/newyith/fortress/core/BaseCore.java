@@ -565,6 +565,10 @@ public abstract class BaseCore {
 		return model.layerOutsideFortress;
 	}
 
+	public Set<Point> getPointsInsideFortress() {
+		return model.pointsInsideFortress;
+	}
+
 	//used by unclaimDisconnected()?
 //	private CompletableFuture<Set<Point>> getPointsConnected(Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
 //		GeneratorRune rune = FortressesManager.getRune(model.anchorPoint);

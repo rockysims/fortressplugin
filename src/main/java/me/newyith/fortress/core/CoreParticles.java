@@ -1,20 +1,14 @@
 package me.newyith.fortress.core;
 
 import javafx.util.Pair;
-import me.newyith.fortress.main.FortressPlugin;
-import me.newyith.fortress.util.Point;
-import me.newyith.fortress.util.particle.ParticleEffect;
 import me.newyith.fortress.event.TickTimer;
 import me.newyith.fortress.util.Blocks;
-import org.bukkit.Bukkit;
+import me.newyith.fortress.util.Point;
+import me.newyith.fortress.util.particle.ParticleEffect;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 public class CoreParticles {
 	private int anchorWaitTicks = 0;
@@ -22,78 +16,11 @@ public class CoreParticles {
 	private List<Pair<Point, Point>> wallOutsidePairs = null;
 	private int wallOutsideIndex = 0;
 	private long maxTimeNsPerParticleTick = 1000000 * 2; //2ms (per core)
-	private final Random random = new Random();
 
 	public void tick(BaseCore core) {
 		tickAnchorParticles(core);
 		tickWallParticles(core);
 	}
-
-
-
-
-
-
-
-	public void showRipple(BaseCore core, Player player, Block block, BlockFace face) {
-		Point origin = new Point(block);
-
-		//get rippleLayers
-		World world = block.getWorld();
-		int layerLimit = 20;
-		Set<Point> searchablePoints = core.getGeneratedPoints();
-		CompletableFuture<List<Set<Point>>> future = Blocks.getPointsConnectedAsLayers(world, origin, layerLimit - 1, searchablePoints);
-		future.join(); //wait for future to resolve
-		List<Set<Point>> rippleLayersFromFuture = future.getNow(null);
-
-		if (rippleLayersFromFuture != null) {
-			Set<Point> originLayer = new HashSet<>();
-			originLayer.add(origin);
-			List<Set<Point>> rippleLayers = new ArrayList<>();
-			rippleLayers.add(originLayer);
-			rippleLayers.addAll(rippleLayersFromFuture);
-
-			//remove some blocks from last 4 rippleLayers to create a fizzle out effect
-			for (int i = 0; i < 4; i++) {
-				int index = (layerLimit-1) - i;
-				if (index < rippleLayers.size()) {
-					Set<Point> rippleLayer = rippleLayers.get(index);
-					if (rippleLayer != null) {
-						Iterator<Point> it = rippleLayer.iterator();
-						while (it.hasNext()) {
-							it.next();
-							int percentSkipChance = 0;
-							if (i == 0) percentSkipChance = 75;
-							else if (i == 1) percentSkipChance = 60;
-							else if (i == 2) percentSkipChance = 45;
-							else if (i == 3) percentSkipChance = 30;
-							if (random.nextInt(99) < percentSkipChance) {
-								it.remove();
-							}
-						}
-					}
-				}
-			}
-
-			int layerIndex = 0;
-			for (Set<Point> layer : rippleLayers) {
-				Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
-					for (Point p : layer) {
-						TimedBedrockManager.convert(world, p, 2000);
-					}
-				}, layerIndex * 3); //20 ticks per second
-
-				layerIndex++;
-			}
-		}
-	}
-
-
-
-
-
-
-
 
 	public void onGeneratedChanges() {
 		wallOutsidePairs = null; //mark wallOutSidePairs as needing refresh
@@ -154,7 +81,7 @@ public class CoreParticles {
 
 //					Debug.msg("wallOutsideIndex: " + wallOutsideIndex);
 
-					showParticleForWallOutsidePair(core.getWorld(), wallOutsidePairs.get(wallOutsideIndex));
+					showParticleForWallOutsidePair(core.getWorld(), wallOutsidePairs.get(wallOutsideIndex), ParticleEffect.PORTAL, 1);
 				}
 			}
 
@@ -162,7 +89,7 @@ public class CoreParticles {
 		}
 	}
 
-	private void showParticleForWallOutsidePair(World world, Pair<Point, Point> wallOutside) {
+	public void showParticleForWallOutsidePair(World world, Pair<Point, Point> wallOutside, ParticleEffect particleEffect, int amount) {
 		//display particles for wall face of outsidePoint
 		Point wall = wallOutside.getKey();
 		Point outsidePoint = wallOutside.getValue();
@@ -190,7 +117,7 @@ public class CoreParticles {
 		}
 
 		Point p = outsidePoint.add(towardWallAdjusted).add(0.5, 0.5, 0.5);
-		ParticleEffect.PORTAL.display(xRand, yRand, zRand, 0, 1, p.toLocation(world), 20);
+		particleEffect.display(xRand, yRand, zRand, 0, amount, p.toLocation(world), 20);
 	}
 
 	private void tickAnchorParticles(BaseCore core) {
