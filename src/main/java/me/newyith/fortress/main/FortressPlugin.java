@@ -259,7 +259,8 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
-
+//TODO: fix issue where smoke (disabled indicator) doesn't work
+//	can't find generator rune to fire the event because wall not generated
 
 //TODO: fix issue where zombies on hard mode can break through wooden door (attack to get agro then close door and wait)
 

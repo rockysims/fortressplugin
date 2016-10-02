@@ -4,8 +4,9 @@ Fortress Manual
 2) Generator Rune
 3) Rune Pattern
 4) Redstone
-5) Doors
-6) /stuck
+5) Security
+6) Doors
+7) /stuck
 =======
 Generator Rune
 
@@ -46,6 +47,18 @@ breakable again.
 Cycle power to spread
 protection to newly
 placed blocks.
+=======
+Security
+
+Right click fortress
+wall with empty hand.
+Bedrock wave will pass
+over protected blocks.
+
+Particle Meanings:
+Heart: Inside
+Fire: Outside
+Smoke: Disabled
 =======
 Doors
 
