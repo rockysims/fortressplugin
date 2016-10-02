@@ -30,7 +30,6 @@ public class CoreAnimator {
 		private Set<Point> protectedPoints = null;
 		private List<Set<Point>> generatedLayers = null;
 		private List<Set<Point>> animationLayers = null;
-		private CoreWave wave = null;
 		private CoreMaterials coreMats = null;
 		private boolean skipAnimation = false;
 		private boolean animationInProgress = false;
@@ -49,7 +48,6 @@ public class CoreAnimator {
 					 @JsonProperty("protectedPoints") Set<Point> protectedPoints,
 					 @JsonProperty("generatedLayers") List<Set<Point>> generatedLayers,
 					 @JsonProperty("animationLayers") List<Set<Point>> animationLayers,
-					 @JsonProperty("wave") CoreWave wave,
 					 @JsonProperty("coreMats") CoreMaterials coreMats,
 					 @JsonProperty("skipAnimation") boolean skipAnimation,
 					 @JsonProperty("animationInProgress") boolean animationInProgress,
@@ -61,7 +59,6 @@ public class CoreAnimator {
 			this.protectedPoints = protectedPoints;
 			this.generatedLayers = generatedLayers;
 			this.animationLayers = animationLayers;
-			this.wave = wave;
 			this.coreMats = coreMats;
 			this.skipAnimation = skipAnimation;
 			this.animationInProgress = animationInProgress;
@@ -89,13 +86,12 @@ public class CoreAnimator {
 		Set<Point> protectedPoints = new HashSet<>();
 		List<Set<Point>> generatedLayers = new ArrayList<>();
 		List<Set<Point>> animationLayers = new ArrayList<>();
-		CoreWave wave = new CoreWave(world);
 		boolean skipAnimation = false;
 		boolean animationInProgress = false;
 		boolean isGeneratingWall = false;
 		int instantLayersRemaining = 0;
 		String worldName = world.getName();
-		model = new Model(anchorPoint, alteredPoints, protectedPoints, generatedLayers, animationLayers, wave,
+		model = new Model(anchorPoint, alteredPoints, protectedPoints, generatedLayers, animationLayers,
 				coreMats, skipAnimation, animationInProgress, isGeneratingWall, instantLayersRemaining, worldName);
 	}
 
@@ -110,16 +106,12 @@ public class CoreAnimator {
 		model.curIndex = 0;
 		model.isGeneratingWall = true;
 		model.animationInProgress = true;
-		model.wave.onBeforeGenerate();
-		model.instantLayersRemaining = model.wave.layerCount();
 	}
 
 	public void degenerate(boolean skipAnimation) {
 		model.curIndex = 0; //starting from end if degenerating is handled elsewhere
 		model.isGeneratingWall = false;
 		model.animationInProgress = true;
-		model.wave.onBeforeDegenerate();
-		model.instantLayersRemaining = model.wave.layerCount();
 
 		if (skipAnimation) {
 			model.skipAnimation = true;
@@ -209,19 +201,12 @@ public class CoreAnimator {
 			}
 		}
 
-		if (!updatedToNextFrame) {
-//			updatedToNextFrame = model.wave.revertLayerIgnoring(model.alteredPoints); //returns true if reverted wave layer
-			updatedToNextFrame = model.wave.revertLayerIgnoring(new HashSet<>()); //returns true if reverted wave layer
-//			if (updatedToNextFrame) Debug.msg("finishing wave");
-		}
-
 		return updatedToNextFrame;
 	}
 
 	private int updateLayer(int layerIndex) {
 		Set<Point> updatedPoints = new HashSet<>();
 
-		boolean partialLayer = false;
 		Set<Point> layer = new HashSet<>(model.animationLayers.get(layerIndex)); //make copy to avoid concurrent modification errors
 		for (Point p : layer) {
 			if (model.isGeneratingWall) {
@@ -256,11 +241,12 @@ public class CoreAnimator {
 
 //		Debug.msg("layer " + layerIndex + " blockUpdates: " + updatedPoints.size());
 
-		partialLayer = layer.size() > updatedPoints.size();
-
-		if (!model.skipAnimation && !updatedPoints.isEmpty()) {
-//			Debug.msg("<-> convert layerIndex: " + layerIndex);
-			model.wave.convertLayer(layerIndex, updatedPoints, model.alteredPoints, partialLayer);
+		if (!model.skipAnimation) {
+			//show bedrock wave
+			for (Point p : updatedPoints) {
+				int ms = 4 * model.ticksPerFrame * TickTimer.msPerTick;
+				TimedBedrockManager.convert(model.world, p, ms);
+			}
 		}
 
 		return updatedPoints.size();

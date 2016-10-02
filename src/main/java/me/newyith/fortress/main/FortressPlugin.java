@@ -262,8 +262,6 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: fix issue where zombies on hard mode can break through wooden door (attack to get agro then close door and wait)
 
-//TODO: remove micro managed bedrock wave
-
 //TODO: update fortress manual (add bedrock ripple)
 
 
@@ -274,6 +272,8 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: consider making bedrock ripple 3 blocks wide with empty hand and 8 blocks wide with quartz
 
 //TODO: consider making all containers non generatable (or make changing block to bedrock not drop contents)
+
+//TODO: show particles on right click claimedWallPoint even when not generated (different particles when not generated)
 
 //TODO: switch paused/running around so redstone on means running
 //	I think people will build the rune first then build the structure and try to protect it (when they're first learning)
@@ -292,7 +292,7 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: better bedrock
 //	DONE: make BedrockManager convert() and revert() count conversions/reversions (revert() vs forceRevert())
 //	FIXED: currently quartz ripple reverts altered points
-//	TODO: remove managed bedrock wave and replace with TimedBedrock
+//	DONE: remove managed bedrock wave and replace with TimedBedrock
 //	Problem: bedrock ripple doesn't show up when traversing generated cobblestone
 //		maybe show nether particles kind of like with doors?
 
@@ -302,7 +302,7 @@ public class FortressPlugin extends JavaPlugin {
 //	make BedrockManager.revert() undo 1 convert() call (not all convert() calls)
 //		maybe do forceRevert() when degenerating? not sure its needed
 //	test to make sure timed bedrock is /reload and ctrl+c safe
-//	replace wave with timed bedrock
+//	DONE: replace wave with timed bedrock
 //	maybe: make all attempts to break protected blocks show timed bedrock
 //		currently explosions and breaking blocks by hand show timed bedrock
 //	make sure timed bedrock from breaking blocks and timed bedrock from wave interact correctly
@@ -320,9 +320,6 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: consider adding a small (2 blocks wide?) wave of bedrock when generator consumes another glowstone dust
 //	maybe 2 ripples where blocks between ripples indicates how many glowstone/fuel items are left
-
-//PROBLEM: currently generating line of 8 blocks near generator by cycling power results in wave animation skipping first 4
-//SOLUTION: use timed bedrock for wave and remove 4 instant layers thing entirely along with managed 4 layers of wave
 
 
 
