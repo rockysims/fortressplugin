@@ -264,12 +264,14 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: remove micro managed bedrock wave
 
+//TODO: update fortress manual (add bedrock ripple)
 
 
 //forceRevert is needed when destroying rune during bedrock ripple. fix
 //	make GeneratorCore responsible for bedrock ripples then onDestroy revert the ripples
 //		will also need to make ripple refuse to change !generated to bedrock (otherwise ripple continues after generator destroyed)
 
+//TODO: consider making bedrock ripple 3 blocks wide with empty hand and 8 blocks wide with quartz
 
 //TODO: consider making all containers non generatable (or make changing block to bedrock not drop contents)
 
