@@ -259,12 +259,60 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+//Fortress Disruptor Idea:
+//	Overview:
+//	disruptor must be built touching fortress and needs time to warm up
+//	this means defending players can do periodic sweeps for disruptor on their fortress
+//	even if defending players know the disruptor is there the attacking players can defend the disruptor
+//	attacker must balancing giving the disruptor more time to charge against the danger that it will be found and destroyed
+//	also gives players a reason to set off bedrock ripples periodically (disruptor emits bedrock pings when touched by ripple)
+//	Specifics:
+//	rune pattern: quartz block with redstone on top and sign on side
+//	must be built touching a fortress wall
+//	disruptor needs to warm up for 1 RL day
+//	timer counts up while redstone is off and down while redstone is on
+//		counts up 1 second for every 1 minute redstone is off
+//	when redstone is on and time > 0, disruptor is enabled
+//		sphere of disruption expands slowly to radius of 16
+//		on disabled, sphere contracts slowly
+//	fairly small disruptor range (16 block radius?)
+//		players can still create multiple disruptors to attack all at once
+//		small radius also means fortress can be partially raided with some parts still remaining secure
+//		large radius would make it too hard to sweep for disruptors
+//	when bedrock ripple touches disruptor, disruptor emits bedrock pings
+//		wait 5 seconds then ping 3 times (3 seconds between pings)
+//		pings should be 2 wide
+
+
+//Fortress Disruptor Idea (first draft):
+//	Overview:
+//	disruptor must be built touching fortress and needs time to warm up
+//	this means defending players can do periodic sweeps for disruptor on their fortress
+//		seems really hard to sweep for so maybe:
+//			when bedrock ripple touches disruptor, disruptor emits 3 ripples each 3 wide (3 seconds between ripples? and 3 seconds before first)
+//	even if defending players know the disruptor is there the attacking players can defend the disruptor
+//	Specifics:
+//	rune pattern: quartz block with sign on side
+//	must be built touching a fortress wall
+//	disruptor has to warm up for 1 RL day
+//	any player can right click the disruptor sign to enable it (expands slowly then disrupts indefinitely)
+//	fairly small disruptor range (16 block radius?)
+//		players can still create multiple disruptors to attack all at once
+//		small radius also means fortress can be partially raided with some parts still remaining secure
+//		large radius would make it too hard to sweep for disruptors
+
+
+
+//TODO: consider making bedrock safety save the revert data for a while even if it was reverted
+//	in case its reverted but then the minecraft world isn't
+
+
 //TODO: fix issue where smoke (disabled indicator) doesn't work
 //	can't find generator rune to fire the event because wall not generated
 
 //TODO: fix issue where zombies on hard mode can break through wooden door (attack to get agro then close door and wait)
 
-//TODO: update fortress manual (add bedrock ripple)
+//TODO: update fortress manual (add bedrock ripple) (done except smoke particles doesn't work yet)
 
 
 //forceRevert is needed when destroying rune during bedrock ripple. fix
