@@ -306,13 +306,25 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: consider making bedrock safety save the revert data for a while even if it was reverted
 //	in case its reverted but then the minecraft world isn't
 
-
 //TODO: fix issue where smoke (disabled indicator) doesn't work
 //	can't find generator rune to fire the event because wall not generated
 
 //TODO: fix issue where zombies on hard mode can break through wooden door (attack to get agro then close door and wait)
 
 //TODO: update fortress manual (add bedrock ripple) (done except smoke particles doesn't work yet)
+
+
+//TODO: consider suppressing forceRevert warning when destroying rune (can't think of a better solution)
+//	maybe TimedBedrock keeps track of all reverts issued by generator and handle onGeneratorDestroyed event?
+
+
+//TODO: consider allowing bedrock ripple on unprotected blocks
+//	could be useful when rebuilding fortress to see which blocks were protected
+//	allows players to not use fuel but still defend against attackers temporarily
+//		probably makes little difference since you can already save fuel by pausing generator until you see attackers
+//			could be a fun game mode though if fuel burned really fast
+//				still doesn't need ripple on unprotected to work
+
 
 
 //forceRevert is needed when destroying rune during bedrock ripple. fix

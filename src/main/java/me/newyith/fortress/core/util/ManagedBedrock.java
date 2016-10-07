@@ -1,6 +1,5 @@
 package me.newyith.fortress.core.util;
 
-import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Material;
 import org.bukkit.World;
