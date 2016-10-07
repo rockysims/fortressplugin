@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
 public class GeneratorCore extends BaseCore {
 	private static class Model extends BaseCore.Model {
 		private String datum = null; //placeholder since GeneratorCore doesn't need its own data (at least not yet)
-		private transient Random random;
+		private final transient Random random = new Random(); //showRipple() needs model.random to be final
 
 		@JsonCreator
 		public Model(@JsonProperty("anchorPoint") Point anchorPoint,
@@ -39,7 +39,7 @@ public class GeneratorCore extends BaseCore {
 			this.datum = datum;
 
 			//rebuild transient fields
-			this.random = new Random();
+			//this.random = new Random(); //this.random is final so can't init here
 		}
 
 		//should this be JsonCreator instead? if not, delete this comment
@@ -177,7 +177,14 @@ public class GeneratorCore extends BaseCore {
 					for (Point p : layer) {
 						int ms = msMin;
 						if (msMin < msMax) {
-							ms += model.random.nextInt(msMax - msMin);
+							//model.random must be final
+							if (model.random != null) {
+								ms += model.random.nextInt(msMax - msMin);
+							} else {
+								//this can happen if model.random is not final
+								ms = msMin;
+								Debug.warn("GeneratorCore::showRipple() model.random == null");
+							}
 						}
 						TimedBedrockManager.convert(model.world, p, ms);
 					}
