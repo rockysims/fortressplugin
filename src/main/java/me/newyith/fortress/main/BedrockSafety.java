@@ -85,7 +85,7 @@ public class BedrockSafety {
 					boolean managedBedrock = BedrockManager.getMaterial(world, p) != null;
 					boolean safeBedrock = claimedWallPoints.contains(p) && managedBedrock;
 					if (!safeBedrock) {
-						BedrockManager.revert(world, p); //gives BedrockManager a chance to handle tall doors gracefully
+						BedrockManager.fullRevert(world, p); //gives BedrockManager a chance to handle tall doors gracefully
 						BedrockManager.forget(world, p);
 						Material mat = materialByPoint.remove(p);
 						p.setType(mat, world);

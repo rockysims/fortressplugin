@@ -81,10 +81,9 @@ public class BedrockManager {
 		}
 	}
 
-	public static void forceRevert(World world, Point p) {
+	public static void fullRevert(World world, Point p) {
 		ManagedBedrockBase managedBedrock = instance.getManagedBedrock(world, p);
 		if (managedBedrock != null && managedBedrock.isConverted()) {
-			Debug.warn("forceRevert was needed at " + p);
 			revert(world, p, true); //true means full revert
 		}
 	}

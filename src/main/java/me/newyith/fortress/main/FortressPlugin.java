@@ -316,8 +316,6 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: update fortress manual (add bedrock ripple) (done except smoke particles doesn't work yet)
 
 
-//TODO: consider suppressing forceRevert warning when destroying rune (can't think of a better solution)
-//	maybe TimedBedrock keeps track of all reverts issued by generator and handle onGeneratorDestroyed event?
 
 
 //TODO: consider allowing bedrock ripple on unprotected blocks
@@ -329,11 +327,7 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-//forceRevert is needed when destroying rune during bedrock ripple. fix
-//	make GeneratorCore responsible for bedrock ripples then onDestroy revert the ripples
-//		will also need to make ripple refuse to change !generated to bedrock (otherwise ripple continues after generator destroyed)
-
-//TODO: consider making bedrock ripple 3 blocks wide with empty hand and 8 blocks wide with quartz
+//TODO: make ripple refuse to change !generated to bedrock (otherwise ripple continues after generator destroyed)
 
 //TODO: consider making all containers non generatable (or make changing block to bedrock not drop contents)
 
@@ -354,7 +348,7 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: make bedrock ripple ignore planned points that are not generated
 
 //TODO: better bedrock
-//	DONE: make BedrockManager convert() and revert() count conversions/reversions (revert() vs forceRevert())
+//	DONE: make BedrockManager convert() and revert() count conversions/reversions (revert() vs fullRevert())
 //	FIXED: currently quartz ripple reverts altered points
 //	DONE: remove managed bedrock wave and replace with TimedBedrock
 //	Problem: bedrock ripple doesn't show up when traversing generated cobblestone
@@ -364,7 +358,7 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: continue working on timed bedrock
 //	make BedrockManager.revert() undo 1 convert() call (not all convert() calls)
-//		maybe do forceRevert() when degenerating? not sure its needed
+//		maybe do fullRevert() when degenerating? not sure its needed
 //	test to make sure timed bedrock is /reload and ctrl+c safe
 //	DONE: replace wave with timed bedrock
 //	maybe: make all attempts to break protected blocks show timed bedrock
@@ -399,7 +393,7 @@ public class FortressPlugin extends JavaPlugin {
 //	send out wave of bedrock from right clicked block
 //		limit wave range to 8 blocks?
 //consider reworking BedrockManager so that a block converted n times would have to be reverted n times before it really reverts
-//	but have a forceRevert() method for degeneration
+//	but have a fullRevert() method for degeneration
 
 
 //TODO: fix explosion issue where players take damage through protected blocks (go back to bedrock shield with delayed, eventless explosion?)

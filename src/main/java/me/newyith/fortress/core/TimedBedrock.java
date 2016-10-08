@@ -50,7 +50,6 @@ public class TimedBedrock implements Comparable<TimedBedrock> {
 
 	public void revert() {
 		BedrockManager.revert(model.world, model.point);
-		//TODO: make BedrockManger::revert() only undo 1 convert() (revert() vs forceRevert())
 	}
 
 	public int getEndTick() {

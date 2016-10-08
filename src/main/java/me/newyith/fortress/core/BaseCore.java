@@ -250,7 +250,7 @@ public abstract class BaseCore {
 
 		//enforce bedrock revert (to allow cleaning up bugged/abandoned bedrock)
 		for (Point p : model.claimedWallPoints) {
-			BedrockManager.forceRevert(model.world, p); //true means full revert
+			BedrockManager.fullRevert(model.world, p);
 		}
 	}
 
