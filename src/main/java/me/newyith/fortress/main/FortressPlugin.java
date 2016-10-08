@@ -259,8 +259,53 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+
+//TODO: consider refactoring so that each world has essential a separate instance of the plugin (separate save files)
+//	should drastically decrease the number of places the world name must be saved
+//	should make saving bedrockSafety.json faster
+
+
+
+//TODO: make bedrock safety save the revert data for a while even if it was reverted
+//	in case its reverted but then the minecraft world isn't
+
+//TODO: fix issue where smoke (disabled indicator) doesn't work
+//	can't find generator rune to fire the event because wall not generated
+//	TODO: consider just removing smoke particles idea (if generator isn't on, doesn't feel like it needs to show particles)
+//		probably should keep smoke particles. should be easy to switch fortresses manager over to do that
+// 			search for "//TODO: remove generatorRuneByProtectedPoint and generatorRuneByAlteredPoint and replace with generatorRuneByClaimedWallPoint"
+//TODO: update fortress manual (add bedrock ripple) (done except smoke particles doesn't work yet)
+
+//TODO: make ripple refuse to change !generated to bedrock (otherwise ripple continues after generator destroyed)
+
+
+
+//TODO: consider making all containers non generatable (or make changing block to bedrock not drop contents)
+//TODO: make anything that doesn't work properly non generatable (such as torches, water/lava, and probably much more)
+
+//TODO: have another look at saving (make sure it happens periodically and maybe also on world(s) save)
+
+//TODO: consider allowing bedrock ripple on unprotected blocks
+//	could be useful when rebuilding fortress to see which blocks were protected
+//	allows players to not use fuel but still defend against attackers temporarily
+//		probably makes little difference since you can already save fuel by pausing generator until you see attackers
+//			could be a fun game mode though if fuel burned really fast
+//				still doesn't need ripple on unprotected to work
+
+
 //TODO: don't show hearts (inside) unless all doors are on generated blocks
 //	currently it can show hearts even if door can be broken/bypassed by breaking block its on
+
+//TODO: switch paused/running around so redstone on means running
+//	I think people will build the rune first then build the structure and try to protect it (when they're first learning)
+
+
+
+
+
+
+
+
 
 //Fortress Disruptor Idea:
 //	Overview:
@@ -306,35 +351,10 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-//TODO: consider making bedrock safety save the revert data for a while even if it was reverted
-//	in case its reverted but then the minecraft world isn't
-
-//TODO: fix issue where smoke (disabled indicator) doesn't work
-//	can't find generator rune to fire the event because wall not generated
-//	TODO: consider just removing smoke particles idea (if generator isn't on, doesn't feel like it needs to show particles)
-
-//TODO: update fortress manual (add bedrock ripple) (done except smoke particles doesn't work yet)
 
 
 
 
-//TODO: consider allowing bedrock ripple on unprotected blocks
-//	could be useful when rebuilding fortress to see which blocks were protected
-//	allows players to not use fuel but still defend against attackers temporarily
-//		probably makes little difference since you can already save fuel by pausing generator until you see attackers
-//			could be a fun game mode though if fuel burned really fast
-//				still doesn't need ripple on unprotected to work
-
-
-
-//TODO: make ripple refuse to change !generated to bedrock (otherwise ripple continues after generator destroyed)
-
-//TODO: consider making all containers non generatable (or make changing block to bedrock not drop contents)
-
-//TODO: show particles on right click claimedWallPoint even when not generated (different particles when not generated)
-
-//TODO: switch paused/running around so redstone on means running
-//	I think people will build the rune first then build the structure and try to protect it (when they're first learning)
 
 //TODO: give altered blocks same protection as protected blocks (make protected include altered?)
 //	then:
