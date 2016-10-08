@@ -619,6 +619,17 @@ public class FortressesManagerForWorld {
 		return cancel;
 	}
 
+	public boolean onZombieBreakBlock(Block block) {
+		boolean cancel = false;
+
+		Point p = new Point(block);
+		if (isGenerated(p)) {
+			cancel = true;
+		}
+
+		return cancel;
+	}
+
 	public boolean onPlayerExitVehicle(Player player) {
 		boolean cancel = false;
 

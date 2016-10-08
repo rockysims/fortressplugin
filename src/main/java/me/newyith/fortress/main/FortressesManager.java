@@ -209,6 +209,11 @@ public class FortressesManager {
 		return getManager(w).onEndermanPickupBlock(block);
 	}
 
+	public static boolean onZombieBreakBlock(Block block) {
+		World w = block.getWorld();
+		return getManager(w).onZombieBreakBlock(block);
+	}
+
 	public static void onPlayerExitVehicle(Player player) {
 		World w = player.getWorld();
 		getManager(w).onPlayerExitVehicle(player);

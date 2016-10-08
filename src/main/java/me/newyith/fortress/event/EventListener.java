@@ -12,6 +12,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
@@ -181,14 +182,24 @@ public class EventListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public boolean onEntityChangeBlock(EntityChangeBlockEvent event) {
-		if (!(event.getEntity() instanceof Enderman)) return false; //if enderman
 		boolean cancel = false;
 
-		if (event.getTo() == Material.AIR) {
-			//picking up block
-			cancel = FortressesManager.onEndermanPickupBlock(event.getBlock());
-			if (cancel) {
-				event.setCancelled(true);
+		Entity entity = event.getEntity();
+		if (entity instanceof Enderman) {
+			if (event.getTo() == Material.AIR) {
+				//picking up block
+				cancel = FortressesManager.onEndermanPickupBlock(event.getBlock());
+				if (cancel) {
+					event.setCancelled(true);
+				}
+			}
+		} else if (entity instanceof Zombie) {
+			if (event.getTo() == Material.AIR) {
+				Block block = event.getBlock();
+				cancel = FortressesManager.onZombieBreakBlock(block);
+				if (cancel) {
+					event.setCancelled(true);
+				}
 			}
 		}
 

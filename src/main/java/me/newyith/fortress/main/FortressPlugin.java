@@ -259,6 +259,9 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+//TODO: don't show hearts (inside) unless all doors are on generated blocks
+//	currently it can show hearts even if door can be broken/bypassed by breaking block its on
+
 //Fortress Disruptor Idea:
 //	Overview:
 //	disruptor must be built touching fortress and needs time to warm up
@@ -308,8 +311,7 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: fix issue where smoke (disabled indicator) doesn't work
 //	can't find generator rune to fire the event because wall not generated
-
-//TODO: fix issue where zombies on hard mode can break through wooden door (attack to get agro then close door and wait)
+//	TODO: consider just removing smoke particles idea (if generator isn't on, doesn't feel like it needs to show particles)
 
 //TODO: update fortress manual (add bedrock ripple) (done except smoke particles doesn't work yet)
 
