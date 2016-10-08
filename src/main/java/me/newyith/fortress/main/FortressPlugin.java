@@ -260,14 +260,17 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
-//TODO: consider refactoring so that each world has essential a separate instance of the plugin (separate save files)
-//	should drastically decrease the number of places the world name must be saved
-//	should make saving bedrockSafety.json faster
 
 
 
 //TODO: make bedrock safety save the revert data for a while even if it was reverted
 //	in case its reverted but then the minecraft world isn't
+
+//TODO: have another look at saving (make sure it happens periodically and maybe also on world(s) save)
+
+//TODO: consider making all containers non generatable (or make changing block to bedrock not drop contents)
+//TODO: make anything that doesn't work properly non generatable (such as torches, water/lava, and probably much more)
+
 
 //TODO: fix issue where smoke (disabled indicator) doesn't work
 //	can't find generator rune to fire the event because wall not generated
@@ -280,17 +283,8 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-//TODO: consider making all containers non generatable (or make changing block to bedrock not drop contents)
-//TODO: make anything that doesn't work properly non generatable (such as torches, water/lava, and probably much more)
 
-//TODO: have another look at saving (make sure it happens periodically and maybe also on world(s) save)
 
-//TODO: consider allowing bedrock ripple on unprotected blocks
-//	could be useful when rebuilding fortress to see which blocks were protected
-//	allows players to not use fuel but still defend against attackers temporarily
-//		probably makes little difference since you can already save fuel by pausing generator until you see attackers
-//			could be a fun game mode though if fuel burned really fast
-//				still doesn't need ripple on unprotected to work
 
 
 //TODO: don't show hearts (inside) unless all doors are on generated blocks
@@ -350,6 +344,19 @@ public class FortressPlugin extends JavaPlugin {
 //		large radius would make it too hard to sweep for disruptors
 
 
+
+
+
+//TODO: consider allowing bedrock ripple on unprotected blocks
+//	could be useful when rebuilding fortress to see which blocks were protected
+//	allows players to not use fuel but still defend against attackers temporarily
+//		probably makes little difference since you can already save fuel by pausing generator until you see attackers
+//			could be a fun game mode though if fuel burned really fast
+//				still doesn't need ripple on unprotected to work
+
+//TODO: consider refactoring so that each world has essentially a separate instance of the plugin (and thus separate save files)
+//	should drastically decrease the number of places the world name must be saved
+//	should make saving bedrockSafety.json faster
 
 
 
