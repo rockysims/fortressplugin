@@ -43,8 +43,7 @@ public class FortressesManagerForWorld {
 	private static class Model {
 		private Set<GeneratorRune> generatorRunes = null;
 		private transient Map<Point, GeneratorRune> generatorRuneByPatternPoint = null;
-		private transient Map<Point, GeneratorRune> generatorRuneByAlteredPoint = null;
-		private transient Map<Point, GeneratorRune> generatorRuneByProtectedPoint = null;
+		private transient Map<Point, GeneratorRune> generatorRuneByClaimedWallPoint = null;
 		private transient Set<Point> protectedPoints = null;
 		private transient Set<Point> alteredPoints = null;
 
@@ -54,8 +53,7 @@ public class FortressesManagerForWorld {
 
 			//rebuild transient fields
 			generatorRuneByPatternPoint = new HashMap<>();
-			generatorRuneByAlteredPoint = new HashMap<>();
-			generatorRuneByProtectedPoint = new HashMap<>();
+			generatorRuneByClaimedWallPoint = new HashMap<>();
 			protectedPoints = new HashSet<>();
 			alteredPoints = new HashSet<>();
 			for (GeneratorRune rune : generatorRunes) {
@@ -66,6 +64,11 @@ public class FortressesManagerForWorld {
 					generatorRuneByPatternPoint.put(p, rune);
 				}
 
+				//rebuild generatorRuneByClaimedWallPoint map
+				for (Point p : rune.getGeneratorCore().getClaimedWallPoints()) {
+					generatorRuneByClaimedWallPoint.put(p, rune);
+				}
+
 				//rebuild alteredPoints
 				Set<Point> altereds = rune.getGeneratorCore().getAlteredPoints();
 				alteredPoints.addAll(altereds);
@@ -73,16 +76,6 @@ public class FortressesManagerForWorld {
 				//rebuild protectedPoints
 				Set<Point> protecteds = rune.getGeneratorCore().getProtectedPoints();
 				protectedPoints.addAll(protecteds);
-
-				//rebuild generatorRuneByAlteredPoint
-				for (Point p : altereds) {
-					generatorRuneByAlteredPoint.put(p, rune);
-				}
-
-				//rebuild generatorRuneByProtectedPoint
-				for (Point p : protecteds) {
-					generatorRuneByProtectedPoint.put(p, rune);
-				}
 			}
 		}
 	}
@@ -171,24 +164,37 @@ public class FortressesManagerForWorld {
 		return coresInRange;
 	}
 
+	public void addClaimedWallPoints(Set<Point> claimedWallPoints, Point anchor) {
+//		Debug.msg("addClaimedWallPoints() claimedWallPoints.size(): " + claimedWallPoints.size());
+		GeneratorRune rune = getRune(anchor);
+		if (rune != null) {
+			for (Point p : claimedWallPoints) {
+				model.generatorRuneByClaimedWallPoint.put(p, rune);
+			}
+		} else {
+			Debug.error("FortressesManagerForWorld::addClaimedWallPoints() failed to find rune associated with anchor: " + anchor);
+		}
+	}
+
+	public void removeClaimedWallPoints(Set<Point> claimedWallPoints) {
+//		Debug.msg("removeClaimedWallPoints() claimedWallPoints.size(): " + claimedWallPoints.size());
+		claimedWallPoints.forEach(model.generatorRuneByClaimedWallPoint::remove);
+	}
+
 	public void addProtectedPoint(Point p, Point anchor) {
 		model.protectedPoints.add(p);
-		model.generatorRuneByProtectedPoint.put(p, getRune(anchor));
 	}
 
 	public void removeProtectedPoint(Point p) {
 		model.protectedPoints.remove(p);
-		model.generatorRuneByProtectedPoint.remove(p);
 	}
 
 	public void addAlteredPoint(Point p, Point anchor) {
 		model.alteredPoints.add(p);
-		model.generatorRuneByAlteredPoint.put(p, getRune(anchor));
 	}
 
 	public void removeAlteredPoint(Point p) {
 		model.alteredPoints.remove(p);
-		model.generatorRuneByAlteredPoint.remove(p);
 	}
 
 	public boolean isGenerated(Point p) {
@@ -426,71 +432,72 @@ public class FortressesManagerForWorld {
 		Point doorPoint = new Point(doorBlock.getLocation());
 		World world = doorBlock.getWorld();
 
-		GeneratorRune rune = model.generatorRuneByProtectedPoint.get(doorPoint);
-		if (rune != null) {
-			Player player = event.getPlayer();
-			Point aboveDoorPoint = new Point(doorPoint).add(0, 1, 0);
-			switch (aboveDoorPoint.getBlock(world).getType()) {
-				case IRON_DOOR_BLOCK:
-				case WOODEN_DOOR:
-				case ACACIA_DOOR:
-				case BIRCH_DOOR:
-				case DARK_OAK_DOOR:
-				case JUNGLE_DOOR:
-				case SPRUCE_DOOR:
-					//ignore trap doors since they're only 1 high
-					doorPoint = aboveDoorPoint;
-			}
-			boolean canOpen = rune.getGeneratorCore().playerCanOpenDoor(player, doorPoint);
-			if (!canOpen) {
-				event.setCancelled(true);
-			} else {
-				//if iron door, open for player
-				Material doorType = doorPoint.getBlock(world).getType();
-				boolean isIronDoor = doorType == Material.IRON_DOOR_BLOCK;
-				boolean isIronTrap = doorType == Material.IRON_TRAPDOOR;
-				if (isIronDoor || isIronTrap) {
-					BlockState state = doorBlock.getState();
-					boolean nowOpen;
-					if (isIronDoor) {
-						Door door = (Door) state.getData();
-						if (door.isTopHalf()) {
-							Block bottomDoorBlock = (new Point(doorPoint).add(0, -1, 0)).getBlock(world);
-							state = bottomDoorBlock.getState();
-							door = (Door) state.getData();
+		if (isGenerated(doorPoint)) {
+			GeneratorRune rune = getRuneByClaimedPoint(doorPoint);
+			if (rune != null) {
+				Player player = event.getPlayer();
+				Point aboveDoorPoint = new Point(doorPoint).add(0, 1, 0);
+				switch (aboveDoorPoint.getBlock(world).getType()) {
+					case IRON_DOOR_BLOCK:
+					case WOODEN_DOOR:
+					case ACACIA_DOOR:
+					case BIRCH_DOOR:
+					case DARK_OAK_DOOR:
+					case JUNGLE_DOOR:
+					case SPRUCE_DOOR:
+						//ignore trap doors since they're only 1 high
+						doorPoint = aboveDoorPoint;
+				}
+				boolean canOpen = rune.getGeneratorCore().playerCanOpenDoor(player, doorPoint);
+				if (!canOpen) {
+					event.setCancelled(true);
+				} else {
+					//if iron door, open for player
+					Material doorType = doorPoint.getBlock(world).getType();
+					boolean isIronDoor = doorType == Material.IRON_DOOR_BLOCK;
+					boolean isIronTrap = doorType == Material.IRON_TRAPDOOR;
+					if (isIronDoor || isIronTrap) {
+						BlockState state = doorBlock.getState();
+						boolean nowOpen;
+						if (isIronDoor) {
+							Door door = (Door) state.getData();
+							if (door.isTopHalf()) {
+								Block bottomDoorBlock = (new Point(doorPoint).add(0, -1, 0)).getBlock(world);
+								state = bottomDoorBlock.getState();
+								door = (Door) state.getData();
+							}
+							door.setOpen(!door.isOpen());
+							state.update();
+							nowOpen = door.isOpen();
+						} else {
+							TrapDoor door = (TrapDoor) state.getData();
+							door.setOpen(!door.isOpen());
+							state.update();
+							nowOpen = door.isOpen();
 						}
-						door.setOpen(!door.isOpen());
-						state.update();
-						nowOpen = door.isOpen();
-					} else {
-						TrapDoor door = (TrapDoor) state.getData();
-						door.setOpen(!door.isOpen());
-						state.update();
-						nowOpen = door.isOpen();
-					}
-					if (nowOpen) {
-						player.playSound(doorPoint.toLocation(world), Sound.DOOR_OPEN, 1.0F, 1.0F);
-					} else {
-						player.playSound(doorPoint.toLocation(world), Sound.DOOR_CLOSE, 1.0F, 1.0F);
+						if (nowOpen) {
+							player.playSound(doorPoint.toLocation(world), Sound.DOOR_OPEN, 1.0F, 1.0F);
+						} else {
+							player.playSound(doorPoint.toLocation(world), Sound.DOOR_CLOSE, 1.0F, 1.0F);
+						}
 					}
 				}
+			} else {
+				Debug.error("FortressesManagerForWorld::onPlayerOpenCloseDoor() failed to find rune from doorPoint " + doorPoint);
 			}
 		}
 	}
 
 	public void onPlayerRightClickBlock(Player player, Block block, BlockFace face) {
 		Point p = new Point(block);
-		GeneratorRune rune = getRuneByPoint(p);
+		GeneratorRune rune = getRuneByClaimedPoint(p);
 		if (rune != null) {
 			rune.onPlayerRightClickWall(player, block, face);
 		}
 	}
 
-	private GeneratorRune getRuneByPoint(Point p) {
-		//TODO: remove generatorRuneByProtectedPoint and generatorRuneByAlteredPoint and replace with generatorRuneByClaimedWallPoint
-		GeneratorRune rune = model.generatorRuneByProtectedPoint.get(p);
-		if (rune == null) rune = model.generatorRuneByAlteredPoint.get(p);
-		return rune;
+	private GeneratorRune getRuneByClaimedPoint(Point p) {
+		return model.generatorRuneByClaimedWallPoint.get(p);
 	}
 
 	public void onBlockBreakEvent(BlockBreakEvent event) {

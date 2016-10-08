@@ -107,6 +107,14 @@ public class FortressesManager {
 		getManager(w).addProtectedPoint(p, anchor);
 	}
 
+	public static void addClaimedWallPoints(World w, Set<Point> claimedWallPoints, Point anchor) {
+		getManager(w).addClaimedWallPoints(claimedWallPoints, anchor);
+	}
+
+	public static void removeClaimedWallPoints(World w, Set<Point> claimedWallPoints) {
+		getManager(w).removeClaimedWallPoints(claimedWallPoints);
+	}
+
 	public static void removeProtectedPoint(World w, Point p) {
 		getManager(w).removeProtectedPoint(p);
 	}

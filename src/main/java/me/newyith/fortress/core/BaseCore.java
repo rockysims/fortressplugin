@@ -248,6 +248,8 @@ public abstract class BaseCore {
 	public void onBroken() {
 		degenerateWall(true); //true means skipAnimation
 
+		FortressesManager.removeClaimedWallPoints(model.world, model.claimedWallPoints);
+
 		//enforce bedrock revert (to allow cleaning up bugged/abandoned bedrock)
 		for (Point p : model.claimedWallPoints) {
 			BedrockManager.fullRevert(model.world, p);
@@ -444,7 +446,9 @@ public abstract class BaseCore {
 		return pointsInside;
 	}
 
-	private void updateClaimedPoints(Set<Point> wallPoints, Set<Point> layerAroundWall) {
+	protected void updateClaimedPoints(Set<Point> wallPoints, Set<Point> layerAroundWall) {
+		FortressesManager.removeClaimedWallPoints(model.world, model.claimedWallPoints);
+
 		model.claimedPoints.clear();
 		model.claimedWallPoints.clear();
 
@@ -460,6 +464,8 @@ public abstract class BaseCore {
 		Set<Point> layerAroundOrigins = getLayerAround(originPoints, Blocks.ConnectedThreshold.POINTS).join(); //should be nearly instant so ok to wait
 		model.claimedPoints.addAll(originPoints);
 		model.claimedPoints.addAll(layerAroundOrigins);
+
+		FortressesManager.addClaimedWallPoints(model.world, model.claimedWallPoints, model.anchorPoint);
 	}
 
 	private List<Set<Point>> getGeneratableWallLayers() {

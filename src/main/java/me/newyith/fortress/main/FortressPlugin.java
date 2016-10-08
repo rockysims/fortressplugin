@@ -270,14 +270,7 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: consider making all containers non generatable (or make changing block to bedrock not drop contents)
 //TODO: make anything that doesn't work properly non generatable (such as torches, water/lava, and probably much more)
-
-
-//TODO: fix issue where smoke (disabled indicator) doesn't work
-//	can't find generator rune to fire the event because wall not generated
-//	TODO: consider just removing smoke particles idea (if generator isn't on, doesn't feel like it needs to show particles)
-//		probably should keep smoke particles. should be easy to switch fortresses manager over to do that
-// 			search for "//TODO: remove generatorRuneByProtectedPoint and generatorRuneByAlteredPoint and replace with generatorRuneByClaimedWallPoint"
-//TODO: update fortress manual (add bedrock ripple) (done except smoke particles doesn't work yet)
+//TODO: consider adding message when turning on generator that tells you which blocks in chest are being ignored (like dirt)
 
 //TODO: make ripple refuse to change !generated to bedrock (otherwise ripple continues after generator destroyed)
 
