@@ -261,15 +261,14 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-
-
 //TODO: make bedrock safety save the revert data for a while even if it was reverted
 //	in case its reverted but then the minecraft world isn't
 
 //TODO: have another look at saving (make sure it happens periodically and maybe also on world(s) save)
 
 //TODO: consider making all containers non generatable (or make changing block to bedrock not drop contents)
-//TODO: make anything that doesn't work properly non generatable (such as torches, water/lava, and probably much more)
+//TODO: make anything that doesn't work properly non generatable (such as containers and probably much more)
+//	maybe white list generatable blocks and make generatable blocks configurable
 //TODO: consider adding message when turning on generator that tells you which blocks in chest are being ignored (like dirt)
 
 //TODO: make ripple refuse to change !generated to bedrock (otherwise ripple continues after generator destroyed)
@@ -351,6 +350,9 @@ public class FortressPlugin extends JavaPlugin {
 //	should drastically decrease the number of places the world name must be saved
 //	should make saving bedrockSafety.json faster
 
+//TODO: make protection prevent breaking by water
+//TODO: fix bug where breaking piston while protected and extended results in piston's extension disappearing
+//	maybe make converting piston to bedrock automatically convert extension too (if extended)?
 
 
 

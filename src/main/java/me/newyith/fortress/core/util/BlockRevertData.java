@@ -14,7 +14,6 @@ public class BlockRevertData {
 	private static class Model {
 		private final Material material;
 		private byte data;
-		private final transient MaterialData materialData;
 
 		@JsonCreator
 		public Model(@JsonProperty("material") Material material,
@@ -23,7 +22,6 @@ public class BlockRevertData {
 			this.data = data;
 
 			//rebuild transient fields
-			this.materialData = new MaterialData(material, data);
 		}
 	}
 	private Model model = null;
@@ -45,10 +43,22 @@ public class BlockRevertData {
 
 	public void revert(World world, Point p) {
 		Block b = p.getBlock(world);
-		b.setType(model.material);
-		BlockState state = b.getState();
-		state.setData(model.materialData);
-		state.update();
+
+		switch (model.material) {
+			case TORCH:
+			case REDSTONE_TORCH_ON:
+			case REDSTONE_TORCH_OFF:
+				//set material and data at the same time so torches on walls don't fall down
+				b.setTypeIdAndData(model.material.getId(), model.data, false);
+				break;
+			default:
+				b.setType(model.material);
+				BlockState state = b.getState();
+				MaterialData materialData = new MaterialData(model.material, model.data);
+				state.setData(materialData);
+				state.update();
+				break;
+		}
 	}
 
 	public Material getMaterial() {
