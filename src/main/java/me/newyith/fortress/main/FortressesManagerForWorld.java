@@ -609,7 +609,7 @@ public class FortressesManagerForWorld {
 			//Debug.msg("piston: " + piston);
 			//Debug.msg("target: " + target);
 			//Debug.msg("target type: " + target.getBlock().getType());
-			Debug.msg("movedBlocks.size(): " + movedBlocks.size());
+//			Debug.msg("movedBlocks.size(): " + movedBlocks.size());
 		}
 
 		return cancel;

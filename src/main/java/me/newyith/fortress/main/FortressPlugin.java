@@ -273,7 +273,7 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: make ripple refuse to change !generated to bedrock (otherwise ripple continues after generator destroyed)
 
-
+//TODO: add config setting to specify debug level: errors, errors & warnings, all
 
 
 
