@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
 public class GeneratorCore extends BaseCore {
 	private static class Model extends BaseCore.Model {
 		private String datum = null; //placeholder since GeneratorCore doesn't need its own data (at least not yet)
-		private transient Random random = null;
+		private final transient Random random = new Random(); //showRipple() needs model.random to be final
 
 		@JsonCreator
 		public Model(@JsonProperty("anchorPoint") Point anchorPoint,
@@ -39,7 +39,7 @@ public class GeneratorCore extends BaseCore {
 			this.datum = datum;
 
 			//rebuild transient fields
-			this.random = new Random();
+			//this.random = new Random(); //this.random is final so can't init here
 		}
 
 		//should this be JsonCreator instead? if not, delete this comment
@@ -173,22 +173,20 @@ public class GeneratorCore extends BaseCore {
 
 				final int msMin = min;
 				final int msMax = max;
-				final World world = model.world; //model.world is already final but in case that changes finalizing here
-				final Random random = model.random; //model.random isn't final so this is needed
-				final Point anchor = model.anchorPoint; //model.anchorPoint is already final but in case that changes finalizing here
 				Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
 					//TODO: consider fixing hacky call to getRune() here. GeneratorCore shouldn't need to know about rune
 					//	maybe add BaseCore::onBroken() should set model.isBroken = true?
-					boolean runeStillExists = FortressesManager.getRune(world, anchor) != null;
+					boolean runeStillExists = FortressesManager.getRune(model.world, model.anchorPoint) != null;
 					if (runeStillExists) { //rune might have been destroyed before ripple ended
 						for (Point p : layer) {
 							int ms = msMin;
 							if (msMin < msMax) {
-								ms += random.nextInt(msMax - msMin);
+								ms += model.random.nextInt(msMax - msMin);
 							}
-							TimedBedrockManager.convert(world, p, ms);
+							TimedBedrockManager.convert(model.world, p, ms);
 						}
 					}
+					else Debug.msg("!runeStillExists");
 				}, layerIndex * 3); //20 ticks per second
 
 				layerIndex++;

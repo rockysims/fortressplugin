@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
 
 public abstract class BaseCore {
 	public static class Model {
-		protected final Point anchorPoint;
+		protected final Point anchorPoint; //GeneratorCore::showRipple() needs model.anchorPoint to be final (I think)
 		protected final Set<Point> claimedPoints;
 		protected final Set<Point> claimedWallPoints;
 		protected final CoreAnimator animator;
@@ -31,7 +31,7 @@ public abstract class BaseCore {
 		protected final Set<Point> layerOutsideFortress;
 		protected final Set<Point> pointsInsideFortress;
 		protected final String worldName;
-		protected final transient World world;
+		protected final transient World world; //GeneratorCore::showRipple() needs model.world to be final (I think)
 		protected final transient int generationRangeLimit;
 		protected transient CoreParticles coreParticles;
 		protected transient CompletableFuture<GenPrepData> genPrepDataFuture;

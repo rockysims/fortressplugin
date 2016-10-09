@@ -271,20 +271,19 @@ public class FortressPlugin extends JavaPlugin {
 //	maybe white list generatable blocks and make generatable blocks configurable
 //TODO: consider adding message when turning on generator that tells you which blocks in chest are being ignored (like dirt)
 
-//TODO: make ripple refuse to change !generated to bedrock (otherwise ripple continues after generator destroyed)
-
 //TODO: add config setting to specify debug level: errors, errors & warnings, all
 
 
 
 
 
+//TODO: switch paused/running around so redstone on means running (and update manual)
+//	I think people will build the rune first then build the structure and try to protect it (when they're first learning)
+
 //TODO: don't show hearts (inside) unless all doors are on generated blocks
 //	currently it can show hearts even if door can be broken/bypassed by breaking block its on
 
-//TODO: switch paused/running around so redstone on means running
-//	I think people will build the rune first then build the structure and try to protect it (when they're first learning)
-
+//TODO: make protection prevent breaking by water
 
 
 
@@ -350,8 +349,7 @@ public class FortressPlugin extends JavaPlugin {
 //	should drastically decrease the number of places the world name must be saved
 //	should make saving bedrockSafety.json faster
 
-//TODO: make protection prevent breaking by water
-//TODO: fix bug where breaking piston while protected and extended results in piston's extension disappearing
+//LATER: fix bug where breaking piston while protected and extended results in piston's extension disappearing
 //	maybe make converting piston to bedrock automatically convert extension too (if extended)?
 
 
