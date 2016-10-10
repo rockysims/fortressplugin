@@ -1,14 +1,16 @@
 package me.newyith.fortress.rune.generator;
 
+import me.newyith.fortress.core.CoreMaterials;
 import me.newyith.fortress.core.GeneratorCore;
 import me.newyith.fortress.event.TickTimer;
-import me.newyith.fortress.core.CoreMaterials;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Cuboid;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -18,6 +20,7 @@ import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 //fully written again (except particles manager which should go in a core)
 public class GeneratorRune {
@@ -203,6 +206,23 @@ public class GeneratorRune {
 		}
 		//*/
 	}
+
+	public void onPlayerCloseChest(Player player, Point chestPoint) {
+		if (chestPoint.equals(model.pattern.getChestPoint())) {
+			Set<Material> invalidMaterials = model.core.getInvalidWallMaterials();
+			invalidMaterials = invalidMaterials.stream().filter(material -> material.isBlock()).collect(Collectors.toSet());
+			if (invalidMaterials.size() > 0) {
+				String msg = "Fortress generator can't protect: ";
+				for (Material mat : invalidMaterials) {
+					msg += "\n" + mat.toString();
+				}
+				msg = ChatColor.AQUA + msg;
+				player.sendMessage(msg);
+			}
+		}
+	}
+
+
 
 	// - Handlers -
 

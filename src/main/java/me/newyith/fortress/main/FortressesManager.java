@@ -222,6 +222,11 @@ public class FortressesManager {
 		return getManager(w).onZombieBreakBlock(block);
 	}
 
+	public static void onPlayerCloseChest(Player player, Block block) {
+		World w = block.getWorld();
+		getManager(w).onPlayerCloseChest(player, block);
+	}
+
 	public static void onPlayerExitVehicle(Player player) {
 		World w = player.getWorld();
 		getManager(w).onPlayerExitVehicle(player);

@@ -263,16 +263,18 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: make bedrock safety save the revert data for a while even if it was reverted
 //	in case its reverted but then the minecraft world isn't
+//	skip for now. worried that multiple reverts could do more than just revert abandoned bedrock
 
 //TODO: have another look at saving (make sure it happens periodically and maybe also on world(s) save)
 
 //TODO: consider making all containers non generatable (or make changing block to bedrock not drop contents)
 //TODO: make anything that doesn't work properly non generatable (such as containers and probably much more)
 //	maybe white list generatable blocks and make generatable blocks configurable
-//TODO: consider adding message when turning on generator that tells you which blocks in chest are being ignored (like dirt)
+//	maybe make protected containers refuse to change to bedrock (show particles like for door)
 
 //TODO: add config setting to specify debug level: errors, errors & warnings, all
 
+//TODO: fix issue where right clicking door with empty hand doesn't cause bedrock ripple if player isn't white listed
 
 
 
@@ -364,8 +366,7 @@ public class FortressPlugin extends JavaPlugin {
 //			probably this option because it will also make overlapping ripples visible
 
 
-//TODO: fix issue where right clicking door with empty hand doesn't cause bedrock ripple if player isn't white listed
-//TODO: make bedrock ripple ignore planned points that are not generated
+
 
 //TODO: better bedrock
 //	DONE: make BedrockManager convert() and revert() count conversions/reversions (revert() vs fullRevert())

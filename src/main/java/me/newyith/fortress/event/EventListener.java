@@ -2,17 +2,15 @@ package me.newyith.fortress.event;
 
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
-import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Blocks;
+import me.newyith.fortress.util.Point;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Enderman;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Zombie;
+import org.bukkit.block.Chest;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
@@ -20,9 +18,12 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 
 import java.util.HashSet;
 import java.util.List;
@@ -206,9 +207,26 @@ public class EventListener implements Listener {
 		return cancel;
 	}
 
+	@EventHandler(ignoreCancelled = true)
+	public void onInventoryCloseEvent(InventoryCloseEvent event) {
+		HumanEntity humanEntity = event.getPlayer();
+		if (humanEntity instanceof Player) {
+			Inventory inventory = event.getInventory();
+			InventoryHolder holder = inventory.getHolder();
+			if (holder instanceof Chest) { //Trap Chest is also instanceof Chest
+				Chest chest = (Chest) holder;
+				Block block = chest.getBlock();
+				Player player = (Player) humanEntity;
+				FortressesManager.onPlayerCloseChest(player, block);
+			}
+		}
+	}
+
 
 
 	Set<Player> playersExitingVehicle = new HashSet<>();
+
+
 
 	@EventHandler(ignoreCancelled = true)
 	public void onExitVehicle(VehicleExitEvent event) {

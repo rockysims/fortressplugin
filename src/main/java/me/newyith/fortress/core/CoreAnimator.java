@@ -5,6 +5,7 @@ import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.codehaus.jackson.annotate.JsonCreator;
@@ -137,6 +138,10 @@ public class CoreAnimator {
 		generatedPoints.addAll(model.protectedPoints);
 		generatedPoints.addAll(model.alteredPoints);
 		return generatedPoints;
+	}
+
+	public Set<Material> getInvalidWallMaterials() {
+		return model.coreMats.getInvalidWallMaterials();
 	}
 
 	public void tick() {

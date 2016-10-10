@@ -80,11 +80,17 @@ public class CoreMaterials {
 		return false;
 	}
 
+	public Set<Material> getInvalidWallMaterials() {
+		return refresh();
+	}
+
 	// - Refreshing -
 
-	public void refresh() {
+	public Set<Material> refresh() {
 		//Debug.msg("CoreMaterials refresh()ed. chest: " + chestPoint);
 		resetToBaseBlockTypes();
+
+		Set<Material> invalidWallMaterials = new HashSet<>();
 
 		ItemStack[] items = getChestContents();
 		for (ItemStack item : items) {
@@ -101,6 +107,7 @@ public class CoreMaterials {
 					case NETHERRACK:
 					//*/
 					case BEDROCK:
+						invalidWallMaterials.add(mat);
 						break;
 					//special protectable
 					case IRON_DOOR:
@@ -150,10 +157,14 @@ public class CoreMaterials {
 					default:
 						if (mat.isBlock()) {
 							addProtectable(item.getType());
+						} else if (mat != Material.GLOWSTONE_DUST) {
+							invalidWallMaterials.add(mat);
 						}
 				}
 			}
 		}
+
+		return invalidWallMaterials;
 	}
 	private ItemStack[] getChestContents() {
 		Block chestBlock = model.chestPoint.getBlock(model.world);

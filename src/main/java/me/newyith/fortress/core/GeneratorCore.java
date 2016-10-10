@@ -97,6 +97,10 @@ public class GeneratorCore extends BaseCore {
 		return fallbackSigns;
 	}
 
+	public Set<Material> getInvalidWallMaterials() {
+		return model.animator.getInvalidWallMaterials();
+	}
+
 	public void onPlayerRightClickWall(Player player, Block block, BlockFace face) {
 		Material materialInHand = player.getItemInHand().getType();
 		if (materialInHand == Material.AIR) {
@@ -186,7 +190,6 @@ public class GeneratorCore extends BaseCore {
 							TimedBedrockManager.convert(model.world, p, ms);
 						}
 					}
-					else Debug.msg("!runeStillExists");
 				}, layerIndex * 3); //20 ticks per second
 
 				layerIndex++;
