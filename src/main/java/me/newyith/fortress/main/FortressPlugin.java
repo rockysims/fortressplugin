@@ -256,9 +256,17 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
-//BedrockManager::convert(Set<Point> points)
-//BedrockManager::revert(Set<Point> points)
+//BedrockManager::convert(Set<Point> points) returns BedrockBatch
+//BedrockManager::revert(BedrockBatch batch)
 //BedrockManager::convertTimed(Set<Point> points)
+
+//TODO: try to refactor to use batch converts
+//	BedrockBatch batch = BedrockManager.convert(points);
+//	batch.revert();
+
+
+//class BedrockBatch
+//class BedrockDoorsBatch
 
 //maybe add abstract class BedrockBatchAuthorization
 //	then each batch of bedrock can come with an authorization
