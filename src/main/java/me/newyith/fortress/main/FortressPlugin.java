@@ -256,7 +256,30 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+//BedrockManager::convert(Set<Point> points)
+//BedrockManager::revert(Set<Point> points)
+//BedrockManager::convertTimed(Set<Point> points)
 
+//maybe add abstract class BedrockBatchAuthorization
+//	then each batch of bedrock can come with an authorization
+//		authorization(s) can then be checked to see if
+
+
+//Yona's Suggestion: add ManagedBedrockBatch class with its own timer
+//	decide if its time to revert a point by checking if any batches (not expired) contain the point
+//		synchronize convert/revert batch methods to solve concurrency problem
+//		by batching I can batch up convert/revert calls to be faster too
+
+
+//TODO: work on lag when de/generating lots of big fortresses at once
+//	also make bedrock safety save each rune in a separate file and have a master bedrock safety file with names of other bedrock safety files
+//		currently every time a generator turns on the whole bedrock safety file has to be written again
+//			TODO: time this and make sure saving bedrock safety is the issue
+//TODO: fix concurrent modification exception in BedrockManager::getMaterialByPointMapForWorld()
+//	turning 2 big fortresses off and on while others are de/generating (especially right after reload) seems to cause this
+
+
+//TODO: make max blocks per generator configurable (definitely needs to be configurable)
 
 //TODO: make bedrock safety save the revert data for a while even if it was reverted
 //	in case its reverted but then the minecraft world isn't

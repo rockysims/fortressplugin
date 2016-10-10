@@ -12,6 +12,8 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 public class BedrockManager {
 	private static BedrockManager instance = null;
@@ -61,7 +63,7 @@ public class BedrockManager {
 		revert(world, p, false);
 	}
 
-	public static void revert(World world, Point p, boolean fullRevert) {
+	private static void revert(World world, Point p, boolean fullRevert) {
 //		Debug.msg("--");
 //		Debug.msg("BedrockManager::revert() " + p);
 		ManagedBedrockBase managedBedrock = instance.getManagedBedrock(world, p);
@@ -103,15 +105,20 @@ public class BedrockManager {
 		return mat;
 	}
 
-	public static Map<Point, Material> getMaterialByPointMapForWorld(World world) {
+	//synchronized because called by getGeneratableWallLayers() which is called from async in getGenPrepDataFuture()
+	public static synchronized Map<Point, Material> getMaterialByPointMapForWorld(World world) {
 		Map<Point, Material> map = new HashMap<>();
 
 		Map<Point, ManagedBedrockBase> managedBedrockMap = instance.model.managedBedrockMapByWorld.get(world.getName());
 		if (managedBedrockMap != null) {
+			Random random = new Random();
+			int rand = random.nextInt(10000);
+			Debug.msg("start getMaterialByPointMapForWorld " + rand);
 			for (Point p : managedBedrockMap.keySet()) {
 				ManagedBedrockBase managedBedrock = managedBedrockMap.get(p);
 				map.put(p, managedBedrock.getMaterial(p));
 			}
+			Debug.msg("end getMaterialByPointMapForWorld " + rand);
 		}
 
 		return map;
@@ -153,7 +160,11 @@ public class BedrockManager {
 		return managedBedrock != null && managedBedrock.isConverted();
 	}
 
-	private ManagedBedrockBase ensureManagedBedrockAt(World world, Point p) {
+	private synchronized ManagedBedrockBase ensureManagedBedrockAt(World world, Point p) {
+//		Random random = new Random();
+//		int rand = random.nextInt(10000);
+//		Debug.msg("start ensureManagedBedrockAt " + rand);
+
 		//Debug.msg("ensureManagedBedrockAt() " + p);
 		ManagedBedrockBase managedBedrock = getManagedBedrock(world, p);
 		if (managedBedrock == null) {
@@ -191,10 +202,16 @@ public class BedrockManager {
 				putManagedBedrock(world, p, managedBedrock);
 			}
 		}
+
+//		Debug.msg("end ensureManagedBedrockAt " + rand);
 		return managedBedrock;
 	}
 
-	private ManagedBedrockBase getManagedBedrock(World world, Point p) {
+	private synchronized ManagedBedrockBase getManagedBedrock(World world, Point p) {
+//		Random random = new Random();
+//		int rand = random.nextInt(10000);
+//		Debug.msg("start getManagedBedrock " + rand);
+
 		ManagedBedrockBase managedBedrock = null;
 
 		Map<Point, ManagedBedrockBase> managedBedrockMap = instance.model.managedBedrockMapByWorld.get(world.getName());
@@ -202,10 +219,15 @@ public class BedrockManager {
 			managedBedrock = managedBedrockMap.get(p);
 		}
 
+//		Debug.msg("end getManagedBedrock " + rand);
 		return managedBedrock;
 	}
 
-	private void putManagedBedrock(World world, Point p, ManagedBedrockBase managedBedrock) {
+	private synchronized void putManagedBedrock(World world, Point p, ManagedBedrockBase managedBedrock) {
+//		Random random = new Random();
+//		int rand = random.nextInt(10000);
+//		Debug.msg("start putManagedBedrock " + rand);
+
 		//Debug.msg("putManagedBedrock() " + p);
 		Map<Point, ManagedBedrockBase> managedBedrockMap = instance.model.managedBedrockMapByWorld.get(world.getName());
 		if (managedBedrockMap == null) {
@@ -214,9 +236,15 @@ public class BedrockManager {
 		}
 
 		managedBedrockMap.put(p, managedBedrock);
+
+//		Debug.msg("end putManagedBedrock " + rand);
 	}
 
-	private void removeManagedBedrock(World world, Point p) {
+	private synchronized void removeManagedBedrock(World world, Point p) {
+//		Random random = new Random();
+//		int rand = random.nextInt(10000);
+//		Debug.msg("start putManagedBedrock " + rand);
+
 		//Debug.msg("removeManagedBedrock() " + p);
 		Map<Point, ManagedBedrockBase> managedBedrockMap = instance.model.managedBedrockMapByWorld.get(world.getName());
 		if (managedBedrockMap != null) {
@@ -225,5 +253,7 @@ public class BedrockManager {
 				instance.model.managedBedrockMapByWorld.remove(world.getName());
 			}
 		}
+
+//		Debug.msg("end putManagedBedrock " + rand);
 	}
 }
