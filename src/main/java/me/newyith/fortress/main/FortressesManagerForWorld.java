@@ -427,15 +427,15 @@ public class FortressesManagerForWorld {
 		return cancel;
 	}
 
-	public void onPlayerOpenCloseDoor(PlayerInteractEvent event) {
-		Block doorBlock = event.getClickedBlock();
+	public boolean onPlayerOpenCloseDoor(Player player, Block doorBlock) {
+		boolean cancel = false;
+
 		Point doorPoint = new Point(doorBlock.getLocation());
 		World world = doorBlock.getWorld();
 
 		if (isGenerated(doorPoint)) {
 			GeneratorRune rune = getRuneByClaimedPoint(doorPoint);
 			if (rune != null) {
-				Player player = event.getPlayer();
 				Point aboveDoorPoint = new Point(doorPoint).add(0, 1, 0);
 				switch (aboveDoorPoint.getBlock(world).getType()) {
 					case IRON_DOOR_BLOCK:
@@ -450,7 +450,7 @@ public class FortressesManagerForWorld {
 				}
 				boolean canOpen = rune.getGeneratorCore().playerCanOpenDoor(player, doorPoint);
 				if (!canOpen) {
-					event.setCancelled(true);
+					cancel = true;
 				} else {
 					//if iron door, open for player
 					Material doorType = doorPoint.getBlock(world).getType();
@@ -486,6 +486,8 @@ public class FortressesManagerForWorld {
 				Debug.error("FortressesManagerForWorld::onPlayerOpenCloseDoor() failed to find rune from doorPoint " + doorPoint);
 			}
 		}
+
+		return cancel;
 	}
 
 	public void onPlayerRightClickBlock(Player player, Block block, BlockFace face) {

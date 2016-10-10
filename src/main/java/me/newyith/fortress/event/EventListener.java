@@ -159,25 +159,21 @@ public class EventListener implements Listener {
 	}
 
 	@EventHandler(ignoreCancelled = true)
-	public void onPlayerOpenCloseDoor(PlayerInteractEvent event) {
-		Action action = event.getAction();
-		Block clicked = event.getClickedBlock();
-
-		if (action == Action.RIGHT_CLICK_BLOCK) {
-			if (Blocks.isDoor(clicked.getType())) {
-				FortressesManager.onPlayerOpenCloseDoor(event);
-			}
-		}
-	}
-
-	@EventHandler(ignoreCancelled = true)
-	public void onPlayerRightClickBlock(PlayerInteractEvent event) {
+	public void onPlayerInteractEvent(PlayerInteractEvent event) {
 		Action action = event.getAction();
 		if (action == Action.RIGHT_CLICK_BLOCK) {
+			Block clicked = event.getClickedBlock();
+
 			Player player = event.getPlayer();
-			Block block = event.getClickedBlock();
 			BlockFace face = event.getBlockFace();
-			FortressesManager.onPlayerRightClickBlock(player, block, face);
+			FortressesManager.onPlayerRightClickBlock(player, clicked, face);
+
+			if (Blocks.isDoor(clicked.getType())) {
+				boolean cancel = FortressesManager.onPlayerOpenCloseDoor(player, clicked);
+				if (cancel) {
+					event.setCancelled(true);
+				}
+			}
 		}
 	}
 

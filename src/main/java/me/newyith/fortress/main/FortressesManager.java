@@ -184,9 +184,9 @@ public class FortressesManager {
 		return getManager(w).onBurn(block);
 	}
 
-	public static void onPlayerOpenCloseDoor(PlayerInteractEvent event) {
-		World w = event.getPlayer().getWorld();
-		getManager(w).onPlayerOpenCloseDoor(event);
+	public static boolean onPlayerOpenCloseDoor(Player player, Block doorBlock) {
+		World w = player.getWorld();
+		return getManager(w).onPlayerOpenCloseDoor(player, doorBlock);
 	}
 
 	public static void onPlayerRightClickBlock(Player player, Block block, BlockFace face) {

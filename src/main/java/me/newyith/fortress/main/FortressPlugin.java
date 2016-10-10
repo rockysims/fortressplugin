@@ -274,7 +274,7 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: add config setting to specify debug level: errors, errors & warnings, all
 
-//TODO: fix issue where right clicking door with empty hand doesn't cause bedrock ripple if player isn't white listed
+//TODO: Fixed issue where right clicking door with empty hand didn't cause bedrock ripple if player not white listed
 
 
 
