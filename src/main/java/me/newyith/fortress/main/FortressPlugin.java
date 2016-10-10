@@ -7,6 +7,7 @@ import me.newyith.fortress.fix.PearlGlitchFix;
 import me.newyith.fortress.manual.ManualCraftManager;
 import me.newyith.fortress.sandbox.jackson.SandboxSaveLoadManager;
 import me.newyith.fortress.util.Debug;
+import me.newyith.fortress.util.Log;
 import me.newyith.fortress.util.Point;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -23,7 +24,7 @@ import java.util.Random;
 
 public class FortressPlugin extends JavaPlugin {
 	public static final boolean releaseBuild = false; //TODO: change this to true for release builds
-	private static final double saveDelayMs = 60*1000;
+	private static final double saveDelayMs = 5*60*1000;
 	private static int saveWaitTicks = 0;
 
 	private static FortressPlugin instance;
@@ -59,6 +60,12 @@ public class FortressPlugin extends JavaPlugin {
 		instance = this;
 
 		loadConfig();
+
+		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
+		Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
+		Log.sendConsole("         >> ON <<           ", ChatColor.GREEN);
+		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
+
 		saveLoadManager = new SaveLoadManager(this);
 		saveLoadManager.load();
 
@@ -71,11 +78,6 @@ public class FortressPlugin extends JavaPlugin {
 		TickTimer.onEnable(this);
 		ManualCraftManager.onEnable(this);
 		PearlGlitchFix.onEnable(this);
-
-		sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
-		sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
-		sendToConsole("         >> ON <<           ", ChatColor.GREEN);
-		sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
 	}
 
 	@Override
@@ -85,15 +87,10 @@ public class FortressPlugin extends JavaPlugin {
 //			sandboxSaveLoadManager.save();
 		}
 
-		sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
-		sendToConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
-		sendToConsole("         >> OFF <<          ", ChatColor.RED);
-		sendToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
-	}
-
-	private void sendToConsole(String s, ChatColor color) {
-		ConsoleCommandSender console = this.getServer().getConsoleSender();
-		console.sendMessage(color + s);
+		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
+		Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
+		Log.sendConsole("         >> OFF <<          ", ChatColor.RED);
+		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
 	}
 
 	public static void onTick() {
@@ -273,8 +270,6 @@ public class FortressPlugin extends JavaPlugin {
 //	maybe make protected containers refuse to change to bedrock (show particles like for door)
 
 //TODO: add config setting to specify debug level: errors, errors & warnings, all
-
-//TODO: Fixed issue where right clicking door with empty hand didn't cause bedrock ripple if player not white listed
 
 
 

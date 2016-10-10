@@ -3,6 +3,7 @@ package me.newyith.fortress.main;
 import me.newyith.fortress.core.BedrockManager;
 import me.newyith.fortress.core.TimedBedrockManager;
 import me.newyith.fortress.util.Debug;
+import me.newyith.fortress.util.Log;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldSaveEvent;
@@ -50,7 +51,6 @@ public class SaveLoadManager implements Listener {
 		data.put("FortressesManager", FortressesManager.getInstance());
 		data.put("BedrockManager", BedrockManager.getInstance());
 		data.put("TimedBedrockManager", TimedBedrockManager.getInstance());
-		Debug.msg("Saved " + FortressesManager.getRuneCountForAllWorlds() + " rune(s)."); //TODO: delete this line
 	}
 
 	private void loadFromMap(Map<String, Object> data) {
@@ -85,8 +85,6 @@ public class SaveLoadManager implements Listener {
 			FortressesManager.setInstance(fortressesManager);
 			FortressesManager.secondStageLoad();
 		}
-
-		Debug.msg("Loaded " + FortressesManager.getRuneCountForAllWorlds() + " rune(s)."); //TODO: delete this line
 	}
 
 	public void save() {
@@ -102,6 +100,8 @@ public class SaveLoadManager implements Listener {
 			e.printStackTrace();
 		}
 		Debug.end("save");
+
+		Log.success("Saved " + FortressesManager.getRuneCountForAllWorlds() + " rune(s).");
 	}
 
 	public void load() {
@@ -118,6 +118,8 @@ public class SaveLoadManager implements Listener {
 			e.printStackTrace();
 		}
 		Debug.end("load");
+
+		Log.success("Loaded " + FortressesManager.getRuneCountForAllWorlds() + " rune(s).");
 
 		onAfterLoad();
 
