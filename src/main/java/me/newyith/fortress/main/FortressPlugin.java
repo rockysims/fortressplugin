@@ -256,6 +256,16 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+
+//TODO: consider: why not move the actual converting in BedrockManager to onTick and just keep 2 maps: origMaterialByPoint and convertCountByPoint
+//	convert() and revert() just change convertCountByPoint (and dirtyPoints.addAll(updatedPoints))
+//	onTick() do the actual convert/revert (update which points are actually converted to match convertCountByPoint)
+//		and update origMaterialByPoint
+//	doesn't that solve the lots of synchronizations issue?
+//		don't even necessarily need to add bedrock batches
+
+
+
 //BedrockManager::convert(Set<Point> points) returns BedrockBatch
 //BedrockManager::revert(BedrockBatch batch)
 //BedrockManager::convertTimed(Set<Point> points)
@@ -317,8 +327,12 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-
-
+//Fortress Collector Idea:
+//fortress disruptor needs to be invulnerable and visible during the 1 RL day warm up (so each side can marshal an army)
+//fortress collector must be built touching the fortress wall and slowly accumulates enchanted wool (disruptor fuel)
+//the fortress disruptor rune would then burn enchanted wool
+//	only the fortress from which the enchanted wool came is disrupted
+//		PROBLEM: player can just destroy generator and create a new one (seems like a deal breaker... can't do collector idea?)
 
 //Fortress Disruptor Idea:
 //	Overview:
