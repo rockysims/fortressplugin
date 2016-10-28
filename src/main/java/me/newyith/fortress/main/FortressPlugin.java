@@ -263,7 +263,8 @@ public class FortressPlugin extends JavaPlugin {
 //		and update origMaterialByPoint
 //	doesn't that solve the lots of synchronizations issue?
 //		don't even necessarily need to add bedrock batches
-
+//MAYBE: convertCountByPoint should be convertAuthTokensByPoint? (where auth token is a BaseCore?)
+//	not sure if/how jackson can save that properly (so that a whole new copy of BaseCore data is not saved)
 
 
 //BedrockManager::convert(Set<Point> points) returns BedrockBatch
