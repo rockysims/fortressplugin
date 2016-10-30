@@ -52,7 +52,7 @@ public class BedrockManagerNew {
 
 	//-----------------------------------------------------------------------
 
-	private static BedrockManagerNewForWorld forWorld(World world) {
+	public static BedrockManagerNewForWorld forWorld(World world) {
 		return instance.model.getManagerByWorldName(world.getName());
 	}
 }

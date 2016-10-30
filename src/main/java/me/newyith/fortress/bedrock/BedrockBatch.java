@@ -1,17 +1,48 @@
 package me.newyith.fortress.bedrock;
 
+import com.google.common.collect.ImmutableSet;
 import me.newyith.fortress.util.Point;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.Set;
 
 public class BedrockBatch {
-	//TODO: add model part
+	private static class Model {
+		private final BedrockAuthToken authToken;
+		private final ImmutableSet<Point> points;
 
-	public BedrockBatch(Set<Point> points) {
+		@JsonCreator
+		public Model(@JsonProperty("authToken") BedrockAuthToken authToken,
+					 @JsonProperty("points") ImmutableSet<Point> points) {
+			this.authToken = authToken;
+			this.points = points;
 
+			//rebuild transient fields
+		}
+	}
+	private Model model = null;
+
+	@JsonCreator
+	public BedrockBatch(@JsonProperty("model") Model model) {
+		this.model = model;
 	}
 
+	public BedrockBatch(Set<Point> points, BedrockAuthToken authToken) {
+		model = new Model(authToken, ImmutableSet.copyOf(points));
+	}
+
+	//-----------------------------------------------------------------------
+
 	public Set<Point> getPoints() {
-		return null;
+		return model.points;
+	}
+
+	public boolean contains(Point p) {
+		return model.points.contains(p);
+	}
+
+	public boolean authorizedBy(BedrockAuthToken otherAuthToken) {
+		return model.authToken.equals(otherAuthToken);
 	}
 }

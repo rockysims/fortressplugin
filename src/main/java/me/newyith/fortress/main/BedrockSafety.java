@@ -1,6 +1,6 @@
 package me.newyith.fortress.main;
 
-import me.newyith.fortress.core.BedrockManager;
+import me.newyith.fortress.bedrock.BedrockManagerNew;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
@@ -79,19 +79,26 @@ public class BedrockSafety {
 				claimedWallPoints = new HashSet<>();
 			}
 			World world = Bukkit.getWorld(worldName);
+			Set<Point> unsafeBedrock = new HashSet<>();
 			Set<Point> materialByPointKeys = new HashSet<>(materialByPoint.keySet()); //copy to avoid concurrent modification
 			for (Point p : materialByPointKeys) {
 				if (p.is(Material.BEDROCK, world)) {
-					boolean managedBedrock = BedrockManager.getMaterial(world, p) != null;
+					boolean managedBedrock = BedrockManagerNew.forWorld(world).getMaterialOrNull(p) != null;
 					boolean safeBedrock = claimedWallPoints.contains(p) && managedBedrock;
 					if (!safeBedrock) {
-						BedrockManager.fullRevert(world, p); //gives BedrockManager a chance to handle tall doors gracefully
-						BedrockManager.forget(world, p);
-						Material mat = materialByPoint.remove(p);
-						p.setType(mat, world);
-						Debug.msg("set !safeBedrock at " + p + " back to " + mat); //LATER: delete this line
+						unsafeBedrock.add(p);
 					}
 				}
+			}
+
+			//give BedrockManager a chance to revert unsafeBedrock (try to handle tall doors gracefully)
+			Set<Point> forceRevertedPoints = BedrockManagerNew.forWorld(world).forceRevertBatchesContaining(unsafeBedrock);
+
+			//ensure unsafeBedrock is really reverted
+			for (Point p : unsafeBedrock) {
+				Material mat = materialByPoint.remove(p);
+				p.setType(mat, world);
+				Debug.warn("set !safeBedrock at " + p + " back to " + mat + " (force reverted " + (forceRevertedPoints.size() - 1) + " other points)");
 			}
 		}
 		model.materialMapByWorld.clear();
@@ -102,7 +109,7 @@ public class BedrockSafety {
 	}
 	public void doRecord(World world, Set<Point> wallPoints) {
 		for (Point p : wallPoints) {
-			Material mat = BedrockManager.getMaterial(world, p);
+			Material mat = BedrockManagerNew.forWorld(world).getMaterialOrNull(p);
 			if (mat == null) mat = p.getType(world);
 
 			String worldName = world.getName();

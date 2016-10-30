@@ -263,10 +263,10 @@ public class CoreAnimator {
 		Block b = p.getBlock(model.world);
 		boolean alterable = false;
 		alterable = alterable || model.coreMats.isAlterable(b);
-		alterable = alterable || model.coreMats.isAlterable(BedrockManager.getMaterial(model.world, p));
+		alterable = alterable || model.coreMats.isAlterable(BedrockManagerOld.getMaterial(model.world, p));
 		boolean alreadyAltered = model.alteredPoints.contains(p);
 		if (alterable && !alreadyAltered) {
-			BedrockManager.convert(model.world, p);
+			BedrockManagerOld.convert(model.world, p);
 			addAlteredPoint(p);
 			altered = true;
 		}
@@ -278,7 +278,7 @@ public class CoreAnimator {
 		boolean unaltered = false;
 
 		if (model.alteredPoints.contains(p)) {
-			BedrockManager.revert(model.world, p);
+			BedrockManagerOld.revert(model.world, p);
 			removeAlteredPoint(p);
 			unaltered = true;
 		}
@@ -292,7 +292,7 @@ public class CoreAnimator {
 		Block b = p.getBlock(model.world);
 		boolean protectable = false;
 		protectable = protectable || model.coreMats.isProtectable(b);
-		protectable = protectable || model.coreMats.isProtectable(BedrockManager.getMaterial(model.world, p));
+		protectable = protectable || model.coreMats.isProtectable(BedrockManagerOld.getMaterial(model.world, p));
 		if (!model.protectedPoints.contains(p) && protectable) {
 			addProtectedPoint(p);
 			pointProtected = true;

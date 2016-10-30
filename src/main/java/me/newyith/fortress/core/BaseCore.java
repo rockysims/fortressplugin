@@ -1,5 +1,7 @@
 package me.newyith.fortress.core;
 
+import me.newyith.fortress.bedrock.BedrockAuthToken;
+import me.newyith.fortress.bedrock.BedrockManagerNew;
 import me.newyith.fortress.core.util.GenPrepData;
 import me.newyith.fortress.main.BedrockSafety;
 import me.newyith.fortress.main.FortressPlugin;
@@ -26,6 +28,7 @@ public abstract class BaseCore {
 		protected final Point anchorPoint; //GeneratorCore::showRipple() needs model.anchorPoint to be final (I think)
 		protected final Set<Point> claimedPoints;
 		protected final Set<Point> claimedWallPoints;
+		protected final BedrockAuthToken bedrockAuthToken;
 		protected final CoreAnimator animator;
 		protected UUID placedByPlayerId;
 		protected final Set<Point> layerOutsideFortress;
@@ -40,6 +43,7 @@ public abstract class BaseCore {
 		public Model(@JsonProperty("anchorPoint") Point anchorPoint,
 					 @JsonProperty("claimedPoints") Set<Point> claimedPoints,
 					 @JsonProperty("claimedWallPoints") Set<Point> claimedWallPoints,
+					 @JsonProperty("bedrockAuthToken") BedrockAuthToken bedrockAuthToken,
 					 @JsonProperty("animator") CoreAnimator animator,
 					 @JsonProperty("placedByPlayerId") UUID placedByPlayerId,
 					 @JsonProperty("layerOutsideFortress") Set<Point> layerOutsideFortress,
@@ -48,6 +52,7 @@ public abstract class BaseCore {
 			this.anchorPoint = anchorPoint;
 			this.claimedPoints = claimedPoints;
 			this.claimedWallPoints = claimedWallPoints;
+			this.bedrockAuthToken = bedrockAuthToken;
 			this.animator = animator;
 			this.placedByPlayerId = placedByPlayerId;
 			this.layerOutsideFortress = layerOutsideFortress;
@@ -62,7 +67,7 @@ public abstract class BaseCore {
 		}
 
 		public Model(Model m) {
-			this(m.anchorPoint, m.claimedPoints, m.claimedWallPoints, m.animator, m.placedByPlayerId, m.layerOutsideFortress, m.pointsInsideFortress, m.worldName);
+			this(m.anchorPoint, m.claimedPoints, m.claimedWallPoints, m.bedrockAuthToken, m.animator, m.placedByPlayerId, m.layerOutsideFortress, m.pointsInsideFortress, m.worldName);
 		}
 	}
 	protected Model model = null;
@@ -75,12 +80,13 @@ public abstract class BaseCore {
 	public BaseCore(World world, Point anchorPoint, CoreMaterials coreMats) {
 		Set<Point> claimedPoints = new HashSet<>();
 		Set<Point> claimedWallPoints = new HashSet<>();
+		BedrockAuthToken bedrockAuthToken = new BedrockAuthToken();
 		CoreAnimator animator = new CoreAnimator(world, anchorPoint, coreMats);
 		UUID placedByPlayerId = null; //set by onCreated()
 		Set<Point> layerOutsideFortress = new HashSet<>();
 		Set<Point> pointsInsideFortress = new HashSet<>();
 		String worldName = world.getName();
-		model = new Model(anchorPoint, claimedPoints, claimedWallPoints, animator,
+		model = new Model(anchorPoint, claimedPoints, claimedWallPoints, bedrockAuthToken, animator,
 				placedByPlayerId, layerOutsideFortress, pointsInsideFortress, worldName);
 	}
 
@@ -247,13 +253,8 @@ public abstract class BaseCore {
 
 	public void onBroken() {
 		degenerateWall(true); //true means skipAnimation
-
+		BedrockManagerNew.forWorld(model.world).revert(model.bedrockAuthToken);
 		FortressesManager.removeClaimedWallPoints(model.world, model.claimedWallPoints);
-
-		//enforce bedrock revert (to allow cleaning up bugged/abandoned bedrock)
-		for (Point p : model.claimedWallPoints) {
-			BedrockManager.fullRevert(model.world, p);
-		}
 	}
 
 	public void setActive(boolean active) {
@@ -483,7 +484,7 @@ public abstract class BaseCore {
 		int maxReturns = Math.max(0, FortressPlugin.config_generationBlockLimit - getGeneratedPoints().size());
 		int rangeLimit = model.generationRangeLimit;
 		Set<Point> ignorePoints = nearbyClaimedPoints;
-		Map<Point, Material> pretendPoints = BedrockManager.getMaterialByPointMapForWorld(model.world);
+		Map<Point, Material> pretendPoints = BedrockManagerNew.forWorld(model.world).getMaterialByPointMap();
 		List<Set<Point>> foundLayers = Blocks.getPointsConnectedAsLayers(model.world, origin, originLayer, traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints, pretendPoints).join();
 
 		//correct layer indexes (first non already generated layer is not always layer 0)

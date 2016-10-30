@@ -55,22 +55,56 @@ public class BedrockManagerNewForWorld {
 	//-----------------------------------------------------------------------
 
 	//this method is (or should be) thread safe
-	public BedrockBatch convert(Set<Point> points) {
-		BedrockBatch batch = new BedrockBatch(points);
+	public BedrockBatch convert(Set<Point> points, BedrockAuthToken authToken) {
+		BedrockBatch batch = new BedrockBatch(points, authToken);
 		synchronized (model.mutex) {
-			model.batches.add(batch);
-			model.updatePoints.addAll(batch.getPoints());
+			addBatch(batch);
 		}
 
 		return batch;
+	}
+	private void addBatch(BedrockBatch batch) {
+		model.batches.add(batch);
+		model.updatePoints.addAll(batch.getPoints());
 	}
 
 	//this method is (or should be) thread safe
 	public void revert(BedrockBatch batch) {
 		synchronized (model.mutex) {
-			model.batches.remove(batch);
-			model.updatePoints.addAll(batch.getPoints());
+			removeBatch(batch);
 		}
+	}
+	private void removeBatch(BedrockBatch batch) {
+		model.batches.remove(batch);
+		model.updatePoints.addAll(batch.getPoints());
+	}
+
+	public void revert(BedrockAuthToken authToken) {
+		synchronized (model.mutex) {
+			for (BedrockBatch batch : model.batches) {
+				if (batch.authorizedBy(authToken)) {
+					removeBatch(batch);
+				}
+			}
+		}
+	}
+
+	public Set<Point> forceRevertBatchesContaining(Set<Point> forceRevertPoints) {
+		Set<Point> forceRevertedPoints = new HashSet<>();
+
+		synchronized (model.mutex) {
+			for (BedrockBatch batch : model.batches) {
+				Set<Point> batchPoints = batch.getPoints();
+				boolean forceRevert = !Collections.disjoint(batchPoints, forceRevertPoints);
+
+				if (forceRevert) {
+					forceRevertedPoints.addAll(batchPoints);
+					removeBatch(batch);
+				}
+			}
+		}
+
+		return forceRevertedPoints;
 	}
 
 	public void onTick() {
@@ -80,7 +114,7 @@ public class BedrockManagerNewForWorld {
 		}
 	}
 
-	public Material getMaterial(Point p) {
+	public Material getMaterialOrNull(Point p) {
 		return model.materialByPoint.get(p);
 	}
 

@@ -13,17 +13,16 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
-public class BedrockManager {
-	private static BedrockManager instance = null;
-	public static BedrockManager getInstance() {
+public class BedrockManagerOld {
+	private static BedrockManagerOld instance = null;
+	public static BedrockManagerOld getInstance() {
 		if (instance == null) {
-			instance = new BedrockManager();
+			instance = new BedrockManagerOld();
 		}
 		return instance;
 	}
-	public static void setInstance(BedrockManager newInstance) {
+	public static void setInstance(BedrockManagerOld newInstance) {
 		instance = newInstance;
 	}
 
@@ -42,11 +41,11 @@ public class BedrockManager {
 	private Model model = null;
 
 	@JsonCreator
-	public BedrockManager(@JsonProperty("model") Model model) {
+	public BedrockManagerOld(@JsonProperty("model") Model model) {
 		this.model = model;
 	}
 
-	public BedrockManager() {
+	public BedrockManagerOld() {
 		model = new Model(new HashMap<>());
 	}
 
@@ -68,7 +67,7 @@ public class BedrockManager {
 //		Debug.msg("BedrockManager::revert() " + p);
 		ManagedBedrockBase managedBedrock = instance.getManagedBedrock(world, p);
 		if (managedBedrock != null) {
-			managedBedrock.revert(world, fullRevert);
+			managedBedrock.revert(world);
 			if (!managedBedrock.isConverted()) {
 				if (managedBedrock instanceof ManagedBedrockDoor) {
 					ManagedBedrockDoor managedBedrockDoor = (ManagedBedrockDoor) managedBedrock;

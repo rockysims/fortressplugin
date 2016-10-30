@@ -45,11 +45,11 @@ public class TimedBedrock implements Comparable<TimedBedrock> {
 	}
 
 	public void convert() {
-		BedrockManager.convert(model.world, model.point);
+		BedrockManagerOld.convert(model.world, model.point);
 	}
 
 	public void revert() {
-		BedrockManager.revert(model.world, model.point);
+		BedrockManagerOld.revert(model.world, model.point);
 	}
 
 	public int getEndTick() {

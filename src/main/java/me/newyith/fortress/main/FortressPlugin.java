@@ -256,6 +256,10 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+//TODO: finish changing from BedrockManagerOld to BedrockManagerNew (including save/load rewiring)
+
+//TODO: retest bedrock safety (once change to new bedrock manager is done)
+
 
 //TODO: consider: why not move the actual converting in BedrockManager to onTick and just keep 2 maps: origMaterialByPoint and convertCountByPoint
 //	convert() and revert() just change convertCountByPoint (and dirtyPoints.addAll(updatedPoints))

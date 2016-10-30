@@ -1,6 +1,6 @@
 package me.newyith.fortress.main;
 
-import me.newyith.fortress.core.BedrockManager;
+import me.newyith.fortress.core.BedrockManagerOld;
 import me.newyith.fortress.core.TimedBedrockManager;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Log;
@@ -49,7 +49,7 @@ public class SaveLoadManager implements Listener {
 
 	private void saveToMap(Map<String, Object> data) {
 		data.put("FortressesManager", FortressesManager.getInstance());
-		data.put("BedrockManager", BedrockManager.getInstance());
+		data.put("BedrockManager", BedrockManagerOld.getInstance());
 		data.put("TimedBedrockManager", TimedBedrockManager.getInstance());
 	}
 
@@ -68,11 +68,11 @@ public class SaveLoadManager implements Listener {
 		//load BedrockManager
 		obj = data.get("BedrockManager");
 		if (obj == null) {
-			BedrockManager.setInstance(new BedrockManager());
+			BedrockManagerOld.setInstance(new BedrockManagerOld());
 		} else {
 //			Debug.msg("load obj (BM) type: " + obj.getClass().getName());
-			BedrockManager bedrockManager = mapper.convertValue(obj, BedrockManager.class);
-			BedrockManager.setInstance(bedrockManager);
+			BedrockManagerOld bedrockManager = mapper.convertValue(obj, BedrockManagerOld.class);
+			BedrockManagerOld.setInstance(bedrockManager);
 		}
 
 		//load FortressesManager
