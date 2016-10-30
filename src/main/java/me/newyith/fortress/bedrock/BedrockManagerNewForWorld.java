@@ -1,7 +1,7 @@
 package me.newyith.fortress.bedrock;
 
 import com.google.common.collect.ImmutableMap;
-import me.newyith.fortress.core.BedrockManager;
+import me.newyith.fortress.util.Blocks;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Bukkit;
@@ -15,19 +15,22 @@ import java.util.stream.Collectors;
 
 public class BedrockManagerNewForWorld {
 	private static class Model {
-		private ImmutableMap<Point, Material> materialByPointMap;
-		private Set<BedrockBatch> batches;
-		private Set<Point> updatePoints;
-		private String worldName;
-		private transient World world;
+		private final BedrockHandler bedrockHandler;
+		private ImmutableMap<Point, Material> materialByPoint;
+		private final Set<BedrockBatch> batches;
+		private final Set<Point> updatePoints;
+		private final String worldName;
+		private final transient World world;
 		private final transient Object mutex;
 
 		@JsonCreator
-		public Model(@JsonProperty("materialByPointMap") ImmutableMap<Point, Material> materialByPointMap,
+		public Model(@JsonProperty("bedrockHandler") BedrockHandler bedrockHandler,
+					 @JsonProperty("materialByPoint") ImmutableMap<Point, Material> materialByPoint,
 					 @JsonProperty("batches") Set<BedrockBatch> batches,
 					 @JsonProperty("updatePoints") Set<Point> updatePoints,
 					 @JsonProperty("worldName") String worldName) {
-			this.materialByPointMap = materialByPointMap;
+			this.bedrockHandler = bedrockHandler;
+			this.materialByPoint = materialByPoint;
 			this.batches = batches;
 			this.updatePoints = updatePoints;
 			this.worldName = worldName;
@@ -45,7 +48,7 @@ public class BedrockManagerNewForWorld {
 	}
 
 	public BedrockManagerNewForWorld(World world) {
-		model = new Model(ImmutableMap.of(), new HashSet<>(), new HashSet<>(), world.getName());
+		model = new Model(new BedrockHandler(world), ImmutableMap.of(), new HashSet<>(), new HashSet<>(), world.getName());
 	}
 
 	//-----------------------------------------------------------------------
@@ -76,6 +79,16 @@ public class BedrockManagerNewForWorld {
 		}
 	}
 
+	public Material getMaterial(Point p) {
+		return model.materialByPoint.get(p);
+	}
+
+	public Map<Point, Material> getMaterialByPointMap() {
+		return model.materialByPoint;
+	}
+
+	// utils //
+
 	private void update() {
 		Set<Point> allBatchPoints = new HashSet<>();
 		Set<Point> shouldBeConverted;
@@ -91,39 +104,59 @@ public class BedrockManagerNewForWorld {
 					.collect(Collectors.toSet());
 		}
 
-		Map<Point, Material> matByPoint = new HashMap<>(model.materialByPointMap);
-
-		//update matByPoint and convert/revert as needed
+		//convert/revert updatedPoints
 		for (Point p : model.updatePoints) {
-			if (shouldBeConverted.contains(p)) {
-				//ensure converted
-				Material mat = ensureConverted(p);
-				matByPoint.put(p, mat);
-			} else {
-				//ensure reverted
-				ensureReverted(p);
-				matByPoint.remove(p);
+			boolean shouldBeConv = shouldBeConverted.contains(p);
+			boolean isConv = model.bedrockHandler.isConverted(p);
+
+			//if (isTallDoor) update shouldBeConv (since it also depends on other half of door)
+			Material mat = p.getType(model.world);
+			boolean isTallDoor = Blocks.isTallDoor(mat);
+			if (isTallDoor) {
+				Point pOtherHalf = getOtherHalfOfDoor(p);
+				boolean otherHalfShouldBeConv = allBatchPoints.contains(pOtherHalf);
+				shouldBeConv = shouldBeConv || otherHalfShouldBeConv;
+			}
+
+			if (!isConv && shouldBeConv) {
+				model.bedrockHandler.convert(p);
+			} else if (isConv && !shouldBeConv) {
+				model.bedrockHandler.revert(p);
 			}
 		}
 
-		model.materialByPointMap = ImmutableMap.copyOf(matByPoint);
+		model.materialByPoint = ImmutableMap.copyOf(model.bedrockHandler.getMaterialByPointMap());
 	}
 
-	private Material ensureConverted(Point p) {
-		BedrockManager.convert(model.world, p); //TODO: delete and replace this line
-		return BedrockManager.getMaterial(model.world, p); //TODO: delete and replace this line
-	}
+	private Point getOtherHalfOfDoor(Point p) {
+		//assumes p is a door block
+		World world = model.world;
+		Point top = null;
+		Point bottom = null;
+		Point a = p.add(0, 1, 0);
+		Point b = p.add(0, -1, 0);
+		Material above = a.getType(world);
+		Material below = b.getType(world);
+		Material middle = p.getType(world);
 
-	private void ensureReverted(Point p) {
-		BedrockManager.fullRevert(model.world, p); //TODO: delete and replace this line
-	}
+		if (model.bedrockHandler.isConverted(a)) above = model.bedrockHandler.getMaterial(a);
+		if (model.bedrockHandler.isConverted(b)) below = model.bedrockHandler.getMaterial(b);
+		if (model.bedrockHandler.isConverted(p)) middle = model.bedrockHandler.getMaterial(p);
 
-	public Material getMaterial(Point p) {
-		return model.materialByPointMap.get(p);
-	}
+		if (above == middle) {
+			top = a;
+			bottom = p;
+		} else if (below == middle) {
+			top = p;
+			bottom = b;
+		}
 
-	public Map<Point, Material> getMaterialByPointMap() {
-		return model.materialByPointMap;
+		if (top == null || bottom == null) {
+			Debug.error("getOtherHalfOfDoor() failed at " + p);
+			return null;
+		} else {
+			return (p.equals(top))?bottom:top;
+		}
 	}
 }
 
