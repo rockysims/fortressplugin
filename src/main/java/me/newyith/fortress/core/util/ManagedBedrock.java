@@ -44,10 +44,9 @@ public class ManagedBedrock extends ManagedBedrockBase {
 		updateConverted(world);
 	}
 
-	public void revert(World world, boolean fullRevert) {
+	public void revert(World world) {
 //		Debug.msg("ManagedBedrock::revert() " + model.point);
 		model.converts--;
-		if (fullRevert) model.converts = 0;
 		updateConverted(world);
 	}
 

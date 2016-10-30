@@ -46,106 +46,82 @@ public class BedrockHandler {
 	//-----------------------------------------------------------------------
 
 	public boolean isConverted(Point p) {
-		return false; //TODO: write
+		ManagedBedrockBase managedBedrock = model.managedBedrockByPoint.get(p);
+		if (managedBedrock != null) {
+			return managedBedrock.isConverted();
+		} else {
+			return false;
+		}
 	}
 
-	public Material convert(Point p) {
+	public void convert(Point p) {
 		ManagedBedrockBase managedBedrock = ensureManagedBedrockAt(p);
+		managedBedrock.convert(model.world);
+		model.managedBedrockByPoint.put(p, managedBedrock);
 
-		if (!managedBedrock.isConverted()) {
-			managedBedrock.convert(model.world);
+		if (managedBedrock instanceof ManagedBedrockDoor) {
+			ManagedBedrockDoor managedBedrockDoor = (ManagedBedrockDoor) managedBedrock;
+			if (managedBedrockDoor.isTallDoor()) {
+				Point top = managedBedrockDoor.getTop();
+				Point bottom = managedBedrockDoor.getBottom();
+				model.managedBedrockByPoint.put(top, managedBedrock);
+				model.managedBedrockByPoint.put(bottom, managedBedrock);
+			}
 		}
-
-		return managedBedrock.getMaterial(p);
 	}
 
 	public void revert(Point p) {
 		ManagedBedrockBase managedBedrock = model.managedBedrockByPoint.get(p);
 		if (managedBedrock != null) {
-			managedBedrock.revert(model.world, false);
-			if (!managedBedrock.isConverted()) {
-				if (managedBedrock instanceof ManagedBedrockDoor) {
-					ManagedBedrockDoor managedBedrockDoor = (ManagedBedrockDoor) managedBedrock;
+			managedBedrock.revert(model.world);
+			model.managedBedrockByPoint.remove(p);
+
+			if (managedBedrock instanceof ManagedBedrockDoor) {
+				ManagedBedrockDoor managedBedrockDoor = (ManagedBedrockDoor) managedBedrock;
+				if (managedBedrockDoor.isTallDoor()) {
 					Point top = managedBedrockDoor.getTop();
-					Point bottom = managedBedrockDoor.getBottom(); //null if trap door
-					instance.removeManagedBedrock(world, top);
-					if (bottom != null) instance.removeManagedBedrock(world, bottom);
-				} else {
-					instance.removeManagedBedrock(world, p);
+					Point bottom = managedBedrockDoor.getBottom();
+					model.managedBedrockByPoint.remove(top);
+					model.managedBedrockByPoint.remove(bottom);
 				}
 			}
 		}
-
-//		BedrockManager.fullRevert(model.world, p); //TODO: delete and replace this line
-	}
-
-
-
-
-	private ManagedBedrockBase ensureManagedBedrockAt(Point p) {
-		ManagedBedrockBase managedBedrock = model.managedBedrockByPoint.get(p);
-		if (managedBedrock == null) {
-			//special cases (doors)
-			Material mat = p.getType(model.world);
-			boolean isTallDoor = Blocks.isTallDoor(mat);
-			boolean isTrapDoor = Blocks.isTrapDoor(mat);
-			if (isTallDoor || isTrapDoor) {
-				//Debug.msg("ensuring door: " + mat);
-				if (isTallDoor) {
-					Pair<Point, Point> doorTopBottom = getDoorTopBottom(world, p);
-					if (doorTopBottom != null) {
-						Point top = doorTopBottom.getKey();
-						Point bottom = doorTopBottom.getValue();
-
-						managedBedrock = new ManagedBedrockDoor(world, top, bottom);
-						putManagedBedrock(world, top, managedBedrock);
-						putManagedBedrock(world, bottom, managedBedrock);
-						//Debug.msg("ensureManagedBedrockAt() top: " + top + " (tall door)");
-						//Debug.msg("ensureManagedBedrockAt() bottom: " + bottom);
-					} //else fallback
-				} else { //isTrapDoor
-					managedBedrock = new ManagedBedrockDoor(world, p, null);
-					putManagedBedrock(world, p, managedBedrock);
-					//Debug.msg("ensureManagedBedrockAt() p: " + p + " (trap door)");
-				}
-			}
-			//else Debug.msg("ensuring non door: " + mat);
-
-			//fallback
-			if (managedBedrock == null) {
-				managedBedrock = new ManagedBedrock(model.world, p);
-				model.managedBedrockByPoint.put(p, managedBedrock);
-			}
-		}
-
-		return managedBedrock;
 	}
 
 	public Map<Point, Material> getMaterialByPointMap() {
-		return model.materialByPoint;
+		Debug.start("getMaterialByPointMap");
+
+		Map<Point, Material> matByPointMap = new HashMap<>();
+		for (Point p : model.managedBedrockByPoint.keySet()) {
+			ManagedBedrockBase managedBedrock = model.managedBedrockByPoint.get(p);
+			Material mat = managedBedrock.getMaterial(p);
+			matByPointMap.put(p, mat);
+		}
+
+		Debug.end("getMaterialByPointMap");
+
+		return matByPointMap;
 	}
 
-	public Material getMaterial(Point p) {
-		return model.materialByPoint.get(p);
+	public Material getMaterialOrNull(Point p) {
+		ManagedBedrockBase managedBedrock = model.managedBedrockByPoint.get(p);
+		return (managedBedrock == null)?null:managedBedrock.getMaterial(p);
 	}
 
-
-	// utils //
-
-	private Pair<Point, Point> getDoorTopBottom(Point p) {
+	public Pair<Point, Point> getDoorTopBottom(Point p) {
 		//assumes p is a door block
 		World world = model.world;
 		Point top = null;
 		Point bottom = null;
 		Point a = p.add(0, 1, 0);
 		Point b = p.add(0, -1, 0);
-		Material above = a.getType(world);
-		Material below = b.getType(world);
-		Material middle = p.getType(world);
 
-		if (isConverted(world, a)) above = getMaterial(a);
-		if (isConverted(world, b)) below = getMaterial(b);
-		if (isConverted(world, p)) middle = getMaterial(p);
+		Material above = getMaterialOrNull(a);
+		Material below = getMaterialOrNull(b);
+		Material middle = getMaterialOrNull(p);
+		if (above == null) above = a.getType(world);
+		if (below == null) below = b.getType(world);
+		if (middle == null) middle = p.getType(world);
 
 		if (above == middle) {
 			top = a;
@@ -162,8 +138,37 @@ public class BedrockHandler {
 			return new Pair<>(top, bottom);
 		}
 	}
-	private boolean isConverted(World world, Point p) {
-		ManagedBedrockBase managedBedrock = instance.getManagedBedrock(world, p);
-		return managedBedrock != null && managedBedrock.isConverted();
+
+	// utils //
+
+	private ManagedBedrockBase ensureManagedBedrockAt(Point p) {
+		ManagedBedrockBase managedBedrock = model.managedBedrockByPoint.get(p);
+		if (managedBedrock == null) {
+			Material mat = p.getType(model.world);
+
+			if (Blocks.isTrapDoor(mat)) { // trap door
+				managedBedrock = new ManagedBedrockDoor(model.world, p, null);
+				model.managedBedrockByPoint.put(p, managedBedrock);
+			}
+			else if (Blocks.isTallDoor(mat)) { // tall door
+				Pair<Point, Point> doorTopBottom = getDoorTopBottom(p);
+				if (doorTopBottom != null) {
+					Point top = doorTopBottom.getKey();
+					Point bottom = doorTopBottom.getValue();
+
+					managedBedrock = new ManagedBedrockDoor(model.world, top, bottom);
+					model.managedBedrockByPoint.put(top, managedBedrock);
+					model.managedBedrockByPoint.put(bottom, managedBedrock);
+				} //else fallback
+			}
+
+			//fallback
+			if (managedBedrock == null) {
+				managedBedrock = new ManagedBedrock(model.world, p);
+				model.managedBedrockByPoint.put(p, managedBedrock);
+			}
+		}
+
+		return managedBedrock;
 	}
 }

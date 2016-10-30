@@ -1,6 +1,7 @@
 package me.newyith.fortress.bedrock;
 
 import com.google.common.collect.ImmutableMap;
+import javafx.util.Pair;
 import me.newyith.fortress.util.Blocks;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
@@ -114,8 +115,10 @@ public class BedrockManagerNewForWorld {
 			boolean isTallDoor = Blocks.isTallDoor(mat);
 			if (isTallDoor) {
 				Point pOtherHalf = getOtherHalfOfDoor(p);
-				boolean otherHalfShouldBeConv = allBatchPoints.contains(pOtherHalf);
-				shouldBeConv = shouldBeConv || otherHalfShouldBeConv;
+				if (pOtherHalf != null) {
+					boolean otherHalfShouldBeConv = allBatchPoints.contains(pOtherHalf);
+					shouldBeConv = shouldBeConv || otherHalfShouldBeConv;
+				}
 			}
 
 			if (!isConv && shouldBeConv) {
@@ -129,34 +132,17 @@ public class BedrockManagerNewForWorld {
 	}
 
 	private Point getOtherHalfOfDoor(Point p) {
-		//assumes p is a door block
-		World world = model.world;
-		Point top = null;
-		Point bottom = null;
-		Point a = p.add(0, 1, 0);
-		Point b = p.add(0, -1, 0);
-		Material above = a.getType(world);
-		Material below = b.getType(world);
-		Material middle = p.getType(world);
+		Point pOtherHalf = null;
 
-		if (model.bedrockHandler.isConverted(a)) above = model.bedrockHandler.getMaterial(a);
-		if (model.bedrockHandler.isConverted(b)) below = model.bedrockHandler.getMaterial(b);
-		if (model.bedrockHandler.isConverted(p)) middle = model.bedrockHandler.getMaterial(p);
+		Pair<Point, Point> doorTopBottom = model.bedrockHandler.getDoorTopBottom(p);
+		if (doorTopBottom != null) {
+			Point top = doorTopBottom.getKey();
+			Point bottom = doorTopBottom.getValue();
 
-		if (above == middle) {
-			top = a;
-			bottom = p;
-		} else if (below == middle) {
-			top = p;
-			bottom = b;
+			pOtherHalf = (p.equals(top))?bottom:top;
 		}
 
-		if (top == null || bottom == null) {
-			Debug.error("getOtherHalfOfDoor() failed at " + p);
-			return null;
-		} else {
-			return (p.equals(top))?bottom:top;
-		}
+		return pOtherHalf;
 	}
 }
 

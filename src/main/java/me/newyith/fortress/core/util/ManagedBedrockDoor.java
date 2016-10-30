@@ -68,10 +68,9 @@ public class ManagedBedrockDoor extends ManagedBedrockBase {
 	}
 
 	@Override
-	public void revert(World world, boolean fullRevert) {
+	public void revert(World world) {
 //		Debug.msg("ManagedBedrockDoor::revert() " + model.top + " ~ " + model.bottom);
 		model.converts--;
-		if (fullRevert) model.converts = 0;
 		updateConverted(world);
 	}
 
@@ -86,6 +85,10 @@ public class ManagedBedrockDoor extends ManagedBedrockBase {
 		if (p.equals(model.top)) mat = model.topRevertData.getMaterial();
 		if (p.equals(model.bottom)) mat = model.bottomRevertData.getMaterial();
 		return mat;
+	}
+
+	public boolean isTallDoor() {
+		return model.bottom != null;
 	}
 
 	public Point getTop() {
