@@ -257,7 +257,6 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 //TODO: finish changing from BedrockManagerOld to BedrockManagerNew
-//	also need to remove convert counter from ManagedBedrockBase and subclasses
 
 //TODO: retest bedrock safety (once change to new bedrock manager is done)
 

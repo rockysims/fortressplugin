@@ -9,15 +9,15 @@ import org.codehaus.jackson.annotate.JsonProperty;
 public class ManagedBedrock extends ManagedBedrockBase {
 	private static class Model {
 		private Point point;
-		private int converts;
+		private boolean isConverted;
 		private BlockRevertData revertData;
 
 		@JsonCreator
 		public Model(@JsonProperty("point") Point point,
-					 @JsonProperty("converts") int converts,
+					 @JsonProperty("isConverted") boolean isConverted,
 					 @JsonProperty("revertData") BlockRevertData revertData) {
 			this.point = point;
-			this.converts = converts;
+			this.isConverted = isConverted;
 			this.revertData = revertData;
 
 			//rebuild transient fields
@@ -31,27 +31,25 @@ public class ManagedBedrock extends ManagedBedrockBase {
 	}
 
 	public ManagedBedrock(World world, Point p) {
-		int converts = 0;
-		BlockRevertData revertData = new BlockRevertData(world, p);
-		model = new Model(p, converts, revertData);
+		boolean isConverted = false;
+		BlockRevertData revertData = new BlockRevertData(world, p); //TODO: consider setting to null here instead
+		model = new Model(p, isConverted, revertData);
 	}
 
 	//-----------------------------------------------------------------------
 
 	public void convert(World world) {
-//		Debug.msg("ManagedBedrock::convert() " + model.point);
-		model.converts++;
+		model.isConverted = true;
 		updateConverted(world);
 	}
 
 	public void revert(World world) {
-//		Debug.msg("ManagedBedrock::revert() " + model.point);
-		model.converts--;
+		model.isConverted = false;
 		updateConverted(world);
 	}
 
 	public boolean isConverted() {
-		return model.converts > 0;
+		return model.isConverted;
 	}
 
 	public Material getMaterial(Point p) {
@@ -59,13 +57,14 @@ public class ManagedBedrock extends ManagedBedrockBase {
 	}
 
 	private void updateConverted(World world) {
-		boolean converted = model.point.is(Material.BEDROCK, world);
-		int converts = model.converts;
+		boolean isBedrock = model.point.is(Material.BEDROCK, world);
+		boolean isConverted = model.isConverted;
 
-		if (converts > 0 && !converted) {
+		if (isConverted && !isBedrock) {
 			//convert
+			model.revertData = new BlockRevertData(world, model.point);
 			model.point.setType(Material.BEDROCK, world);
-		} else if (converts <= 0 && converted) {
+		} else if (!isConverted && isBedrock) {
 			//revert
 			model.revertData.revert(world, model.point);
 		}

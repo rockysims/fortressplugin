@@ -2,6 +2,7 @@ package me.newyith.fortress.bedrock.util;
 
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.particle.ParticleEffect;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -13,19 +14,19 @@ import java.util.Collection;
 
 public class ManagedBedrockDoor extends ManagedBedrockBase {
 	private static class Model {
-		private int converts;
+		private boolean isConverted;
 		private final Point top;
 		private final Point bottom;
 		private BlockRevertData topRevertData;
 		private BlockRevertData bottomRevertData;
 
 		@JsonCreator
-		public Model(@JsonProperty("converts") int converts,
+		public Model(@JsonProperty("isConverted") boolean isConverted,
 					 @JsonProperty("top") Point top,
 					 @JsonProperty("bottom") Point bottom,
 					 @JsonProperty("topRevertData") BlockRevertData topRevertData,
 					 @JsonProperty("bottomRevertData") BlockRevertData bottomRevertData) {
-			this.converts = converts;
+			this.isConverted = isConverted;
 			this.top = top;
 			this.bottom = bottom;
 			this.topRevertData = topRevertData;
@@ -42,40 +43,33 @@ public class ManagedBedrockDoor extends ManagedBedrockBase {
 	}
 
 	public ManagedBedrockDoor(World world, Point top, Point bottom) {
-		int converts = 0;
-		BlockRevertData topRevertData = new BlockRevertData(world, top);
+		boolean isConverted = false;
+		BlockRevertData topRevertData = new BlockRevertData(world, top); //TODO: consider setting to null here instead
 
 		BlockRevertData bottomRevertData = null;
 		if (bottom != null) {
-			bottomRevertData = new BlockRevertData(world, bottom);
+			bottomRevertData = new BlockRevertData(world, bottom); //TODO: consider setting to null here instead
 		}
-		model = new Model(converts, top, bottom, topRevertData, bottomRevertData);
+		model = new Model(isConverted, top, bottom, topRevertData, bottomRevertData);
 	}
-//	new
-//	public ManagedBedrockDoor(World world, Point top, Point bottom) {
-//		int converts = 0;
-//		model = new Model(converts, top, bottom, null, null);
-//	}
 
 	//-----------------------------------------------------------------------
 
 	@Override
 	public void convert(World world) {
-//		Debug.msg("ManagedBedrockDoor::convert() " + model.top + " ~ " + model.bottom);
-		model.converts++;
+		model.isConverted = true;
 		updateConverted(world);
 	}
 
 	@Override
 	public void revert(World world) {
-//		Debug.msg("ManagedBedrockDoor::revert() " + model.top + " ~ " + model.bottom);
-		model.converts--;
+		model.isConverted = false;
 		updateConverted(world);
 	}
 
 	@Override
 	public boolean isConverted() {
-		return model.converts > 0;
+		return model.isConverted;
 	}
 
 	@Override
@@ -101,38 +95,28 @@ public class ManagedBedrockDoor extends ManagedBedrockBase {
 	// utils //
 
 	private void updateConverted(World world) {
-		boolean converted = model.top.is(Material.BEDROCK, world);
-		int converts = model.converts;
+		boolean isBedrock = model.top.is(Material.BEDROCK, world);
+		boolean isConverted = model.isConverted;
 
-		if (converts > 0 && !converted) {
+		if (isConverted && !isBedrock) {
 			//convert
 			boolean potentialSecurityBreach = livingEntitiesInRange(world, model.top, 1) > 0;
 			if (potentialSecurityBreach) {
 				//show particles instead of changing to bedrock
-				float rand = 0.25F;
-				if (model.bottom == null) {
-					Point top = model.top.add(0.5, 0.0, 0.5);
-					ParticleEffect.PORTAL.display(rand, rand, rand, 0, 35, top.toLocation(world), 20);
-				} else {
-					if (model.converts % 2 == 0) {
-						Point bottom = model.bottom.add(0.5, 0.0, 0.5);
-						ParticleEffect.PORTAL.display(rand, rand, rand, 0, 35, bottom.toLocation(world), 20);
-					} else {
-						Point top = model.top.add(0.5, 0.0, 0.5);
-						ParticleEffect.PORTAL.display(rand, rand, rand, 0, 35, top.toLocation(world), 20);
-					}
+				showParticles(world, model.top);
+				if (model.bottom != null) {
+					showParticles(world, model.bottom);
 				}
 			} else {
 				//change to bedrock
 				model.topRevertData = new BlockRevertData(world, model.top);
 				if (model.bottom != null) {
 					model.bottomRevertData = new BlockRevertData(world, model.bottom);
-					//Debug.msg("saved bottomRevertData material: " + model.bottomRevertData.getMaterial() + " -------------------");
 					model.bottom.setType(Material.BEDROCK, world);
 				}
 				model.top.setType(Material.BEDROCK, world);
 			}
-		} else if (converts <= 0 && converted) {
+		} else if (!isConverted && isBedrock) {
 			//revert
 
 			//isBedrock condition is to prevent chance of duplicating blocks if plugin save gets out of sync with world save
@@ -147,5 +131,11 @@ public class ManagedBedrockDoor extends ManagedBedrockBase {
 		Collection<Entity> entities =  world.getNearbyEntities(p.add(0.5, 0.5, 0.5).toLocation(world), range, range, range);
 		entities.removeIf(entity -> !(entity instanceof LivingEntity));
 		return entities.size();
+	}
+
+	private void showParticles(World world, Point p) {
+		float rand = 0.25F;
+		Location loc = p.add(0.5, 0.0, 0.5).toLocation(world);
+		ParticleEffect.PORTAL.display(rand, rand, rand, 0, 35, loc, 20);
 	}
 }
