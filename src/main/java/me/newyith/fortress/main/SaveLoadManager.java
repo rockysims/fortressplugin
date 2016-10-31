@@ -1,7 +1,7 @@
 package me.newyith.fortress.main;
 
 import me.newyith.fortress.bedrock.BedrockManagerNew;
-import me.newyith.fortress.core.TimedBedrockManagerOld;
+import me.newyith.fortress.bedrock.timed.TimedBedrockManagerNew;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Log;
 import org.bukkit.event.EventHandler;
@@ -50,7 +50,7 @@ public class SaveLoadManager implements Listener {
 	private void saveToMap(Map<String, Object> data) {
 		data.put("FortressesManager", FortressesManager.getInstance());
 		data.put("BedrockManager", BedrockManagerNew.getInstance());
-		data.put("TimedBedrockManager", TimedBedrockManagerOld.getInstance());
+		data.put("TimedBedrockManager", TimedBedrockManagerNew.getInstance());
 	}
 
 	private void loadFromMap(Map<String, Object> data) {
@@ -59,10 +59,10 @@ public class SaveLoadManager implements Listener {
 		//load TimedBedrockManager
 		obj = data.get("TimedBedrockManager");
 		if (obj == null) {
-			TimedBedrockManagerOld.setInstance(new TimedBedrockManagerOld());
+			TimedBedrockManagerNew.setInstance(new TimedBedrockManagerNew());
 		} else {
-			TimedBedrockManagerOld timedBedrockManager = mapper.convertValue(obj, TimedBedrockManagerOld.class);
-			TimedBedrockManagerOld.setInstance(timedBedrockManager);
+			TimedBedrockManagerNew timedBedrockManager = mapper.convertValue(obj, TimedBedrockManagerNew.class);
+			TimedBedrockManagerNew.setInstance(timedBedrockManager);
 		}
 
 		//load BedrockManager
