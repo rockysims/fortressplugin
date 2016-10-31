@@ -33,10 +33,12 @@ public class TimedBedrockManagerNew {
 
 		public TimedBedrockManagerNewForWorld getManagerByWorld(World world) {
 			String worldName = world.getName();
-			if (!managerByWorld.containsKey(worldName)) {
-				managerByWorld.put(worldName, new TimedBedrockManagerNewForWorld(world));
+			TimedBedrockManagerNewForWorld manager = managerByWorld.get(worldName);
+			if (manager == null) {
+				manager = new TimedBedrockManagerNewForWorld(world);
+				managerByWorld.put(worldName, manager);
 			}
-			return managerByWorld.get(worldName);
+			return manager;
 		}
 	}
 	private Model model = null;
@@ -54,5 +56,12 @@ public class TimedBedrockManagerNew {
 
 	public static TimedBedrockManagerNewForWorld forWorld(World world) {
 		return instance.model.getManagerByWorld(world);
+	}
+
+	public static void onTick() {
+		instance.model.managerByWorld.entrySet().stream().forEach((entry) -> {
+			TimedBedrockManagerNewForWorld manager = entry.getValue();
+			manager.onTick();
+		});
 	}
 }
