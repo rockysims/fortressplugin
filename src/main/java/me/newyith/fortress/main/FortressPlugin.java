@@ -256,6 +256,8 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+
+
 //TODO: finish changing from BedrockManagerOld to BedrockManagerNew
 
 //TODO: retest bedrock safety (once change to new bedrock manager is done)
@@ -327,6 +329,11 @@ public class FortressPlugin extends JavaPlugin {
 //	currently it can show hearts even if door can be broken/bypassed by breaking block its on
 
 //TODO: make protection prevent breaking by water
+
+//TODO: consider leaving in bug where piston extensions don't receive protection from explosions (and other things)
+//	or think of some reasonably elegant way of handling the fact that piston extension is technically a different block
+//		don't want retracted piston to still protect block piston would extend into
+
 
 
 

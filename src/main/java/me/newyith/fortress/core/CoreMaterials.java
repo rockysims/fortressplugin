@@ -141,9 +141,10 @@ public class CoreMaterials {
 						addProtectable(Material.STEP);
 						addProtectable(Material.DOUBLE_STEP);
 						break;
-					//pistons commented out because bedrock ripple and shield don't seem to play nice with pistons
+					//pistons not protectable because bedrock ripple and shield don't seem to play nice with pistons
 					//had piston turn into piston extension (invisible) when toggling switch controlling piston with empty hand (causing ripple)
-//					case PISTON_BASE:
+					/*
+					case PISTON_BASE:
 //						addProtectable(Material.PISTON_BASE);
 //						addProtectable(Material.PISTON_EXTENSION);
 //						break;
@@ -151,6 +152,11 @@ public class CoreMaterials {
 //						addProtectable(Material.PISTON_STICKY_BASE);
 //						addProtectable(Material.PISTON_MOVING_PIECE);
 //						break;
+					/*/
+					case PISTON_BASE:
+					case PISTON_STICKY_BASE:
+						break;
+					//*/
 					case REDSTONE:
 						addProtectable(Material.REDSTONE_WIRE);
 						break;

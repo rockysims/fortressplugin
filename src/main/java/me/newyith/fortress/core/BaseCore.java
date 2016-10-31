@@ -2,6 +2,7 @@ package me.newyith.fortress.core;
 
 import me.newyith.fortress.bedrock.BedrockAuthToken;
 import me.newyith.fortress.bedrock.BedrockManagerNew;
+import me.newyith.fortress.bedrock.timed.TimedBedrockManagerNew;
 import me.newyith.fortress.core.util.GenPrepData;
 import me.newyith.fortress.main.BedrockSafety;
 import me.newyith.fortress.main.FortressPlugin;
@@ -91,6 +92,16 @@ public abstract class BaseCore {
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
+
+	public void shield(Point shieldPoint) {
+		Set<Point> shieldPoints = new HashSet<>();
+		shieldPoints.add(shieldPoint);
+		shield(shieldPoints);
+	}
+
+	public void shield(Set<Point> shieldPoints) {
+		TimedBedrockManagerNew.forWorld(model.world).convert(model.bedrockAuthToken, shieldPoints);
+	}
 
 	public boolean playerCanOpenDoor(Player player, Point doorPoint) {
 		String playerName = player.getName();

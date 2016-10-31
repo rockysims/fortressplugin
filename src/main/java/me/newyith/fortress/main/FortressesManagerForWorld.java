@@ -2,7 +2,6 @@ package me.newyith.fortress.main;
 
 import me.newyith.fortress.command.StuckPlayer;
 import me.newyith.fortress.core.BaseCore;
-import me.newyith.fortress.core.TimedBedrockManagerOld;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.rune.generator.GeneratorRunePattern;
 import me.newyith.fortress.util.Blocks;
@@ -291,14 +290,14 @@ public class FortressesManagerForWorld {
 		}
 
 		if (generatedBlockExploded) {
-			Set<Point> pointsToShield = new HashSet<>();
+			Set<Point> allPointsToShield = new HashSet<>();
 			Vector explosionOrigin = loc.toVector();
 			it = explodeBlocks.iterator();
 			while (it.hasNext()) {
 				Point explodePoint = new Point(it.next());
 
 				//if (generated block between explosion and explodePoint)
-				//	add generated block to pointsToShield
+				//	add generated block to allPointsToShield
 				//	remove explodePoint from explodeBlocks
 				Vector direction = explodePoint.add(0.5, 0.5, 0.5).toVector().subtract(explosionOrigin);
 				int distance = Math.max(1, (int) explosionOrigin.distance(explodePoint.toVector()));
@@ -308,7 +307,7 @@ public class FortressesManagerForWorld {
 					Point rayPoint = new Point(rayBlock);
 					boolean rayBlockIsShield = isGenerated(rayPoint) && !rayPoint.is(Material.BEDROCK, world);
 					if (rayBlockIsShield) {
-						pointsToShield.add(rayPoint);
+						allPointsToShield.add(rayPoint);
 						it.remove(); //remove explodePoint from explodeBlocks since rayBlockIsShield
 						break;
 					}
@@ -324,11 +323,28 @@ public class FortressesManagerForWorld {
 				}
 			}
 
-			//show timed bedrock at pointsToShield
-			if (!pointsToShield.isEmpty()) {
-				//pointsToShield excludes bedrock so we know points are not already converted
-				for (Point p : pointsToShield) {
-					TimedBedrockManagerOld.convert(world, p);
+			//show shield bedrock
+			if (!allPointsToShield.isEmpty()) {
+				//fill pointsToShieldByRune from allPointsToShield
+				Map<GeneratorRune, Set<Point>> pointsToShieldByRune = new HashMap<>();
+				for (Point p : allPointsToShield) {
+					GeneratorRune rune = getRuneByClaimedWallPoint(p);
+					if (rune != null) { //should always be true in theory
+						Set<Point> runePointsToShield = pointsToShieldByRune.get(rune);
+						if (runePointsToShield == null) {
+							runePointsToShield = new HashSet<>();
+							pointsToShieldByRune.put(rune, runePointsToShield);
+						}
+						runePointsToShield.add(p);
+					} else {
+						Debug.warn("onExplode() failed to show shield because rune == null at " + p);
+					}
+				}
+
+				for (Map.Entry<GeneratorRune, Set<Point>> entry : pointsToShieldByRune.entrySet()) {
+					GeneratorRune rune = entry.getKey();
+					Set<Point> runePointsToShield = entry.getValue();
+					rune.getGeneratorCore().shield(runePointsToShield);
 				}
 			}
 		}
@@ -336,47 +352,6 @@ public class FortressesManagerForWorld {
 		//break runes if needed
 		explodeBlocks.forEach(this::onRuneMightHaveBeenBrokenBy);
 
-
-		if (false) {
-			/* OLD WAY
-			Set<Point> pointsToShield = new HashSet<>();
-			Iterator<Block> it = explodeBlocks.iterator();
-			while (it.hasNext()) {
-				Point p = new Point(it.next());
-				if (isGenerated(p) && !p.is(Material.BEDROCK, world)) {
-					pointsToShield.add(p);
-				}
-			}
-
-			if (!pointsToShield.isEmpty()) {
-				//pointsToShield excludes bedrock so we know points are not already converted
-				for (Point p : pointsToShield) {
-					BedrockManager.convert(world, p);
-				}
-
-				world.createExplosion(loc, yield);
-
-				/*
-				Random random = new Random();
-				for (Point p : pointsToShield) {
-				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
-					BedrockManager.revert(world, p);
-				}, 25 + random.nextInt(15)); //20 ticks per second
-				}
-				/ * /
-				for (Point p : pointsToShield) {
-					BedrockManager.revert(world, p);
-				}
-				// * /
-
-				cancel = true;
-			}
-			//*/
-		}
-
-
-
-//		Debug.msg("onExplode() returning " + String.valueOf(cancel));
 		return cancel;
 	}
 
@@ -433,7 +408,7 @@ public class FortressesManagerForWorld {
 		World world = doorBlock.getWorld();
 
 		if (isGenerated(doorPoint)) {
-			GeneratorRune rune = getRuneByClaimedPoint(doorPoint);
+			GeneratorRune rune = getRuneByClaimedWallPoint(doorPoint);
 			if (rune != null) {
 				Point aboveDoorPoint = new Point(doorPoint).add(0, 1, 0);
 				switch (aboveDoorPoint.getBlock(world).getType()) {
@@ -491,13 +466,13 @@ public class FortressesManagerForWorld {
 
 	public void onPlayerRightClickBlock(Player player, Block block, BlockFace face) {
 		Point p = new Point(block);
-		GeneratorRune rune = getRuneByClaimedPoint(p);
+		GeneratorRune rune = getRuneByClaimedWallPoint(p);
 		if (rune != null) {
 			rune.onPlayerRightClickWall(player, block, face);
 		}
 	}
 
-	private GeneratorRune getRuneByClaimedPoint(Point p) {
+	private GeneratorRune getRuneByClaimedWallPoint(Point p) {
 		return model.generatorRuneByClaimedWallPoint.get(p);
 	}
 
@@ -506,27 +481,62 @@ public class FortressesManagerForWorld {
 		Point brokenPoint = new Point(brokenBlock);
 		World world = brokenBlock.getWorld();
 
-		boolean isProtected = model.protectedPoints.contains(brokenPoint);
-		boolean inCreative = event.getPlayer().getGameMode() == GameMode.CREATIVE;
 		boolean cancel = false;
-		if (isProtected && !inCreative) {
-			cancel = true;
-			TimedBedrockManagerOld.convert(world, brokenPoint);
-		} else {
-			if (brokenPoint.is(Material.PISTON_EXTENSION, world) || brokenPoint.is(Material.PISTON_MOVING_PIECE, world)) {
-				MaterialData matData = brokenBlock.getState().getData();
-				if (matData instanceof PistonExtensionMaterial) {
-					PistonExtensionMaterial pem = (PistonExtensionMaterial) matData;
-					BlockFace face = pem.getFacing().getOppositeFace();
-					Point pistonPoint = new Point(brokenBlock.getRelative(face, 1));
-					if (model.protectedPoints.contains(pistonPoint)) {
-						cancel = true;
-					}
-				} else {
-					Debug.error("matData not instanceof PistonExtensionMaterial");
-				}
+		boolean inCreative = event.getPlayer().getGameMode() == GameMode.CREATIVE;
+		if (!inCreative) {
+			GeneratorRune rune = getRuneByClaimedWallPoint(brokenPoint);
+			boolean isProtected = model.protectedPoints.contains(brokenPoint);
+			if (isProtected) {
+				cancel = true;
+				if (rune != null) rune.getGeneratorCore().shield(brokenPoint);
 			}
+
+			//commented out because we're not gonna bother handling piston special case yet (handling it here is not elegant)
+//			if (!isProtected) {
+//				switch (brokenPoint.getType(world)) {
+//					case PISTON_EXTENSION:
+//					case PISTON_MOVING_PIECE:
+//						MaterialData matData = brokenBlock.getState().getData();
+//						if (matData instanceof PistonExtensionMaterial) {
+//							PistonExtensionMaterial pem = (PistonExtensionMaterial) matData;
+//							BlockFace face = pem.getFacing().getOppositeFace();
+//							Point pistonBasePoint = new Point(brokenBlock.getRelative(face, 1));
+//							if (model.protectedPoints.contains(pistonBasePoint)) {
+//								cancel = true;
+//								if (rune != null) rune.getGeneratorCore().shield(brokenPoint);
+//							}
+//						} else {
+//							Debug.error("matData not instanceof PistonExtensionMaterial");
+//						}
+//				}
+//			}
 		}
+
+//TODO: delete this block of code
+//		boolean isProtected = model.protectedPoints.contains(brokenPoint);
+//		boolean inCreative = event.getPlayer().getGameMode() == GameMode.CREATIVE;
+//		boolean cancel = false;
+//		if (isProtected && !inCreative) {
+//			cancel = true;
+////			TimedBedrockManagerOld.convert(world, brokenPoint);
+//
+//
+//			TimedBedrockManagerNew.forWorld(world).convert(brokenPoint);
+//		} else {
+//			if (brokenPoint.is(Material.PISTON_EXTENSION, world) || brokenPoint.is(Material.PISTON_MOVING_PIECE, world)) {
+//				MaterialData matData = brokenBlock.getState().getData();
+//				if (matData instanceof PistonExtensionMaterial) {
+//					PistonExtensionMaterial pem = (PistonExtensionMaterial) matData;
+//					BlockFace face = pem.getFacing().getOppositeFace();
+//					Point pistonPoint = new Point(brokenBlock.getRelative(face, 1));
+//					if (model.protectedPoints.contains(pistonPoint)) {
+//						cancel = true;
+//					}
+//				} else {
+//					Debug.error("matData not instanceof PistonExtensionMaterial");
+//				}
+//			}
+//		}
 
 		if (cancel) {
 			event.setCancelled(true);
