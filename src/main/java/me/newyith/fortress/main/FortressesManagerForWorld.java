@@ -2,7 +2,7 @@ package me.newyith.fortress.main;
 
 import me.newyith.fortress.command.StuckPlayer;
 import me.newyith.fortress.core.BaseCore;
-import me.newyith.fortress.core.TimedBedrockManager;
+import me.newyith.fortress.core.TimedBedrockManagerOld;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.rune.generator.GeneratorRunePattern;
 import me.newyith.fortress.util.Blocks;
@@ -16,7 +16,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.*;
 import org.bukkit.util.BlockIterator;
@@ -329,7 +328,7 @@ public class FortressesManagerForWorld {
 			if (!pointsToShield.isEmpty()) {
 				//pointsToShield excludes bedrock so we know points are not already converted
 				for (Point p : pointsToShield) {
-					TimedBedrockManager.convert(world, p);
+					TimedBedrockManagerOld.convert(world, p);
 				}
 			}
 		}
@@ -512,7 +511,7 @@ public class FortressesManagerForWorld {
 		boolean cancel = false;
 		if (isProtected && !inCreative) {
 			cancel = true;
-			TimedBedrockManager.convert(world, brokenPoint);
+			TimedBedrockManagerOld.convert(world, brokenPoint);
 		} else {
 			if (brokenPoint.is(Material.PISTON_EXTENSION, world) || brokenPoint.is(Material.PISTON_MOVING_PIECE, world)) {
 				MaterialData matData = brokenBlock.getState().getData();

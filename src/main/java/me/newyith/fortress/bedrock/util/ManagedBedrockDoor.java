@@ -1,6 +1,5 @@
-package me.newyith.fortress.core.util;
+package me.newyith.fortress.bedrock.util;
 
-import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.particle.ParticleEffect;
 import org.bukkit.Material;

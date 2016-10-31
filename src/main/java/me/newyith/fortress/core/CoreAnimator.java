@@ -250,7 +250,7 @@ public class CoreAnimator {
 			//show bedrock wave
 			for (Point p : updatedPoints) {
 				int ms = 4 * model.ticksPerFrame * TickTimer.msPerTick;
-				TimedBedrockManager.convert(model.world, p, ms);
+				TimedBedrockManagerOld.convert(model.world, p, ms);
 			}
 		}
 

@@ -8,7 +8,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.Set;
 
 public class BedrockBatch {
-	private static class Model {
+	protected static class Model {
 		private final BedrockAuthToken authToken;
 		private final ImmutableSet<Point> points;
 
@@ -28,7 +28,7 @@ public class BedrockBatch {
 		this.model = model;
 	}
 
-	public BedrockBatch(Set<Point> points, BedrockAuthToken authToken) {
+	public BedrockBatch(BedrockAuthToken authToken, Set<Point> points) {
 		model = new Model(authToken, ImmutableSet.copyOf(points));
 	}
 

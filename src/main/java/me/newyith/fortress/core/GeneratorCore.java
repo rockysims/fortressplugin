@@ -2,6 +2,7 @@ package me.newyith.fortress.core;
 
 import javafx.util.Pair;
 import me.newyith.fortress.bedrock.BedrockAuthToken;
+import me.newyith.fortress.bedrock.timed.TimedBedrockManagerNew;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.rune.generator.GeneratorRune;
@@ -168,29 +169,20 @@ public class GeneratorCore extends BaseCore {
 
 			int layerIndex = 0;
 			for (Set<Point> layer : rippleLayers) {
-				int min = 2000;
-				int max = 2000;
+				int msDuration = 2000;
 
 				int layersRemaining = rippleLayers.size() - layerIndex;
 				if (layersRemaining < 4) {
-					min = 450 * layersRemaining;
-					max = Math.min(2000, min + 500);
+					msDuration = 450 * layersRemaining;
 				}
 
-				final int msMin = min;
-				final int msMax = max;
+				final int msDurationFinal = msDuration;
 				Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
 					//TODO: consider fixing hacky call to getRune() here. GeneratorCore shouldn't need to know about rune
 					//	maybe add BaseCore::onBroken() should set model.isBroken = true?
 					boolean runeStillExists = FortressesManager.getRune(model.world, model.anchorPoint) != null;
 					if (runeStillExists) { //rune might have been destroyed before ripple ended
-						for (Point p : layer) {
-							int ms = msMin;
-							if (msMin < msMax) {
-								ms += model.random.nextInt(msMax - msMin);
-							}
-							TimedBedrockManager.convert(model.world, p, ms);
-						}
+						TimedBedrockManagerNew.forWorld(model.world).convert(model.bedrockAuthToken, layer, msDurationFinal);
 					}
 				}, layerIndex * 3); //20 ticks per second
 

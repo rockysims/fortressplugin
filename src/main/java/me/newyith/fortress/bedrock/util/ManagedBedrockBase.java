@@ -1,4 +1,4 @@
-package me.newyith.fortress.core.util;
+package me.newyith.fortress.bedrock.util;
 
 import me.newyith.fortress.util.Point;
 import org.bukkit.Material;

@@ -55,13 +55,17 @@ public class BedrockManagerNewForWorld {
 	//-----------------------------------------------------------------------
 
 	//this method is (or should be) thread safe
-	public BedrockBatch convert(Set<Point> points, BedrockAuthToken authToken) {
-		BedrockBatch batch = new BedrockBatch(points, authToken);
+	public BedrockBatch convert(BedrockAuthToken authToken, Set<Point> points) {
+		BedrockBatch batch = new BedrockBatch(authToken, points);
+		convert(batch);
+		return batch;
+	}
+
+	//this method is (or should be) thread safe
+	public void convert(BedrockBatch batch) {
 		synchronized (model.mutex) {
 			addBatch(batch);
 		}
-
-		return batch;
 	}
 	private void addBatch(BedrockBatch batch) {
 		model.batches.add(batch);
@@ -102,6 +106,10 @@ public class BedrockManagerNewForWorld {
 					removeBatch(batch);
 				}
 			}
+		}
+
+		if (forceRevertedPoints.size() > 0) {
+			Debug.warn("Force reverted " + forceRevertedPoints.size() + " points.");
 		}
 
 		return forceRevertedPoints;

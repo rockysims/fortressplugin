@@ -1,9 +1,9 @@
 package me.newyith.fortress.bedrock;
 
 import javafx.util.Pair;
-import me.newyith.fortress.core.util.ManagedBedrock;
-import me.newyith.fortress.core.util.ManagedBedrockBase;
-import me.newyith.fortress.core.util.ManagedBedrockDoor;
+import me.newyith.fortress.bedrock.util.ManagedBedrock;
+import me.newyith.fortress.bedrock.util.ManagedBedrockBase;
+import me.newyith.fortress.bedrock.util.ManagedBedrockDoor;
 import me.newyith.fortress.util.Blocks;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;

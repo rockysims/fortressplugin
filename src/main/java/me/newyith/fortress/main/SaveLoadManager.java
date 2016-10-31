@@ -1,7 +1,7 @@
 package me.newyith.fortress.main;
 
-import me.newyith.fortress.core.BedrockManagerOld;
-import me.newyith.fortress.core.TimedBedrockManager;
+import me.newyith.fortress.bedrock.BedrockManagerNew;
+import me.newyith.fortress.core.TimedBedrockManagerOld;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Log;
 import org.bukkit.event.EventHandler;
@@ -49,8 +49,8 @@ public class SaveLoadManager implements Listener {
 
 	private void saveToMap(Map<String, Object> data) {
 		data.put("FortressesManager", FortressesManager.getInstance());
-		data.put("BedrockManager", BedrockManagerOld.getInstance());
-		data.put("TimedBedrockManager", TimedBedrockManager.getInstance());
+		data.put("BedrockManager", BedrockManagerNew.getInstance());
+		data.put("TimedBedrockManager", TimedBedrockManagerOld.getInstance());
 	}
 
 	private void loadFromMap(Map<String, Object> data) {
@@ -59,20 +59,20 @@ public class SaveLoadManager implements Listener {
 		//load TimedBedrockManager
 		obj = data.get("TimedBedrockManager");
 		if (obj == null) {
-			TimedBedrockManager.setInstance(new TimedBedrockManager());
+			TimedBedrockManagerOld.setInstance(new TimedBedrockManagerOld());
 		} else {
-			TimedBedrockManager timedBedrockManager = mapper.convertValue(obj, TimedBedrockManager.class);
-			TimedBedrockManager.setInstance(timedBedrockManager);
+			TimedBedrockManagerOld timedBedrockManager = mapper.convertValue(obj, TimedBedrockManagerOld.class);
+			TimedBedrockManagerOld.setInstance(timedBedrockManager);
 		}
 
 		//load BedrockManager
 		obj = data.get("BedrockManager");
 		if (obj == null) {
-			BedrockManagerOld.setInstance(new BedrockManagerOld());
+			BedrockManagerNew.setInstance(new BedrockManagerNew());
 		} else {
 //			Debug.msg("load obj (BM) type: " + obj.getClass().getName());
-			BedrockManagerOld bedrockManager = mapper.convertValue(obj, BedrockManagerOld.class);
-			BedrockManagerOld.setInstance(bedrockManager);
+			BedrockManagerNew bedrockManager = mapper.convertValue(obj, BedrockManagerNew.class);
+			BedrockManagerNew.setInstance(bedrockManager);
 		}
 
 		//load FortressesManager

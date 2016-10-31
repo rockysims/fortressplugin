@@ -6,7 +6,7 @@ import org.bukkit.World;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class TimedBedrock implements Comparable<TimedBedrock> {
+public class TimedBedrockOld implements Comparable<TimedBedrockOld> {
 	private static class Model {
 		private int endTick = 0;
 		private Point point = null;
@@ -28,11 +28,11 @@ public class TimedBedrock implements Comparable<TimedBedrock> {
 	private Model model = null;
 
 	@JsonCreator
-	public TimedBedrock(@JsonProperty("model") Model model) {
+	public TimedBedrockOld(@JsonProperty("model") Model model) {
 		this.model = model;
 	}
 
-	public TimedBedrock(World w, Point p, int endTick) {
+	public TimedBedrockOld(World w, Point p, int endTick) {
 		String worldName = w.getName();
 		model = new Model(endTick, p, worldName);
 	}
@@ -40,7 +40,7 @@ public class TimedBedrock implements Comparable<TimedBedrock> {
 	//------------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public int compareTo(TimedBedrock otherTimedBedrock) {
+	public int compareTo(TimedBedrockOld otherTimedBedrock) {
 		return model.endTick - otherTimedBedrock.getEndTick();
 	}
 
