@@ -512,32 +512,6 @@ public class FortressesManagerForWorld {
 //			}
 		}
 
-//TODO: delete this block of code
-//		boolean isProtected = model.protectedPoints.contains(brokenPoint);
-//		boolean inCreative = event.getPlayer().getGameMode() == GameMode.CREATIVE;
-//		boolean cancel = false;
-//		if (isProtected && !inCreative) {
-//			cancel = true;
-////			TimedBedrockManagerOld.convert(world, brokenPoint);
-//
-//
-//			TimedBedrockManagerNew.forWorld(world).convert(brokenPoint);
-//		} else {
-//			if (brokenPoint.is(Material.PISTON_EXTENSION, world) || brokenPoint.is(Material.PISTON_MOVING_PIECE, world)) {
-//				MaterialData matData = brokenBlock.getState().getData();
-//				if (matData instanceof PistonExtensionMaterial) {
-//					PistonExtensionMaterial pem = (PistonExtensionMaterial) matData;
-//					BlockFace face = pem.getFacing().getOppositeFace();
-//					Point pistonPoint = new Point(brokenBlock.getRelative(face, 1));
-//					if (model.protectedPoints.contains(pistonPoint)) {
-//						cancel = true;
-//					}
-//				} else {
-//					Debug.error("matData not instanceof PistonExtensionMaterial");
-//				}
-//			}
-//		}
-
 		if (cancel) {
 			event.setCancelled(true);
 		} else {

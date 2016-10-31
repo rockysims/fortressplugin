@@ -259,6 +259,9 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //TODO: finish changing from BedrockManagerOld to BedrockManagerNew
+//	TODO: consider adding AnimationLayer to wrap layerPoints and bedrockBatch (would handle altered and protected)
+//	then delete all classes ending in "Old" (and remove "New" suffix from replacements)
+
 
 //TODO: retest bedrock safety (once change to new bedrock manager is done)
 
