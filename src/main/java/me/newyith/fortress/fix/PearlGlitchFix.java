@@ -33,12 +33,12 @@ public class PearlGlitchFix implements Listener {
 			Point above = target.add(0, 1, 0);
 
 			boolean validTarget = true;
-			validTarget = validTarget && !FortressesManager.isGenerated(world, target);
-			validTarget = validTarget && !FortressesManager.isGenerated(world, above);
+			validTarget = validTarget && !FortressesManager.forWorld(world).isGenerated(target);
+			validTarget = validTarget && !FortressesManager.forWorld(world).isGenerated(above);
 			if (validTarget) {
 				boolean safeTarget = true;
-				safeTarget = safeTarget && !FortressesManager.isClaimed(world, target);
-				safeTarget = safeTarget && !FortressesManager.isClaimed(world, above);
+				safeTarget = safeTarget && !FortressesManager.forWorld(world).isClaimed(target);
+				safeTarget = safeTarget && !FortressesManager.forWorld(world).isClaimed(above);
 				if (!safeTarget) {
 					boolean targetAiry = Blocks.isAiry(target, world);
 					if (targetAiry) {

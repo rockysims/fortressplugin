@@ -46,7 +46,8 @@ public class EventListener implements Listener {
 	public void onSignChange(SignChangeEvent event) {
 		Player player = event.getPlayer();
 		Block block = event.getBlock();
-		boolean cancel = FortressesManager.onSignChange(player, block);
+		World world = block.getWorld();
+		boolean cancel = FortressesManager.forWorld(world).onSignChange(player, block);
 		if (cancel) {
 			event.setCancelled(true);
 		}
@@ -54,27 +55,31 @@ public class EventListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockBreakEvent(BlockBreakEvent event) {
-		FortressesManager.onBlockBreakEvent(event);
+		World world = event.getBlock().getWorld();
+		FortressesManager.forWorld(world).onBlockBreakEvent(event);
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	public void onEnvironmentBreaksRedstoneWireEvent(BlockFromToEvent event) {
-		if(event.getToBlock().getType() == Material.REDSTONE_WIRE) {
-			FortressesManager.onEnvironmentBreaksRedstoneWireEvent(event.getToBlock());
+		if (event.getToBlock().getType() == Material.REDSTONE_WIRE) {
+			World world = event.getToBlock().getWorld();
+			FortressesManager.forWorld(world).onEnvironmentBreaksRedstoneWireEvent(event.getToBlock());
 		}
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockRedstoneEvent(BlockRedstoneEvent event) {
-		FortressesManager.onBlockRedstoneEvent(event);
+		World world = event.getBlock().getWorld();
+		FortressesManager.forWorld(world).onBlockRedstoneEvent(event);
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockPlaceEvent(BlockPlaceEvent event) {
-		Player player = event.getPlayer();
 		Block placedBlock = event.getBlockPlaced();
+		World world = placedBlock.getWorld();
+		Player player = event.getPlayer();
 		Material replacedMaterial = event.getBlockReplacedState().getType();
-		boolean cancel = FortressesManager.onBlockPlaceEvent(player, placedBlock, replacedMaterial);
+		boolean cancel = FortressesManager.forWorld(world).onBlockPlaceEvent(player, placedBlock, replacedMaterial);
 		if (cancel) {
 			event.setCancelled(true);
 		}
@@ -94,7 +99,7 @@ public class EventListener implements Listener {
 		Set<Block> movedBlocks = new HashSet<>(event.getBlocks());
 		boolean isSticky = event.isSticky();
 
-		boolean cancel = FortressesManager.onPistonEvent(isSticky, w, p, t, movedBlocks);
+		boolean cancel = FortressesManager.forWorld(w).onPistonEvent(isSticky, p, t, movedBlocks);
 		if (cancel) {
 			event.setCancelled(true);
 		}
@@ -107,7 +112,7 @@ public class EventListener implements Listener {
 		boolean isSticky = event.isSticky();
 		Set<Block> movedBlocks = new HashSet<>(event.getBlocks());
 
-		boolean cancel = FortressesManager.onPistonEvent(isSticky, w, p, null, movedBlocks);
+		boolean cancel = FortressesManager.forWorld(w).onPistonEvent(isSticky, p, null, movedBlocks);
 		if (cancel) {
 			event.setCancelled(true);
 		}
@@ -136,7 +141,8 @@ public class EventListener implements Listener {
 		Debug.msg("calculated yield: " + yield);
 		//*/
 
-		boolean cancel = FortressesManager.onExplode(explodeBlocks, loc);
+		World world = loc.getWorld();
+		boolean cancel = FortressesManager.forWorld(world).onExplode(explodeBlocks, loc);
 		if (cancel) {
 			event.setCancelled(true);
 		}
@@ -144,7 +150,8 @@ public class EventListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockIgnite(BlockIgniteEvent event) {
-		boolean cancel = FortressesManager.onIgnite(event.getBlock());
+		World world = event.getBlock().getWorld();
+		boolean cancel = FortressesManager.forWorld(world).onIgnite(event.getBlock());
 		if (cancel) {
 			event.setCancelled(true);
 		}
@@ -152,7 +159,8 @@ public class EventListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockBurn(BlockBurnEvent event) {
-		boolean cancel = FortressesManager.onBurn(event.getBlock());
+		World world = event.getBlock().getWorld();
+		boolean cancel = FortressesManager.forWorld(world).onBurn(event.getBlock());
 		if (cancel) {
 			event.setCancelled(true);
 		}
@@ -163,13 +171,14 @@ public class EventListener implements Listener {
 		Action action = event.getAction();
 		if (action == Action.RIGHT_CLICK_BLOCK) {
 			Block clicked = event.getClickedBlock();
+			World world = clicked.getWorld();
 
 			Player player = event.getPlayer();
 			BlockFace face = event.getBlockFace();
-			FortressesManager.onPlayerRightClickBlock(player, clicked, face);
+			FortressesManager.forWorld(world).onPlayerRightClickBlock(player, clicked, face);
 
 			if (Blocks.isDoor(clicked.getType())) {
-				boolean cancel = FortressesManager.onPlayerOpenCloseDoor(player, clicked);
+				boolean cancel = FortressesManager.forWorld(world).onPlayerOpenCloseDoor(player, clicked);
 				if (cancel) {
 					event.setCancelled(true);
 				}
@@ -185,7 +194,9 @@ public class EventListener implements Listener {
 		if (entity instanceof Enderman) {
 			if (event.getTo() == Material.AIR) {
 				//picking up block
-				cancel = FortressesManager.onEndermanPickupBlock(event.getBlock());
+				Block block = event.getBlock();
+				World world = block.getWorld();
+				cancel = FortressesManager.forWorld(world).onEndermanPickupBlock(block);
 				if (cancel) {
 					event.setCancelled(true);
 				}
@@ -193,7 +204,8 @@ public class EventListener implements Listener {
 		} else if (entity instanceof Zombie) {
 			if (event.getTo() == Material.AIR) {
 				Block block = event.getBlock();
-				cancel = FortressesManager.onZombieBreakBlock(block);
+				World world = block.getWorld();
+				cancel = FortressesManager.forWorld(world).onZombieBreakBlock(block);
 				if (cancel) {
 					event.setCancelled(true);
 				}
@@ -213,7 +225,8 @@ public class EventListener implements Listener {
 				Chest chest = (Chest) holder;
 				Block block = chest.getBlock();
 				Player player = (Player) humanEntity;
-				FortressesManager.onPlayerCloseChest(player, block);
+				World world = block.getWorld();
+				FortressesManager.forWorld(world).onPlayerCloseChest(player, block);
 			}
 		}
 	}
@@ -233,7 +246,8 @@ public class EventListener implements Listener {
 		Player player = (Player) event.getExited();
 		if (!playersExitingVehicle.contains(player)) {
 			playersExitingVehicle.add(player);
-			FortressesManager.onPlayerExitVehicle(player);
+			World world = player.getWorld();
+			FortressesManager.forWorld(world).onPlayerExitVehicle(player);
 			playersExitingVehicle.remove(player);
 		}
 	}
@@ -247,7 +261,8 @@ public class EventListener implements Listener {
 			EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
 			Entity damagee = e.getEntity();
 			Entity damager = e.getDamager();
-			boolean cancel = FortressesManager.onEntityDamageFromExplosion(damagee, damager);
+			World world = damagee.getWorld();
+			boolean cancel = FortressesManager.forWorld(world).onEntityDamageFromExplosion(damagee, damager);
 			if (cancel) {
 				event.setCancelled(true);
 			}
@@ -260,7 +275,8 @@ public class EventListener implements Listener {
 			Player player = event.getPlayer();
 			Point source = new Point(event.getFrom());
 			Point target = new Point(event.getTo());
-			boolean cancel = FortressesManager.onEnderPearlThrown(player, source, target);
+			World world = event.getTo().getWorld();
+			boolean cancel = FortressesManager.forWorld(world).onEnderPearlThrown(player, source, target);
 			if (cancel) {
 				event.setCancelled(true);
 			}

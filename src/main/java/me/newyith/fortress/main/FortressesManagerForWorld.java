@@ -40,23 +40,24 @@ public class FortressesManagerForWorld {
 
 	private static class Model {
 		private Set<GeneratorRune> generatorRunes = null;
+		private final String worldName;
+		private final transient World world;
 		private transient Map<Point, GeneratorRune> generatorRuneByPatternPoint = null;
 		private transient Map<Point, GeneratorRune> generatorRuneByClaimedWallPoint = null;
-		private transient Set<Point> protectedPoints = null;
-		private transient Set<Point> alteredPoints = null;
+		private transient Set<Point> generatedPoints = null;
 
 		@JsonCreator
-		public Model(@JsonProperty("generatorRunes") Set<GeneratorRune> generatorRunes) {
+		public Model(@JsonProperty("generatorRunes") Set<GeneratorRune> generatorRunes,
+					 @JsonProperty("worldName") String worldName) {
 			this.generatorRunes = generatorRunes;
+			this.worldName = worldName;
 
 			//rebuild transient fields
+			this.world = Bukkit.getWorld(worldName);
 			generatorRuneByPatternPoint = new HashMap<>();
 			generatorRuneByClaimedWallPoint = new HashMap<>();
-			protectedPoints = new HashSet<>();
-			alteredPoints = new HashSet<>();
+			generatedPoints = new HashSet<>();
 			for (GeneratorRune rune : generatorRunes) {
-				World world = rune.getPattern().getWorld();
-
 				//rebuild runeByPoint map
 				for (Point p : rune.getPattern().getPoints()) {
 					generatorRuneByPatternPoint.put(p, rune);
@@ -67,13 +68,9 @@ public class FortressesManagerForWorld {
 					generatorRuneByClaimedWallPoint.put(p, rune);
 				}
 
-				//rebuild alteredPoints
-				Set<Point> altereds = rune.getGeneratorCore().getAlteredPoints();
-				alteredPoints.addAll(altereds);
-
-				//rebuild protectedPoints
-				Set<Point> protecteds = rune.getGeneratorCore().getProtectedPoints();
-				protectedPoints.addAll(protecteds);
+				//rebuild generatedPoints
+				Set<Point> generateds = rune.getGeneratorCore().getGeneratedPoints();
+				generatedPoints.addAll(generateds);
 			}
 		}
 	}
@@ -85,7 +82,7 @@ public class FortressesManagerForWorld {
 	}
 
 	public FortressesManagerForWorld(World world) {
-		model = new Model(new HashSet<>());
+		model = new Model(new HashSet<>(), world.getName());
 	}
 
 	public void secondStageLoad() {
@@ -107,7 +104,7 @@ public class FortressesManagerForWorld {
 
 	// - Getters / Setters -
 
-	public GeneratorRune getRune(Point p) {
+	public GeneratorRune getRuneByPatternPoint(Point p) {
 		return model.generatorRuneByPatternPoint.get(p);
 	}
 
@@ -115,7 +112,7 @@ public class FortressesManagerForWorld {
 	public BaseCore getCore(Point p) {
 		BaseCore core = null;
 
-		GeneratorRune rune = getRune(p);
+		GeneratorRune rune = getRuneByPatternPoint(p);
 		if (rune != null) {
 			core = rune.getGeneratorCore();
 		}
@@ -127,7 +124,7 @@ public class FortressesManagerForWorld {
 		return model.generatorRunes;
 	}
 
-	//during /fort stuck, we need all generators player might be inside so we can search by fortress cuboids
+	//during /stuck, we need all generators player might be inside so we can search by fortress cuboids
 	public Set<GeneratorRune> getGeneratorRunesNear(Point center) {
 		Set<GeneratorRune> overlapRunes = new HashSet<>();
 
@@ -158,13 +155,13 @@ public class FortressesManagerForWorld {
 				coresInRange.add(rune.getGeneratorCore());
 			}
 		}
-		coresInRange.remove(getRune(center).getGeneratorCore());
+		coresInRange.remove(getRuneByPatternPoint(center).getGeneratorCore());
 		return coresInRange;
 	}
 
 	public void addClaimedWallPoints(Set<Point> claimedWallPoints, Point anchor) {
 //		Debug.msg("addClaimedWallPoints() claimedWallPoints.size(): " + claimedWallPoints.size());
-		GeneratorRune rune = getRune(anchor);
+		GeneratorRune rune = getRuneByPatternPoint(anchor);
 		if (rune != null) {
 			for (Point p : claimedWallPoints) {
 				model.generatorRuneByClaimedWallPoint.put(p, rune);
@@ -179,28 +176,22 @@ public class FortressesManagerForWorld {
 		claimedWallPoints.forEach(model.generatorRuneByClaimedWallPoint::remove);
 	}
 
-	public void addProtectedPoint(Point p, Point anchor) {
-		model.protectedPoints.add(p);
+	public void addGeneratedPoint(Point p) {
+		model.generatedPoints.add(p);
+	}
+	public void removeGeneratedPoint(Point p) {
+		model.generatedPoints.remove(p);
 	}
 
-	public void removeProtectedPoint(Point p) {
-		model.protectedPoints.remove(p);
+	public void addGeneratedPoints(Set<Point> points) {
+		model.generatedPoints.addAll(points);
 	}
-
-	public void addAlteredPoint(Point p, Point anchor) {
-		model.alteredPoints.add(p);
-	}
-
-	public void removeAlteredPoint(Point p) {
-		model.alteredPoints.remove(p);
+	public void removeGeneratedPoints(Set<Point> points) {
+		model.generatedPoints.removeAll(points);
 	}
 
 	public boolean isGenerated(Point p) {
-		return model.protectedPoints.contains(p) || model.alteredPoints.contains(p);
-	}
-
-	public boolean isAltered(Point p) {
-		return model.alteredPoints.contains(p);
+		return model.generatedPoints.contains(p);
 	}
 
 	public boolean isClaimed(Point p) {
@@ -264,8 +255,8 @@ public class FortressesManagerForWorld {
 			rune.setPowered(signal > 0);
 		}
 
-		//if door is protected, ignore redstone event
-		if (Blocks.isDoor(block.getType()) && model.protectedPoints.contains(p)) {
+		//if door is generated, ignore redstone event
+		if (Blocks.isDoor(block.getType()) && isGenerated(p)) {
 			Openable openableDoor = (Openable)block.getState().getData();
 			if (openableDoor.isOpen()) {
 				event.setNewCurrent(1);
@@ -383,7 +374,7 @@ public class FortressesManagerForWorld {
 
 		World w = b.getWorld();
 		Point p = new Point(b);
-		boolean burnProof = FortressesManager.isGenerated(w, p);
+		boolean burnProof = FortressesManager.forWorld(w).isGenerated(p);
 		if (burnProof) {
 			//TODO: uncomment out once issue where /reload causes delayed task to be forgotten is fixed
 //			BedrockManager.convert(w, p);
@@ -479,14 +470,12 @@ public class FortressesManagerForWorld {
 	public void onBlockBreakEvent(BlockBreakEvent event) {
 		Block brokenBlock = event.getBlock();
 		Point brokenPoint = new Point(brokenBlock);
-		World world = brokenBlock.getWorld();
 
 		boolean cancel = false;
 		boolean inCreative = event.getPlayer().getGameMode() == GameMode.CREATIVE;
 		if (!inCreative) {
 			GeneratorRune rune = getRuneByClaimedWallPoint(brokenPoint);
-			boolean isProtected = model.protectedPoints.contains(brokenPoint);
-			if (isProtected) {
+			if (isGenerated(brokenPoint)) {
 				cancel = true;
 				if (rune != null) rune.getGeneratorCore().shield(brokenPoint);
 			}
@@ -528,9 +517,9 @@ public class FortressesManagerForWorld {
 			case STATIONARY_WATER:
 			case STATIONARY_LAVA:
 				Point placedPoint = new Point(placedBlock);
-				boolean isProtected = model.protectedPoints.contains(placedPoint);
+				boolean isGenerated = isGenerated(placedPoint);
 				boolean inCreative = player.getGameMode() == GameMode.CREATIVE;
-				if (isProtected && !inCreative) {
+				if (isGenerated && !inCreative) {
 					cancel = true;
 				}
 		}
@@ -552,20 +541,20 @@ public class FortressesManagerForWorld {
 		}
 	}
 
-	public boolean onPistonEvent(boolean isSticky, World world, Point piston, Point target, Set<Block> movedBlocks) {
+	public boolean onPistonEvent(boolean isSticky, Point piston, Point target, Set<Block> movedBlocks) {
 		boolean cancel = false;
 
 		if (movedBlocks != null) {
 			for (Block movedBlock : movedBlocks) {
 				Point movedPoint = new Point(movedBlock);
-				if (model.protectedPoints.contains(movedPoint)) {
+				if (isGenerated(movedPoint)) {
 					cancel = true;
 				}
 			}
 		}
 
 		if (!cancel) {
-			//build pointsAffected
+			//scan pointsAffected
 			HashSet<Point> pointsAffected = new HashSet<>();
 			pointsAffected.add(piston);
 			if (target != null) {
@@ -577,10 +566,10 @@ public class FortressesManagerForWorld {
 				}
 			}
 
-			//build runesAffected
+			//scan runesAffected
 			HashSet<GeneratorRune> runesAffected = new HashSet<>();
 			for (Point p : pointsAffected) {
-				GeneratorRune rune = getRune(p);
+				GeneratorRune rune = getRuneByPatternPoint(p);
 				if (rune != null) {
 					runesAffected.add(rune);
 				}
@@ -624,7 +613,7 @@ public class FortressesManagerForWorld {
 
 	public void onPlayerCloseChest(Player player, Block block) {
 		Point p = new Point(block);
-		GeneratorRune rune = getRune(p);
+		GeneratorRune rune = getRuneByPatternPoint(p);
 		if (rune != null) {
 			rune.onPlayerCloseChest(player, p);
 		}
@@ -637,15 +626,15 @@ public class FortressesManagerForWorld {
 		World w = player.getWorld();
 		Point eyesPoint = new Point(player.getEyeLocation());
 		Point feetPoint = eyesPoint.add(0, -1, 0);
-		boolean eyesInGenerated = FortressesManager.isGenerated(w, eyesPoint);
-		boolean feetInGenerated = FortressesManager.isGenerated(w, feetPoint);
+		boolean eyesInGenerated = FortressesManager.forWorld(w).isGenerated(eyesPoint);
+		boolean feetInGenerated = FortressesManager.forWorld(w).isGenerated(feetPoint);
 		if (eyesInGenerated || feetInGenerated) {
 			boolean teleported = StuckPlayer.teleport(player);
 			player.sendMessage(ChatColor.AQUA + "You got stuck in fortress wall.");
 			if (!teleported) {
 				player.sendMessage(ChatColor.AQUA + "Stuck teleport failed because no suitable destination was found.");
 				cancel = true; //canceling would allow trap minecarts (except /spawn should get you out, right?)
-//									not canceling would allow forced fortress entry (if enemy can build freely above and below fortress)
+//									not canceling would allow forced fortress entry (if enemy can scan freely above and below fortress)
 			}
 		}
 
@@ -693,8 +682,8 @@ public class FortressesManagerForWorld {
 		}
 		Point feet = source;
 		Point eyes = source.add(0, 1, 0);
-		boolean feetGenerated = FortressesManager.isGenerated(world, feet);
-		boolean eyesGenerated = FortressesManager.isGenerated(world, eyes);
+		boolean feetGenerated = FortressesManager.forWorld(world).isGenerated(feet);
+		boolean eyesGenerated = FortressesManager.forWorld(world).isGenerated(eyes);
 		if (feetGenerated || eyesGenerated) {
 			String msg = ChatColor.AQUA + "Pearling while inside a fortress wall is not allowed.";
 			player.sendMessage(msg);
@@ -708,11 +697,10 @@ public class FortressesManagerForWorld {
 	}
 
 	public void breakRune(GeneratorRune rune) {
-		World world = rune.getPattern().getWorld();
 		Set<Point> patternPoints = rune.getPattern().getPoints();
 
 		rune.onBroken();
-		//breaking should naturally update: alteredPoints, protectedPoints, and generatorRuneByProtectedPoint
+		//breaking should naturally update: generatedPoints and generatorRuneByProtectedPoint
 
 		for (Point p : patternPoints) {
 			model.generatorRuneByPatternPoint.remove(p);

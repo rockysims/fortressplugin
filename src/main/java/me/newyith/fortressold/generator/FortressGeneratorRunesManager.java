@@ -338,7 +338,7 @@ public class FortressGeneratorRunesManager {
 		}
 
 		if (!cancel) {
-			//build pointsAffected
+			//scan pointsAffected
 			HashSet<Point> pointsAffected = new HashSet<>();
 			pointsAffected.add(piston);
 			if (target != null) {
@@ -351,7 +351,7 @@ public class FortressGeneratorRunesManager {
 				}
 			}
 
-			//build runesAffected
+			//scan runesAffected
 			HashSet<FortressGeneratorRune> runesAffected = new HashSet<>();
 			for (Point p : pointsAffected) {
 				FortressGeneratorRune rune = runeByPoint.get(p);

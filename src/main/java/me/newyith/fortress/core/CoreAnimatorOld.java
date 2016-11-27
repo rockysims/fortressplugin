@@ -3,7 +3,6 @@ package me.newyith.fortress.core;
 import me.newyith.fortress.bedrock.BedrockBatch;
 import me.newyith.fortress.bedrock.BedrockManagerNew;
 import me.newyith.fortress.bedrock.timed.TimedBedrockManagerNew;
-import me.newyith.fortress.core.util.WallLayer;
 import me.newyith.fortress.event.TickTimer;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Debug;
@@ -28,10 +27,14 @@ claimed:
 	points the generate thinks it owns
 //*/
 
-public class CoreAnimator {
+public class CoreAnimatorOld {
 	private static class Model {
 		private Point anchorPoint = null;
-		private List<WallLayer> wallLayers = null;
+		//TODO: think about changing alteredBatchesByLayerIndex to alteredBatchByLayerIndex (single batch per layer)
+		private Map<Integer, Set<BedrockBatch>> alteredBatchesByLayerIndex = null;
+		private Set<Point> protectedPoints = null;
+		private List<Set<Point>> generatedLayers = null;
+		private List<Set<Point>> animationLayers = null;
 		private CoreMaterials coreMats = null;
 		private boolean skipAnimation = false;
 		private boolean animationInProgress = false;
@@ -44,14 +47,20 @@ public class CoreAnimator {
 
 		@JsonCreator
 		public Model(@JsonProperty("anchorPoint") Point anchorPoint,
-					 @JsonProperty("wallLayers") List<WallLayer> wallLayers,
+					 @JsonProperty("alteredBatchesByLayerIndex") Map<Integer, Set<BedrockBatch>> alteredBatchesByLayerIndex,
+					 @JsonProperty("protectedPoints") Set<Point> protectedPoints,
+					 @JsonProperty("generatedLayers") List<Set<Point>> generatedLayers,
+					 @JsonProperty("animationLayers") List<Set<Point>> animationLayers,
 					 @JsonProperty("coreMats") CoreMaterials coreMats,
 					 @JsonProperty("skipAnimation") boolean skipAnimation,
 					 @JsonProperty("animationInProgress") boolean animationInProgress,
 					 @JsonProperty("isGeneratingWall") boolean isGeneratingWall,
 					 @JsonProperty("worldName") String worldName) {
 			this.anchorPoint = anchorPoint;
-			this.wallLayers = wallLayers;
+			this.alteredBatchesByLayerIndex = alteredBatchesByLayerIndex;
+			this.protectedPoints = protectedPoints;
+			this.generatedLayers = generatedLayers;
+			this.animationLayers = animationLayers;
 			this.coreMats = coreMats;
 			this.skipAnimation = skipAnimation;
 			this.animationInProgress = animationInProgress;
@@ -68,23 +77,31 @@ public class CoreAnimator {
 	private Model model = null;
 
 	@JsonCreator
-	public CoreAnimator(@JsonProperty("model") Model model) {
+	public CoreAnimatorOld(@JsonProperty("model") Model model) {
 		this.model = model;
 	}
 
-	public CoreAnimator(World world, Point anchorPoint, CoreMaterials coreMats) {
-		List<WallLayer> wallLayers = new ArrayList<>();
+	public CoreAnimatorOld(World world, Point anchorPoint, CoreMaterials coreMats) {
+		Map<Integer, Set<BedrockBatch>> alteredBatchesByLayerIndex = new HashMap<>();
+		Set<Point> protectedPoints = new HashSet<>();
+		List<Set<Point>> generatedLayers = new ArrayList<>();
+		List<Set<Point>> animationLayers = new ArrayList<>();
 		boolean skipAnimation = false;
 		boolean animationInProgress = false;
 		boolean isGeneratingWall = false;
 		String worldName = world.getName();
-		model = new Model(anchorPoint, wallLayers, coreMats, skipAnimation, animationInProgress, isGeneratingWall, worldName);
+		model = new Model(anchorPoint, alteredBatchesByLayerIndex, protectedPoints, generatedLayers, animationLayers,
+				coreMats, skipAnimation, animationInProgress, isGeneratingWall, worldName);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
 
-	public void generate(List<WallLayer> wallLayers) {
-		model.wallLayers = wallLayers;
+	public List<Set<Point>> getGeneratedLayers() {
+		return model.generatedLayers;
+	}
+
+	public void generate(List<Set<Point>> layers) {
+		model.animationLayers = layers;
 		model.curIndex = 0;
 		model.isGeneratingWall = true;
 		model.animationInProgress = true;
@@ -106,15 +123,11 @@ public class CoreAnimator {
 		return model.coreMats;
 	}
 
-	private Set<Point> getAlteredPoints() {
+	public Set<Point> getAlteredPoints() {
 		//TODO: add model.alteredPoints and keep it updated (so we don't need to recalculate here all the time)
 		//	maybe test first to make sure its worth improving performance here?
 		Debug.start("CoreAnimator::getAlteredPoints()");
 		Set<Point> alteredPoints = new HashSet<>();
-		for (AnimationLayer animationLayer : model.animationLayers) {
-
-		}
-
 		for (Set<BedrockBatch> alteredBatches : model.alteredBatchesByLayerIndex.values()) {
 			for (BedrockBatch batch : alteredBatches) {
 				alteredPoints.addAll(batch.getPoints());
@@ -127,10 +140,6 @@ public class CoreAnimator {
 
 	public Set<Point> getProtectedPoints() {
 		return model.protectedPoints;
-	}
-
-	public List<WallLayer> getWallLayers() {
-		return model.wallLayers;
 	}
 
 	public Set<Point> getGeneratedPoints() {
@@ -173,7 +182,7 @@ public class CoreAnimator {
 	private void onGeneratedChanged() {
 		BaseCore core = FortressesManager.forWorld(model.world).getCore(model.anchorPoint);
 		if (core != null) {
-			core.onGeneratedChanged(); //particles update
+			core.onGeneratedChanged();
 		} else {
 			Debug.error("CoreAnimator.onGeneratedChanged(): Core at " + model.anchorPoint + " is null.");
 		}
@@ -182,11 +191,11 @@ public class CoreAnimator {
 	private boolean updateToNextFrame() {
 		boolean updatedToNextFrame = false;
 
-		while (!updatedToNextFrame && model.curIndex < model.wallLayers.size()) {
+		while (!updatedToNextFrame && model.curIndex < model.animationLayers.size()) {
 			int layerIndex = model.curIndex;
 			//if (degenerating) start from the outer most layer
 			if (!model.isGeneratingWall) {
-				layerIndex = (model.wallLayers.size()-1) - model.curIndex;
+				layerIndex = (model.animationLayers.size()-1) - model.curIndex;
 			}
 
 			//try to update layer
@@ -273,24 +282,6 @@ public class CoreAnimator {
 	}
 
 	private Set<Point> generateLayer(int layerIndex) {
-		Set<Point> generatedPoints = new HashSet<>();
-
-		WallLayer layer = model.wallLayers.get(layerIndex);
-		if (layer != null) {
-			Set<Point> genPoints = layer.generate();
-			generatedPoints.addAll(genPoints);
-		} else {
-			Debug.warn("generateLayer() failed to find wallLayer with layerIndex " + layerIndex + " (anchor: " + model.anchorPoint + ")");
-		}
-
-
-
-
-
-
-
-
-
 		Set<Point> layer = new HashSet<>(model.animationLayers.get(layerIndex)); //make copy to avoid concurrent modification errors
 		Set<Point> generatedPoints = new HashSet<>();
 
@@ -471,21 +462,21 @@ public class CoreAnimator {
 
 	private void addProtectedPoint(Point p) {
 		model.protectedPoints.add(p);
-		FortressesManager.forWorld(model.world).addGeneratedPoint(p);
+		FortressesManager.forWorld(model.world).addProtectedPoint(p, model.anchorPoint);
 	}
 
 	private void removeProtectedPoint(Point p) {
 		model.protectedPoints.remove(p);
-		FortressesManager.forWorld(model.world).removeGeneratedPoint(p);
+		FortressesManager.forWorld(model.world).removeProtectedPoint(p);
 	}
 
 	private void addAlteredBatch(int layerIndex, BedrockBatch batch) {
 		model.alteredBatches.add(batch);
-		FortressesManager.forWorld(model.world).addGeneratedPoints(batch.getPoints());
+		FortressesManager.forWorld(model.world).addAlteredPoints(batch.getPoints(), model.anchorPoint);
 	}
 
 	private void removeAlteredBatch(BedrockBatch batch) {
-		FortressesManager.forWorld(model.world).removeGeneratedPoints(batch.getPoints());
+		FortressesManager.forWorld(model.world).removeAlteredPoints(batch.getPoints());
 		model.alteredBatches.remove(batch);
 	}
 }

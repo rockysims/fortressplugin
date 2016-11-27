@@ -146,7 +146,8 @@ public class GeneratorRune {
 
 		boolean placed = model.core.onCreated(player);
 		if (!placed) {
-			FortressesManager.breakRune(this);
+			World world = model.pattern.getWorld();
+			FortressesManager.forWorld(world).breakRune(this);
 		}
 	}
 
@@ -174,7 +175,8 @@ public class GeneratorRune {
 	public void setPowered(boolean powered) {
 		if (model.powered != powered) {
 			if (countRecentPowerToggles() > 10) {
-				FortressesManager.breakRune(this);
+				World world = model.pattern.getWorld();
+				FortressesManager.forWorld(world).breakRune(this);
 			} else {
 				model.powerToggleTimeStamps.add(System.currentTimeMillis()); //used by countRecentPowerToggles()
 				model.powered = powered;

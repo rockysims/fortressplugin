@@ -10,7 +10,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -66,20 +65,11 @@ public class FortressesManager {
 
 	//-----------------------------------------------------------------------
 
-	private static FortressesManagerForWorld getManager(World world) {
+	public static FortressesManagerForWorld forWorld(World world) {
 		return instance.model.getManagerByWorldName(world.getName());
 	}
 
 	// - Getters / Setters -
-
-	public static GeneratorRune getRune(World w, Point p) {
-		return getManager(w).getRune(p);
-	}
-
-	//this helps separate Rune and Core (kind of a hack to find core through rune. fix later)
-	public static BaseCore getCore(World w, Point p) {
-		return getManager(w).getCore(p);
-	}
 
 	public static Set<GeneratorRune> getRunesInAllWorlds() { //TODO: consider refactoring BedrockSafety so it iterators over worlds instead of doing here
 		Set<GeneratorRune> runes = new HashSet<>();
@@ -91,52 +81,6 @@ public class FortressesManager {
 		}
 
 		return runes;
-	}
-
-	//during /fort stuck, we need all generators player might be inside so we can search by fortress cuboids
-	public static Set<GeneratorRune> getGeneratorRunesNear(World w, Point center) {
-		return getManager(w).getGeneratorRunesNear(center);
-	}
-
-	//during generation, we need all potentially conflicting generators (not just known ones) so search by range
-	public static Set<BaseCore> getOtherCoresInRadius(World w, Point center, int radius) {
-		return getManager(w).getOtherCoresInRadius(center, radius);
-	}
-
-	public static void addProtectedPoint(World w, Point p, Point anchor) {
-		getManager(w).addProtectedPoint(p, anchor);
-	}
-
-	public static void addClaimedWallPoints(World w, Set<Point> claimedWallPoints, Point anchor) {
-		getManager(w).addClaimedWallPoints(claimedWallPoints, anchor);
-	}
-
-	public static void removeClaimedWallPoints(World w, Set<Point> claimedWallPoints) {
-		getManager(w).removeClaimedWallPoints(claimedWallPoints);
-	}
-
-	public static void removeProtectedPoint(World w, Point p) {
-		getManager(w).removeProtectedPoint(p);
-	}
-
-	public static void addAlteredPoint(World w, Point p, Point anchor) {
-		getManager(w).addAlteredPoint(p, anchor);
-	}
-
-	public static void removeAlteredPoint(World w, Point p) {
-		getManager(w).removeAlteredPoint(p);
-	}
-
-	public static boolean isGenerated(World w, Point p) {
-		return getManager(w).isGenerated(p);
-	}
-
-	public static boolean isAltered(World w, Point p) {
-		return getManager(w).isAltered(p);
-	}
-
-	public static boolean isClaimed(World w, Point p) {
-		return getManager(w).isClaimed(p);
 	}
 
 	public static int getRuneCountForAllWorlds() {
@@ -157,93 +101,5 @@ public class FortressesManager {
 		instance.model.managerByWorld.forEach((worldName, manager) -> {
 			manager.onTick();
 		});
-	}
-
-	public static boolean onSignChange(Player player, Block signBlock) {
-		World w = signBlock.getWorld();
-		return getManager(w).onSignChange(player, signBlock);
-	}
-
-	public static void onBlockRedstoneEvent(BlockRedstoneEvent event) {
-		World w = event.getBlock().getWorld();
-		getManager(w).onBlockRedstoneEvent(event);
-	}
-
-	public static boolean onExplode(List<Block> explodeBlocks, Location loc) {
-		World w = loc.getWorld();
-		return getManager(w).onExplode(explodeBlocks, loc);
-	}
-
-	public static boolean onIgnite(Block block) {
-		World w = block.getWorld();
-		return getManager(w).onIgnite(block);
-	}
-
-	public static boolean onBurn(Block block) {
-		World w = block.getWorld();
-		return getManager(w).onBurn(block);
-	}
-
-	public static boolean onPlayerOpenCloseDoor(Player player, Block doorBlock) {
-		World w = player.getWorld();
-		return getManager(w).onPlayerOpenCloseDoor(player, doorBlock);
-	}
-
-	public static void onPlayerRightClickBlock(Player player, Block block, BlockFace face) {
-		World w = block.getWorld();
-		getManager(w).onPlayerRightClickBlock(player, block, face);
-	}
-
-
-	public static void onBlockBreakEvent(BlockBreakEvent event) {
-		World w = event.getBlock().getWorld();
-		getManager(w).onBlockBreakEvent(event);
-	}
-	public static void onEnvironmentBreaksRedstoneWireEvent(Block brokenBlock) {
-		World w = brokenBlock.getWorld();
-		getManager(w).onEnvironmentBreaksRedstoneWireEvent(brokenBlock);
-	}
-	public static boolean onBlockPlaceEvent(Player player, Block placedBlock, Material replacedMaterial) {
-		World w = placedBlock.getWorld();
-		return getManager(w).onBlockPlaceEvent(player, placedBlock, replacedMaterial);
-	}
-
-	public static boolean onPistonEvent(boolean isSticky, World world, Point piston, Point target, Set<Block> movedBlocks) {
-		return getManager(world).onPistonEvent(isSticky, world, piston, target, movedBlocks);
-	}
-
-	public static boolean onEndermanPickupBlock(Block block) {
-		World w = block.getWorld();
-		return getManager(w).onEndermanPickupBlock(block);
-	}
-
-	public static boolean onZombieBreakBlock(Block block) {
-		World w = block.getWorld();
-		return getManager(w).onZombieBreakBlock(block);
-	}
-
-	public static void onPlayerCloseChest(Player player, Block block) {
-		World w = block.getWorld();
-		getManager(w).onPlayerCloseChest(player, block);
-	}
-
-	public static void onPlayerExitVehicle(Player player) {
-		World w = player.getWorld();
-		getManager(w).onPlayerExitVehicle(player);
-	}
-
-	public static boolean onEntityDamageFromExplosion(Entity damagee, Entity damager) {
-		World w = damagee.getWorld();
-		return getManager(w).onEntityDamageFromExplosion(damagee, damager);
-	}
-
-	public static boolean onEnderPearlThrown(Player player, Point source, Point target) {
-		World w = player.getWorld();
-		return getManager(w).onEnderPearlThrown(player, source, target);
-	}
-
-	public static void breakRune(GeneratorRune rune) {
-		World w = rune.getPattern().getWorld();
-		getManager(w).breakRune(rune);
 	}
 }

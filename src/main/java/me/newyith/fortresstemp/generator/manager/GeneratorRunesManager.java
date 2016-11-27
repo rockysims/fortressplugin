@@ -12,7 +12,7 @@ public class GeneratorRunesManager {
 
 	// - Getters / Setters -
 
-	public static GeneratorRune getRune(Point p) {
+	public static GeneratorRune getRuneByPatternPoint(Point p) {
 		return runeByRunePoint.get(p);
 	}
 
@@ -45,7 +45,7 @@ public class GeneratorRunesManager {
 			}
 		}
 
-		runesInRange.remove(getRune(center));
+		runesInRange.remove(getRuneByPatternPoint(center));
 		return runesInRange;
 	}
 
@@ -317,7 +317,7 @@ public class GeneratorRunesManager {
 		}
 
 		if (!cancel) {
-			//build pointsAffected
+			//scan pointsAffected
 			HashSet<Point> pointsAffected = new HashSet<>();
 			pointsAffected.add(piston);
 			if (target != null) {
@@ -330,7 +330,7 @@ public class GeneratorRunesManager {
 				}
 			}
 
-			//build runesAffected
+			//scan runesAffected
 			HashSet<GeneratorRune> runesAffected = new HashSet<>();
 			for (Point p : pointsAffected) {
 				GeneratorRune rune = runeByRunePoint.get(p);

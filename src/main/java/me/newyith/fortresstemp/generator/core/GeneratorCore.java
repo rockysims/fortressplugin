@@ -138,7 +138,7 @@ public class GeneratorCore { // extends AwareCore {
 		placedByPlayerId = placingPlayer.getUniqueId();
 
 		//set overlapWithClaimed = true if placed generator is connected (by faces) to another generator's claimed points
-		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(anchorPoint);
+		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRuneByPatternPoint(anchorPoint);
 		Set<Point> claimPoints = rune.getPoints();
 		Set<Point> alreadyClaimedPoints = getClaimedPointsOfNearbyGenerators();
 		boolean overlapWithClaimed = !Collections.disjoint(alreadyClaimedPoints, claimPoints); //disjoint means no points in common
@@ -243,7 +243,7 @@ public class GeneratorCore { // extends AwareCore {
 			int rangeLimit = 2 * generationRangeLimit + 2;
 			Set<Point> ignorePoints = wallPoints;
 			Set<Point> searchablePoints = new HashSet<>(layerAroundWall);
-			FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(anchorPoint);
+			FortressGeneratorRune rune = FortressGeneratorRunesManager.getRuneByPatternPoint(anchorPoint);
 			searchablePoints.addAll(rune.getPoints());
 			layerOutsideFortress = Wall.getPointsConnected(origin, originLayer, wallMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
 			layerOutsideFortress.addAll(originLayer);
@@ -290,7 +290,7 @@ public class GeneratorCore { // extends AwareCore {
 		Set<Point> layerAroundWallPoints = getLayerAround(claimedWallPoints);
 		claimedPoints.addAll(layerAroundWallPoints);
 
-		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(anchorPoint);
+		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRuneByPatternPoint(anchorPoint);
 		if (rune != null) {
 			//claim rune
 			Set<Point> runePoints = rune.getPoints();
@@ -372,13 +372,13 @@ public class GeneratorCore { // extends AwareCore {
 	}
 
 	private Set<Point> getPointsConnected(Set<Material> wallMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
-		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(anchorPoint);
+		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRuneByPatternPoint(anchorPoint);
 		Set<Point> originLayer = rune.getPoints();
 		return Wall.getPointsConnected(anchorPoint, originLayer, wallMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
 	}
 
 	private List<List<Point>> getPointsConnectedAsLayers(Set<Material> wallMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints) {
-		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRune(anchorPoint);
+		FortressGeneratorRune rune = FortressGeneratorRunesManager.getRuneByPatternPoint(anchorPoint);
 		Set<Point> originLayer = rune.getPoints();
 		return Wall.getPointsConnectedAsLayers(anchorPoint, originLayer, wallMaterials, returnMaterials, rangeLimit, ignorePoints);
 	}

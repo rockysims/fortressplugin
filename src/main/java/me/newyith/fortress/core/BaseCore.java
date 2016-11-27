@@ -1,9 +1,14 @@
 package me.newyith.fortress.core;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import me.newyith.fortress.bedrock.BedrockAuthToken;
 import me.newyith.fortress.bedrock.BedrockManagerNew;
 import me.newyith.fortress.bedrock.timed.TimedBedrockManagerNew;
 import me.newyith.fortress.core.util.GenPrepData;
+import me.newyith.fortress.core.util.WallLayer;
+import me.newyith.fortress.core.util.WallLayers;
 import me.newyith.fortress.main.BedrockSafety;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
@@ -23,6 +28,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public abstract class BaseCore {
 	public static class Model {
@@ -235,15 +241,15 @@ public abstract class BaseCore {
 
 		//set overlapWithClaimed = true if placed generator is connected (by faces) to another generator's claimed points
 		Set<Point> claimPoints = getOriginPoints();
-		Set<Point> alreadyClaimedPoints = getClaimedPointsOfNearbyCores();
+		Set<Point> alreadyClaimedPoints = buildClaimedPointsOfNearbyCores();
 		boolean overlapWithClaimed = !Collections.disjoint(alreadyClaimedPoints, claimPoints); //disjoint means no points in common
 
 		boolean canPlace = !overlapWithClaimed;
 		if (canPlace) {
-			getGenPrepDataFuture().thenAccept((data) -> {
+			makeGenPrepDataFuture().thenAccept((data) -> {
 				//update claimed points
-				List<Set<Point>> wallLayers = Blocks.merge(data.generatableLayers, model.animator.getGeneratedLayers());
-				Set<Point> wallPoints = Blocks.flattenLayers(wallLayers);
+				ImmutableList<WallLayer> wallLayers = data.wallLayers;
+				Set<Point> wallPoints = WallLayers.getAllPointsIn(wallLayers);
 				updateClaimedPoints(wallPoints, data.layerAroundWall);
 
 				//update inside & outside
@@ -265,7 +271,7 @@ public abstract class BaseCore {
 	public void onBroken() {
 		degenerateWall(true); //true means skipAnimation
 		BedrockManagerNew.forWorld(model.world).revert(model.bedrockAuthToken);
-		FortressesManager.removeClaimedWallPoints(model.world, model.claimedWallPoints);
+		FortressesManager.forWorld(model.world).removeClaimedWallPoints(model.claimedWallPoints);
 	}
 
 	public void setActive(boolean active) {
@@ -288,10 +294,11 @@ public abstract class BaseCore {
 				model.genPrepDataFuture = null;
 
 				//* Generate
+				//data.wallLayers should already be merged with any old wallLayers that are still generated
+				ImmutableList<WallLayer> wallLayers = data.wallLayers;
+				Set<Point> wallPoints = WallLayers.getAllPointsIn(wallLayers);
 
 				//update claimed points
-				List<Set<Point>> wallLayers = Blocks.merge(data.generatableLayers, model.animator.getGeneratedLayers());
-				Set<Point> wallPoints = Blocks.flattenLayers(wallLayers);
 				updateClaimedPoints(wallPoints, data.layerAroundWall);
 
 				//update inside & outside
@@ -356,33 +363,40 @@ public abstract class BaseCore {
 		}
 
 		//start preparing for generation (tick() handles it when future completes)
-		model.genPrepDataFuture = getGenPrepDataFuture();
+		model.genPrepDataFuture = makeGenPrepDataFuture();
 	}
 
-	private CompletableFuture<GenPrepData> getGenPrepDataFuture() {
-//		Debug.msg("getGenPrepDataFuture() called");
 
-		CompletableFuture<GenPrepData> future = CompletableFuture.supplyAsync(() -> {
-//			Debug.msg("getGenPrepDataFuture() start");
-			List<Set<Point>> generatableLayers = getGeneratableWallLayers();
 
-			//set layerAroundWall
-			List<Set<Point>> wallLayers = Blocks.merge(generatableLayers, model.animator.getGeneratedLayers());
-			Set<Point> wallPoints = Blocks.flattenLayers(wallLayers);
-			Set<Point> layerAroundWall = getLayerAround(wallPoints, Blocks.ConnectedThreshold.POINTS).join();
 
-			Set<Point> layerOutside = getLayerOutside(wallPoints, layerAroundWall);
-			Set<Point> pointsInside = getPointsInside(layerOutside, layerAroundWall, wallPoints);
+	private CompletableFuture<GenPrepData> makeGenPrepDataFuture() {
+		//prepare to make future
+		CoreMaterials coreMats = model.animator.getCoreMats();
+		coreMats.refresh(); //refresh protectable blocks list based on chest contents
+		ImmutableSet<Material> wallMaterials = ImmutableSet.copyOf(coreMats.getGeneratableWallMaterials());
+		ImmutableSet<Point> originPoints = ImmutableSet.copyOf(getOriginPoints());
+		ImmutableSet<Point> nearbyClaimedPoints = ImmutableSet.copyOf(buildClaimedPointsOfNearbyCores());
+		ImmutableList<ImmutableSet<Point>> existingLayers = ImmutableList.copyOf(
+			model.animator.getWallLayers().parallelStream()
+				.map(wallLayer -> ImmutableSet.copyOf(wallLayer.getGeneratedPoints()))
+				.collect(Collectors.toList())
+		);
+		ImmutableMap<Point, Material> pretendPoints = ImmutableMap.copyOf(BedrockManagerNew.forWorld(model.world).getMaterialByPointMap());
 
-//			Debug.msg("getGenPrepDataFuture() returning");
-			return new GenPrepData(generatableLayers, layerAroundWall, pointsInside, layerOutside);
-		});
+		//make future
+		CompletableFuture<GenPrepData> future = GenPrepData.makeFuture(
+				model.world, model.anchorPoint, originPoints, wallMaterials,
+				nearbyClaimedPoints, existingLayers, pretendPoints);
 
+		//fire onSearchingChanged events
 		onSearchingChanged(true);
 		future.thenAccept((data) -> onSearchingChanged(false)); //thenAccept is not called if future was cancelled
 
 		return future;
 	}
+
+
+
 
 	protected abstract void onSearchingChanged(boolean searching);
 
@@ -459,7 +473,7 @@ public abstract class BaseCore {
 	}
 
 	protected void updateClaimedPoints(Set<Point> wallPoints, Set<Point> layerAroundWall) {
-		FortressesManager.removeClaimedWallPoints(model.world, model.claimedWallPoints);
+		FortressesManager.forWorld(model.world).removeClaimedWallPoints(model.claimedWallPoints);
 
 		model.claimedPoints.clear();
 		model.claimedWallPoints.clear();
@@ -477,43 +491,44 @@ public abstract class BaseCore {
 		model.claimedPoints.addAll(originPoints);
 		model.claimedPoints.addAll(layerAroundOrigins);
 
-		FortressesManager.addClaimedWallPoints(model.world, model.claimedWallPoints, model.anchorPoint);
+		FortressesManager.forWorld(model.world).addClaimedWallPoints(model.claimedWallPoints, model.anchorPoint);
 	}
 
-	private List<Set<Point>> getGeneratableWallLayers() {
-		CoreMaterials coreMats = model.animator.getCoreMats();
-		coreMats.refresh(); //refresh protectable blocks list based on chest contents
+	//TODO: delete commented out getGeneratableWallLayers() method
+//	private List<Set<Point>> getGeneratableWallLayers() {
+//		CoreMaterials coreMats = model.animator.getCoreMats();
+//		coreMats.refresh(); //refresh protectable blocks list based on chest contents
+//
+//		Set<Point> nearbyClaimedPoints = buildClaimedPointsOfNearbyCores();
+//
+//		//return all connected wall points ignoring (and not traversing) nearbyClaimedPoints (generationRangeLimit search range)
+//		Point origin = model.anchorPoint;
+//		Set<Point> originLayer = new HashSet<>(getOriginPoints());
+//		originLayer.addAll(getGeneratedPoints());
+//		Set<Material> traverseMaterials = coreMats.getGeneratableWallMaterials();
+//		Set<Material> returnMaterials = coreMats.getGeneratableWallMaterials();
+//		int maxReturns = Math.max(0, FortressPlugin.config_generationBlockLimit - getGeneratedPoints().size());
+//		int rangeLimit = model.generationRangeLimit;
+//		Set<Point> ignorePoints = nearbyClaimedPoints;
+//		Map<Point, Material> pretendPoints = BedrockManagerNew.forWorld(model.world).getMaterialByPointMap();
+//		List<Set<Point>> foundLayers = Blocks.getPointsConnectedAsLayers(model.world, origin, originLayer, traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints, pretendPoints).join();
+//
+//		//correct layer indexes (first non already generated layer is not always layer 0)
+//		List<Set<Point>> layers = new ArrayList<>();
+//		int dummyLayerCount = model.animator.getGeneratedLayers().stream()
+//				.map((layer) -> (layer.isEmpty()) ? 0 : 1)
+//				.reduce((a, b) -> a + b).orElse(0);
+//		for (int i = 0; i < dummyLayerCount; i++) {
+//			layers.add(new HashSet<>());
+//		}
+//		layers.addAll(foundLayers);
+//
+//		return layers;
+//	}
 
-		Set<Point> nearbyClaimedPoints = getClaimedPointsOfNearbyCores();
-
-		//return all connected wall points ignoring (and not traversing) claimedPoints (generationRangeLimit search range)
-		Point origin = model.anchorPoint;
-		Set<Point> originLayer = new HashSet<>(getOriginPoints());
-		originLayer.addAll(getGeneratedPoints());
-		Set<Material> traverseMaterials = coreMats.getGeneratableWallMaterials();
-		Set<Material> returnMaterials = coreMats.getGeneratableWallMaterials();
-		int maxReturns = Math.max(0, FortressPlugin.config_generationBlockLimit - getGeneratedPoints().size());
-		int rangeLimit = model.generationRangeLimit;
-		Set<Point> ignorePoints = nearbyClaimedPoints;
-		Map<Point, Material> pretendPoints = BedrockManagerNew.forWorld(model.world).getMaterialByPointMap();
-		List<Set<Point>> foundLayers = Blocks.getPointsConnectedAsLayers(model.world, origin, originLayer, traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints, pretendPoints).join();
-
-		//correct layer indexes (first non already generated layer is not always layer 0)
-		List<Set<Point>> layers = new ArrayList<>();
-		int dummyLayerCount = model.animator.getGeneratedLayers().stream()
-				.map((layer) -> (layer.isEmpty()) ? 0 : 1)
-				.reduce((a, b) -> a + b).orElse(0);
-		for (int i = 0; i < dummyLayerCount; i++) {
-			layers.add(new HashSet<>());
-		}
-		layers.addAll(foundLayers);
-
-		return layers;
-	}
-
-	private Set<Point> getClaimedPointsOfNearbyCores() {
+	private Set<Point> buildClaimedPointsOfNearbyCores() {
 		int radius = model.generationRangeLimit * 2 + 1; //not sure if the + 1 is needed
-		Set<BaseCore> nearbyCores = FortressesManager.getOtherCoresInRadius(model.world, model.anchorPoint, radius);
+		Set<BaseCore> nearbyCores = FortressesManager.forWorld(model.world).getOtherCoresInRadius(model.anchorPoint, radius);
 
 		Set<Point> nearbyClaimedPoints = new HashSet<>();
 		for (BaseCore core : nearbyCores) {
@@ -524,55 +539,11 @@ public abstract class BaseCore {
 	}
 
 	public Set<Point> getClaimedPoints() {
-		//commented out because now that protectable blocks can be changed by user
-		//we don't want a generator to be able to degenerate another generator's generated points
-		//even though the other generator's points are no longer connected to the generator by protectable block types
-		/*
-		//update claimedPoints if claimedWallPoints are not all wall type blocks
-		for (Point p : model.claimedWallPoints) {
-			Material claimedWallMaterial = p.getBlock(model.world).getType();
-			if (!model.animator.getWallMats().getWallMaterials().contains(claimedWallMaterial)) { //claimedWallMaterial isn't a wall type block
-				unclaimDisconnected();
-				break;
-			}
-		}
-		//*/
-
 		return model.claimedPoints;
 	}
 
 	public Set<Point> getClaimedWallPoints() {
 		return model.claimedWallPoints;
-	}
-
-
-//	private void unclaimDisconnected() {
-//		//fill pointsToUnclaim
-//		Set<Point> pointsToUnclaim = new HashSet<>();
-//		Set<Material> wallMaterials = model.animator.getWallMats().getWallMaterials();
-//		Set<Point> connectedPoints = getPointsConnected(wallMaterials, wallMaterials, model.generationRangeLimit, null, model.claimedWallPoints);
-//		for (Point claimedWallPoint : model.claimedWallPoints) {
-//			if (!connectedPoints.contains(claimedWallPoint)) { //found claimed wall point that is now disconnected
-//				pointsToUnclaim.add(claimedWallPoint);
-//			}
-//		}
-//
-//		//unclaim pointsToUnclaim
-//		model.claimedWallPoints.removeAll(pointsToUnclaim);
-//		updateClaimedPoints(model.claimedWallPoints).join(); //wait for async
-//
-//		//degenerate overlap between pointsToUnclaim and generatedLayers
-//		Set<Point> pointsToDegenerate = new HashSet<>(pointsToUnclaim);
-//		pointsToDegenerate.retainAll(Wall.flattenLayers(model.animator.getGeneratedLayers()));
-//		model.animator.degenerate(pointsToDegenerate);
-//	}
-
-	public Set<Point> getAlteredPoints() {
-		return model.animator.getAlteredPoints();
-	}
-
-	public Set<Point> getProtectedPoints() {
-		return model.animator.getProtectedPoints();
 	}
 
 	public Set<Point> getGeneratedPoints() {
@@ -587,14 +558,6 @@ public abstract class BaseCore {
 		return model.pointsInsideFortress;
 	}
 
-	//used by unclaimDisconnected()?
-//	private CompletableFuture<Set<Point>> getPointsConnected(Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
-//		GeneratorRune rune = FortressesManager.getRune(model.anchorPoint);
-//		Point origin = model.anchorPoint;
-//		Set<Point> originLayer = rune.getPattern().getPoints();
-//		return Wall.getPointsConnected(model.world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints);
-//	}
-
 	protected CompletableFuture<Set<Point>> getLayerAround(Set<Point> originLayer, Blocks.ConnectedThreshold threshold) {
 		Point origin = model.anchorPoint;
 		Set<Material> traverseMaterials = new HashSet<>(); //no blocks are traversed
@@ -603,22 +566,4 @@ public abstract class BaseCore {
 		Set<Point> ignorePoints = null; //no points ignored
 		return Blocks.getPointsConnected(model.world, origin, originLayer, traverseMaterials, returnMaterials, rangeLimit, ignorePoints, threshold);
 	}
-
-//	will be used for emergency key
-//	public String getPlacedByPlayerId() {
-//		return placedByPlayerId;
-//	}
-
-//	will be used for emergency key
-//	private List<FortressGeneratorRune> getConnectedFortressGenerators() {
-//		List<FortressGeneratorRune> matches = new ArrayList<>();
-//
-//		Set<Point> connectRunePoints = getPointsConnected(animator.wallMats.getWallMaterials(), animator.wallMats.getNotCloggedGeneratorBlocks());
-//		for (Point p : connectRunePoints) {
-//			FortressGeneratorRune fg = (FortressGeneratorRune) world.getTileEntity(p.x, p.y, p.z);
-//			matches.add(fg);
-//		}
-//
-//		return matches;
-//	}
 }

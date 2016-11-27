@@ -70,7 +70,7 @@ public class GeneratorCore extends BaseCore {
 	protected Set<Point> getFallbackWhitelistSignPoints() {
 		Set<Point> fallbackSigns = new HashSet<>();
 
-		GeneratorRune rune = FortressesManager.getRune(model.world, model.anchorPoint);
+		GeneratorRune rune = FortressesManager.forWorld(model.world).getRuneByPatternPoint(model.anchorPoint);
 		if (rune != null) {
 			Set<Point> potentialSigns = getLayerAround(rune.getPattern().getPoints(), Blocks.ConnectedThreshold.FACES).join();
 
@@ -178,9 +178,9 @@ public class GeneratorCore extends BaseCore {
 
 				final int msDurationFinal = msDuration;
 				Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
-					//TODO: consider fixing hacky call to getRune() here. GeneratorCore shouldn't need to know about rune
+					//TODO: consider fixing hacky call to getRuneByPatternPoint() here. GeneratorCore shouldn't need to know about rune
 					//	maybe add BaseCore::onBroken() should set model.isBroken = true?
-					boolean runeStillExists = FortressesManager.getRune(model.world, model.anchorPoint) != null;
+					boolean runeStillExists = FortressesManager.forWorld(model.world).getRuneByPatternPoint(model.anchorPoint) != null;
 					if (runeStillExists) { //rune might have been destroyed before ripple ended
 						TimedBedrockManagerNew.forWorld(model.world).convert(model.bedrockAuthToken, layer, msDurationFinal);
 					}
@@ -194,7 +194,7 @@ public class GeneratorCore extends BaseCore {
 
 	/* Yona's version
 	protected Set<Point> getFallbackWhitelistSignPoints() {
-		GeneratorRune rune = FortressesManager.getRune(model.anchorPoint);
+		GeneratorRune rune = FortressesManager.getRuneByPatternPoint(model.anchorPoint);
 		if (rune != null) {
 			Set<Point> potentialSigns = getLayerAround(rune.getPattern().getPoints(), Blocks.ConnectedThreshold.FACES).join();
 
@@ -233,7 +233,7 @@ public class GeneratorCore extends BaseCore {
 //*/
 	@Override
 	protected void onSearchingChanged(boolean searching) {
-		GeneratorRune rune = FortressesManager.getRune(model.world, model.anchorPoint);
+		GeneratorRune rune = FortressesManager.forWorld(model.world).getRuneByPatternPoint(model.anchorPoint);
 		if (rune != null) {
 			rune.onSearchingChanged(searching);
 		}
@@ -241,7 +241,7 @@ public class GeneratorCore extends BaseCore {
 
 	@Override
 	protected Set<Point> getOriginPoints() {
-		GeneratorRune rune = FortressesManager.getRune(model.world, model.anchorPoint);
+		GeneratorRune rune = FortressesManager.forWorld(model.world).getRuneByPatternPoint(model.anchorPoint);
 		return rune.getPattern().getPoints();
 	}
 }

@@ -257,6 +257,7 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
+//TODO: rename BedrockAuthToken to BedrockGroupId (and update variable names)
 
 //TODO: finish changing from BedrockManagerOld to BedrockManagerNew
 //	TODO: consider adding AnimationLayer to wrap layerPoints and bedrockBatch (would handle altered and protected)
@@ -326,7 +327,7 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //TODO: switch paused/running around so redstone on means running (and update manual)
-//	I think people will build the rune first then build the structure and try to protect it (when they're first learning)
+//	I think people will scan the rune first then scan the structure and try to protect it (when they're first learning)
 
 //TODO: don't show hearts (inside) unless all doors are on generated blocks
 //	currently it can show hearts even if door can be broken/bypassed by breaking block its on
@@ -993,7 +994,7 @@ maybe instead of requiring piston be protected before it can work as a mini gene
 
 //for beginning for post on bukkit.org once I'm ready to release:
 /*
-Fortress is a whole new approach to self-service protection. Instead of claiming chunks, players build a fortress out
+Fortress is a whole new approach to self-service protection. Instead of claiming chunks, players scan a fortress out
 of ordinary blocks then protect the structure itself by building a rune (pattern of blocks). The blocks that make up
 the structure are detected automatically and protected. Runes are fueled by glowstone.
 For details, obsidian + book = manual.
