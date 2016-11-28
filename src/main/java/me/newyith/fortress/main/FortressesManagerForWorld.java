@@ -2,6 +2,7 @@ package me.newyith.fortress.main;
 
 import me.newyith.fortress.command.StuckPlayer;
 import me.newyith.fortress.core.BaseCore;
+import me.newyith.fortress.protection.ProtectionManager;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.rune.generator.GeneratorRunePattern;
 import me.newyith.fortress.util.Blocks;
@@ -44,7 +45,6 @@ public class FortressesManagerForWorld {
 		private final transient World world;
 		private transient Map<Point, GeneratorRune> generatorRuneByPatternPoint = null;
 		private transient Map<Point, GeneratorRune> generatorRuneByClaimedWallPoint = null;
-		private transient Set<Point> generatedPoints = null;
 
 		@JsonCreator
 		public Model(@JsonProperty("generatorRunes") Set<GeneratorRune> generatorRunes,
@@ -56,7 +56,6 @@ public class FortressesManagerForWorld {
 			this.world = Bukkit.getWorld(worldName);
 			generatorRuneByPatternPoint = new HashMap<>();
 			generatorRuneByClaimedWallPoint = new HashMap<>();
-			generatedPoints = new HashSet<>();
 			for (GeneratorRune rune : generatorRunes) {
 				//rebuild runeByPoint map
 				for (Point p : rune.getPattern().getPoints()) {
@@ -67,10 +66,6 @@ public class FortressesManagerForWorld {
 				for (Point p : rune.getGeneratorCore().getClaimedWallPoints()) {
 					generatorRuneByClaimedWallPoint.put(p, rune);
 				}
-
-				//rebuild generatedPoints
-				Set<Point> generateds = rune.getGeneratorCore().getGeneratedPoints();
-				generatedPoints.addAll(generateds);
 			}
 		}
 	}
@@ -176,22 +171,9 @@ public class FortressesManagerForWorld {
 		claimedWallPoints.forEach(model.generatorRuneByClaimedWallPoint::remove);
 	}
 
-	public void addGeneratedPoint(Point p) {
-		model.generatedPoints.add(p);
-	}
-	public void removeGeneratedPoint(Point p) {
-		model.generatedPoints.remove(p);
-	}
-
-	public void addGeneratedPoints(Set<Point> points) {
-		model.generatedPoints.addAll(points);
-	}
-	public void removeGeneratedPoints(Set<Point> points) {
-		model.generatedPoints.removeAll(points);
-	}
-
+	//TODO: remove this method and call isProtected() directly
 	public boolean isGenerated(Point p) {
-		return model.generatedPoints.contains(p);
+		return ProtectionManager.forWorld(model.world).isProtected(p);
 	}
 
 	public boolean isClaimed(Point p) {

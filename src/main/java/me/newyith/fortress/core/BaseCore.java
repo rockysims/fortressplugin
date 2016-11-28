@@ -371,22 +371,15 @@ public abstract class BaseCore {
 
 	private CompletableFuture<GenPrepData> makeGenPrepDataFuture() {
 		//prepare to make future
-		CoreMaterials coreMats = model.animator.getCoreMats();
-		coreMats.refresh(); //refresh protectable blocks list based on chest contents
-		ImmutableSet<Material> wallMaterials = ImmutableSet.copyOf(coreMats.getGeneratableWallMaterials());
+		ImmutableSet<Material> wallMaterials = ImmutableSet.copyOf(model.animator.getGeneratableWallMaterials());
 		ImmutableSet<Point> originPoints = ImmutableSet.copyOf(getOriginPoints());
 		ImmutableSet<Point> nearbyClaimedPoints = ImmutableSet.copyOf(buildClaimedPointsOfNearbyCores());
-		ImmutableList<ImmutableSet<Point>> existingLayers = ImmutableList.copyOf(
-			model.animator.getWallLayers().parallelStream()
-				.map(wallLayer -> ImmutableSet.copyOf(wallLayer.getGeneratedPoints()))
-				.collect(Collectors.toList())
-		);
 		ImmutableMap<Point, Material> pretendPoints = ImmutableMap.copyOf(BedrockManagerNew.forWorld(model.world).getMaterialByPointMap());
 
 		//make future
 		CompletableFuture<GenPrepData> future = GenPrepData.makeFuture(
 				model.world, model.anchorPoint, originPoints, wallMaterials,
-				nearbyClaimedPoints, existingLayers, pretendPoints);
+				nearbyClaimedPoints, pretendPoints);
 
 		//fire onSearchingChanged events
 		onSearchingChanged(true);

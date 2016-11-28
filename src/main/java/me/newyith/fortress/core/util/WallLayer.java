@@ -5,7 +5,7 @@ import me.newyith.fortress.util.Point;
 import java.util.Set;
 
 //TODO: make WallLayer hold no state?
-//WallLayer should represents a layer of wall and knows how to convert/revert and merge with another WallLayer
+//WallLayer should represents a layer of wall and be immutable (remove de/generate() methods?)
 public class WallLayer {
 
 	public WallLayer(Set<Point> layerPoints) {

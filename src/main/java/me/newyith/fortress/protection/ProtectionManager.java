@@ -1,4 +1,4 @@
-package me.newyith.fortress.bedrock;
+package me.newyith.fortress.protection;
 
 import me.newyith.fortress.util.Debug;
 import org.bukkit.Bukkit;
@@ -9,37 +9,37 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BedrockManagerNew {
-	private static BedrockManagerNew instance = null;
-	public static BedrockManagerNew getInstance() {
+public class ProtectionManager {
+	private static ProtectionManager instance = null;
+	public static ProtectionManager getInstance() {
 		if (instance == null) {
-			instance = new BedrockManagerNew();
+			instance = new ProtectionManager();
 		}
 		return instance;
 	}
-	public static void setInstance(BedrockManagerNew newInstance) {
+	public static void setInstance(ProtectionManager newInstance) {
 		instance = newInstance;
 	}
 
 	//-----------------------------------------------------------------------
 
 	private static class Model {
-		private Map<String, BedrockManagerNewForWorld> managerByWorld = null;
+		private Map<String, ProtectionManagerForWorld> managerByWorld = null;
 
 		@JsonCreator
-		public Model(@JsonProperty("managerByWorld") Map<String, BedrockManagerNewForWorld> managerByWorld) {
+		public Model(@JsonProperty("managerByWorld") Map<String, ProtectionManagerForWorld> managerByWorld) {
 			this.managerByWorld = managerByWorld;
 
 			//rebuild transient fields
 		}
 
-		public BedrockManagerNewForWorld getManagerByWorldName(String worldName) {
+		public ProtectionManagerForWorld getManagerByWorldName(String worldName) {
 			if (!managerByWorld.containsKey(worldName)) {
 				World world = Bukkit.getWorld(worldName);
 				if (world != null) {
-					managerByWorld.put(worldName, new BedrockManagerNewForWorld(world));
+					managerByWorld.put(worldName, new ProtectionManagerForWorld(world));
 				} else {
-					Debug.warn("BedrockManagerNew::getManagerByWorldName() failed to find world named: " + worldName);
+					Debug.warn("ProtectionManager::getManagerByWorldName() failed to find world named: " + worldName);
 				}
 			}
 			return managerByWorld.get(worldName);
@@ -48,17 +48,17 @@ public class BedrockManagerNew {
 	private Model model = null;
 
 	@JsonCreator
-	public BedrockManagerNew(@JsonProperty("model") Model model) {
+	public ProtectionManager(@JsonProperty("model") Model model) {
 		this.model = model;
 	}
 
-	public BedrockManagerNew() {
+	public ProtectionManager() {
 		model = new Model(new HashMap<>());
 	}
 
 	//-----------------------------------------------------------------------
 
-	public static BedrockManagerNewForWorld forWorld(World world) {
+	public static ProtectionManagerForWorld forWorld(World world) {
 		return instance.model.getManagerByWorldName(world.getName());
 	}
 }

@@ -37,13 +37,11 @@ public class GenPrepData {
 			final ImmutableSet<Point> originPoints,
 			final ImmutableSet<Material> wallMaterials,
 			final ImmutableSet<Point> nearbyClaimedPoints,
-			final ImmutableList<ImmutableSet<Point>> existingLayers,
 			final ImmutableMap<Point, Material> pretendPoints
 	) {
 		CompletableFuture<GenPrepData> future = CompletableFuture.supplyAsync(() -> {
 			//build wallLayers and merge in existing wallLayers
 			ImmutableList<WallLayer> wallLayers = WallLayers.scan(world, anchorPoint, originPoints, wallMaterials, nearbyClaimedPoints, pretendPoints);
-			wallLayers = WallLayers.merge(wallLayers, existingLayers);
 
 			//set layerAroundWall
 			ImmutableSet<Point> wallPoints = WallLayers.getAllPointsIn(wallLayers);
@@ -51,6 +49,7 @@ public class GenPrepData {
 					getLayerAround(world, anchorPoint, wallPoints, Blocks.ConnectedThreshold.POINTS).join()
 			);
 
+			//set layerOutside and pointsInside
 			ImmutableSet<Point> layerOutside = ImmutableSet.copyOf(
 					getLayerOutside(world, originPoints, wallPoints, layerAroundWall)
 			);

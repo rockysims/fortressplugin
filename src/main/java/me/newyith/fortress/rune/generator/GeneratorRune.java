@@ -102,10 +102,6 @@ public class GeneratorRune {
 		return model.core.getLayerOutsideFortress();
 	}
 
-	public Set<Point> getGeneratedPoints() {
-		return model.core.getGeneratedPoints();
-	}
-
 	public Cuboid getFortressCuboid() {
 		Point anchor = model.pattern.getAnchorPoint();
 		Vector min = new Point(anchor).toVector();
@@ -113,7 +109,7 @@ public class GeneratorRune {
 
 		Set<Point> points = new HashSet<>();
 		points.addAll(model.pattern.getPoints());
-		points.addAll(getGeneratedPoints());
+		points.addAll(model.core.getClaimedWallPoints());
 		for (Point p : points) {
 			min.setX(Math.min(min.getX(), p.x()));
 			min.setY(Math.min(min.getY(), p.y()));
