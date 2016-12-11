@@ -1,6 +1,8 @@
 package me.newyith.fortress.core;
 
 import me.newyith.fortress.bedrock.BedrockAuthToken;
+import me.newyith.fortress.bedrock.BedrockBatch;
+import me.newyith.fortress.bedrock.BedrockManagerNew;
 import me.newyith.fortress.bedrock.timed.TimedBedrockManagerNew;
 import me.newyith.fortress.core.util.WallLayer;
 import me.newyith.fortress.event.TickTimer;
@@ -16,6 +18,7 @@ import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CoreAnimator {
 	private static class Model {
@@ -40,6 +43,8 @@ public class CoreAnimator {
 					 @JsonProperty("anchorPoint") Point anchorPoint,
 					 @JsonProperty("wallLayers") List<WallLayer> wallLayers,
 					 @JsonProperty("coreMats") CoreMaterials coreMats,
+					 @JsonProperty("bedrockAuthToken") BedrockAuthToken bedrockAuthToken,
+					 @JsonProperty("protectionAuthToken") ProtectionAuthToken protectionAuthToken,
 					 @JsonProperty("skipAnimation") boolean skipAnimation,
 					 @JsonProperty("animationInProgress") boolean animationInProgress,
 					 @JsonProperty("worldName") String worldName) {
@@ -48,6 +53,8 @@ public class CoreAnimator {
 			this.anchorPoint = anchorPoint;
 			this.wallLayers = wallLayers;
 			this.coreMats = coreMats;
+			this.bedrockAuthToken = bedrockAuthToken;
+			this.protectionAuthToken = protectionAuthToken;
 			this.skipAnimation = skipAnimation;
 			this.animationInProgress = animationInProgress;
 			this.worldName = worldName;
@@ -66,15 +73,15 @@ public class CoreAnimator {
 		this.model = model;
 	}
 
-	public CoreAnimator(World world, Point anchorPoint, CoreMaterials coreMats) {
+	public CoreAnimator(World world, Point anchorPoint, CoreMaterials coreMats, BedrockAuthToken bedrockAuthToken, ProtectionAuthToken protectionAuthToken) {
 		Set<List<ProtectionBatch>> allOldProtectionBatches = new HashSet<>();
 		List<ProtectionBatch> curProtectionBatches = new ArrayList<>();
 		List<WallLayer> wallLayers = new ArrayList<>();
 		boolean skipAnimation = false;
 		boolean animationInProgress = false;
 		String worldName = world.getName();
-		model = new Model(allOldProtectionBatches, curProtectionBatches, anchorPoint, wallLayers,
-				coreMats, skipAnimation, animationInProgress, worldName);
+		model = new Model(allOldProtectionBatches, curProtectionBatches, anchorPoint, wallLayers, coreMats,
+				bedrockAuthToken, protectionAuthToken, skipAnimation, animationInProgress, worldName);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -153,6 +160,7 @@ public class CoreAnimator {
 				ProtectionBatch protectionBatch = new ProtectionBatch(model.protectionAuthToken, layer.getPoints());
 				Set<Point> newlyProtecteds = ProtectionManager.forWorld(model.world).protect(protectionBatch);
 				model.curProtectionBatches.add(protectionBatch);
+				alter(protectionBatch);
 
 				if (newlyProtecteds.size() > 0) {
 					generatedNewLayer = true;
@@ -184,6 +192,7 @@ public class CoreAnimator {
 			//remove and degenerate last batch in oldProtectionBatches
 			ProtectionBatch lastOldProtectionBatch = oldProtectionBatches.remove(oldProtectionBatches.size() - 1);
 			Set<Point> newlyUnprotecteds = ProtectionManager.forWorld(model.world).unprotect(lastOldProtectionBatch);
+			unalter(lastOldProtectionBatch);
 
 			if (newlyUnprotecteds.size() > 0) {
 				degeneratedOldLayer = true;
@@ -197,5 +206,23 @@ public class CoreAnimator {
 		}
 
 		return generatedNewLayer || degeneratedOldLayer;
+	}
+
+	private void alter(ProtectionBatch batch) {
+		//convert cobblestone in batch to bedrock
+		Set<Point> cobblePoints = batch.getPoints().stream()
+				.filter(p -> p.is(Material.COBBLESTONE, model.world))
+				.collect(Collectors.toSet());
+		BedrockBatch bedrockBatch = new BedrockBatch(model.bedrockAuthToken, cobblePoints);
+		BedrockManagerNew.forWorld(model.world).convert(bedrockBatch);
+		batch.addBedrockBatch(bedrockBatch);
+	}
+
+	private void unalter(ProtectionBatch protectionBatch) {
+		//revert bedrock in protectionBatch to cobblestone
+		Set<BedrockBatch> bedrockBatches = protectionBatch.removeBedrockBatches();
+		for (BedrockBatch bedrockBatch : bedrockBatches) {
+			BedrockManagerNew.forWorld(model.world).revert(bedrockBatch);
+		}
 	}
 }

@@ -211,6 +211,24 @@ public class CoreAnimatorOld {
 		return updatedToNextFrame;
 	}
 
+
+
+
+
+
+
+
+
+
+
+
+
+	//*/
+	private int updateLayer(int layerIndex) {
+		return 0;
+	}
+	/*/ //commented out to allow compile despite errors here
+
 	private int updateLayer(int layerIndex) {
 		Set<Point> updatedPoints = new HashSet<>();
 
@@ -479,4 +497,7 @@ public class CoreAnimatorOld {
 		FortressesManager.forWorld(model.world).removeAlteredPoints(batch.getPoints());
 		model.alteredBatches.remove(batch);
 	}
+
+	//*/
+
 }

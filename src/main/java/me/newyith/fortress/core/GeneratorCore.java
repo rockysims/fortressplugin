@@ -5,6 +5,7 @@ import me.newyith.fortress.bedrock.BedrockAuthToken;
 import me.newyith.fortress.bedrock.timed.TimedBedrockManagerNew;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
+import me.newyith.fortress.protection.ProtectionAuthToken;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.util.Blocks;
 import me.newyith.fortress.util.Point;
@@ -31,14 +32,15 @@ public class GeneratorCore extends BaseCore {
 					 @JsonProperty("claimedPoints") Set<Point> claimedPoints,
 					 @JsonProperty("claimedWallPoints") Set<Point> claimedWallPoints,
 					 @JsonProperty("bedrockAuthToken") BedrockAuthToken bedrockAuthToken,
+					 @JsonProperty("protectionAuthToken") ProtectionAuthToken protectionAuthToken,
 					 @JsonProperty("animator") CoreAnimator animator,
 					 @JsonProperty("placedByPlayerId") UUID placedByPlayerId,
 					 @JsonProperty("layerOutsideFortress") Set<Point> layerOutsideFortress,
 					 @JsonProperty("pointsInsideFortress") Set<Point> pointsInsideFortress,
 					 @JsonProperty("worldName") String worldName,
 					 @JsonProperty("datum") String datum) {
-			super(anchorPoint, claimedPoints, claimedWallPoints, bedrockAuthToken, animator,
-					placedByPlayerId, layerOutsideFortress, pointsInsideFortress, worldName);
+			super(anchorPoint, claimedPoints, claimedWallPoints, bedrockAuthToken, protectionAuthToken,
+					animator, placedByPlayerId, layerOutsideFortress, pointsInsideFortress, worldName);
 			this.datum = datum;
 
 			//rebuild transient fields

@@ -1,8 +1,12 @@
 package me.newyith.fortress.protection;
 
+import me.newyith.fortress.bedrock.BedrockAuthToken;
+import me.newyith.fortress.bedrock.BedrockBatch;
+import me.newyith.fortress.bedrock.BedrockManagerNew;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -83,7 +87,6 @@ public class ProtectionManagerForWorld {
 		return newUnprotected;
 	}
 
-	//TODO: consider: shouldn't this be called when generator is destroyed?
 	public void unprotect(ProtectionAuthToken authToken) {
 		Debug.start("unprotect(authToken)");
 		model.batches.stream()

@@ -12,6 +12,8 @@ import me.newyith.fortress.core.util.WallLayers;
 import me.newyith.fortress.main.BedrockSafety;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
+import me.newyith.fortress.protection.ProtectionAuthToken;
+import me.newyith.fortress.protection.ProtectionManager;
 import me.newyith.fortress.util.Cuboid;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
@@ -36,6 +38,7 @@ public abstract class BaseCore {
 		protected final Set<Point> claimedPoints;
 		protected final Set<Point> claimedWallPoints;
 		protected final BedrockAuthToken bedrockAuthToken;
+		protected final ProtectionAuthToken protectionAuthToken;
 		protected final CoreAnimator animator;
 		protected UUID placedByPlayerId;
 		protected final Set<Point> layerOutsideFortress;
@@ -51,6 +54,7 @@ public abstract class BaseCore {
 					 @JsonProperty("claimedPoints") Set<Point> claimedPoints,
 					 @JsonProperty("claimedWallPoints") Set<Point> claimedWallPoints,
 					 @JsonProperty("bedrockAuthToken") BedrockAuthToken bedrockAuthToken,
+					 @JsonProperty("protectionAuthToken") ProtectionAuthToken protectionAuthToken,
 					 @JsonProperty("animator") CoreAnimator animator,
 					 @JsonProperty("placedByPlayerId") UUID placedByPlayerId,
 					 @JsonProperty("layerOutsideFortress") Set<Point> layerOutsideFortress,
@@ -60,6 +64,7 @@ public abstract class BaseCore {
 			this.claimedPoints = claimedPoints;
 			this.claimedWallPoints = claimedWallPoints;
 			this.bedrockAuthToken = bedrockAuthToken;
+			this.protectionAuthToken = protectionAuthToken;
 			this.animator = animator;
 			this.placedByPlayerId = placedByPlayerId;
 			this.layerOutsideFortress = layerOutsideFortress;
@@ -74,7 +79,8 @@ public abstract class BaseCore {
 		}
 
 		public Model(Model m) {
-			this(m.anchorPoint, m.claimedPoints, m.claimedWallPoints, m.bedrockAuthToken, m.animator, m.placedByPlayerId, m.layerOutsideFortress, m.pointsInsideFortress, m.worldName);
+			this(m.anchorPoint, m.claimedPoints, m.claimedWallPoints, m.bedrockAuthToken, m.protectionAuthToken,
+					m.animator, m.placedByPlayerId, m.layerOutsideFortress, m.pointsInsideFortress, m.worldName);
 		}
 	}
 	protected Model model = null;
@@ -88,12 +94,13 @@ public abstract class BaseCore {
 		Set<Point> claimedPoints = new HashSet<>();
 		Set<Point> claimedWallPoints = new HashSet<>();
 		BedrockAuthToken bedrockAuthToken = new BedrockAuthToken();
-		CoreAnimator animator = new CoreAnimator(world, anchorPoint, coreMats);
+		ProtectionAuthToken protectionAuthToken = new ProtectionAuthToken();
+		CoreAnimator animator = new CoreAnimator(world, anchorPoint, coreMats, model.bedrockAuthToken, model.protectionAuthToken);
 		UUID placedByPlayerId = null; //set by onCreated()
 		Set<Point> layerOutsideFortress = new HashSet<>();
 		Set<Point> pointsInsideFortress = new HashSet<>();
 		String worldName = world.getName();
-		model = new Model(anchorPoint, claimedPoints, claimedWallPoints, bedrockAuthToken, animator,
+		model = new Model(anchorPoint, claimedPoints, claimedWallPoints, bedrockAuthToken, protectionAuthToken, animator,
 				placedByPlayerId, layerOutsideFortress, pointsInsideFortress, worldName);
 	}
 
@@ -270,6 +277,7 @@ public abstract class BaseCore {
 
 	public void onBroken() {
 		degenerateWall(true); //true means skipAnimation
+		ProtectionManager.forWorld(model.world).unprotect(model.protectionAuthToken);
 		BedrockManagerNew.forWorld(model.world).revert(model.bedrockAuthToken);
 		FortressesManager.forWorld(model.world).removeClaimedWallPoints(model.claimedWallPoints);
 	}
