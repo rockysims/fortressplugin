@@ -256,8 +256,11 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+//TODO: work on removing need for buildProtectedPointsByAuthToken()
+
 
 //TODO: rename BedrockAuthToken to BedrockGroupId (and update variable names)
+//	or maybe not unless I can think of a better new name
 
 //TODO: finish changing from BedrockManagerOld to BedrockManagerNew
 //	TODO: consider adding AnimationLayer to wrap layerPoints and bedrockBatch (would handle altered and protected)

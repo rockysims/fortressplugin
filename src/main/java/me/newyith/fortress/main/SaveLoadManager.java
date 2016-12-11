@@ -2,6 +2,7 @@ package me.newyith.fortress.main;
 
 import me.newyith.fortress.bedrock.BedrockManagerNew;
 import me.newyith.fortress.bedrock.timed.TimedBedrockManagerNew;
+import me.newyith.fortress.protection.ProtectionManager;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Log;
 import org.bukkit.event.EventHandler;
@@ -49,6 +50,7 @@ public class SaveLoadManager implements Listener {
 
 	private void saveToMap(Map<String, Object> data) {
 		data.put("FortressesManager", FortressesManager.getInstance());
+		data.put("ProtectionManager", ProtectionManager.getInstance());
 		data.put("BedrockManager", BedrockManagerNew.getInstance());
 		data.put("TimedBedrockManager", TimedBedrockManagerNew.getInstance());
 	}
@@ -73,6 +75,16 @@ public class SaveLoadManager implements Listener {
 //			Debug.msg("load obj (BM) type: " + obj.getClass().getName());
 			BedrockManagerNew bedrockManager = mapper.convertValue(obj, BedrockManagerNew.class);
 			BedrockManagerNew.setInstance(bedrockManager);
+		}
+
+		//load ProtectionManager
+		obj = data.get("ProtectionManager");
+		if (obj == null) {
+			ProtectionManager.setInstance(new ProtectionManager());
+		} else {
+//			Debug.msg("load obj (BM) type: " + obj.getClass().getName());
+			ProtectionManager protectionManager = mapper.convertValue(obj, ProtectionManager.class);
+			ProtectionManager.setInstance(protectionManager);
 		}
 
 		//load FortressesManager

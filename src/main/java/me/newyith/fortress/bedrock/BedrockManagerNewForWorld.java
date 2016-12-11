@@ -26,12 +26,12 @@ public class BedrockManagerNewForWorld {
 
 		@JsonCreator
 		public Model(@JsonProperty("bedrockHandler") BedrockHandler bedrockHandler,
-					 @JsonProperty("materialByPoint") ImmutableMap<Point, Material> materialByPoint,
+					 @JsonProperty("materialByPoint") Map<Point, Material> materialByPoint,
 					 @JsonProperty("batches") Set<BedrockBatch> batches,
 					 @JsonProperty("updatePoints") Set<Point> updatePoints,
 					 @JsonProperty("worldName") String worldName) {
 			this.bedrockHandler = bedrockHandler;
-			this.materialByPoint = materialByPoint;
+			this.materialByPoint = ImmutableMap.copyOf(materialByPoint);
 			this.batches = batches;
 			this.updatePoints = updatePoints;
 			this.worldName = worldName;

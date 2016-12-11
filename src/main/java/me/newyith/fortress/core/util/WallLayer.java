@@ -1,29 +1,38 @@
 package me.newyith.fortress.core.util;
 
+import com.google.common.collect.ImmutableSet;
 import me.newyith.fortress.util.Point;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.Set;
 
-//TODO: make WallLayer hold no state?
-//WallLayer should represents a layer of wall and be immutable (remove de/generate() methods?)
+//WallLayer represents a layer of wall and should be immutable
 public class WallLayer {
+	protected static class Model {
+		private final ImmutableSet<Point> points;
+
+		@JsonCreator
+		public Model(@JsonProperty("points") Set<Point> points) {
+			this.points = ImmutableSet.copyOf(points);
+
+			//rebuild transient fields
+		}
+	}
+	private Model model = null;
+
+	@JsonCreator
+	public WallLayer(@JsonProperty("model") Model model) {
+		this.model = model;
+	}
 
 	public WallLayer(Set<Point> layerPoints) {
-		//TODO: write
+		model = new Model(ImmutableSet.copyOf(layerPoints));
 	}
+
+	//-----------------------------------------------------------------------
 
 	public Set<Point> getPoints() {
-		//TODO: write
-		return null;
-	}
-
-	public Set<Point> getGeneratedPoints() {
-		//TODO: write
-		return null;
-	}
-
-	public Set<Point> generate() {
-		//TODO: write
-		return null;
+		return model.points;
 	}
 }

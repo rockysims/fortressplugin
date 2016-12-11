@@ -14,9 +14,9 @@ public class BedrockBatch {
 
 		@JsonCreator
 		public Model(@JsonProperty("authToken") BedrockAuthToken authToken,
-					 @JsonProperty("points") ImmutableSet<Point> points) {
+					 @JsonProperty("points") Set<Point> points) {
 			this.authToken = authToken;
-			this.points = points;
+			this.points = ImmutableSet.copyOf(points);
 
 			//rebuild transient fields
 		}

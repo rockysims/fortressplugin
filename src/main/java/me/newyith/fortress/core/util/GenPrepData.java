@@ -57,7 +57,6 @@ public class GenPrepData {
 					getPointsInside(world, layerOutside, layerAroundWall, wallPoints)
 			);
 
-//			Debug.msg("makeFuture() returning");
 			return new GenPrepData(wallLayers, layerAroundWall, pointsInside, layerOutside);
 		});
 

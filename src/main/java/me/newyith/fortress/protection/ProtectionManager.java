@@ -59,6 +59,11 @@ public class ProtectionManager {
 	//-----------------------------------------------------------------------
 
 	public static ProtectionManagerForWorld forWorld(World world) {
+		if (instance == null) Debug.msg("null a");
+		if (instance.model == null) Debug.msg("null b");
+
+
+
 		return instance.model.getManagerByWorldName(world.getName());
 	}
 }

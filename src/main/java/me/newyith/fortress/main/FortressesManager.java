@@ -1,15 +1,7 @@
 package me.newyith.fortress.main;
 
-import me.newyith.fortress.core.BaseCore;
 import me.newyith.fortress.rune.generator.GeneratorRune;
-import me.newyith.fortress.util.Point;
 import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockRedstoneEvent;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 

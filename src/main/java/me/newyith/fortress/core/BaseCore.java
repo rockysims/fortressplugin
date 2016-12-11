@@ -95,7 +95,7 @@ public abstract class BaseCore {
 		Set<Point> claimedWallPoints = new HashSet<>();
 		BedrockAuthToken bedrockAuthToken = new BedrockAuthToken();
 		ProtectionAuthToken protectionAuthToken = new ProtectionAuthToken();
-		CoreAnimator animator = new CoreAnimator(world, anchorPoint, coreMats, model.bedrockAuthToken, model.protectionAuthToken);
+		CoreAnimator animator = new CoreAnimator(world, anchorPoint, coreMats, bedrockAuthToken, protectionAuthToken);
 		UUID placedByPlayerId = null; //set by onCreated()
 		Set<Point> layerOutsideFortress = new HashSet<>();
 		Set<Point> pointsInsideFortress = new HashSet<>();

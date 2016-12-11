@@ -15,9 +15,9 @@ public class TimedBedrockBatch extends BedrockBatch implements Comparable<TimedB
 
 		@JsonCreator
 		public Model(@JsonProperty("authToken") BedrockAuthToken authToken,
-					 @JsonProperty("points") ImmutableSet<Point> points,
+					 @JsonProperty("points") Set<Point> points,
 					 @JsonProperty("endTick") int endTick) {
-			super(authToken, points);
+			super(authToken, ImmutableSet.copyOf(points));
 			this.endTick = endTick;
 
 			//rebuild transient fields

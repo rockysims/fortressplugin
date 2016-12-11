@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.util.Blocks;
+import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -14,17 +15,21 @@ import java.util.stream.Collectors;
 
 public class WallLayers {
 	//this method is (or should be) thread safe
-	//TODO: make sure this method is thread safe
 	public static ImmutableSet<Point> getAllPointsIn(ImmutableList<WallLayer> wallLayers) {
-		//TODO: write
-		return null;
-	}
+		Set<Point> points = wallLayers.stream()
+				.flatMap(wallLayer -> {
 
-	//this method is (or should be) thread safe
-	//TODO: make sure this method is thread safe
-	public static ImmutableList<WallLayer> merge(ImmutableList<WallLayer> wallLayers, ImmutableList<ImmutableSet<Point>> moreWallLayers) {
-		//TODO: write
-		return null;
+
+					if (wallLayer == null) Debug.msg("wallLayer is null");
+					if (wallLayer.getPoints() == null) Debug.msg("wallLayer.getPoints() is null");
+					if (wallLayer.getPoints().stream() == null) Debug.msg("wallLayer.getPoints().stream() is null");
+
+
+					return wallLayer.getPoints().stream();
+				})
+				.collect(Collectors.toSet());
+
+		return ImmutableSet.copyOf(points);
 	}
 
 	//this method is (or should be) thread safe

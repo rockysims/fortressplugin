@@ -17,10 +17,10 @@ public class ProtectionBatch {
 
 		@JsonCreator
 		public Model(@JsonProperty("authToken") ProtectionAuthToken authToken,
-					 @JsonProperty("points") ImmutableSet<Point> points,
+					 @JsonProperty("points") Set<Point> points,
 					 @JsonProperty("bedrockBatches") Set<BedrockBatch> bedrockBatches) {
 			this.authToken = authToken;
-			this.points = points;
+			this.points = ImmutableSet.copyOf(points);
 			this.bedrockBatches = bedrockBatches;
 
 			//rebuild transient fields
