@@ -323,6 +323,8 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: add config setting to specify debug level: errors, errors & warnings, all
 
+//TODO: change name on sign from "Generator:" to "Fortress:"
+
 
 
 
@@ -337,6 +339,9 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: consider leaving in bug where piston extensions don't receive protection from explosions (and other things)
 //	or think of some reasonably elegant way of handling the fact that piston extension is technically a different block
 //		don't want retracted piston to still protect block piston would extend into
+
+//TODO: make bedrock shield not apply to transparent blocks like glass
+//	show a bunch of nether particles instead
 
 
 
