@@ -1,8 +1,10 @@
 package me.newyith.fortress.core;
 
+import me.newyith.fortress.bedrock.BedrockAuthToken;
 import me.newyith.fortress.bedrock.timed.TimedBedrockManagerNew;
 import me.newyith.fortress.core.util.WallLayer;
 import me.newyith.fortress.event.TickTimer;
+import me.newyith.fortress.protection.ProtectionAuthToken;
 import me.newyith.fortress.protection.ProtectionBatch;
 import me.newyith.fortress.protection.ProtectionManager;
 import me.newyith.fortress.util.Debug;
@@ -22,6 +24,8 @@ public class CoreAnimator {
 		private Point anchorPoint = null;
 		private List<WallLayer> wallLayers = null;
 		private CoreMaterials coreMats = null;
+		private BedrockAuthToken bedrockAuthToken;
+		private ProtectionAuthToken protectionAuthToken;
 		private boolean skipAnimation = false;
 		private boolean animationInProgress = false;
 		private String worldName = null;

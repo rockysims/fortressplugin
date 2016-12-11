@@ -93,6 +93,7 @@ public class BedrockManagerNewForWorld {
 		}
 	}
 
+	//TODO: consider getting rid of the method if we can (quite possible it's needed)
 	public Set<Point> forceRevertBatchesContaining(Set<Point> forceRevertPoints) {
 		Set<Point> forceRevertedPoints = new HashSet<>();
 

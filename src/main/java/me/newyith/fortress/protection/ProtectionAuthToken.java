@@ -1,5 +1,5 @@
 package me.newyith.fortress.protection;
 
-public class BedrockAuthToken {
+public class ProtectionAuthToken {
 	//just an object
 }
