@@ -30,7 +30,6 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 public abstract class BaseCore {
 	public static class Model {
@@ -40,6 +39,7 @@ public abstract class BaseCore {
 		protected final BedrockAuthToken bedrockAuthToken;
 		protected final ProtectionAuthToken protectionAuthToken;
 		protected final CoreAnimator animator;
+		protected boolean active;
 		protected UUID placedByPlayerId;
 		protected final Set<Point> layerOutsideFortress;
 		protected final Set<Point> pointsInsideFortress;
@@ -56,6 +56,7 @@ public abstract class BaseCore {
 					 @JsonProperty("bedrockAuthToken") BedrockAuthToken bedrockAuthToken,
 					 @JsonProperty("protectionAuthToken") ProtectionAuthToken protectionAuthToken,
 					 @JsonProperty("animator") CoreAnimator animator,
+					 @JsonProperty("active") boolean active,
 					 @JsonProperty("placedByPlayerId") UUID placedByPlayerId,
 					 @JsonProperty("layerOutsideFortress") Set<Point> layerOutsideFortress,
 					 @JsonProperty("pointsInsideFortress") Set<Point> pointsInsideFortress,
@@ -66,6 +67,7 @@ public abstract class BaseCore {
 			this.bedrockAuthToken = bedrockAuthToken;
 			this.protectionAuthToken = protectionAuthToken;
 			this.animator = animator;
+			this.active = active;
 			this.placedByPlayerId = placedByPlayerId;
 			this.layerOutsideFortress = layerOutsideFortress;
 			this.pointsInsideFortress = pointsInsideFortress;
@@ -80,7 +82,7 @@ public abstract class BaseCore {
 
 		public Model(Model m) {
 			this(m.anchorPoint, m.claimedPoints, m.claimedWallPoints, m.bedrockAuthToken, m.protectionAuthToken,
-					m.animator, m.placedByPlayerId, m.layerOutsideFortress, m.pointsInsideFortress, m.worldName);
+					m.animator, m.active, m.placedByPlayerId, m.layerOutsideFortress, m.pointsInsideFortress, m.worldName);
 		}
 	}
 	protected Model model = null;
@@ -96,12 +98,13 @@ public abstract class BaseCore {
 		BedrockAuthToken bedrockAuthToken = new BedrockAuthToken();
 		ProtectionAuthToken protectionAuthToken = new ProtectionAuthToken();
 		CoreAnimator animator = new CoreAnimator(world, anchorPoint, coreMats, bedrockAuthToken, protectionAuthToken);
+		boolean active = false;
 		UUID placedByPlayerId = null; //set by onCreated()
 		Set<Point> layerOutsideFortress = new HashSet<>();
 		Set<Point> pointsInsideFortress = new HashSet<>();
 		String worldName = world.getName();
 		model = new Model(anchorPoint, claimedPoints, claimedWallPoints, bedrockAuthToken, protectionAuthToken, animator,
-				placedByPlayerId, layerOutsideFortress, pointsInsideFortress, worldName);
+				active, placedByPlayerId, layerOutsideFortress, pointsInsideFortress, worldName);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -288,6 +291,12 @@ public abstract class BaseCore {
 		} else {
 			degenerateWall(false); //false means don't skipAnimation
 		}
+
+		model.active = active;
+	}
+
+	public boolean isActive() {
+		return model.active;
 	}
 
 	public void onGeneratedChanged() {

@@ -121,7 +121,7 @@ public class CoreParticles {
 	}
 
 	private void tickAnchorParticles(BaseCore core) {
-		if (core.getGeneratedPoints().size() > 0) {
+		if (core.isActive()) {
 			if (anchorWaitTicks <= 0) {
 				long now = (new Date()).getTime();
 				anchorWaitTicks = (1000 + (int)(now % 5000)) / TickTimer.msPerTick;

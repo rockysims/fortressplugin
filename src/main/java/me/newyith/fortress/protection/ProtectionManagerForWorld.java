@@ -1,12 +1,8 @@
 package me.newyith.fortress.protection;
 
-import me.newyith.fortress.bedrock.BedrockAuthToken;
-import me.newyith.fortress.bedrock.BedrockBatch;
-import me.newyith.fortress.bedrock.BedrockManagerNew;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -99,30 +95,24 @@ public class ProtectionManagerForWorld {
 		return model.protectedPoints.contains(p);
 	}
 
+	private Set<Point> buildBatchPoints() {
+		Debug.start("buildBatchPoints()");
+		Set<Point> allBatchPoints = model.batches.parallelStream()
+				.flatMap(batch -> batch.getPoints().stream())
+				.collect(Collectors.toSet());
+		Debug.end("buildBatchPoints()");
+
+		return allBatchPoints;
+	}
+
 	public Set<Point> buildProtectedPointsByAuthToken(ProtectionAuthToken authToken) {
 		Debug.start("buildProtectedPointsByAuthToken()");
 		Set<Point> pointsProtectedByAuthToken = model.batches.parallelStream()
 				.filter(batch -> batch.authorizedBy(authToken))
-				.map(ProtectionBatch::getPoints)
-				.reduce(new HashSet<>(), (carry, batchPoints) -> {
-					carry.addAll(batchPoints);
-					return carry;
-				});
+				.flatMap(batch -> batch.getPoints().stream())
+				.collect(Collectors.toSet());
 		Debug.end("buildProtectedPointsByAuthToken()");
 
 		return pointsProtectedByAuthToken;
-	}
-
-	private Set<Point> buildBatchPoints() {
-		Debug.start("buildBatchPoints()");
-		Set<Point> allBatchPoints = model.batches.parallelStream()
-				.map(ProtectionBatch::getPoints)
-				.reduce(new HashSet<>(), (carry, batchPoints) -> {
-					carry.addAll(batchPoints);
-					return carry;
-				});
-		Debug.end("buildBatchPoints()");
-
-		return allBatchPoints;
 	}
 }

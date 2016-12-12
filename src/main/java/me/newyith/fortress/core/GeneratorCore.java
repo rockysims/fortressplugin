@@ -34,13 +34,14 @@ public class GeneratorCore extends BaseCore {
 					 @JsonProperty("bedrockAuthToken") BedrockAuthToken bedrockAuthToken,
 					 @JsonProperty("protectionAuthToken") ProtectionAuthToken protectionAuthToken,
 					 @JsonProperty("animator") CoreAnimator animator,
+					 @JsonProperty("active") boolean active,
 					 @JsonProperty("placedByPlayerId") UUID placedByPlayerId,
 					 @JsonProperty("layerOutsideFortress") Set<Point> layerOutsideFortress,
 					 @JsonProperty("pointsInsideFortress") Set<Point> pointsInsideFortress,
 					 @JsonProperty("worldName") String worldName,
 					 @JsonProperty("datum") String datum) {
 			super(anchorPoint, claimedPoints, claimedWallPoints, bedrockAuthToken, protectionAuthToken,
-					animator, placedByPlayerId, layerOutsideFortress, pointsInsideFortress, worldName);
+					animator, active, placedByPlayerId, layerOutsideFortress, pointsInsideFortress, worldName);
 			this.datum = datum;
 
 			//rebuild transient fields
@@ -113,7 +114,8 @@ public class GeneratorCore extends BaseCore {
 			Point towardFace = origin.add(face.getModX(), face.getModY(), face.getModZ());
 
 			//particleEffect = heart/flame/smoke (inside/outside/disabled)
-			boolean originGenerated = getGeneratedPoints().contains(origin);
+			Set<Point> generatedPoints = getGeneratedPoints();
+			boolean originGenerated = generatedPoints.contains(origin);
 			ParticleEffect particleEffect = ParticleEffect.SMOKE_NORMAL;
 			if (originGenerated) {
 				boolean inside = getPointsInsideFortress().contains(towardFace);
@@ -127,15 +129,15 @@ public class GeneratorCore extends BaseCore {
 
 			//show bedrock ripple
 			if (originGenerated) {
-				showRipple(origin);
+				showRipple(origin, generatedPoints);
 			}
 		}
 	}
 
-	private void showRipple(Point origin) {
+	private void showRipple(Point origin, Set<Point> generatedPoints) {
 		//get rippleLayers
 		int layerLimit = 20;
-		Set<Point> searchablePoints = getGeneratedPoints();
+		Set<Point> searchablePoints = generatedPoints;
 		CompletableFuture<List<Set<Point>>> future = Blocks.getPointsConnectedAsLayers(model.world, origin, layerLimit - 1, searchablePoints);
 		future.join(); //wait for future to resolve
 		List<Set<Point>> rippleLayersFromFuture = future.getNow(null);
