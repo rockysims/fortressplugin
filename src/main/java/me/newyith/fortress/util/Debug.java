@@ -43,7 +43,7 @@ public class Debug {
 	public static void particleAtTimed(Point point, ParticleEffect particleEffect) {
 		int repeatingTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(FortressPlugin.getInstance(), () -> {
 			particleAt(point, particleEffect);
-		}, 0, 10); //delay, period
+		}, 0, 20); //delay, period
 
 		Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
 			Bukkit.getScheduler().cancelTask(repeatingTaskId);
@@ -84,7 +84,7 @@ public class Debug {
 	public static void end(String key) {
 		if (timestamps.containsKey(key) || durations.containsKey(key)) {
 			stop(key, false);
-			duration(key);
+			duration(key); //TODO: uncomment out this line <----------------------------------------------------------
 			clear(key);
 		} else {
 			Debug.print("Timer \"" + key + "\" ended WITHOUT A DURATION");

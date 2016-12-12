@@ -166,7 +166,7 @@ public class CoreAnimator {
 					generatedNewLayer = true;
 
 					//show bedrock wave (if animation on)
-					if (!model.skipAnimation) {
+					if (true && !model.skipAnimation) { //TODO: remove "false && " part
 						int ms = 4 * model.ticksPerFrame * TickTimer.msPerTick;
 						TimedBedrockManagerNew.forWorld(model.world).convert(model.bedrockAuthToken, newlyProtecteds, ms);
 					}
@@ -198,7 +198,7 @@ public class CoreAnimator {
 				degeneratedOldLayer = true;
 
 				//show bedrock wave (if animation on)
-				if (!model.skipAnimation) {
+				if (true && !model.skipAnimation) { //TODO: remove "false && " part
 					int ms = 4 * model.ticksPerFrame * TickTimer.msPerTick;
 					TimedBedrockManagerNew.forWorld(model.world).convert(model.bedrockAuthToken, newlyUnprotecteds, ms);
 				}
@@ -211,8 +211,12 @@ public class CoreAnimator {
 	private void alter(ProtectionBatch batch) {
 		//convert cobblestone in batch to bedrock
 		Set<Point> cobblePoints = batch.getPoints().stream()
-				.filter(p -> p.is(Material.COBBLESTONE, model.world))
+				.filter(p -> {
+					return p.is(Material.COBBLESTONE, model.world);
+				})
 				.collect(Collectors.toSet());
+		Debug.msg("cobblePoints: " + cobblePoints.size());
+//		BedrockBatch bedrockBatch = new BedrockBatch(model.bedrockAuthToken, batch.getAlterPoints());
 		BedrockBatch bedrockBatch = new BedrockBatch(model.bedrockAuthToken, cobblePoints);
 		BedrockManagerNew.forWorld(model.world).convert(bedrockBatch);
 		batch.addBedrockBatch(bedrockBatch);

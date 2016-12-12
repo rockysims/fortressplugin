@@ -61,4 +61,12 @@ public class BedrockManagerNew {
 	public static BedrockManagerNewForWorld forWorld(World world) {
 		return instance.model.getManagerByWorldName(world.getName());
 	}
+
+	// - Events -
+
+	public static void onTick() {
+		instance.model.managerByWorld.forEach((worldName, manager) -> {
+			manager.onTick();
+		});
+	}
 }

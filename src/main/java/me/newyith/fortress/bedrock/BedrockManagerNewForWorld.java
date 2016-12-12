@@ -11,7 +11,10 @@ import org.bukkit.World;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class BedrockManagerNewForWorld {
@@ -152,6 +155,7 @@ public class BedrockManagerNewForWorld {
 		for (Point p : model.updatePoints) {
 			boolean shouldBeConv = shouldBeConverted.contains(p);
 			boolean isConv = model.bedrockHandler.isConverted(p);
+			Debug.msg(isConv + "/" + shouldBeConv + " is/should at " + p);
 
 			//if (isTallDoor) update shouldBeConv (since it also depends on other half of door)
 			Material mat = p.getType(model.world);
