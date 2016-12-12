@@ -84,7 +84,7 @@ public class Debug {
 	public static void end(String key) {
 		if (timestamps.containsKey(key) || durations.containsKey(key)) {
 			stop(key, false);
-			duration(key); //TODO: uncomment out this line <----------------------------------------------------------
+			duration(key);
 			clear(key);
 		} else {
 			Debug.print("Timer \"" + key + "\" ended WITHOUT A DURATION");

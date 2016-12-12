@@ -11,10 +11,13 @@ import java.util.Set;
 public class WallLayer {
 	protected static class Model {
 		private final ImmutableSet<Point> points;
+		private final ImmutableSet<Point> alterPoints;
 
 		@JsonCreator
-		public Model(@JsonProperty("points") Set<Point> points) {
+		public Model(@JsonProperty("points") Set<Point> points,
+					 @JsonProperty("alterPoints") Set<Point> alterPoints) {
 			this.points = ImmutableSet.copyOf(points);
+			this.alterPoints = ImmutableSet.copyOf(alterPoints);
 
 			//rebuild transient fields
 		}
@@ -26,13 +29,17 @@ public class WallLayer {
 		this.model = model;
 	}
 
-	public WallLayer(Set<Point> layerPoints) {
-		model = new Model(ImmutableSet.copyOf(layerPoints));
+	public WallLayer(Set<Point> layerPoints, Set<Point> alterPoints) {
+		model = new Model(ImmutableSet.copyOf(layerPoints), ImmutableSet.copyOf(alterPoints));
 	}
 
 	//-----------------------------------------------------------------------
 
 	public Set<Point> getPoints() {
 		return model.points;
+	}
+
+	public Set<Point> getAlterPoints() {
+		return model.alterPoints;
 	}
 }

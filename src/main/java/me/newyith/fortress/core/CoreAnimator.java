@@ -160,13 +160,13 @@ public class CoreAnimator {
 				ProtectionBatch protectionBatch = new ProtectionBatch(model.protectionAuthToken, layer.getPoints());
 				Set<Point> newlyProtecteds = ProtectionManager.forWorld(model.world).protect(protectionBatch);
 				model.curProtectionBatches.add(protectionBatch);
-				alter(protectionBatch);
+				alter(protectionBatch, layer.getAlterPoints());
 
 				if (newlyProtecteds.size() > 0) {
 					generatedNewLayer = true;
 
 					//show bedrock wave (if animation on)
-					if (true && !model.skipAnimation) { //TODO: remove "false && " part
+					if (!model.skipAnimation) {
 						int ms = 4 * model.ticksPerFrame * TickTimer.msPerTick;
 						TimedBedrockManagerNew.forWorld(model.world).convert(model.bedrockAuthToken, newlyProtecteds, ms);
 					}
@@ -198,7 +198,7 @@ public class CoreAnimator {
 				degeneratedOldLayer = true;
 
 				//show bedrock wave (if animation on)
-				if (true && !model.skipAnimation) { //TODO: remove "false && " part
+				if (!model.skipAnimation) {
 					int ms = 4 * model.ticksPerFrame * TickTimer.msPerTick;
 					TimedBedrockManagerNew.forWorld(model.world).convert(model.bedrockAuthToken, newlyUnprotecteds, ms);
 				}
@@ -208,16 +208,9 @@ public class CoreAnimator {
 		return generatedNewLayer || degeneratedOldLayer;
 	}
 
-	private void alter(ProtectionBatch batch) {
+	private void alter(ProtectionBatch batch, Set<Point> alterPoints) {
 		//convert cobblestone in batch to bedrock
-		Set<Point> cobblePoints = batch.getPoints().stream()
-				.filter(p -> {
-					return p.is(Material.COBBLESTONE, model.world);
-				})
-				.collect(Collectors.toSet());
-		Debug.msg("cobblePoints: " + cobblePoints.size());
-//		BedrockBatch bedrockBatch = new BedrockBatch(model.bedrockAuthToken, batch.getAlterPoints());
-		BedrockBatch bedrockBatch = new BedrockBatch(model.bedrockAuthToken, cobblePoints);
+		BedrockBatch bedrockBatch = new BedrockBatch(model.bedrockAuthToken, alterPoints);
 		BedrockManagerNew.forWorld(model.world).convert(bedrockBatch);
 		batch.addBedrockBatch(bedrockBatch);
 	}

@@ -39,7 +39,7 @@ public class WallLayers {
 			final ImmutableSet<Point> originPoints,
 			final ImmutableSet<Material> wallMaterials,
 			final ImmutableSet<Point> nearbyClaimedPoints,
-			final ImmutableMap<Point, Material> pretendPoints // = BedrockManagerNew.forWorld(world).getMaterialByPointMap();
+			final ImmutableMap<Point, Material> pretendPoints
 	) {
 		//set foundLayers to all connected wall points ignoring (and not traversing) nearbyClaimedPoints
 		ImmutableSet<Material> traverseMaterials = wallMaterials;
@@ -53,7 +53,14 @@ public class WallLayers {
 		).join();
 
 		//build wallLayers from foundLayers
-		List<WallLayer> wallLayers = foundLayers.stream().map(WallLayer::new).collect(Collectors.toList());
+		List<WallLayer> wallLayers = foundLayers.stream()
+				.map(layerPoints -> {
+					Set<Point> cobblePoints = layerPoints.stream()
+							.filter(p -> pretendPoints.get(p) == Material.COBBLESTONE || p.is(Material.COBBLESTONE, world))
+							.collect(Collectors.toSet());
+					return new WallLayer(layerPoints, cobblePoints);
+				})
+				.collect(Collectors.toList());
 
 		return ImmutableList.copyOf(wallLayers);
 	}
