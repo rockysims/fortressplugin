@@ -261,6 +261,7 @@ public class FortressPlugin extends JavaPlugin {
 //	then use @JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
 //		avoids need for uuid in authTokens
 //		remember to apply to BedrockBatch and ProtectionBatch too
+// maybe change IntSequenceGenerator to UUIDGenerator
 
 
 //TODO: work on removing need for buildProtectedPointsByAuthToken() (or just making it run faster?)

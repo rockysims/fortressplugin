@@ -2,8 +2,8 @@ package me.newyith.fortress.main;
 
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import org.bukkit.*;
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.*;
 

@@ -3,8 +3,8 @@ package me.newyith.fortress.protection;
 import com.google.common.collect.ImmutableSet;
 import me.newyith.fortress.bedrock.BedrockBatch;
 import me.newyith.fortress.util.Point;
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.HashSet;
 import java.util.Set;

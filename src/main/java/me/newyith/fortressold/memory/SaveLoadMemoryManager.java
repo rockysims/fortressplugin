@@ -3,7 +3,7 @@ package me.newyith.fortressold.memory;
 import me.newyith.fortressold.generator.FortressGeneratorRunesManager;
 import me.newyith.fortressold.main.FortressPlugin;
 import me.newyith.fortressold.util.Debug;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
 import java.util.LinkedHashMap;

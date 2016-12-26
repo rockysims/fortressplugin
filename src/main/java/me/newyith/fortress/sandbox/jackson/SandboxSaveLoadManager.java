@@ -2,8 +2,8 @@ package me.newyith.fortress.sandbox.jackson;
 
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.util.Debug;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.annotate.JsonAutoDetect;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 import java.io.*;
 import java.util.HashMap;

@@ -3,8 +3,8 @@ package me.newyith.fortress.core;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TimedBedrockOld implements Comparable<TimedBedrockOld> {
 	private static class Model {

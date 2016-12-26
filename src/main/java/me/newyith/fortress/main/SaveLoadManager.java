@@ -8,9 +8,8 @@ import me.newyith.fortress.util.Log;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldSaveEvent;
-import org.codehaus.jackson.annotate.JsonAutoDetect;
-import org.codehaus.jackson.map.ObjectMapper;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import java.io.*;
 import java.util.Date;
 import java.util.HashMap;
@@ -49,10 +48,10 @@ public class SaveLoadManager implements Listener {
 	}
 
 	private void saveToMap(Map<String, Object> data) {
-		data.put("FortressesManager", FortressesManager.getInstance());
-		data.put("ProtectionManager", ProtectionManager.getInstance());
-		data.put("BedrockManager", BedrockManagerNew.getInstance());
 		data.put("TimedBedrockManager", TimedBedrockManagerNew.getInstance());
+		data.put("ProtectionManager", ProtectionManager.getInstance());
+		data.put("FortressesManager", FortressesManager.getInstance());
+		data.put("BedrockManager", BedrockManagerNew.getInstance());
 	}
 
 	private void loadFromMap(Map<String, Object> data) {
@@ -67,22 +66,12 @@ public class SaveLoadManager implements Listener {
 			TimedBedrockManagerNew.setInstance(timedBedrockManager);
 		}
 
-		//load BedrockManager
-		obj = data.get("BedrockManager");
-		if (obj == null) {
-			BedrockManagerNew.setInstance(new BedrockManagerNew());
-		} else {
-//			Debug.msg("load obj (BM) type: " + obj.getClass().getName());
-			BedrockManagerNew bedrockManager = mapper.convertValue(obj, BedrockManagerNew.class);
-			BedrockManagerNew.setInstance(bedrockManager);
-		}
-
 		//load ProtectionManager
 		obj = data.get("ProtectionManager");
 		if (obj == null) {
 			ProtectionManager.setInstance(new ProtectionManager());
 		} else {
-//			Debug.msg("load obj (BM) type: " + obj.getClass().getName());
+//			Debug.msg("load obj (PM) type: " + obj.getClass().getName());
 			ProtectionManager protectionManager = mapper.convertValue(obj, ProtectionManager.class);
 			ProtectionManager.setInstance(protectionManager);
 		}
@@ -96,6 +85,16 @@ public class SaveLoadManager implements Listener {
 			FortressesManager fortressesManager = mapper.convertValue(obj, FortressesManager.class);
 			FortressesManager.setInstance(fortressesManager);
 			FortressesManager.secondStageLoad();
+		}
+
+		//load BedrockManager
+		obj = data.get("BedrockManager");
+		if (obj == null) {
+			BedrockManagerNew.setInstance(new BedrockManagerNew());
+		} else {
+//			Debug.msg("load obj (BM) type: " + obj.getClass().getName());
+			BedrockManagerNew bedrockManager = mapper.convertValue(obj, BedrockManagerNew.class);
+			BedrockManagerNew.setInstance(bedrockManager);
 		}
 	}
 
