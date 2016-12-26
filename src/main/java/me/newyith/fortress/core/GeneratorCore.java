@@ -175,7 +175,8 @@ public class GeneratorCore extends BaseCore {
 			for (Set<Point> layer : rippleLayers) {
 				int msDuration = 2000;
 
-				int layersRemaining = rippleLayers.size() - layerIndex; //layersRemaining == 1 on last layer
+				//make end of wave recede
+				int layersRemaining = layerLimit - layerIndex; //layersRemaining == 1 on last layer
 				if (layersRemaining <= 4) {
 					int msPerLayer = 150;
 					msDuration = msDuration - (2 * msPerLayer) * (4 - layersRemaining);
