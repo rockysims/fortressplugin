@@ -175,20 +175,23 @@ public class GeneratorCore extends BaseCore {
 			for (Set<Point> layer : rippleLayers) {
 				int msDuration = 2000;
 
-				int layersRemaining = rippleLayers.size() - layerIndex;
-				if (layersRemaining < 4) {
-					msDuration = 450 * layersRemaining;
+				int layersRemaining = rippleLayers.size() - layerIndex; //layersRemaining == 1 on last layer
+				if (layersRemaining <= 4) {
+					int msPerLayer = 150;
+					msDuration = msDuration - (2 * msPerLayer) * (4 - layersRemaining);
+					msDuration += msPerLayer;
 				}
 
 				final int msDurationFinal = msDuration;
 				Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
 					//TODO: consider fixing hacky call to getRuneByPatternPoint() here. GeneratorCore shouldn't need to know about rune
 					//	maybe add BaseCore::onBroken() should set model.isBroken = true?
+
 					boolean runeStillExists = FortressesManager.forWorld(model.world).getRuneByPatternPoint(model.anchorPoint) != null;
 					if (runeStillExists) { //rune might have been destroyed before ripple ended
 						TimedBedrockManagerNew.forWorld(model.world).convert(model.bedrockAuthToken, layer, msDurationFinal);
 					}
-				}, layerIndex * 3); //20 ticks per second
+				}, layerIndex * 3); //ticks (50 ms per tick)
 
 				layerIndex++;
 			}
