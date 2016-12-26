@@ -1,6 +1,7 @@
 package me.newyith.fortress.bedrock;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import javafx.util.Pair;
 import me.newyith.fortress.util.Blocks;
 import me.newyith.fortress.util.Debug;
@@ -88,11 +89,10 @@ public class BedrockManagerNewForWorld {
 
 	public void revert(BedrockAuthToken authToken) {
 		synchronized (model.mutex) {
-			for (BedrockBatch batch : model.batches) {
-				if (batch.authorizedBy(authToken)) {
-					removeBatch(batch);
-				}
-			}
+			ImmutableSet.copyOf(model.batches) //copy to avoid concurrent modification exception
+					.stream()
+					.filter(batch -> batch.authorizedBy(authToken))
+					.forEach(this::removeBatch);
 		}
 	}
 
@@ -101,7 +101,8 @@ public class BedrockManagerNewForWorld {
 		Set<Point> forceRevertedPoints = new HashSet<>();
 
 		synchronized (model.mutex) {
-			for (BedrockBatch batch : model.batches) {
+			ImmutableSet<BedrockBatch> origBatches = ImmutableSet.copyOf(model.batches); //copy to avoid concurrent modification exception
+			for (BedrockBatch batch : origBatches) {
 				Set<Point> batchPoints = batch.getPoints();
 				boolean forceRevert = !Collections.disjoint(batchPoints, forceRevertPoints);
 
