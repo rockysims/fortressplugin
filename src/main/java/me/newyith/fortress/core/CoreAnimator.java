@@ -6,6 +6,7 @@ import me.newyith.fortress.bedrock.BedrockManagerNew;
 import me.newyith.fortress.bedrock.timed.TimedBedrockManagerNew;
 import me.newyith.fortress.core.util.WallLayer;
 import me.newyith.fortress.event.TickTimer;
+import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.protection.ProtectionAuthToken;
 import me.newyith.fortress.protection.ProtectionBatch;
 import me.newyith.fortress.protection.ProtectionManager;
@@ -205,7 +206,19 @@ public class CoreAnimator {
 			}
 		}
 
-		return generatedNewLayer || degeneratedOldLayer;
+		boolean updatedToNextFrame = generatedNewLayer || degeneratedOldLayer;
+
+		//tell CoreParticles to update where to display particles
+		if (updatedToNextFrame) {
+			BaseCore core = FortressesManager.forWorld(model.world).getCore(model.anchorPoint);
+			if (core != null) {
+				core.onGeneratedChanged();
+			} else {
+				Debug.error("CoreAnimator.onGeneratedChanged(): Core at " + model.anchorPoint + " is null.");
+			}
+		}
+
+		return updatedToNextFrame;
 	}
 
 	private void alter(ProtectionBatch batch, Set<Point> alterPoints) {
