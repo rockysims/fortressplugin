@@ -1,12 +1,36 @@
 package me.newyith.fortress.util;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.UUID;
 
 public class BaseUUID {
-	private final UUID uuid = UUID.randomUUID();
+	protected static class Model {
+		private final UUID uuid;
+
+		@JsonCreator
+		public Model(@JsonProperty("uuid") UUID uuid) {
+			this.uuid = uuid;
+
+			//rebuild transient fields
+		}
+	}
+	private Model model = null;
+
+	@JsonCreator
+	public BaseUUID(@JsonProperty("model") Model model) {
+		this.model = model;
+	}
+
+	public BaseUUID() {
+		model = new Model(UUID.randomUUID());
+	}
+
+	//-----------------------------------------------------------------------
 
 	public UUID getUuid() {
-		return uuid;
+		return model.uuid;
 	}
 
 	@Override
@@ -14,14 +38,13 @@ public class BaseUUID {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		BaseUUID baseUUID = (BaseUUID) o;
+		BaseUUID that = (BaseUUID) o;
 
-		return !(uuid != null ? !uuid.equals(baseUUID.uuid) : baseUUID.uuid != null);
-
+		return !(model.uuid != null ? !model.uuid.equals(that.getUuid()) : that.getUuid() != null);
 	}
 
 	@Override
 	public int hashCode() {
-		return uuid != null ? uuid.hashCode() : 0;
+		return model.uuid != null ? model.uuid.hashCode() : 0;
 	}
 }

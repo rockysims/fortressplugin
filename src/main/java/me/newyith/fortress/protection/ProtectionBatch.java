@@ -9,16 +9,18 @@ import me.newyith.fortress.util.Point;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 public class ProtectionBatch extends Batch {
 	protected static class Model extends Batch.Model {
 		private final Set<BedrockBatch> bedrockBatches;
 
 		@JsonCreator
-		public Model(@JsonProperty("authToken") ProtectionAuthToken authToken,
+		public Model(@JsonProperty("uuid") UUID uuid,
+					 @JsonProperty("authToken") ProtectionAuthToken authToken,
 					 @JsonProperty("points") Set<Point> points,
 					 @JsonProperty("bedrockBatches") Set<BedrockBatch> bedrockBatches) {
-			super(authToken, ImmutableSet.copyOf(points));
+			super(uuid, authToken, ImmutableSet.copyOf(points));
 			this.bedrockBatches = bedrockBatches;
 
 			//rebuild transient fields
@@ -34,7 +36,7 @@ public class ProtectionBatch extends Batch {
 
 	public ProtectionBatch(ProtectionAuthToken authToken, Set<Point> points) {
 		super(authToken, points);
-		model = new Model(authToken, ImmutableSet.copyOf(points), new HashSet<>());
+		model = new Model(super.getUuid(), authToken, ImmutableSet.copyOf(points), new HashSet<>());
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
