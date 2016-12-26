@@ -3,6 +3,7 @@ package me.newyith.fortress.main;
 import me.newyith.fortress.bedrock.BedrockManagerNew;
 import me.newyith.fortress.bedrock.timed.TimedBedrockManagerNew;
 import me.newyith.fortress.protection.ProtectionManager;
+import me.newyith.fortress.util.BatchDataStore;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Log;
 import org.bukkit.event.EventHandler;
@@ -48,6 +49,7 @@ public class SaveLoadManager implements Listener {
 	}
 
 	private void saveToMap(Map<String, Object> data) {
+		data.put("BatchDataStore", BatchDataStore.getInstance());
 		data.put("TimedBedrockManager", TimedBedrockManagerNew.getInstance());
 		data.put("ProtectionManager", ProtectionManager.getInstance());
 		data.put("FortressesManager", FortressesManager.getInstance());
@@ -56,6 +58,15 @@ public class SaveLoadManager implements Listener {
 
 	private void loadFromMap(Map<String, Object> data) {
 		Object obj;
+
+		//load BatchDataStore
+		obj = data.get("BatchDataStore");
+		if (obj == null) {
+			BatchDataStore.setInstance(new BatchDataStore());
+		} else {
+			BatchDataStore batchDataStore = mapper.convertValue(obj, BatchDataStore.class);
+			BatchDataStore.setInstance(batchDataStore);
+		}
 
 		//load TimedBedrockManager
 		obj = data.get("TimedBedrockManager");

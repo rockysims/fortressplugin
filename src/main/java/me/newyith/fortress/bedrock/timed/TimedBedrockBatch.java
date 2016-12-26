@@ -1,6 +1,5 @@
 package me.newyith.fortress.bedrock.timed;
 
-import com.google.common.collect.ImmutableSet;
 import me.newyith.fortress.bedrock.BedrockAuthToken;
 import me.newyith.fortress.bedrock.BedrockBatch;
 import me.newyith.fortress.util.Point;
@@ -16,10 +15,8 @@ public class TimedBedrockBatch extends BedrockBatch implements Comparable<TimedB
 
 		@JsonCreator
 		public Model(@JsonProperty("uuid") UUID uuid,
-					 @JsonProperty("authToken") BedrockAuthToken authToken,
-					 @JsonProperty("points") Set<Point> points,
 					 @JsonProperty("endTick") int endTick) {
-			super(uuid, authToken, ImmutableSet.copyOf(points));
+			super(uuid);
 			this.endTick = endTick;
 
 			//rebuild transient fields
@@ -35,7 +32,7 @@ public class TimedBedrockBatch extends BedrockBatch implements Comparable<TimedB
 
 	public TimedBedrockBatch(BedrockAuthToken authToken, Set<Point> points, int endTick) {
 		super(authToken, points);
-		model = new Model(super.getUuid(), authToken, ImmutableSet.copyOf(points), endTick);
+		model = new Model(super.getUuid(), endTick);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

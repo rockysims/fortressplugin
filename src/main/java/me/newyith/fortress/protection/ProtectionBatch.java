@@ -17,10 +17,8 @@ public class ProtectionBatch extends Batch {
 
 		@JsonCreator
 		public Model(@JsonProperty("uuid") UUID uuid,
-					 @JsonProperty("authToken") ProtectionAuthToken authToken,
-					 @JsonProperty("points") Set<Point> points,
 					 @JsonProperty("bedrockBatches") Set<BedrockBatch> bedrockBatches) {
-			super(uuid, authToken, ImmutableSet.copyOf(points));
+			super(uuid);
 			this.bedrockBatches = bedrockBatches;
 
 			//rebuild transient fields
@@ -36,7 +34,7 @@ public class ProtectionBatch extends Batch {
 
 	public ProtectionBatch(ProtectionAuthToken authToken, Set<Point> points) {
 		super(authToken, points);
-		model = new Model(super.getUuid(), authToken, ImmutableSet.copyOf(points), new HashSet<>());
+		model = new Model(super.getUuid(), new HashSet<>());
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

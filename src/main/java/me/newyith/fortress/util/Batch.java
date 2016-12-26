@@ -2,27 +2,20 @@ package me.newyith.fortress.util;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;
 import java.util.UUID;
 
 public class Batch extends BaseUUID {
 	protected static class Model extends BaseUUID.Model {
-		private final AuthToken authToken;
-		private final ImmutableSet<Point> points;
-//		private final transient BatchData batchData;
+		private final transient BatchData batchData;
 
 		@JsonCreator
-		public Model(@JsonProperty("uuid") UUID uuid,
-					 @JsonProperty("authToken") AuthToken authToken,
-					 @JsonProperty("points") Set<Point> points) {
+		public Model(@JsonProperty("uuid") UUID uuid) {
 			super(uuid);
-			this.authToken = authToken;
-			this.points = ImmutableSet.copyOf(points);
 
 			//rebuild transient fields
-//			this.batchData = BatchDataStore.get(this.uuid);
+			this.batchData = BatchDataStore.get(uuid);
 		}
 	}
 	private Model model = null;
@@ -34,20 +27,21 @@ public class Batch extends BaseUUID {
 	}
 
 	public Batch(AuthToken authToken, Set<Point> points) {
-		model = new Model(super.getUuid(), authToken, ImmutableSet.copyOf(points));
+		BatchDataStore.put(super.getUuid(), new BatchData(authToken, points));
+		model = new Model(super.getUuid());
 	}
 
 	//-----------------------------------------------------------------------
 
 	public boolean authorizedBy(AuthToken otherAuthToken) {
-		return model.authToken.equals(otherAuthToken);
+		return model.batchData.getAuthToken().equals(otherAuthToken);
 	}
 
 	public Set<Point> getPoints() {
-		return model.points;
+		return model.batchData.getPoints();
 	}
 
 	public boolean contains(Point p) {
-		return model.points.contains(p);
+		return model.batchData.getPoints().contains(p);
 	}
 }
