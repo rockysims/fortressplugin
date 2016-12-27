@@ -78,6 +78,7 @@ public class ProtectionManagerForWorld {
 				.collect(Collectors.toSet());
 
 		model.protectedPoints.removeAll(newUnprotected);
+		batch.destroy();
 		Debug.end("unprotect()");
 
 		return newUnprotected;

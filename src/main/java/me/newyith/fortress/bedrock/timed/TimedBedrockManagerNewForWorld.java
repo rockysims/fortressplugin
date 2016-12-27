@@ -70,6 +70,7 @@ public class TimedBedrockManagerNewForWorld {
 		while (timedBedrockBatch != null && isExpired(timedBedrockBatch)) {
 			model.timedBedrockBatches.remove(timedBedrockBatch);
 			BedrockManagerNew.forWorld(model.world).revert(timedBedrockBatch);
+			timedBedrockBatch.destroy();
 			timedBedrockBatch = model.timedBedrockBatches.peek();
 		}
 	}

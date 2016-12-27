@@ -44,11 +44,15 @@ public class BatchDataStore {
 
 	//-----------------------------------------------------------------------
 
+	public static BatchData get(UUID uuid) {
+		return getInstance().model.dataByUuid.get(uuid);
+	}
+
 	public static void put(UUID uuid, BatchData batchData) {
 		getInstance().model.dataByUuid.put(uuid, batchData);
 	}
 
-	public static BatchData get(UUID uuid) {
-		return getInstance().model.dataByUuid.get(uuid);
+	public static void remove(UUID uuid) {
+		getInstance().model.dataByUuid.remove(uuid);
 	}
 }

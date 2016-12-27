@@ -85,6 +85,7 @@ public class BedrockManagerNewForWorld {
 	private void removeBatch(BedrockBatch batch) {
 		model.batches.remove(batch);
 		model.updatePoints.addAll(batch.getPoints());
+		batch.destroy();
 	}
 
 	public void revert(BedrockAuthToken authToken) {

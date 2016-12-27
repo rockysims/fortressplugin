@@ -44,4 +44,8 @@ public class Batch extends BaseUUID {
 	public boolean contains(Point p) {
 		return model.batchData.getPoints().contains(p);
 	}
+
+	public void destroy() {
+		BatchDataStore.remove(super.getUuid());
+	}
 }
