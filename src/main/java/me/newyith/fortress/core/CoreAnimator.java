@@ -31,11 +31,11 @@ public class CoreAnimator {
 		private ProtectionAuthToken protectionAuthToken;
 		private boolean skipAnimation = false;
 		private boolean animationInProgress = false;
+		private int curIndex = 0;
 		private String worldName = null;
 		private transient World world = null;
 		private final transient int ticksPerFrame;
 		private transient int animationWaitTicks = 0;
-		private transient int curIndex = 0;
 
 		@JsonCreator
 		public Model(@JsonProperty("allOldProtectionBatches") Set<List<ProtectionBatch>> allOldProtectionBatches,
@@ -47,6 +47,7 @@ public class CoreAnimator {
 					 @JsonProperty("protectionAuthToken") ProtectionAuthToken protectionAuthToken,
 					 @JsonProperty("skipAnimation") boolean skipAnimation,
 					 @JsonProperty("animationInProgress") boolean animationInProgress,
+					 @JsonProperty("curIndex") int curIndex,
 					 @JsonProperty("worldName") String worldName) {
 			this.allOldProtectionBatches = allOldProtectionBatches;
 			this.curProtectionBatches = curProtectionBatches;
@@ -57,13 +58,13 @@ public class CoreAnimator {
 			this.protectionAuthToken = protectionAuthToken;
 			this.skipAnimation = skipAnimation;
 			this.animationInProgress = animationInProgress;
+			this.curIndex = curIndex;
 			this.worldName = worldName;
 
 			//rebuild transient fields
 			this.world = Bukkit.getWorld(worldName);
 			this.ticksPerFrame = (150 / TickTimer.msPerTick); // msPerFrame / msPerTick
 			this.animationWaitTicks = 0;
-			this.curIndex = 0;
 		}
 	}
 	private Model model = null;
@@ -79,9 +80,10 @@ public class CoreAnimator {
 		List<WallLayer> wallLayers = new ArrayList<>();
 		boolean skipAnimation = false;
 		boolean animationInProgress = false;
+		int curIndex = 0;
 		String worldName = world.getName();
 		model = new Model(allOldProtectionBatches, curProtectionBatches, anchorPoint, wallLayers, coreMats,
-				bedrockAuthToken, protectionAuthToken, skipAnimation, animationInProgress, worldName);
+				bedrockAuthToken, protectionAuthToken, skipAnimation, animationInProgress, curIndex, worldName);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

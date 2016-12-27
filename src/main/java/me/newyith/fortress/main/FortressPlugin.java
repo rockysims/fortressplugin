@@ -256,12 +256,9 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
-//TODO: fix bug where bedrock is left behind
-//	start generating
-//	/reload
-//	stop generating
-//	bedrock converted at /reload is not reverted
-
+//TODO: do more stress testing (may need to try to cache some things like materialByPointMap and protectedByAuthToken)
+//	or in the case of protectedByAuthToken maybe just keep an updated copy?
+//		no because its hard to know when to remove the point since another batch might still be active
 
 //TODO: remove "Old" classes and remove "New" from new classes
 
