@@ -156,7 +156,7 @@ public class BedrockManagerNewForWorld {
 		for (Point p : model.updatePoints) {
 			boolean shouldBeConv = shouldBeConverted.contains(p);
 			boolean isConv = model.bedrockHandler.isConverted(p);
-			Debug.msg(isConv + "/" + shouldBeConv + " is/should at " + p);
+//			Debug.msg(isConv + "/" + shouldBeConv + " is/should at " + p);
 
 			//if (isTallDoor) update shouldBeConv (since it also depends on other half of door)
 			Material mat = p.getType(model.world);
@@ -193,11 +193,3 @@ public class BedrockManagerNewForWorld {
 		return pOtherHalf;
 	}
 }
-
-
-
-//TimedBedrockManager::convertTimed(Set<Point> points)
-
-//TODO: try to refactor to use batch converts
-//	BedrockBatch batch = BedrockManager.convert(points);
-//	batch.revert();
