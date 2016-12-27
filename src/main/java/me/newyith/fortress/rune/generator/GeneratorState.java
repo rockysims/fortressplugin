@@ -1,6 +1,6 @@
 package me.newyith.fortress.rune.generator;
 
-import me.newyith.fortressold.util.Debug;
+import me.newyith.fortress.util.Debug;
 
 public enum GeneratorState {
 	NULL,
