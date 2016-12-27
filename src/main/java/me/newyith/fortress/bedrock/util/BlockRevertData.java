@@ -36,7 +36,10 @@ public class BlockRevertData {
 		Material material = b.getType();
 		byte data = b.getState().getData().getData();
 		model = new Model(material, data);
-		if (material == Material.BEDROCK) Debug.warn("Saved BEDROCK as revertData material at " + p);
+		if (material == Material.BEDROCK) {
+			Debug.warn("Saved BEDROCK as revertData material at " + p);
+//			throw new RuntimeException("Saved BEDROCK as revert material.");
+		}
 	}
 
 	//-----------------------------------------------------------------------

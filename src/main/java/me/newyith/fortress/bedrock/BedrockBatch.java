@@ -2,12 +2,14 @@ package me.newyith.fortress.bedrock;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import me.newyith.fortress.util.Batch;
 import me.newyith.fortress.util.Point;
 
 import java.util.Set;
 import java.util.UUID;
 
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
 public class BedrockBatch extends Batch {
 	protected static class Model extends Batch.Model {
 		@JsonCreator

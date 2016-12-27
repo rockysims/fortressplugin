@@ -257,6 +257,9 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
+//TODO: fix bug where /reload during de/generate causes bedrock to be stored as revert material
+
+
 //TODO: remove "Old" classes and remove "New" from new classes
 
 //TODO: work on removing need for buildProtectedPointsByAuthToken() (or just making it run faster?)
