@@ -1,5 +1,6 @@
 package me.newyith.fortress.protection;
 
+import com.google.common.collect.ImmutableSet;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Bukkit;
@@ -86,7 +87,7 @@ public class ProtectionManagerForWorld {
 
 	public void unprotect(ProtectionAuthToken authToken) {
 		Debug.start("unprotect(authToken)");
-		model.batches.stream()
+		ImmutableSet.copyOf(model.batches).stream() //copy to avoid concurrent modification exception
 				.filter(batch -> batch.authorizedBy(authToken))
 				.forEach(this::unprotect);
 		Debug.end("unprotect(authToken)");
