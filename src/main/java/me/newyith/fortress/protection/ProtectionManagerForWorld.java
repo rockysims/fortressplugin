@@ -115,8 +115,8 @@ public class ProtectionManagerForWorld {
 				.collect(Collectors.toSet());
 		Debug.end("buildProtectedPointsByAuthToken()");
 
-		Debug.msg("pointsProtectedByAuthToken.size(): " + pointsProtectedByAuthToken.size());
-		Debug.msg("model.batches.size(): " + model.batches.size());
+//		Debug.msg("pointsProtectedByAuthToken.size(): " + pointsProtectedByAuthToken.size());
+//		Debug.msg("model.batches.size(): " + model.batches.size());
 
 		return pointsProtectedByAuthToken;
 	}

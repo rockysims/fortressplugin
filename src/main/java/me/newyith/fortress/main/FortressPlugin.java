@@ -260,39 +260,13 @@ public class FortressPlugin extends JavaPlugin {
 //	or in the case of protectedByAuthToken maybe just keep an updated copy?
 //		no because its hard to know when to remove the point since another batch might still be active
 
-//TODO: remove "Old" classes and remove "New" from new classes
-
 //TODO: work on removing need for buildProtectedPointsByAuthToken() (or just making it run faster?)
 
 
 //TODO: rename BedrockAuthToken to BedrockGroupId (and update variable names)
 //	or maybe not unless I can think of a better new name
 
-
 //TODO: retest bedrock safety (once change to new bedrock manager is done)
-
-
-//TODO: consider: why not move the actual converting in BedrockManager to onTick and just keep 2 maps: origMaterialByPoint and convertCountByPoint
-//	convert() and revert() just change convertCountByPoint (and dirtyPoints.addAll(updatedPoints))
-//	onTick() do the actual convert/revert (update which points are actually converted to match convertCountByPoint)
-//		and update origMaterialByPoint
-//	doesn't that solve the lots of synchronizations issue?
-//		don't even necessarily need to add bedrock batches
-//MAYBE: convertCountByPoint should be convertAuthTokensByPoint? (where auth token is a BaseCore?)
-//	not sure if/how jackson can save that properly (so that a whole new copy of BaseCore data is not saved)
-
-
-//BedrockManager::convert(Set<Point> points) returns BedrockBatch
-//BedrockManager::revert(BedrockBatch batch)
-//BedrockManager::convertTimed(Set<Point> points)
-
-//TODO: try to refactor to use batch converts
-//	BedrockBatch batch = BedrockManager.convert(points);
-//	batch.revert();
-
-
-//class BedrockBatch
-//class BedrockDoorsBatch
 
 //maybe add abstract class BedrockBatchAuthorization
 //	then each batch of bedrock can come with an authorization

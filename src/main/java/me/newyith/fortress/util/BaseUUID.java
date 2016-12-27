@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.UUID;
 
-public class BaseUUID {
+public abstract class BaseUUID {
 	protected static class Model {
 		private final UUID uuid;
 

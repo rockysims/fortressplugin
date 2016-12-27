@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Set;
 import java.util.UUID;
 
-public class Batch extends BaseUUID {
+public abstract class Batch extends BaseUUID {
 	protected static class Model extends BaseUUID.Model {
 		private final transient BatchData batchData;
 
