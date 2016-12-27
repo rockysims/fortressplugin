@@ -257,12 +257,7 @@ public class FortressPlugin extends JavaPlugin {
 }
 
 
-//TODO: upgrade jackson to 2.0 (see http://wiki.fasterxml.com/JacksonUpgradeFrom19To20)
-//	then use @JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
-//		avoids need for uuid in authTokens
-//		remember to apply to BedrockBatch and ProtectionBatch too
-// maybe change IntSequenceGenerator to UUIDGenerator
-
+//TODO: remove "Old" classes and remove "New" from new classes
 
 //TODO: work on removing need for buildProtectedPointsByAuthToken() (or just making it run faster?)
 
