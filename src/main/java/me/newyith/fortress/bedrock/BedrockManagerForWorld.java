@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class BedrockManagerNewForWorld {
+public class BedrockManagerForWorld {
 	private static class Model {
 		private final BedrockHandler bedrockHandler;
 		private ImmutableMap<Point, Material> materialByPoint;
@@ -48,11 +48,11 @@ public class BedrockManagerNewForWorld {
 	private Model model = null;
 
 	@JsonCreator
-	public BedrockManagerNewForWorld(@JsonProperty("model") Model model) {
+	public BedrockManagerForWorld(@JsonProperty("model") Model model) {
 		this.model = model;
 	}
 
-	public BedrockManagerNewForWorld(World world) {
+	public BedrockManagerForWorld(World world) {
 		model = new Model(new BedrockHandler(world), ImmutableMap.of(), new HashSet<>(), new HashSet<>(), world.getName());
 	}
 

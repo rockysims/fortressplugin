@@ -1,8 +1,6 @@
 package me.newyith.fortress.core;
 
 import me.newyith.fortress.bedrock.BedrockBatch;
-import me.newyith.fortress.bedrock.BedrockManagerNew;
-import me.newyith.fortress.bedrock.timed.TimedBedrockManagerNew;
 import me.newyith.fortress.event.TickTimer;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Debug;
@@ -10,7 +8,6 @@ import me.newyith.fortress.util.Point;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -293,7 +290,7 @@ public class CoreAnimatorOld {
 		if (!model.skipAnimation) {
 			//show bedrock wave
 			int ms = 4 * model.ticksPerFrame * TickTimer.msPerTick;
-			TimedBedrockManagerNew.forWorld(model.world).convert(model.bedrockGroupId, updatedPoints, ms);
+			TimedBedrockManager.forWorld(model.world).convert(model.bedrockGroupId, updatedPoints, ms);
 		}
 
 		return updatedPoints.size();
@@ -349,7 +346,7 @@ public class CoreAnimatorOld {
 		if (alterPoints.size() > 0) {
 			Set<BedrockBatch> batches = getAlteredBatches(layerIndex);
 			for (BedrockBatch batch : batches) {
-				BedrockManagerNew.forWorld(model.world).revert(batch);
+				BedrockManager.forWorld(model.world).revert(batch);
 				removeAlteredBatch(batch);
 				degeneratedPoints.addAll(batch.getPoints());
 			}
@@ -364,7 +361,7 @@ public class CoreAnimatorOld {
 		if (alterPoints.size() > 0) {
 			Set<BedrockBatch> batches = getAlteredBatches(layerIndex);
 			for (BedrockBatch batch : batches) {
-				BedrockManagerNew.forWorld(model.world).revert(batch);
+				BedrockManager.forWorld(model.world).revert(batch);
 				removeAlteredBatch(batch);
 				degeneratedPoints.addAll(batch.getPoints());
 			}
@@ -379,7 +376,7 @@ public class CoreAnimatorOld {
 
 		if (alterPoints.size() > 0) {
 			BedrockBatch batch = new BedrockBatch(model.bedrockGroupId, alterPoints);
-			BedrockManagerNew.forWorld(model.world).convert(batch);
+			BedrockManager.forWorld(model.world).convert(batch);
 			addAlteredBatch(layerIndex, batch);
 			alteredPoints.addAll(batch.getPoints());
 		}
@@ -410,13 +407,13 @@ public class CoreAnimatorOld {
 	}
 
 	private boolean isAlterable(Point p) {
-		Material mat = BedrockManagerNew.forWorld(model.world).getMaterialOrNull(p);
+		Material mat = BedrockManager.forWorld(model.world).getMaterialOrNull(p);
 		if (mat == null) mat = p.getType(model.world);
 		return model.coreMats.isAlterable(mat);
 	}
 
 	private boolean isProtectable(Point p) {
-		Material mat = BedrockManagerNew.forWorld(model.world).getMaterialOrNull(p);
+		Material mat = BedrockManager.forWorld(model.world).getMaterialOrNull(p);
 		if (mat == null) mat = p.getType(model.world);
 		return model.coreMats.isProtectable(mat);
 	}

@@ -1,7 +1,7 @@
 package me.newyith.fortress.event;
 
-import me.newyith.fortress.bedrock.BedrockManagerNew;
-import me.newyith.fortress.bedrock.timed.TimedBedrockManagerNew;
+import me.newyith.fortress.bedrock.BedrockManager;
+import me.newyith.fortress.bedrock.timed.TimedBedrockManager;
 import me.newyith.fortress.command.Commands;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
@@ -19,8 +19,8 @@ public class TickTimer extends BukkitRunnable {
 	public void run() {
 //		Debug.start("tick");
 		FortressesManager.onTick();
-		TimedBedrockManagerNew.onTick();
-		BedrockManagerNew.onTick();
+		TimedBedrockManager.onTick();
+		BedrockManager.onTick();
 		Commands.onTick();
 		FortressPlugin.onTick();
 //		Debug.end("tick");

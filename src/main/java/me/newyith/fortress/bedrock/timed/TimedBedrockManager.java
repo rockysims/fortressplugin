@@ -7,35 +7,35 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TimedBedrockManagerNew {
-	private static TimedBedrockManagerNew instance = null;
-	public static TimedBedrockManagerNew getInstance() {
+public class TimedBedrockManager {
+	private static TimedBedrockManager instance = null;
+	public static TimedBedrockManager getInstance() {
 		if (instance == null) {
-			instance = new TimedBedrockManagerNew();
+			instance = new TimedBedrockManager();
 		}
 		return instance;
 	}
-	public static void setInstance(TimedBedrockManagerNew newInstance) {
+	public static void setInstance(TimedBedrockManager newInstance) {
 		instance = newInstance;
 	}
 
 	//-----------------------------------------------------------------------
 
 	private static class Model {
-		private Map<String, TimedBedrockManagerNewForWorld> managerByWorld = null;
+		private Map<String, TimedBedrockManagerForWorld> managerByWorld = null;
 
 		@JsonCreator
-		public Model(@JsonProperty("managerByWorld") Map<String, TimedBedrockManagerNewForWorld> managerByWorld) {
+		public Model(@JsonProperty("managerByWorld") Map<String, TimedBedrockManagerForWorld> managerByWorld) {
 			this.managerByWorld = managerByWorld;
 
 			//rebuild transient fields
 		}
 
-		public TimedBedrockManagerNewForWorld getManagerByWorld(World world) {
+		public TimedBedrockManagerForWorld getManagerByWorld(World world) {
 			String worldName = world.getName();
-			TimedBedrockManagerNewForWorld manager = managerByWorld.get(worldName);
+			TimedBedrockManagerForWorld manager = managerByWorld.get(worldName);
 			if (manager == null) {
-				manager = new TimedBedrockManagerNewForWorld(world);
+				manager = new TimedBedrockManagerForWorld(world);
 				managerByWorld.put(worldName, manager);
 			}
 			return manager;
@@ -44,23 +44,23 @@ public class TimedBedrockManagerNew {
 	private Model model = null;
 
 	@JsonCreator
-	public TimedBedrockManagerNew(@JsonProperty("model") Model model) {
+	public TimedBedrockManager(@JsonProperty("model") Model model) {
 		this.model = model;
 	}
 
-	public TimedBedrockManagerNew() {
+	public TimedBedrockManager() {
 		model = new Model(new HashMap<>());
 	}
 
 	//-----------------------------------------------------------------------
 
-	public static TimedBedrockManagerNewForWorld forWorld(World world) {
+	public static TimedBedrockManagerForWorld forWorld(World world) {
 		return instance.model.getManagerByWorld(world);
 	}
 
 	public static void onTick() {
 		instance.model.managerByWorld.entrySet().stream().forEach((entry) -> {
-			TimedBedrockManagerNewForWorld manager = entry.getValue();
+			TimedBedrockManagerForWorld manager = entry.getValue();
 			manager.onTick();
 		});
 	}

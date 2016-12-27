@@ -2,7 +2,7 @@ package me.newyith.fortress.core;
 
 import javafx.util.Pair;
 import me.newyith.fortress.bedrock.BedrockAuthToken;
-import me.newyith.fortress.bedrock.timed.TimedBedrockManagerNew;
+import me.newyith.fortress.bedrock.timed.TimedBedrockManager;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.protection.ProtectionAuthToken;
@@ -190,7 +190,7 @@ public class GeneratorCore extends BaseCore {
 
 					boolean runeStillExists = FortressesManager.forWorld(model.world).getRuneByPatternPoint(model.anchorPoint) != null;
 					if (runeStillExists) { //rune might have been destroyed before ripple ended
-						TimedBedrockManagerNew.forWorld(model.world).convert(model.bedrockAuthToken, layer, msDurationFinal);
+						TimedBedrockManager.forWorld(model.world).convert(model.bedrockAuthToken, layer, msDurationFinal);
 					}
 				}, layerIndex * 3); //ticks (50 ms per tick)
 

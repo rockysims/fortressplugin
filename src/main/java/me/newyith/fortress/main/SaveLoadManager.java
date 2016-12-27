@@ -1,7 +1,7 @@
 package me.newyith.fortress.main;
 
-import me.newyith.fortress.bedrock.BedrockManagerNew;
-import me.newyith.fortress.bedrock.timed.TimedBedrockManagerNew;
+import me.newyith.fortress.bedrock.BedrockManager;
+import me.newyith.fortress.bedrock.timed.TimedBedrockManager;
 import me.newyith.fortress.protection.ProtectionManager;
 import me.newyith.fortress.util.BatchDataStore;
 import me.newyith.fortress.util.Debug;
@@ -50,10 +50,10 @@ public class SaveLoadManager implements Listener {
 
 	private void saveToMap(Map<String, Object> data) {
 		data.put("BatchDataStore", BatchDataStore.getInstance());
-		data.put("TimedBedrockManager", TimedBedrockManagerNew.getInstance());
+		data.put("TimedBedrockManager", TimedBedrockManager.getInstance());
 		data.put("ProtectionManager", ProtectionManager.getInstance());
 		data.put("FortressesManager", FortressesManager.getInstance());
-		data.put("BedrockManager", BedrockManagerNew.getInstance());
+		data.put("BedrockManager", BedrockManager.getInstance());
 	}
 
 	private void loadFromMap(Map<String, Object> data) {
@@ -71,10 +71,10 @@ public class SaveLoadManager implements Listener {
 		//load TimedBedrockManager
 		obj = data.get("TimedBedrockManager");
 		if (obj == null) {
-			TimedBedrockManagerNew.setInstance(new TimedBedrockManagerNew());
+			TimedBedrockManager.setInstance(new TimedBedrockManager());
 		} else {
-			TimedBedrockManagerNew timedBedrockManager = mapper.convertValue(obj, TimedBedrockManagerNew.class);
-			TimedBedrockManagerNew.setInstance(timedBedrockManager);
+			TimedBedrockManager timedBedrockManager = mapper.convertValue(obj, TimedBedrockManager.class);
+			TimedBedrockManager.setInstance(timedBedrockManager);
 		}
 
 		//load ProtectionManager
@@ -101,11 +101,11 @@ public class SaveLoadManager implements Listener {
 		//load BedrockManager
 		obj = data.get("BedrockManager");
 		if (obj == null) {
-			BedrockManagerNew.setInstance(new BedrockManagerNew());
+			BedrockManager.setInstance(new BedrockManager());
 		} else {
 //			Debug.msg("load obj (BM) type: " + obj.getClass().getName());
-			BedrockManagerNew bedrockManager = mapper.convertValue(obj, BedrockManagerNew.class);
-			BedrockManagerNew.setInstance(bedrockManager);
+			BedrockManager bedrockManager = mapper.convertValue(obj, BedrockManager.class);
+			BedrockManager.setInstance(bedrockManager);
 		}
 	}
 

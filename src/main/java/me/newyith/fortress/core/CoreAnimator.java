@@ -2,8 +2,8 @@ package me.newyith.fortress.core;
 
 import me.newyith.fortress.bedrock.BedrockAuthToken;
 import me.newyith.fortress.bedrock.BedrockBatch;
-import me.newyith.fortress.bedrock.BedrockManagerNew;
-import me.newyith.fortress.bedrock.timed.TimedBedrockManagerNew;
+import me.newyith.fortress.bedrock.BedrockManager;
+import me.newyith.fortress.bedrock.timed.TimedBedrockManager;
 import me.newyith.fortress.core.util.WallLayer;
 import me.newyith.fortress.event.TickTimer;
 import me.newyith.fortress.main.FortressesManager;
@@ -19,7 +19,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class CoreAnimator {
 	private static class Model {
@@ -169,7 +168,7 @@ public class CoreAnimator {
 					//show bedrock wave (if animation on)
 					if (!model.skipAnimation) {
 						int ms = 4 * model.ticksPerFrame * TickTimer.msPerTick;
-						TimedBedrockManagerNew.forWorld(model.world).convert(model.bedrockAuthToken, newlyProtecteds, ms);
+						TimedBedrockManager.forWorld(model.world).convert(model.bedrockAuthToken, newlyProtecteds, ms);
 					}
 				}
 			} else {
@@ -201,7 +200,7 @@ public class CoreAnimator {
 				//show bedrock wave (if animation on)
 				if (!model.skipAnimation) {
 					int ms = 4 * model.ticksPerFrame * TickTimer.msPerTick;
-					TimedBedrockManagerNew.forWorld(model.world).convert(model.bedrockAuthToken, newlyUnprotecteds, ms);
+					TimedBedrockManager.forWorld(model.world).convert(model.bedrockAuthToken, newlyUnprotecteds, ms);
 				}
 			}
 		}
@@ -224,7 +223,7 @@ public class CoreAnimator {
 	private void alter(ProtectionBatch batch, Set<Point> alterPoints) {
 		//convert cobblestone in batch to bedrock
 		BedrockBatch bedrockBatch = new BedrockBatch(model.bedrockAuthToken, alterPoints);
-		BedrockManagerNew.forWorld(model.world).convert(bedrockBatch);
+		BedrockManager.forWorld(model.world).convert(bedrockBatch);
 		batch.addBedrockBatch(bedrockBatch);
 	}
 
@@ -232,7 +231,7 @@ public class CoreAnimator {
 		//revert bedrock in protectionBatch to cobblestone
 		Set<BedrockBatch> bedrockBatches = protectionBatch.removeBedrockBatches();
 		for (BedrockBatch bedrockBatch : bedrockBatches) {
-			BedrockManagerNew.forWorld(model.world).revert(bedrockBatch);
+			BedrockManager.forWorld(model.world).revert(bedrockBatch);
 		}
 	}
 }

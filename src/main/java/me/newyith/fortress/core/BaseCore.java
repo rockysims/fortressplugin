@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import me.newyith.fortress.bedrock.BedrockAuthToken;
-import me.newyith.fortress.bedrock.BedrockManagerNew;
-import me.newyith.fortress.bedrock.timed.TimedBedrockManagerNew;
+import me.newyith.fortress.bedrock.BedrockManager;
+import me.newyith.fortress.bedrock.timed.TimedBedrockManager;
 import me.newyith.fortress.core.util.GenPrepData;
 import me.newyith.fortress.core.util.WallLayer;
 import me.newyith.fortress.core.util.WallLayers;
@@ -116,7 +116,7 @@ public abstract class BaseCore {
 	}
 
 	public void shield(Set<Point> shieldPoints) {
-		TimedBedrockManagerNew.forWorld(model.world).convert(model.bedrockAuthToken, shieldPoints);
+		TimedBedrockManager.forWorld(model.world).convert(model.bedrockAuthToken, shieldPoints);
 	}
 
 	public boolean playerCanOpenDoor(Player player, Point doorPoint) {
@@ -281,7 +281,7 @@ public abstract class BaseCore {
 	public void onBroken() {
 		degenerateWall(true); //true means skipAnimation
 		ProtectionManager.forWorld(model.world).unprotect(model.protectionAuthToken);
-		BedrockManagerNew.forWorld(model.world).revert(model.bedrockAuthToken);
+		BedrockManager.forWorld(model.world).revert(model.bedrockAuthToken);
 		FortressesManager.forWorld(model.world).removeClaimedWallPoints(model.claimedWallPoints);
 	}
 
@@ -391,7 +391,7 @@ public abstract class BaseCore {
 		ImmutableSet<Material> wallMaterials = ImmutableSet.copyOf(model.animator.getGeneratableWallMaterials());
 		ImmutableSet<Point> originPoints = ImmutableSet.copyOf(getOriginPoints());
 		ImmutableSet<Point> nearbyClaimedPoints = ImmutableSet.copyOf(buildClaimedPointsOfNearbyCores());
-		ImmutableMap<Point, Material> pretendPoints = ImmutableMap.copyOf(BedrockManagerNew.forWorld(model.world).getMaterialByPointMap());
+		ImmutableMap<Point, Material> pretendPoints = ImmutableMap.copyOf(BedrockManager.forWorld(model.world).getMaterialByPointMap());
 
 		//make future
 		CompletableFuture<GenPrepData> future = GenPrepData.makeFuture(
@@ -520,7 +520,7 @@ public abstract class BaseCore {
 //		int maxReturns = Math.max(0, FortressPlugin.config_generationBlockLimit - getGeneratedPoints().size());
 //		int rangeLimit = model.generationRangeLimit;
 //		Set<Point> ignorePoints = nearbyClaimedPoints;
-//		Map<Point, Material> pretendPoints = BedrockManagerNew.forWorld(model.world).getMaterialByPointMap();
+//		Map<Point, Material> pretendPoints = BedrockManager.forWorld(model.world).getMaterialByPointMap();
 //		List<Set<Point>> foundLayers = Blocks.getPointsConnectedAsLayers(model.world, origin, originLayer, traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints, pretendPoints).join();
 //
 //		//correct layer indexes (first non already generated layer is not always layer 0)

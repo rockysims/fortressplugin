@@ -1,7 +1,7 @@
 package me.newyith.fortress.bedrock.timed;
 
 import me.newyith.fortress.bedrock.BedrockAuthToken;
-import me.newyith.fortress.bedrock.BedrockManagerNew;
+import me.newyith.fortress.bedrock.BedrockManager;
 import me.newyith.fortress.event.TickTimer;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Bukkit;
@@ -13,7 +13,7 @@ import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.Set;
 
-public class TimedBedrockManagerNewForWorld {
+public class TimedBedrockManagerForWorld {
 	private static class Model {
 		private PriorityQueue<TimedBedrockBatch> timedBedrockBatches;
 		private int curTick;
@@ -37,11 +37,11 @@ public class TimedBedrockManagerNewForWorld {
 	private Model model = null;
 
 	@JsonCreator
-	public TimedBedrockManagerNewForWorld(@JsonProperty("model") Model model) {
+	public TimedBedrockManagerForWorld(@JsonProperty("model") Model model) {
 		this.model = model;
 	}
 
-	public TimedBedrockManagerNewForWorld(World world) {
+	public TimedBedrockManagerForWorld(World world) {
 		model = new Model(new PriorityQueue<>(), 0, world.getName());
 	}
 
@@ -61,7 +61,7 @@ public class TimedBedrockManagerNewForWorld {
 		int tickDuration = msDuration / TickTimer.msPerTick;
 		int endTick = model.curTick + tickDuration;
 		TimedBedrockBatch timedBedrockBatch = new TimedBedrockBatch(authToken, points, endTick);
-		BedrockManagerNew.forWorld(model.world).convert(timedBedrockBatch);
+		BedrockManager.forWorld(model.world).convert(timedBedrockBatch);
 		model.timedBedrockBatches.add(timedBedrockBatch);
 	}
 
@@ -69,7 +69,7 @@ public class TimedBedrockManagerNewForWorld {
 		TimedBedrockBatch timedBedrockBatch = model.timedBedrockBatches.peek();
 		while (timedBedrockBatch != null && isExpired(timedBedrockBatch)) {
 			model.timedBedrockBatches.remove(timedBedrockBatch);
-			BedrockManagerNew.forWorld(model.world).revert(timedBedrockBatch);
+			BedrockManager.forWorld(model.world).revert(timedBedrockBatch);
 			timedBedrockBatch.destroy();
 			timedBedrockBatch = model.timedBedrockBatches.peek();
 		}

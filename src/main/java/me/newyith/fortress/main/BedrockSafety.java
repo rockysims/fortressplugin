@@ -1,6 +1,6 @@
 package me.newyith.fortress.main;
 
-import me.newyith.fortress.bedrock.BedrockManagerNew;
+import me.newyith.fortress.bedrock.BedrockManager;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
@@ -83,7 +83,7 @@ public class BedrockSafety {
 			Set<Point> materialByPointKeys = new HashSet<>(materialByPoint.keySet()); //copy to avoid concurrent modification
 			for (Point p : materialByPointKeys) {
 				if (p.is(Material.BEDROCK, world)) {
-					boolean managedBedrock = BedrockManagerNew.forWorld(world).getMaterialOrNull(p) != null;
+					boolean managedBedrock = BedrockManager.forWorld(world).getMaterialOrNull(p) != null;
 					boolean safeBedrock = claimedWallPoints.contains(p) && managedBedrock;
 					if (!safeBedrock) {
 						unsafeBedrock.add(p);
@@ -92,7 +92,7 @@ public class BedrockSafety {
 			}
 
 			//give BedrockManager a chance to revert unsafeBedrock (try to handle tall doors gracefully)
-			Set<Point> forceRevertedPoints = BedrockManagerNew.forWorld(world).forceRevertBatchesContaining(unsafeBedrock);
+			Set<Point> forceRevertedPoints = BedrockManager.forWorld(world).forceRevertBatchesContaining(unsafeBedrock);
 
 			//ensure unsafeBedrock is really reverted
 			for (Point p : unsafeBedrock) {
@@ -109,7 +109,7 @@ public class BedrockSafety {
 	}
 	public void doRecord(World world, Set<Point> wallPoints) {
 		for (Point p : wallPoints) {
-			Material mat = BedrockManagerNew.forWorld(world).getMaterialOrNull(p);
+			Material mat = BedrockManager.forWorld(world).getMaterialOrNull(p);
 			if (mat == null) mat = p.getType(world);
 
 			String worldName = world.getName();

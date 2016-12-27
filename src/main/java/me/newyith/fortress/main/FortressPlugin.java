@@ -262,13 +262,6 @@ public class FortressPlugin extends JavaPlugin {
 //	stop generating
 //	bedrock converted at /reload is not reverted
 
-//TODO: fix bug where destroying rune sign doesn't destroy rune
-//	start generating
-//	/reload
-//	stop generating
-//	break sign
-//	warning message displayed repeatedly
-
 
 //TODO: remove "Old" classes and remove "New" from new classes
 
