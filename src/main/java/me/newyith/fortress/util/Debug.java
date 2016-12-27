@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Debug {
+	public static boolean showTimerMessages = true;
+
 	public static void msg(String s) {
 		/*
 		Bukkit.broadcastMessage(s);
@@ -76,7 +78,7 @@ public class Debug {
 		long now = System.nanoTime();
 		timestamps.put(key, now);
 
-		if (extraStr.length() > 0) {
+		if (showTimerMessages && extraStr.length() > 0) {
 			//Debug.print("Timer \"" + key + "\" started." + extraStr);
 		}
 	}
@@ -86,7 +88,7 @@ public class Debug {
 			stop(key, false);
 			duration(key);
 			clear(key);
-		} else {
+		} else if (showTimerMessages) {
 			Debug.print("Timer \"" + key + "\" ended WITHOUT A DURATION");
 		}
 	}
@@ -106,9 +108,9 @@ public class Debug {
 			}
 			durations.put(key, durations.get(key) + durationNs);
 
-			if (print) Debug.print("Timer " + key + ": " + String.valueOf(durationNs / 1000000) + "ms.");
+			if (showTimerMessages && print) Debug.print("Timer " + key + ": " + String.valueOf(durationNs / 1000000) + "ms.");
 		} else {
-			if (print) Debug.print("Timer \"" + key + "\" stopped WITHOUT HAVING BEEN STARTED");
+			if (showTimerMessages && print) Debug.print("Timer \"" + key + "\" stopped WITHOUT HAVING BEEN STARTED");
 		}
 	}
 
@@ -118,7 +120,9 @@ public class Debug {
 
 	public static void duration(String key) {
 		int durationNs = durations.get(key);
-		Debug.print("Timer '" + key + "' total duration: " + String.valueOf((durationNs / 1000) / 1000F) + "ms.");
+		if (showTimerMessages) {
+			Debug.print("Timer '" + key + "' total duration: " + String.valueOf((durationNs / 1000) / 1000F) + "ms.");
+		}
 	}
 
 	public static void console(String s) {

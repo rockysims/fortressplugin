@@ -256,6 +256,10 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+//TODO: consider saving/loading on a different thread so it doesn't slow minecraft down
+
+//TODO: work on poor stress test results of save/load time (20 seconds with stress test complex turned on)
+
 //TODO: do more stress testing (may need to try to cache some things like materialByPointMap and protectedByAuthToken)
 //	or in the case of protectedByAuthToken maybe just keep an updated copy?
 //		no because its hard to know when to remove the point since another batch might still be active
