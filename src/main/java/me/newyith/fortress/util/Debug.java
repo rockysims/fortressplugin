@@ -67,7 +67,7 @@ public class Debug {
 	}
 
 	private static Map<String, Long> timestamps = new HashMap<>();
-	private static Map<String, Integer> durations = new HashMap<String, Integer>();
+	private static Map<String, Long> durations = new HashMap<>();
 
 	public static void start(String key) {
 		String extraStr = "";
@@ -101,10 +101,10 @@ public class Debug {
 		long now = System.nanoTime();
 		if (timestamps.containsKey(key)) {
 			long stamp = timestamps.remove(key);
-			int durationNs = (int)(now - stamp);
+			long durationNs = now - stamp;
 
 			if (!durations.containsKey(key)) {
-				durations.put(key, 0);
+				durations.put(key, 0L);
 			}
 			durations.put(key, durations.get(key) + durationNs);
 
@@ -119,7 +119,7 @@ public class Debug {
 	}
 
 	public static void duration(String key) {
-		int durationNs = durations.get(key);
+		long durationNs = durations.get(key);
 		if (showTimerMessages) {
 			Debug.print("Timer '" + key + "' total duration: " + String.valueOf((durationNs / 1000) / 1000F) + "ms.");
 		}
