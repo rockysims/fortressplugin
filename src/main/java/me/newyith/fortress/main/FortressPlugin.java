@@ -25,7 +25,6 @@ public class FortressPlugin extends JavaPlugin {
 
 	private static FortressPlugin instance;
 	private static SaveLoadManager saveLoadManager;
-	private CompletableFuture<Boolean> loadFuture;
 
 	public static int config_glowstoneDustBurnTimeMs = 1000 * 60 * 60;
 	public static int config_stuckDelayMs = 30 * 1000;
@@ -62,16 +61,9 @@ public class FortressPlugin extends JavaPlugin {
 		Log.sendConsole("         >> ON <<           ", ChatColor.GREEN);
 		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
 
-
 		saveLoadManager = new SaveLoadManager(this);
-		loadFuture = saveLoadManager.loadAsync();
-
-		long startLoadMs = System.currentTimeMillis();
-		Log.success("Loading... (async)");
+		CompletableFuture<Boolean> loadFuture = saveLoadManager.loadAsync();
 		loadFuture.thenAccept((param1) -> {
-			long loadMs = System.currentTimeMillis() - startLoadMs;
-			Log.success("Loaded " + FortressesManager.getRuneCountForAllWorlds() + " rune(s) in " + ((loadMs / 10) / 100F) + " seconds.");
-
 			Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> {
 				Debug.start("enableAll");
 				EventListener.onEnable(this);
@@ -85,23 +77,12 @@ public class FortressPlugin extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		//TODO: don't allow saving until after loadFuture finishes (TODO: including world saves)
+		saveLoadManager.save();
 
-		boolean loaded = loadFuture.getNow(false);
-		if (!loaded) Log.success("Save pending...");
-
-		loadFuture.thenAccept(param1 -> {
-			long startSaveMs = System.currentTimeMillis();
-			saveLoadManager.save();
-			long endSaveMs = System.currentTimeMillis();
-			long saveMs = endSaveMs - startSaveMs;
-			Log.success("Saved " + FortressesManager.getRuneCountForAllWorlds() + " rune(s) in " + ((saveMs / 10) / 100F) + " seconds.");
-
-			Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
-			Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
-			Log.sendConsole("         >> OFF <<          ", ChatColor.RED);
-			Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
-		});
+		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
+		Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
+		Log.sendConsole("         >> OFF <<          ", ChatColor.RED);
+		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
 	}
 
 	public static void onTick() {

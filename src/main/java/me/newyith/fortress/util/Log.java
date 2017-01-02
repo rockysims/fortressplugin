@@ -34,4 +34,20 @@ public class Log {
 		ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
 		console.sendMessage(s);
 	}
+
+	//---//
+
+	private static Map<String, Long> timestamps = new HashMap<>();
+	private static Map<String, Long> durations = new HashMap<>();
+
+	public static void start(String key) {
+		timestamps.put(key, System.nanoTime());
+	}
+
+	public static String end(String key) {
+		long nsStart = timestamps.remove(key);
+		long nsEnd = System.nanoTime();
+		long nsDuration = nsEnd - nsStart;
+		return String.valueOf((nsDuration / (1000000 * 10)) / 100F) + " seconds";
+	}
 }

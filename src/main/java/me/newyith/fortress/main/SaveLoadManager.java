@@ -25,6 +25,7 @@ public class SaveLoadManager implements Listener {
 	private File dataFile = new File(FortressPlugin.getInstance().getDataFolder(), "data.json");
 	private static File bedrockSafetyFile = new File(FortressPlugin.getInstance().getDataFolder(), "bedrockSafety.json");
 	private static final ObjectMapper mapper = new ObjectMapper();
+	private static CompletableFuture<Boolean> loadFuture = null;
 
 	public SaveLoadManager(FortressPlugin plugin) {
 		mapper.setVisibilityChecker(mapper.getSerializationConfig().getDefaultVisibilityChecker()
@@ -44,12 +45,7 @@ public class SaveLoadManager implements Listener {
 		if (elapsed > saveWithWorldsCooldownMs) {
 			Debug.msg("save is cooled");
 			lastSaveTimestamp = now;
-
-			long startSaveMs = System.currentTimeMillis();
 			save();
-			long endSaveMs = System.currentTimeMillis();
-			long saveMs = endSaveMs - startSaveMs;
-			Log.success("Saved " + FortressesManager.getRuneCountForAllWorlds() + " rune(s) in " + ((saveMs / 10) / 100F) + " seconds.");
 		} else {
 			Debug.msg("save is still cooling down");
 		}
@@ -152,21 +148,18 @@ public class SaveLoadManager implements Listener {
 	}
 
 	public void save() {
-		//TODO: consider adding loadFuture and not allowing save until it resolves
-//		boolean loaded = loadFuture.getNow(false);
-//		if (!loaded) Log.success("Save pending...");
-//
-//		loadFuture.thenAccept(param1 -> {
-//			long startSaveMs = System.currentTimeMillis();
-//
-//			saveLoadManager.save();
-//
-//			long endSaveMs = System.currentTimeMillis();
-//			long saveMs = endSaveMs - startSaveMs;
-//			Log.success("Saved " + FortressesManager.getRuneCountForAllWorlds() + " rune(s) in " + ((saveMs / 10) / 100F) + " seconds.");
-//		});
+		if (loadFuture == null) {
+			Log.error("Error: SaveLoadManager tried to save() before loadAsync().");
+		} else {
+			boolean loaded = loadFuture.getNow(false);
+			if (!loaded) Log.success("Save pending...");
+			loadFuture.join(); //wait for load to finish
+			doSave();
+		}
+	}
+	private void doSave() {
+		Log.start("saveTimer");
 
-		Debug.start("save");
 		try {
 			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 			saveToBuffer(buffer);
@@ -177,38 +170,39 @@ public class SaveLoadManager implements Listener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Debug.end("save");
+
+		String saveDuration = Log.end("saveTimer");
+		Log.success("Saved " + FortressesManager.getRuneCountForAllWorlds() + " rune(s) in " + saveDuration + ".");
 	}
 
 	public CompletableFuture<Boolean> loadAsync() {
-		long startLoadMs = System.currentTimeMillis();
+		Log.start("loadAsync");
 		Log.success("Loading... (async)");
-		CompletableFuture<Boolean> future = CompletableFuture.supplyAsync(() -> {
-			load();
-			long loadMs = System.currentTimeMillis() - startLoadMs;
-			Log.success("Loaded " + FortressesManager.getRuneCountForAllWorlds() + " rune(s) in " + ((loadMs / 10) / 100F) + " seconds.");
+		loadFuture = CompletableFuture.supplyAsync(() -> {
+			doLoad();
+			String loadDuration = Log.end("loadAsync");
+			Log.success("Loaded " + FortressesManager.getRuneCountForAllWorlds() + " rune(s) in " + loadDuration + ".");
 			return true;
 		});
 
-		return future;
+		return loadFuture;
 	}
-
-	private void load() {
-		Debug.start("load");
+	private void doLoad() {
+		Debug.start("doLoad");
 		try {
 			//if (data.json doesn't exist) make an empty data.json
 			if (! dataFile.exists()) {
 				mapper.writeValue(dataFile, new LinkedHashMap<String, Object>());
 			}
 
-			Debug.start("load:mapper");
+			Debug.start("doLoad:mapper");
 			Map<String, Object> data = mapper.readValue(dataFile, Map.class);
-			Debug.end("load:mapper");
+			Debug.end("doLoad:mapper");
 			loadFromMap(data);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Debug.end("load");
+		Debug.end("doLoad");
 
 		Debug.start("onAfterLoad");
 		onAfterLoad();
