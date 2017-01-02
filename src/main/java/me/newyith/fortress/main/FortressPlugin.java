@@ -248,6 +248,7 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+//TODO: when done working on memory leak due to /reload, merge 'leak' into 'betterBedrock'
 
 //PROBLEM: /reload memory leak
 //	/reload disables the plugin then creates a new plugin instance which is enabled (leaving disabled plugin as memory leak)
