@@ -5,22 +5,18 @@ import me.newyith.fortress.event.EventListener;
 import me.newyith.fortress.event.TickTimer;
 import me.newyith.fortress.fix.PearlGlitchFix;
 import me.newyith.fortress.manual.ManualCraftManager;
-import me.newyith.fortress.sandbox.jackson.SandboxSaveLoadManager;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Log;
 import me.newyith.fortress.util.Point;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 
 public class FortressPlugin extends JavaPlugin {
 	public static final boolean releaseBuild = false; //TODO: change this to true for release builds
@@ -29,7 +25,7 @@ public class FortressPlugin extends JavaPlugin {
 
 	private static FortressPlugin instance;
 	private static SaveLoadManager saveLoadManager;
-	private static SandboxSaveLoadManager sandboxSaveLoadManager;
+	private CompletableFuture<Boolean> loadFuture;
 
 	public static int config_glowstoneDustBurnTimeMs = 1000 * 60 * 60;
 	public static int config_stuckDelayMs = 30 * 1000;
@@ -66,31 +62,46 @@ public class FortressPlugin extends JavaPlugin {
 		Log.sendConsole("         >> ON <<           ", ChatColor.GREEN);
 		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
 
+
 		saveLoadManager = new SaveLoadManager(this);
-		saveLoadManager.load();
+		loadFuture = saveLoadManager.loadAsync();
 
-		if (!releaseBuild) {
-			sandboxSaveLoadManager = new SandboxSaveLoadManager(this);
-//			sandboxSaveLoadManager.load();
-		}
+		long startLoadMs = System.currentTimeMillis();
+		Log.success("Loading... (async)");
+		loadFuture.thenAccept((param1) -> {
+			long loadMs = System.currentTimeMillis() - startLoadMs;
+			Log.success("Loaded " + FortressesManager.getRuneCountForAllWorlds() + " rune(s) in " + ((loadMs / 10) / 100F) + " seconds.");
 
-		EventListener.onEnable(this);
-		TickTimer.onEnable(this);
-		ManualCraftManager.onEnable(this);
-		PearlGlitchFix.onEnable(this);
+			Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> {
+				Debug.start("enableAll");
+				EventListener.onEnable(this);
+				TickTimer.onEnable(this);
+				ManualCraftManager.onEnable(this);
+				PearlGlitchFix.onEnable(this);
+				Debug.end("enableAll");
+			}, 0); //ticks (50 ms per tick)
+		});
 	}
 
 	@Override
 	public void onDisable() {
-		saveLoadManager.save();
-		if (!releaseBuild) {
-//			sandboxSaveLoadManager.save();
-		}
+		//TODO: don't allow saving until after loadFuture finishes (TODO: including world saves)
 
-		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
-		Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
-		Log.sendConsole("         >> OFF <<          ", ChatColor.RED);
-		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
+		boolean loaded = loadFuture.getNow(false);
+		if (!loaded) Log.success("Save pending...");
+
+		loadFuture.thenAccept(param1 -> {
+			long startSaveMs = System.currentTimeMillis();
+			saveLoadManager.save();
+			long endSaveMs = System.currentTimeMillis();
+			long saveMs = endSaveMs - startSaveMs;
+			Log.success("Saved " + FortressesManager.getRuneCountForAllWorlds() + " rune(s) in " + ((saveMs / 10) / 100F) + " seconds.");
+
+			Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
+			Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
+			Log.sendConsole("         >> OFF <<          ", ChatColor.RED);
+			Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
+		});
 	}
 
 	public static void onTick() {
@@ -256,9 +267,19 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+
+//PROBLEM: /reload memory leak
+//	/reload disables the plugin then creates a new plugin instance which is enabled (leaving disabled plugin as memory leak)
+//	SOLUTION: onDisable, remove all the world managers and anything else with significant memory usage
+
+
+
 //TODO: consider saving/loading on a different thread so it doesn't slow minecraft down
+//	done for loading and mock save but minecraft still loses ticks for some reason when loading a lot
 
 //TODO: work on poor stress test results of save/load time (20 seconds with stress test complex turned on)
+
+//TODO: add generation range and block limit to config file
 
 //TODO: do more stress testing (may need to try to cache some things like materialByPointMap and protectedByAuthToken)
 //	or in the case of protectedByAuthToken maybe just keep an updated copy?
@@ -266,16 +287,17 @@ public class FortressPlugin extends JavaPlugin {
 
 //TODO: work on removing need for buildProtectedPointsByAuthToken() (or just making it run faster?)
 
+//TODO: switch paused/running around so redstone on means running (and update manual)
+//	I think people will scan the rune first then scan the structure and try to protect it (when they're first learning)
+
+
+
+
 
 //TODO: rename BedrockAuthToken to BedrockGroupId (and update variable names)
 //	or maybe not unless I can think of a better new name
 
 //TODO: retest bedrock safety (once change to new bedrock manager is done)
-
-//maybe add abstract class BedrockBatchAuthorization
-//	then each batch of bedrock can come with an authorization
-//		authorization(s) can then be checked to see if
-
 
 //Yona's Suggestion: add ManagedBedrockBatch class with its own timer
 //	decide if its time to revert a point by checking if any batches (not expired) contain the point
@@ -284,7 +306,7 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //TODO: work on lag when de/generating lots of big fortresses at once
-//	also make bedrock safety save each rune in a separate file and have a master bedrock safety file with names of other bedrock safety files
+//	maybe also make bedrock safety save each rune in a separate file and have a master bedrock safety file with names of other bedrock safety files
 //		currently every time a generator turns on the whole bedrock safety file has to be written again
 //			TODO: time this and make sure saving bedrock safety is the issue
 //TODO: fix concurrent modification exception in BedrockManager::getMaterialByPointMapForWorld()
@@ -307,14 +329,13 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: add config setting to specify debug level: errors, errors & warnings, all
 
 //TODO: change name on sign from "Generator:" to "Fortress:"
+//	ackward to update manual because "Fortress" is then both a specific and a general term (rune and structure+rune)
 
 
 
 
-//TODO: switch paused/running around so redstone on means running (and update manual)
-//	I think people will scan the rune first then scan the structure and try to protect it (when they're first learning)
 
-//TODO: don't show hearts (inside) unless all doors are on generated blocks
+//TODO: consider: not showing hearts (inside) unless all doors are on generated blocks
 //	currently it can show hearts even if door can be broken/bypassed by breaking block its on
 
 //TODO: make protection prevent breaking by water
