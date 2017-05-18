@@ -248,11 +248,29 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+
+
+//MVP goals:
+//fix /reload memory leak (remove all managers onDisable)
+//fast saving (take snapshot (copy) of plugin state and then save that on another thread?)
+//more configuration (particularly max blocks per fortress)
+//switch meaning of redstone power (power on should mean fortress running)
+//use cobblestone to indicate ripple over bedrock
+
+
+
+
+
+
+
 //TODO: when done working on memory leak due to /reload, merge 'leak' into 'betterBedrock'
 
 //PROBLEM: /reload memory leak
 //	/reload disables the plugin then creates a new plugin instance which is enabled (leaving disabled plugin as memory leak)
 //	SOLUTION: onDisable, remove all the world managers and anything else with significant memory usage
+
+//TODO: next priority after memory leak is efficiency
+//	buildProtectedPointsByAuthToken and the like should not get slower as number/size of fortresses increases
 
 
 
