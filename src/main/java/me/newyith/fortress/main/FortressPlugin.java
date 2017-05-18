@@ -256,6 +256,22 @@ public class FortressPlugin extends JavaPlugin {
 	}
 }
 
+
+
+
+
+
+//MVP goals:
+//fix /reload memory leak (remove all managers onDisable)
+//fast saving (take snapshot (copy) of plugin state and then save that on another thread?)
+//more configuration (particularly max blocks per fortress)
+//switch meaning of redstone power (power on should mean fortress running)
+//use cobblestone to indicate ripple over bedrock
+
+
+
+
+
 //TODO: consider saving/loading on a different thread so it doesn't slow minecraft down
 
 //TODO: work on poor stress test results of save/load time (20 seconds with stress test complex turned on)
