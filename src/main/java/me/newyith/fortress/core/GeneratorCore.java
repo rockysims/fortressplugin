@@ -2,12 +2,14 @@ package me.newyith.fortress.core;
 
 import javafx.util.Pair;
 import me.newyith.fortress.bedrock.BedrockAuthToken;
+import me.newyith.fortress.bedrock.BedrockManager;
 import me.newyith.fortress.bedrock.timed.TimedBedrockManager;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.protection.ProtectionAuthToken;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.util.Blocks;
+import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.particle.ParticleEffect;
 import org.bukkit.Bukkit;
@@ -21,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class GeneratorCore extends BaseCore {
 	private static class Model extends BaseCore.Model {
@@ -191,6 +194,12 @@ public class GeneratorCore extends BaseCore {
 					boolean runeStillExists = FortressesManager.forWorld(model.world).getRuneByPatternPoint(model.anchorPoint) != null;
 					if (runeStillExists) { //rune might have been destroyed before ripple ended
 						TimedBedrockManager.forWorld(model.world).convert(model.bedrockAuthToken, layer, msDurationFinal);
+
+						//force reversion of cobble in layer
+						Set<Point> cobbleInLayer = layer.stream().filter(p ->
+								BedrockManager.forWorld(model.world).getMaterialOrNull(p) == Material.COBBLESTONE
+						).collect(Collectors.toSet());
+						TimedBedrockManager.forWorld(model.world).forceReversion(model.bedrockAuthToken, cobbleInLayer, msDurationFinal);
 					}
 				}, layerIndex * 3); //ticks (50 ms per tick)
 

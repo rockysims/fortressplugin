@@ -22,6 +22,7 @@ public class BedrockManagerForWorld {
 	private static class Model {
 		private final BedrockHandler bedrockHandler;
 		private ImmutableMap<Point, Material> materialByPoint;
+		private final Set<ForceReversionBatch> forceReversionBatches;
 		private final Set<BedrockBatch> batches;
 		private final Set<Point> updatePoints;
 		private final String worldName;
@@ -31,11 +32,13 @@ public class BedrockManagerForWorld {
 		@JsonCreator
 		public Model(@JsonProperty("bedrockHandler") BedrockHandler bedrockHandler,
 					 @JsonProperty("materialByPoint") Map<Point, Material> materialByPoint,
+					 @JsonProperty("forceReversionBatches") Set<ForceReversionBatch> forceReversionBatches,
 					 @JsonProperty("batches") Set<BedrockBatch> batches,
 					 @JsonProperty("updatePoints") Set<Point> updatePoints,
 					 @JsonProperty("worldName") String worldName) {
 			this.bedrockHandler = bedrockHandler;
 			this.materialByPoint = ImmutableMap.copyOf(materialByPoint);
+			this.forceReversionBatches = forceReversionBatches;
 			this.batches = batches;
 			this.updatePoints = updatePoints;
 			this.worldName = worldName;
@@ -53,10 +56,29 @@ public class BedrockManagerForWorld {
 	}
 
 	public BedrockManagerForWorld(World world) {
-		model = new Model(new BedrockHandler(world), ImmutableMap.of(), new HashSet<>(), new HashSet<>(), world.getName());
+		model = new Model(new BedrockHandler(world), ImmutableMap.of(), new HashSet<>(), new HashSet<>(), new HashSet<>(), world.getName());
 	}
 
 	//-----------------------------------------------------------------------
+
+	//this method is (or should be) thread safe
+	public void addForceReversion(ForceReversionBatch batch) {
+		synchronized (model.mutex) {
+			model.forceReversionBatches.add(batch);
+			model.updatePoints.addAll(batch.getPoints());
+		}
+	}
+
+	//this method is (or should be) thread safe
+	public void removeForceReversion(ForceReversionBatch batch) {
+		synchronized (model.mutex) {
+			model.forceReversionBatches.remove(batch);
+			model.updatePoints.addAll(batch.getPoints());
+			batch.destroy();
+		}
+	}
+
+	//---
 
 	//this method is (or should be) thread safe
 	public BedrockBatch convert(BedrockAuthToken authToken, Set<Point> points) {
@@ -121,6 +143,8 @@ public class BedrockManagerForWorld {
 		return forceRevertedPoints;
 	}
 
+	//---
+
 	public void onTick() {
 		if (model.updatePoints.size() > 0) {
 			update();
@@ -140,16 +164,21 @@ public class BedrockManagerForWorld {
 
 	private void update() {
 		Set<Point> allBatchPoints = new HashSet<>();
+		Set<Point> allForceReversionPoints = new HashSet<>();
 		Set<Point> shouldBeConverted;
 		synchronized (model.mutex) {
 			Debug.start("fillAllBatchPoints");
 			for (BedrockBatch batch : model.batches) {
 				allBatchPoints.addAll(batch.getPoints());
 			}
+			for (ForceReversionBatch forceReversionBatch : model.forceReversionBatches) {
+				allForceReversionPoints.addAll(forceReversionBatch.getPoints());
+			}
 			Debug.end("fillAllBatchPoints");
 
 			shouldBeConverted = model.updatePoints.parallelStream()
 					.filter(allBatchPoints::contains)
+					.filter(p -> !allForceReversionPoints.contains(p))
 					.collect(Collectors.toSet());
 		}
 

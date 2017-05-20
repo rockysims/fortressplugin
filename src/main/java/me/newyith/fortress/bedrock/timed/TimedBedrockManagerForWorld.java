@@ -2,6 +2,7 @@ package me.newyith.fortress.bedrock.timed;
 
 import me.newyith.fortress.bedrock.BedrockAuthToken;
 import me.newyith.fortress.bedrock.BedrockManager;
+import me.newyith.fortress.bedrock.ForceReversionBatch;
 import me.newyith.fortress.event.TickTimer;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Bukkit;
@@ -15,6 +16,7 @@ import java.util.Set;
 
 public class TimedBedrockManagerForWorld {
 	private static class Model {
+		private PriorityQueue<TimedForceReversionBatch> timedForceReversionBatches;
 		private PriorityQueue<TimedBedrockBatch> timedBedrockBatches;
 		private int curTick;
 		private final String worldName;
@@ -22,9 +24,11 @@ public class TimedBedrockManagerForWorld {
 		private final transient Random random;
 
 		@JsonCreator
-		public Model(@JsonProperty("timedBedrockBatches") PriorityQueue<TimedBedrockBatch> timedBedrockBatches,
+		public Model(@JsonProperty("timedForceReversionBatches") PriorityQueue<TimedForceReversionBatch> timedForceReversionBatches,
+					 @JsonProperty("timedBedrockBatches") PriorityQueue<TimedBedrockBatch> timedBedrockBatches,
 					 @JsonProperty("curTick") int curTick,
 					 @JsonProperty("worldName") String worldName) {
+			this.timedForceReversionBatches = timedForceReversionBatches;
 			this.timedBedrockBatches = timedBedrockBatches;
 			this.curTick = curTick;
 			this.worldName = worldName;
@@ -42,7 +46,7 @@ public class TimedBedrockManagerForWorld {
 	}
 
 	public TimedBedrockManagerForWorld(World world) {
-		model = new Model(new PriorityQueue<>(), 0, world.getName());
+		model = new Model(new PriorityQueue<>(), new PriorityQueue<>(), 0, world.getName());
 	}
 
 	//-----------------------------------------------------------------------
@@ -50,7 +54,10 @@ public class TimedBedrockManagerForWorld {
 	public void onTick() {
 		model.curTick++;
 		revertExpiredBedrock();
+		removeExpiredForceReversions();
 	}
+
+	//---
 
 	public void convert(BedrockAuthToken authToken, Set<Point> points) {
 		int msDuration = 500 + model.random.nextInt(750);
@@ -74,8 +81,30 @@ public class TimedBedrockManagerForWorld {
 			timedBedrockBatch = model.timedBedrockBatches.peek();
 		}
 	}
-
 	private boolean isExpired(TimedBedrockBatch timedBedrockBatch) {
 		return model.curTick > timedBedrockBatch.getEndTick();
+	}
+
+	//---
+
+	public void forceReversion(BedrockAuthToken authToken, Set<Point> points, int msDuration) {
+		int tickDuration = msDuration / TickTimer.msPerTick;
+		int endTick = model.curTick + tickDuration;
+		TimedForceReversionBatch timedForceReversionBatch = new TimedForceReversionBatch(authToken, points, endTick);
+		BedrockManager.forWorld(model.world).addForceReversion(timedForceReversionBatch);
+		model.timedForceReversionBatches.add(timedForceReversionBatch);
+	}
+
+	private void removeExpiredForceReversions() {
+		TimedForceReversionBatch timedForceReversionBatch = model.timedForceReversionBatches.peek();
+		while (timedForceReversionBatch != null && isExpired(timedForceReversionBatch)) {
+			model.timedForceReversionBatches.remove(timedForceReversionBatch);
+			BedrockManager.forWorld(model.world).removeForceReversion(timedForceReversionBatch);
+			timedForceReversionBatch.destroy();
+			timedForceReversionBatch = model.timedForceReversionBatches.peek();
+		}
+	}
+	private boolean isExpired(TimedForceReversionBatch timedForceReversionBatch) {
+		return model.curTick > timedForceReversionBatch.getEndTick();
 	}
 }
