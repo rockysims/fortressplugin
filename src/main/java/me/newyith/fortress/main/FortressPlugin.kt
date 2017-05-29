@@ -2,7 +2,7 @@ package me.newyith.fortress.main
 
 import me.newyith.fortress.config.ConfigData
 import me.newyith.fortress.config.ConfigManager
-import me.newyith.fortress.util.Log
+import me.newyith.util.Log
 import org.bukkit.ChatColor
 import org.bukkit.World
 import org.bukkit.command.Command
@@ -24,8 +24,6 @@ object FortressPlugin {
 	}
 
 	//---
-
-
 
 	fun enable(javaPlugin: JavaPlugin) {
 		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED)

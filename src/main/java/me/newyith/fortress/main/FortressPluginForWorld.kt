@@ -1,6 +1,6 @@
 package me.newyith.fortress.main
 
-import me.newyith.fortress.util.Log
+import me.newyith.util.Log
 import org.bukkit.Bukkit
 
 class FortressPluginForWorld(val worldName :String) {
