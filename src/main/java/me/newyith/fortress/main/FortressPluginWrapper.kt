@@ -1,26 +1,26 @@
-package me.newyith.fortress.main;
+package me.newyith.fortress.main
 
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.command.Command
+import org.bukkit.command.CommandSender
+import org.bukkit.plugin.java.JavaPlugin
 
-public class FortressPluginContainerOld extends JavaPlugin {
-	private static FortressPlugin plugin = null;
-
-	@Override
-	public void onEnable() {
-		plugin = new FortressPlugin();
-//		plugin.onEnable();
+class FortressPluginWrapper : JavaPlugin() {
+	override fun onEnable() {
+		FortressPlugin.enable(this)
 	}
 
-	@Override
-	public void onDisable() {
-//		plugin.onDisable();
-		plugin = null;
+	override fun onDisable() {
+		FortressPlugin.disable()
 	}
 
-	public static FortressPlugin getInstance() {
-		return plugin;
+	override fun onCommand(sender: CommandSender, cmd: Command, label: String, args: Array<String>): Boolean {
+		return FortressPlugin.onCommand(sender, cmd, label, args)
 	}
 }
+
+
+
+
 
 
 
@@ -168,7 +168,7 @@ public class FortressPluginContainerOld extends JavaPlugin {
 //			could be a fun game mode though if fuel burned really fast
 //				still doesn't need ripple on unprotected to work
 
-//TODO: consider refactoring so that each world has essentially a separate instance of the plugin (and thus separate save files)
+//TODO: consider refactoring so that each world has essentially a separate launcher of the plugin (and thus separate save files)
 //	should drastically decrease the number of places the world name must be saved
 //	should make saving bedrockSafety.json faster
 
@@ -710,60 +710,60 @@ TODO: remove home and key runes
 //TODO: consider making creating rune require empty hand (again)
 //TODO: make glowstone blocks work as fuel for 4x the fuel value of glowstone dust (silk touch works on glowstone block and fortune III does not)
 
-/* New Feature:
-make pistons transmit generation when extended
-    this will serve as a switch to allow nearby buildings to connect/disconnect from fortress generation
-    pistons should have particle to indicate when the piston has been found by a fortress generator (onGeneratorStart searches)
-    pistons should not be protected (breakable)
+///* New Feature:
+//make pistons transmit generation when extended
+//    this will serve as a switch to allow nearby buildings to connect/disconnect from fortress generation
+//    pistons should have particle to indicate when the piston has been found by a fortress generator (onGeneratorStart searches)
+//    pistons should not be protected (breakable)
+////*/
+
+///*
+//pistonCores should respect even its parent generator's claims
+//pistonCores should respect other pistonCores' claims
+//	other generatorCores' claimed points including their pistonCores' claims and also any other pistonCores belonging to parent generator
+//pistonCore's wallMaterials should be based on parent generator's wallMaterials
+//
+//on piston added to claimedWallPoints:
+//	create new PistonCore
+//on piston removed from claimedWallPoints:
+//	break pistonCore
+//on generator broken:
+//	break all its pistonCores
+//
+//pistonCore:
+//	onExtend:
+//		if (parent generator is running)
+//			if (piston protected || piston extended to touch protected) tell pistonCore to generate
+//	onRetract:
+//		tell pistonCore to degenerate
+//
+//generatorCore:
+//	onProtectPiston, onProtectPistonExtensionTouchPoint:
+//		set pistonCore.layerIndex
+//		if (extended) tell pistonCore to generate
+//	onGenerate:
+//		for each pistonCore
+//			if (pistonCore is protected)
+//				tell pistonCore to generate
+//	onDegenerate:
+//		include child pistonCores' generated
+//			use pistonCore.layerIndex to merge piston's generated with generator's generated
+//
+//maybe instead of requiring piston be protected before it can work as a mini generator just require that a pistonCore has been created
+//	also create pistonCore if block piston is extended to touch is generated
 //*/
-
-/*
-pistonCores should respect even its parent generator's claims
-pistonCores should respect other pistonCores' claims
-	other generatorCores' claimed points including their pistonCores' claims and also any other pistonCores belonging to parent generator
-pistonCore's wallMaterials should be based on parent generator's wallMaterials
-
-on piston added to claimedWallPoints:
-	create new PistonCore
-on piston removed from claimedWallPoints:
-	break pistonCore
-on generator broken:
-	break all its pistonCores
-
-pistonCore:
-	onExtend:
-		if (parent generator is running)
-			if (piston protected || piston extended to touch protected) tell pistonCore to generate
-	onRetract:
-		tell pistonCore to degenerate
-
-generatorCore:
-	onProtectPiston, onProtectPistonExtensionTouchPoint:
-		set pistonCore.layerIndex
-		if (extended) tell pistonCore to generate
-	onGenerate:
-		for each pistonCore
-			if (pistonCore is protected)
-				tell pistonCore to generate
-	onDegenerate:
-		include child pistonCores' generated
-			use pistonCore.layerIndex to merge piston's generated with generator's generated
-
-maybe instead of requiring piston be protected before it can work as a mini generator just require that a pistonCore has been created
-	also create pistonCore if block piston is extended to touch is generated
-*/
 
 
 
 
 
 //for beginning for post on bukkit.org once I'm ready to release:
-/*
-Fortress is a whole new approach to self-service protection. Instead of claiming chunks, players scan a fortress out
-of ordinary blocks then protect the structure itself by building a rune (pattern of blocks). The blocks that make up
-the structure are detected automatically and protected. Runes are fueled by glowstone.
-For details, obsidian + book = manual.
-//*/
+///*
+//Fortress is a whole new approach to self-service protection. Instead of claiming chunks, players scan a fortress out
+//of ordinary blocks then protect the structure itself by building a rune (pattern of blocks). The blocks that make up
+//the structure are detected automatically and protected. Runes are fueled by glowstone.
+//For details, obsidian + book = manual.
+////*/
 
 
 
@@ -779,51 +779,6 @@ For details, obsidian + book = manual.
 //	always prioritize shops that can fulfil buy/sell order over shops that can't
 //maybe add delivery fee based on distance (no one receives the fee)
 //	don't allow cross world delivery
-
-
-
-
-
-
-
-
-//		int taskId = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> {
-//			for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-//				Point point = new Point(player.getLocation().add(0, 2, 0));
-//				float speed = 1;
-//				int amount = 1;
-//				double range = 10;
-//				ParticleEffect.PORTAL.display(0, 0, 0, speed, amount, point, range);
-//				Bukkit.broadcastMessage("display portal at " + point);
-//			}
-//		}, 0, 20); //20 ticks per second
-//		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, () -> {
-//			//
-//			Bukkit.getServer().getScheduler().cancelTask(taskId);
-//			Bukkit.broadcastMessage("canceling taskId: " + taskId);
-//		}, 20*120);
-
-
-
-
-
-
-//class Variance {
-//	static class Vehicle {}
-//	static class WaterVehicle extends Vehicle {}
-//	static class Boat extends WaterVehicle {}
-//	static class Submarine extends WaterVehicle {}
-//	static class LandVehicle extends Vehicle {}
-//	static class Car extends LandVehicle {}
-//	static class Bike extends LandVehicle {}
-//
-//	void foo() {
-//		this.<LandVehicle>bar(new Car());
-//	}
-//
-//	<T> void bar(T t) {}
-//}
-
 
 
 
