@@ -1,5 +1,5 @@
 name: FortressPlugin
-main: me.newyith.fortress.main.FortressPlugin
+main: me.newyith.fortress.main.FortressPluginContainer
 version: 0.1
 author: NewYith
   
@@ -7,15 +7,3 @@ commands:
   stuck:
     description: Teleports you away after a delay.
     usage: /stuck
-  test:
-    description: Test command for debugging
-    usage: /<command>
-  test2:
-    description: Test2 command for debugging
-    usage: /<command>
-  test3:
-    description: Test3 command for debugging
-    usage: /<command>
-  test4:
-    description: Test4 command for debugging
-    usage: /<command>
