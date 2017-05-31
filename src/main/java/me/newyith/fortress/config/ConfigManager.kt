@@ -14,11 +14,11 @@ object ConfigManager {
 		}
 
 		val configData = ConfigData(
-			getOrSetInt(config, "glowstoneDustBurnTimeMs", 1000 * 60 * 60),
-			getOrSetInt(config, "stuckDelayMs", 30 * 1000),
-			getOrSetInt(config, "stuckCancelDistance", 4),
-			getOrSetInt(config, "generationRangeLimit", 128),
-			getOrSetInt(config, "generationBlockLimit", 40000) //roughly 125 empty 8x8x8 rooms (6x6x6 air inside)
+			glowstoneDustBurnTimeMs = getOrSetInt(config, "glowstoneDustBurnTimeMs", 1000 * 60 * 60),
+			stuckDelayMs = getOrSetInt(config, "stuckDelayMs", 30 * 1000),
+			stuckCancelDistance = getOrSetInt(config, "stuckCancelDistance", 4),
+			generationRangeLimit = getOrSetInt(config, "generationRangeLimit", 128),
+			generationBlockLimit = getOrSetInt(config, "generationBlockLimit", 40000) //roughly 125 empty 8x8x8 rooms (6x6x6 air inside)
 		)
 		plugin.saveConfig()
 
