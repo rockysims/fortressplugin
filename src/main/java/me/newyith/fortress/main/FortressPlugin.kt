@@ -4,6 +4,7 @@ import me.newyith.fortress.config.ConfigData
 import me.newyith.fortress.config.ConfigManager
 import me.newyith.fortress.event.EventListener
 import me.newyith.util.Log
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.World
 import org.bukkit.command.Command
@@ -19,7 +20,7 @@ object FortressPlugin {
 
 	fun forWorld(world: World): FortressPluginForWorld {
 		return pluginByWorld.getOrPut(world.name, {
-			FortressPluginForWorld(world.name)
+			FortressPluginForWorld(world)
 		})
 	}
 
@@ -36,6 +37,17 @@ object FortressPlugin {
 	fun enable(javaPlugin: JavaPlugin) {
 		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED)
 		Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD)
+
+
+
+
+		//* //TODO: delete this block
+		val world: World = Bukkit.getWorld("world")
+		pluginByWorld["world"] = FortressPluginForWorld(world)
+		//*/
+
+
+
 
 		config = ConfigManager.loadOrSave(javaPlugin)
 		plugin = javaPlugin
@@ -56,6 +68,19 @@ object FortressPlugin {
 		Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD)
 
 		eventListener = null
+
+
+
+
+
+
+		//* //TODO: delete this block
+		val world: World = Bukkit.getWorld("world")
+		pluginByWorld["world"] = FortressPluginForWorld(world)
+		//*/
+
+
+
 
 		pluginByWorld.values.forEach { it.disable() }
 		pluginByWorld.clear()
