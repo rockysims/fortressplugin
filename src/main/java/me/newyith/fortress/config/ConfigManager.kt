@@ -5,7 +5,7 @@ import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.plugin.java.JavaPlugin
 
 object ConfigManager {
-	fun load(plugin: JavaPlugin): ConfigData {
+	fun loadOrSave(plugin: JavaPlugin): ConfigData {
 		val config = plugin.getConfig()
 
 		if (!FortressPlugin.releaseBuild) {

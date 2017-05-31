@@ -37,7 +37,7 @@ object FortressPlugin {
 		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED)
 		Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD)
 
-		config = ConfigManager.load(javaPlugin)
+		config = ConfigManager.loadOrSave(javaPlugin)
 		plugin = javaPlugin
 
 		pluginByWorld.values.forEach { it.enable() }
