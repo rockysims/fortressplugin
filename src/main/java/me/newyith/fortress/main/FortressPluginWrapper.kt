@@ -19,7 +19,7 @@ class FortressPluginWrapper : JavaPlugin() {
 }
 
 
-//onPluginEnabled,
+//onPluginEnabled, 
 //	for each generatorRune check that a valid rune pattern exists in world (else destroy rune)
 //	for each bedrockSafetyAnchorPoint
 //		check that there is a generatorRune at that point (else revert safety points)
