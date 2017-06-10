@@ -19,16 +19,16 @@ class FortressPluginWrapper : JavaPlugin() {
 }
 
 
-//onPluginEnabled, 
+//onPluginEnabled,
 //	for each generatorRune check that a valid rune pattern exists in world (else destroy rune)
 //	for each bedrockSafetyAnchorPoint
 //		check that there is a generatorRune at that point (else revert safety points)
 //		if safety timestamp > 3 days ago, delete safety json file
-//onStartGenerator, save rune data to generatorRunes/{anchorPoint}.json
-//	also need generatorRunes/list.json
+//onStartGenerator, save rune data to {worldName}/generatorRunes/{anchorPoint}.json
+//	also need {worldName}/generatorRunes/list.json
 //onDestroyGenerator && onGeneratorHasInvalidRune, delete rune save file
-//onDeleteRuneSaveFile, save block revert data to bedrockSafety/{anchorPoint}.json (with timestamp)
-//	also need bedrockSafety/list.json
+//onDeleteRuneSaveFile, save block revert data to {worldName}/bedrockSafety/{anchorPoint}.json (array of {blockRevertDataByPoint, timestamp})
+//	also need {worldName}/bedrockSafety/list.json
 
 
 
@@ -39,6 +39,9 @@ class FortressPluginWrapper : JavaPlugin() {
 //switch meaning of redstone power (power on should mean fortress running)
 //use particles to indicate ripple over bedrock (instead of cobblestone)
 
+
+//TODO: consider loading/unloading generatorRunes when some/none of the chunks rune is in are loaded
+//	or at least architect save/load system to allow adding this later
 
 
 //TODO: consider saving/loading on a different thread so it doesn't slow minecraft down

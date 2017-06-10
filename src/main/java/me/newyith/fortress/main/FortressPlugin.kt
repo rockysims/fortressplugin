@@ -3,6 +3,7 @@ package me.newyith.fortress.main
 import me.newyith.fortress.config.ConfigData
 import me.newyith.fortress.config.ConfigManager
 import me.newyith.fortress.event.EventListener
+import me.newyith.fortress.persist.SaveLoadManager
 import me.newyith.util.Log
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -17,6 +18,7 @@ object FortressPlugin {
 	private var config: ConfigData? = null
 	private var plugin: JavaPlugin? = null
 	private var eventListener: EventListener? = null
+	private var saveLoadManager: SaveLoadManager? = null
 
 	fun forWorld(world: World): FortressPluginForWorld {
 		return pluginByWorld.getOrPut(world.name, {
@@ -30,6 +32,12 @@ object FortressPlugin {
 
 	fun getPlugin(): JavaPlugin? {
 		return plugin
+	}
+
+	fun getSaveLoadManager(): SaveLoadManager {
+		val manager = saveLoadManager ?: SaveLoadManager()
+		saveLoadManager = manager
+		return manager
 	}
 
 	// --- //
@@ -68,19 +76,12 @@ object FortressPlugin {
 		Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD)
 
 		eventListener = null
-
-
-
-
-
+		saveLoadManager = null
 
 		//* //TODO: delete this block
 		val world: World = Bukkit.getWorld("world")
 		pluginByWorld["world"] = FortressPluginForWorld(world)
 		//*/
-
-
-
 
 		pluginByWorld.values.forEach { it.disable() }
 		pluginByWorld.clear()
