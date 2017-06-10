@@ -19,17 +19,25 @@ class FortressPluginWrapper : JavaPlugin() {
 }
 
 
-
-
+//onPluginEnabled,
+//	for each generatorRune check that a valid rune pattern exists in world (else destroy rune)
+//	for each bedrockSafetyAnchorPoint
+//		check that there is a generatorRune at that point (else revert safety points)
+//		if safety timestamp > 3 days ago, delete safety json file
+//onStartGenerator, save rune data to generatorRunes/{anchorPoint}.json
+//	also need generatorRunes/list.json
+//onDestroyGenerator && onGeneratorHasInvalidRune, delete rune save file
+//onDeleteRuneSaveFile, save block revert data to bedrockSafety/{anchorPoint}.json (with timestamp)
+//	also need bedrockSafety/list.json
 
 
 
 //MVP goals:
 //fix /reload memory leak (remove all managers onDisable)
-//fast saving (take snapshot (copy) of plugin state and then save that on another thread?)
+//fast saving (take snapshot (copy) of plugin state then save on another thread? no, give each generator a save file)
 //more configuration (particularly max blocks per fortress)
 //switch meaning of redstone power (power on should mean fortress running)
-//use cobblestone to indicate ripple over bedrock
+//use particles to indicate ripple over bedrock (instead of cobblestone)
 
 
 
