@@ -9,8 +9,10 @@ import org.bukkit.entity.Player
 class GeneratorRune (
 	@JsonProperty("pattern") val pattern: GeneratorRunePattern
 ) {
-	@Transient val world: World = pattern.world
-	@Transient val anchor: Point = pattern.anchorPoint
+	val world: World
+		get() = pattern.world
+	val anchor: Point
+		get() = pattern.anchorPoint
 
 	fun onCreated(player: Player) {
 		Log.log("//TODO: handle GeneratorRune::onCreated() called. player: " + player.name)

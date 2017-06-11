@@ -6,7 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin
 
 object ConfigManager {
 	fun loadOrSave(plugin: JavaPlugin): ConfigData {
-		val config = plugin.getConfig()
+		val config = plugin.config
 
 		if (!FortressPlugin.releaseBuild) {
 			//force use of default config values as defined below (overwrite config file)

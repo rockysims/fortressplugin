@@ -19,16 +19,19 @@ class FortressPluginWrapper : JavaPlugin() {
 }
 
 
+
+//TODO: finish writing GeneratorRune (without GeneratorCore for now)
+//	get rune destruction working
+//	make rune save when turned on
+
 //onPluginEnabled,
 //	for each generatorRune check that a valid rune pattern exists in world (else destroy rune)
 //	for each bedrockSafetyAnchorPoint
 //		check that there is a generatorRune at that point (else revert safety points)
 //		if safety timestamp > 3 days ago, delete safety json file
 //onStartGenerator, save rune data to {worldName}/generatorRunes/{anchorPoint}.json
-//	also need {worldName}/generatorRunes/list.json
 //onDestroyGenerator && onGeneratorHasInvalidRune, delete rune save file
 //onDeleteRuneSaveFile, save block revert data to {worldName}/bedrockSafety/{anchorPoint}.json (array of {blockRevertDataByPoint, timestamp})
-//	also need {worldName}/bedrockSafety/list.json
 
 
 

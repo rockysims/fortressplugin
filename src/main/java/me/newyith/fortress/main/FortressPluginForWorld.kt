@@ -46,15 +46,15 @@ class FortressPluginForWorld(val world: World) {
 		runePattern?.let { runePattern ->
 			val runeAlreadyCreated = Point(signBlock) in generatorRuneByPatternPoint.keys
 			if (!runeAlreadyCreated) {
-				val rune = GeneratorRune(runePattern)
-				generatorRunes.add(rune)
+				val generatorRune = GeneratorRune(runePattern)
+				generatorRunes.add(generatorRune)
 
-				//add new rune to generatorRuneByPoint map
+				//add new generatorRune to generatorRuneByPoint map
 				runePattern.points.forEach {
-					generatorRuneByPatternPoint.put(it, rune)
+					generatorRuneByPatternPoint.put(it, generatorRune)
 				}
 
-				rune.onCreated(player)
+				generatorRune.onCreated(player)
 				cancel = true //otherwise initial text on sign is replaced by what user wrote
 			} else {
 				player.sendMessage(ChatColor.AQUA.toString() + "Failed to create rune because rune already created here.")
