@@ -75,6 +75,7 @@ class SaveLoadManager {
 			mapper.writeValue(buffer, generatorRune)
 
 			//write buffer to file
+			file.parentFile.mkdirs()
 			val fos = FileOutputStream(file)
 			fos.write(buffer.toByteArray(), 0, buffer.size())
 			fos.close()

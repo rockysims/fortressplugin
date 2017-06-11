@@ -1,11 +1,16 @@
 package me.newyith.util
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.block.Block
 
-class Point (val x: Double, val y: Double, val z: Double) {
+class Point (
+	@JsonProperty("x") val x: Double,
+	@JsonProperty("y") val y: Double,
+	@JsonProperty("z") val z: Double
+) {
 	constructor(x: Int, y: Int, z: Int) : this(x.toDouble(), y.toDouble(), z.toDouble())
 	constructor(loc: Location) : this(loc.x, loc.y, loc.z)
 	constructor(b: Block) : this(b.location)

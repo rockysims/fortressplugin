@@ -1,5 +1,6 @@
 package me.newyith.fortress.rune.generator
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import me.newyith.util.Point
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -7,15 +8,15 @@ import org.bukkit.World
 import java.util.HashSet
 
 class GeneratorRunePattern (
-		val worldName: String,
-		val signPoint: Point,
-		val wirePoint: Point,
-		val anchorPoint: Point,
-		val chestPoint: Point,
-		val pausePoint: Point,
-		val runningPoint: Point,
-		val fuelPoint: Point
-	) {
+	@JsonProperty("worldName") val worldName: String,
+	@JsonProperty("signPoint") val signPoint: Point,
+	@JsonProperty("wirePoint") val wirePoint: Point,
+	@JsonProperty("anchorPoint") val anchorPoint: Point,
+	@JsonProperty("chestPoint") val chestPoint: Point,
+	@JsonProperty("pausePoint") val pausePoint: Point,
+	@JsonProperty("runningPoint") val runningPoint: Point,
+	@JsonProperty("fuelPoint") val fuelPoint: Point
+) {
 	@Transient val world: World = Bukkit.getWorld(worldName)
 	@Transient val points = HashSet<Point>()
 

@@ -40,7 +40,6 @@ class FortressPluginForWorld(val world: World) {
 	}
 
 	fun onSignChange(player: Player, signBlock: Block): Boolean {
-		player.sendMessage(ChatColor.AQUA.toString() + "Test aqua color") //TODO: delete this line
 		var cancel = false
 
 		val runePattern = GeneratorRunePatterns.tryReadyPattern(signBlock)
