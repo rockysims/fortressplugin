@@ -5,7 +5,6 @@ import me.newyith.fortress.config.ConfigManager
 import me.newyith.fortress.event.EventListener
 import me.newyith.fortress.persist.SaveLoadManager
 import me.newyith.util.Log
-import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.World
 import org.bukkit.command.Command
@@ -46,20 +45,12 @@ object FortressPlugin {
 		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED)
 		Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD)
 
-
-
-
-		//* //TODO: delete this block
-		val world: World = Bukkit.getWorld("world")
-		pluginByWorld["world"] = FortressPluginForWorld(world)
-		//*/
-
-
-
-
 		config = ConfigManager.loadOrSave(javaPlugin)
 		plugin = javaPlugin
 
+		//load pluginByWorld
+		pluginByWorld.clear()
+		pluginByWorld.putAll(getSaveLoadManager().createPluginByWorld())
 		pluginByWorld.values.forEach { it.enable() }
 
 		eventListener = EventListener(javaPlugin)
@@ -78,11 +69,8 @@ object FortressPlugin {
 		eventListener = null
 		saveLoadManager = null
 
-		//* //TODO: delete this block
-		val world: World = Bukkit.getWorld("world")
-		pluginByWorld["world"] = FortressPluginForWorld(world)
-		//*/
-
+		//save pluginByWorld
+		//no need to actually save pluginByWorld because if {worldName} folder exists that means create pluginForWorld
 		pluginByWorld.values.forEach { it.disable() }
 		pluginByWorld.clear()
 
@@ -94,7 +82,7 @@ object FortressPlugin {
 	}
 
 	fun onCommand(sender: CommandSender, cmd: Command, label: String, args: Array<String>): Boolean {
-		//TODO: write
+		Log.warn("//TODO: handle command: " + cmd.name)
 		return false
 	}
 }

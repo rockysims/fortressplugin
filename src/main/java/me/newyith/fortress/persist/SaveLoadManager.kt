@@ -3,7 +3,9 @@ package me.newyith.fortress.persist
 import com.fasterxml.jackson.annotation.JsonAutoDetect
 import com.fasterxml.jackson.databind.ObjectMapper
 import me.newyith.fortress.main.FortressPlugin
+import me.newyith.fortress.main.FortressPluginForWorld
 import me.newyith.fortress.rune.generator.GeneratorRune
+import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.ByteArrayOutputStream
@@ -19,6 +21,24 @@ class SaveLoadManager {
 			.withGetterVisibility(JsonAutoDetect.Visibility.NONE)
 			.withIsGetterVisibility(JsonAutoDetect.Visibility.NONE)
 			.withCreatorVisibility(JsonAutoDetect.Visibility.NONE)
+	}
+
+	fun createPluginByWorld(): Map<String, FortressPluginForWorld> {
+		val plugin = FortressPlugin.getPlugin() ?: return HashMap()
+
+		val pluginByWorld = HashMap<String, FortressPluginForWorld>()
+		try {
+			plugin.dataFolder.list().toList().parallelStream().forEach {
+				Bukkit.getWorld(it)?.let { world ->
+					pluginByWorld.put(world.name, FortressPluginForWorld(world))
+				}
+			}
+		} catch (e: Exception) {
+			e.printStackTrace()
+			pluginByWorld.clear()
+		}
+
+		return pluginByWorld
 	}
 
 	fun loadGeneratorRunes(world: World): Set<GeneratorRune> {

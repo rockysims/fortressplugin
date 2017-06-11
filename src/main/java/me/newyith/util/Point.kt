@@ -1,34 +1,60 @@
 package me.newyith.util
 
 import org.bukkit.Location
+import org.bukkit.Material
+import org.bukkit.World
 import org.bukkit.block.Block
 
-class Point {
-	private data class Model(
-		val x: Double,
-		val y: Double,
-		val z: Double)
-
-	private var model: Model
-
-	constructor(loc: Location) {
-		val x = loc.x
-		val y = loc.y
-		val z = loc.z
-		model = Model(x, y, z)
-	}
-
+class Point (val x: Double, val y: Double, val z: Double) {
+	constructor(x: Int, y: Int, z: Int) : this(x.toDouble(), y.toDouble(), z.toDouble())
+	constructor(loc: Location) : this(loc.x, loc.y, loc.z)
 	constructor(b: Block) : this(b.location)
 
 	// --- //
 
-	private fun x(): Double = model.x
-	private fun y(): Double = model.y
-	private fun z(): Double = model.z
+	private fun x(): Double = x
+	private fun y(): Double = y
+	private fun z(): Double = z
 
-	private fun xInt(): Int = model.x.toInt()
-	private fun yInt(): Int = model.y.toInt()
-	private fun zInt(): Int = model.z.toInt()
+	private fun xInt(): Int = x.toInt()
+	private fun yInt(): Int = y.toInt()
+	private fun zInt(): Int = z.toInt()
+
+	fun difference(p: Point): Point {
+		return Point(
+			x - p.x,
+			y - p.y,
+			z - p.z
+		)
+	}
+
+	fun add(p: Point): Point {
+		return Point(
+			x + p.x,
+			y + p.y,
+			z + p.z
+		)
+	}
+
+	fun add(xAdd: Int, yAdd: Int, zAdd: Int): Point {
+		return Point(
+			x + xAdd,
+			y + yAdd,
+			z + zAdd
+		)
+	}
+
+	fun isType(mat: Material, world: World): Boolean {
+		return getBlock(world).type == mat
+	}
+
+	fun getBlock(world: World): Block {
+		return world.getBlockAt(xInt(), yInt(), zInt())
+	}
+
+	fun getType(world: World): Material {
+		return getBlock(world).type
+	}
 
 	// - Overrides - //
 
