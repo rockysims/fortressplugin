@@ -4,8 +4,7 @@ import me.newyith.fortress.rune.generator.GeneratorRune
 import me.newyith.fortress.rune.generator.GeneratorRunePatterns
 import me.newyith.util.Log
 import me.newyith.util.Point
-import org.bukkit.ChatColor
-import org.bukkit.World
+import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import java.util.*
@@ -64,8 +63,64 @@ class FortressPluginForWorld(val world: World) {
 		return cancel
 	}
 
-	fun onBlockBreakEvent(player: Player, block: Block): Boolean {
-		Log.warn("//TODO: handle onBlockBreakEvent() at " + Point(block) + " by " + player.name)
-		return false
+	fun onBlockBreakEvent(player: Player, brokenBlock: Block): Boolean {
+		var cancel = false
+
+		val inCreative = player.gameMode == GameMode.CREATIVE
+		if (!inCreative) {
+			/* //TODO: uncomment out this block
+			val brokenPoint = Point(brokenBlock)
+			if (isProtected(brokenPoint)) { //was isGenerated()
+				cancel = true
+				//was getRuneByClaimedWallPoint()
+				getGeneratorRuneByClaimedWallPoint(brokenPoint)?.let { generatorRune ->
+					generatorRune.getGeneratorCore().shield(brokenPoint)
+				}
+			}
+			// */
+
+			//commented out because we're not gonna bother handling piston special case yet (handling it here is not elegant)
+//			if (!isProtected) {
+//				when (brokenPoint.getType(world)) {
+//					Material.PISTON_EXTENSION, Material.PISTON_MOVING_PIECE -> {
+//						val matData = brokenBlock.getState().getData()
+//						if (matData is PistonExtensionMaterial) {
+//							val pem = matData as PistonExtensionMaterial
+//							val face = pem.getFacing().getOppositeFace()
+//							val pistonBasePoint = Point(brokenBlock.getRelative(face, 1))
+//							if (model.protectedPoints.contains(pistonBasePoint)) {
+//								cancel = true
+//								if (rune != null) rune!!.getGeneratorCore().shield(brokenPoint)
+//							}
+//						} else {
+//							Debug.error("matData not instanceof PistonExtensionMaterial")
+//						}
+//					}
+//				}
+//			}
+		}
+
+		if (!cancel) {
+			onRuneMightHaveBeenBrokenBy(brokenBlock)
+		}
+
+		return cancel
+	}
+
+	private fun onRuneMightHaveBeenBrokenBy(block: Block) {
+		generatorRuneByPatternPoint[Point(block)]?.let { breakRune(it) }
+	}
+
+	fun breakRune(generatorRune: GeneratorRune) {
+		//TODO: write this (or rather translate it)
+
+		generatorRune.onBroken()
+		//breaking should naturally update: generatedPoints and generatorRuneByProtectedPoint
+
+		for (p in generatorRune.pattern.points) {
+			generatorRuneByPatternPoint.remove(p)
+		}
+
+		generatorRunes.remove(generatorRune)
 	}
 }
