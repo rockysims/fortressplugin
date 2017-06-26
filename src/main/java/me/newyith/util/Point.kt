@@ -5,6 +5,7 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.block.Block
+import org.bukkit.util.Vector
 
 class Point (
 	@JsonProperty("x") val x: Double,
@@ -13,17 +14,18 @@ class Point (
 ) {
 	constructor(x: Int, y: Int, z: Int) : this(x.toDouble(), y.toDouble(), z.toDouble())
 	constructor(loc: Location) : this(loc.x, loc.y, loc.z)
+	constructor(v: Vector) : this(v.x, v.y, v.z)
 	constructor(b: Block) : this(b.location)
 
 	// --- //
 
-	private fun x(): Double = x
-	private fun y(): Double = y
-	private fun z(): Double = z
-
 	private fun xInt(): Int = x.toInt()
 	private fun yInt(): Int = y.toInt()
 	private fun zInt(): Int = z.toInt()
+
+	fun toVector(): Vector {
+		return Vector(x, y, z)
+	}
 
 	fun difference(p: Point): Point {
 		return Point(
@@ -80,9 +82,9 @@ class Point (
 			val p = other
 
 			var equal = true
-			equal = equal && Math.floor(x()) == Math.floor(p.x())
-			equal = equal && Math.floor(y()) == Math.floor(p.y())
-			equal = equal && Math.floor(z()) == Math.floor(p.z())
+			equal = equal && Math.floor(x) == Math.floor(p.x)
+			equal = equal && Math.floor(y) == Math.floor(p.y)
+			equal = equal && Math.floor(z) == Math.floor(p.z)
 
 			return equal
 		} else {
@@ -91,9 +93,9 @@ class Point (
 	}
 
 	override fun hashCode(): Int {
-		var hash = Math.floor(x()).toInt()
-		hash = 49999 * hash + Math.floor(y()).toInt()
-		hash = 49999 * hash + Math.floor(z()).toInt()
+		var hash = Math.floor(x).toInt()
+		hash = 49999 * hash + Math.floor(y).toInt()
+		hash = 49999 * hash + Math.floor(z).toInt()
 		return hash
 	}
 }

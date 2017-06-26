@@ -25,8 +25,8 @@ object FortressPlugin {
 		})
 	}
 
-	fun getConfig(): ConfigData? {
-		return config
+	fun getConfig(): ConfigData {
+		return config ?: ConfigManager.getDefaults()
 	}
 
 	fun getPlugin(): JavaPlugin? {

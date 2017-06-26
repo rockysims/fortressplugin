@@ -112,8 +112,6 @@ class FortressPluginForWorld(val world: World) {
 	}
 
 	fun breakRune(generatorRune: GeneratorRune) {
-		//TODO: write this (or rather translate it)
-
 		generatorRune.onBroken()
 		//breaking should naturally update: generatedPoints and generatorRuneByProtectedPoint
 
@@ -124,3 +122,23 @@ class FortressPluginForWorld(val world: World) {
 		generatorRunes.remove(generatorRune)
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

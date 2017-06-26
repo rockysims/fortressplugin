@@ -59,6 +59,8 @@ class SaveLoadManager {
 			generatorRunes.clear()
 		}
 
+		generatorRunes.forEach { it.secondStageLoad() }
+
 		return generatorRunes
 	}
 
