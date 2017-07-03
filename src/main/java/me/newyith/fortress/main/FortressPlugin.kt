@@ -3,6 +3,7 @@ package me.newyith.fortress.main
 import me.newyith.fortress.config.ConfigData
 import me.newyith.fortress.config.ConfigManager
 import me.newyith.fortress.event.EventListener
+import me.newyith.fortress.event.TickTimer
 import me.newyith.fortress.persist.SaveLoadManager
 import me.newyith.util.Log
 import org.bukkit.ChatColor
@@ -17,6 +18,7 @@ object FortressPlugin {
 	private var config: ConfigData? = null
 	private var plugin: JavaPlugin? = null
 	private var eventListener: EventListener? = null
+	private var tickTimer: TickTimer? = null
 	private var saveLoadManager: SaveLoadManager? = null
 
 	fun forWorld(world: World): FortressPluginForWorld {
@@ -54,7 +56,12 @@ object FortressPlugin {
 		pluginByWorld.values.forEach { it.enable() }
 
 		eventListener = EventListener(javaPlugin)
-//		TickTimer.onEnable(this)
+
+		tickTimer = TickTimer(javaPlugin)
+		//TODO: consider doing this instead:
+		//	TickTimer.onEnable(javaPlugin)
+		//	then later TickTimer.onDisable() //clean up (TickTimer.instance = null)
+
 //		ManualCraftManager.onEnable(this)
 //		PearlGlitchFix.onEnable(this)
 
@@ -67,6 +74,7 @@ object FortressPlugin {
 		Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD)
 
 		eventListener = null
+		tickTimer = null
 		saveLoadManager = null
 
 		//save pluginByWorld
@@ -84,5 +92,9 @@ object FortressPlugin {
 	fun onCommand(sender: CommandSender, cmd: Command, label: String, args: Array<String>): Boolean {
 		Log.warn("//TODO: handle command: " + cmd.name)
 		return false
+	}
+
+	fun onTick() {
+		pluginByWorld.values.forEach { it.onTick() }
 	}
 }

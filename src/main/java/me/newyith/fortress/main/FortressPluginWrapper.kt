@@ -18,7 +18,30 @@ class FortressPluginWrapper : JavaPlugin() {
 	}
 }
 
+//full rewritten internally (I think):
+//	GeneratorRune
+//	EventListener
 
+//TODO: NEXT: finish wiring up outgoing calls from EventListener
+//	and then continue getting generator rune work again (excluding generatorCore)
+
+
+
+
+
+//TODO: prevent creating nether portal with one end inside fortress unless activating player is inside that fortress
+
+//TODO: must add easing function to de/generate animation! wait is too annoying for large fortresses
+
+//TODO: make GeneratorRune rebuild as much state as possible instead of saving (so that it makes sense to not save rune's json file on state change)
+//	validate pattern, update state (paused, running, needs fuel)
+//		if needs fuel, set state else set state based on redstone power
+//	still need to save fuelTicksRemaining I think
+
+//TODO: consider saving all BlockRevertData for 30 days
+//	that way if owner reverts the world (due to griefers for example) there won't be abandoned bedrock
+//	onEnable, make sure all bedrock ever created during last 30 days has authorization or isn't bedrock else revert it
+//	PROBLEM: what if someone can place bedrock? maybe admin shop sells it
 
 //TODO: finish writing GeneratorRune (without GeneratorCore for now)
 //	get rune destruction working

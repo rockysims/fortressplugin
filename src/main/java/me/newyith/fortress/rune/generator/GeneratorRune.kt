@@ -132,11 +132,11 @@ class GeneratorRune(
 	}
 
 	private fun updatePoweredFromWorld() {
-		val powered = pattern.wirePoint.getBlock(world).getBlockPower() > 0
+		val powered = pattern.wirePoint.getBlock(world).blockPower > 0
 		setPowered(powered)
 	}
 
-	private fun setPowered(powered: Boolean) {
+	fun setPowered(powered: Boolean) {
 		if (this.powered != powered) {
 			if (countRecentPowerToggles() > 10) {
 				FortressPlugin.forWorld(world).breakRune(this)
@@ -148,6 +148,7 @@ class GeneratorRune(
 		}
 	}
 
+	//TODO: call this from GeneratorCore
 	fun onSearchingChanged(searching: Boolean) {
 		//TODO: comment out again (see next line)
 		//* //commented out because flashing "Searching" for a fraction of a second looks bad
@@ -252,7 +253,7 @@ class GeneratorRune(
 
 	// - Utils -
 
-	fun countGlowstoneDustInChest():Int {
+	fun countGlowstoneDustInChest(): Int {
 		var count = 0
 		if (chest != null)
 		{
@@ -269,7 +270,7 @@ class GeneratorRune(
 		return count
 	}
 
-	private val chest:Chest?
+	private val chest: Chest?
 		get() {
 			val blockState = pattern.chestPoint.getBlock(world).state
 			return when(blockState) {
@@ -281,7 +282,7 @@ class GeneratorRune(
 			}
 		}
 
-	private fun updateFuelRemainingDisplay(ms:Long) {
+	private fun updateFuelRemainingDisplay(ms: Long) {
 		var ms = ms
 		val glowstoneDustInChest = countGlowstoneDustInChest()
 		ms += (FortressPlugin.getConfig().glowstoneDustBurnTimeMs * glowstoneDustInChest).toLong()
@@ -339,42 +340,17 @@ class GeneratorRune(
 		b.getBlock(world).type = aMat
 	}
 
-
-
-
-
-
-
-
-
-
-	///////////// continue working down from here
-
-
-
-
-
-
-
-
-
-
-
-
-
-	private fun countRecentPowerToggles():Int {
+	private fun countRecentPowerToggles(): Int {
 		//set count recent power toggles and remove expired stamps
 		val now = System.currentTimeMillis()
 		val stampLifetimeMs = 5 * 1000
 		var count = 0
-		val it = model!!.powerToggleTimeStamps!!.iterator()
+		val it = powerToggleTimeStamps.iterator()
 		while (it.hasNext()) {
 			val stamp = it.next()
 			if (now - stamp < stampLifetimeMs) {
 				count++
-			}
-			else
-			{
+			} else {
 				it.remove()
 			}
 		}
@@ -382,19 +358,11 @@ class GeneratorRune(
 		return count
 	}
 
-	public override fun equals(ob:Any?):Boolean {
-		var match = false
-
-		if (ob is GeneratorRune)
-		{
-			val rune = ob as GeneratorRune?
-			match = model!!.pattern!!.getAnchorPoint() === rune!!.pattern.getAnchorPoint()
-		}
-
-		return match
+	override fun equals(obj: Any?): Boolean {
+		return obj is GeneratorRune && anchor === obj.pattern.anchorPoint
 	}
 
-	public override fun hashCode():Int {
-		return model!!.pattern!!.getAnchorPoint().hashCode()
+	override fun hashCode(): Int {
+		return anchor.hashCode()
 	}
 }

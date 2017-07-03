@@ -27,6 +27,10 @@ class Point (
 		return Vector(x, y, z)
 	}
 
+	fun toLocation(world: World): Location {
+		return Location(world, x, y, z)
+	}
+
 	fun difference(p: Point): Point {
 		return Point(
 			x - p.x,

@@ -63,4 +63,13 @@ class GeneratorCore (
 		//TODO: write
 	}
 
+	fun playerCanOpenCloseDoor(player: Player, topDoorPoint: Point): Boolean {
+		//TODO: write
+		return true
+	}
+
+	fun shield(shieldPoint: Point) {
+		//TODO: write
+	}
+
 }
