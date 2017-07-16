@@ -18,12 +18,18 @@ class FortressPluginWrapper : JavaPlugin() {
 	}
 }
 
-//full rewritten internally (I think):
+
+//parts full rewritten internally (I think):
 //	GeneratorRune
 //	EventListener
 
+////////////////////////////////////////////
+
+
 //TODO: NEXT: finish wiring up outgoing calls from EventListener
 //	and then continue getting generator rune work again (excluding generatorCore)
+
+//TODO: refactor manager pattern? starting with TickTimer (see comment in FortressPlugin::enable() method)
 
 
 

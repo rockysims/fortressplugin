@@ -164,6 +164,10 @@ class FortressPluginForWorld(val world: World) {
 		}
 	}
 
+	fun onEnvironmentBreaksRedstoneWireEvent(brokenBlock: Block) {
+		onRuneMightHaveBeenBrokenBy(brokenBlock)
+	}
+
 	fun onBlockBreakEvent(player: Player, brokenBlock: Block): Boolean {
 		var cancel = false
 
@@ -201,6 +205,36 @@ class FortressPluginForWorld(val world: World) {
 
 		if (!cancel) {
 			onRuneMightHaveBeenBrokenBy(brokenBlock)
+		}
+
+		return cancel
+	}
+
+	fun onBlockPlaceEvent(player: Player, placedBlock: Block, replacedMaterial: Material): Boolean {
+		var cancel = false
+
+		when (replacedMaterial) {
+			Material.STATIONARY_WATER,
+			Material.STATIONARY_LAVA
+			-> {
+				val placedPoint = Point(placedBlock)
+
+
+
+				val isGenerated = isGenerated(placedPoint)
+				//New way (maybe): ProtectionManager.forWorld(world).isProtected(placedPoint)
+
+
+
+				val inCreative = player.gameMode == GameMode.CREATIVE
+				if (isGenerated && !inCreative) {
+					cancel = true
+				}
+			}
+		}
+
+		if (!cancel) {
+			onRuneMightHaveBeenBrokenBy(placedBlock)
 		}
 
 		return cancel
