@@ -1,6 +1,7 @@
 package me.newyith.fortress.event
 
 import me.newyith.fortress.main.FortressPlugin
+import me.newyith.fortress.protection.ProtectionManager
 import me.newyith.util.Log
 import me.newyith.util.Point
 import me.newyith.util.extension.material.isDoor
@@ -70,6 +71,7 @@ class EventListener(plugin: JavaPlugin) : Listener {
 	@EventHandler(ignoreCancelled = true)
 	fun onBlockPistonExtendEvent(event: BlockPistonExtendEvent) {
 		val block = event.block
+		val world = block.world
 		val piston = Point(block)
 		val movedBlocks = HashSet(event.blocks)
 		val target = piston.add(
@@ -78,7 +80,8 @@ class EventListener(plugin: JavaPlugin) : Listener {
 			event.direction.modZ
 		)
 
-		val cancel = FortressPlugin.forWorld(block.world).onPistonEvent(event.isSticky, piston, target, movedBlocks)
+		val cancel = ProtectionManager.forWorld(world).onPistonEvent(movedBlocks)
+			|| FortressPlugin.forWorld(world).onPistonEvent(event.isSticky, piston, target, movedBlocks)
 		if (cancel) event.isCancelled = true
 	}
 

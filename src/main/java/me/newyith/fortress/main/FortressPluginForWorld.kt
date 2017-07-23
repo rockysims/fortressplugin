@@ -254,6 +254,47 @@ class FortressPluginForWorld(val world: World) {
 
 		generatorRunes.remove(generatorRune)
 	}
+
+
+
+
+
+
+
+
+
+
+	fun onPistonEvent(isSticky: Boolean, piston: Point, target: Point?, movedBlocks: Set<Block>): Boolean {
+		var cancel = false
+
+		if (!cancel) {
+			//fill pointsAffected
+			val pointsAffected = HashSet<Point>()
+			pointsAffected.add(piston)
+			target?.let { pointsAffected.add(it) }
+			//add movedBlocks to pointsAffected
+			movedBlocks.mapTo(pointsAffected) { Point(it) }
+
+			//fill runesAffected
+			val runesAffected = HashSet<GeneratorRune>()
+			for (p in pointsAffected) {
+				generatorRuneByPatternPoint[p]?.let { rune ->
+					runesAffected.add(rune)
+				}
+			}
+
+			//break affected runes
+			runesAffected.forEach { breakRune(it) }
+		}
+
+		return cancel
+	}
+
+
+
+
+
+
 }
 
 
