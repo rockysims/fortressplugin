@@ -10,18 +10,10 @@ class TickTimer(plugin: JavaPlugin) : BukkitRunnable() {
 	}
 
 	override fun run() {
-		//TODO: finish writing
-
-		//Log.start("tick");
-
-		//TODO: maybe call commented out parts from within FortressPlugin.onTick() method? not sure
-//		FortressesManager.onTick()
-//		TimedBedrockManager.onTick()
-//		BedrockManager.onTick()
-//		Commands.onTick()
-
+		//Log.start("globalsTick");
+//		Commands.onTick() //TODO: uncomment out this line
 		FortressPlugin.onTick()
-		//Log.end("tick");
+		//Log.end("globalsTick");
 	}
 
 	companion object {

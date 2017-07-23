@@ -22,7 +22,7 @@ class FortressPluginForWorld(val world: World) {
 	private val generatorRuneByClaimedWallPoint = HashMap<Point, GeneratorRune>()
 	private val saveLoadManager = FortressPlugin.getSaveLoadManager()
 
-	fun enable() {
+	fun load() {
 		Log.log(world.name + " FortressPluginForWorld::enable() called") //TODO: delete this line
 
 		//load generatorRunes
@@ -39,10 +39,16 @@ class FortressPluginForWorld(val world: World) {
 			for (p in generatorRune.generatorCore.getClaimedWallPoints()) {
 				generatorRuneByClaimedWallPoint.put(p, generatorRune)
 			}
+
+			//TODO: all generatorRune data should be stored in generatorRune so rebuild data in ProtectionManager here
+//			//register protection granted by generatorRunes
+//			for (generatorRune in generatorRunes) {
+//				ProtectionManager.forWorld(world).protect(generatorRune.generatorCore.getProtectedBatches())
+//			}
 		}
 	}
 
-	fun disable() {
+	fun save() {
 		Log.log(world.name + " FortressPluginForWorld::disable() called") //TODO: delete this line
 
 		//save generatorRunes
@@ -218,16 +224,9 @@ class FortressPluginForWorld(val world: World) {
 			Material.STATIONARY_LAVA
 			-> {
 				val placedPoint = Point(placedBlock)
-
-
-
-				val isGenerated = isGenerated(placedPoint)
-				//New way (maybe): ProtectionManager.forWorld(world).isProtected(placedPoint)
-
-
-
+				val isProtected = ProtectionManager.forWorld(world).isProtected(placedPoint)
 				val inCreative = player.gameMode == GameMode.CREATIVE
-				if (isGenerated && !inCreative) {
+				if (isProtected && !inCreative) {
 					cancel = true
 				}
 			}

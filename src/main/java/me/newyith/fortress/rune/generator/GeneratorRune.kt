@@ -102,6 +102,8 @@ class GeneratorRune(
 	fun onTick() {
 		tickFuel()
 		core.tick()
+		//TODO: also need to tick bedrock managers once they've been made internal to rune
+		//	maybe better to do it in core.tick()?
 	}
 
 	fun onCreated(player: Player) {

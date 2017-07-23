@@ -17,9 +17,9 @@ object FortressPlugin {
 	val pluginByWorld = HashMap<String, FortressPluginForWorld>()
 	private var config: ConfigData? = null
 	private var plugin: JavaPlugin? = null
+	private var saveLoadManager: SaveLoadManager? = null
 	private var eventListener: EventListener? = null
 	private var tickTimer: TickTimer? = null
-	private var saveLoadManager: SaveLoadManager? = null
 
 	fun forWorld(world: World): FortressPluginForWorld {
 		return pluginByWorld.getOrPut(world.name, {
@@ -53,14 +53,10 @@ object FortressPlugin {
 		//load pluginByWorld
 		pluginByWorld.clear()
 		pluginByWorld.putAll(getSaveLoadManager().createPluginByWorld())
-		pluginByWorld.values.forEach { it.enable() }
+		pluginByWorld.values.forEach { it.load() }
 
 		eventListener = EventListener(javaPlugin)
-
 		tickTimer = TickTimer(javaPlugin)
-		//TODO: consider doing this instead:
-		//	TickTimer.onEnable(javaPlugin)
-		//	then later TickTimer.onDisable() //clean up (TickTimer.instance = null)
 
 //		ManualCraftManager.onEnable(this)
 //		PearlGlitchFix.onEnable(this)
@@ -79,7 +75,7 @@ object FortressPlugin {
 
 		//save pluginByWorld
 		//no need to actually save pluginByWorld because if {worldName} folder exists that means create pluginForWorld
-		pluginByWorld.values.forEach { it.disable() }
+		pluginByWorld.values.forEach { it.save() }
 		pluginByWorld.clear()
 
 		config = null
