@@ -1,6 +1,7 @@
 package me.newyith.fortress.main
 
 import me.newyith.fortress.extension.point.isProtected
+import me.newyith.fortress.protection.ProtectionManager
 import me.newyith.fortress.rune.generator.GeneratorRune
 import me.newyith.fortress.rune.generator.GeneratorRunePatterns
 import me.newyith.util.Log

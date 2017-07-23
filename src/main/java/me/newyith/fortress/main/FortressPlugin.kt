@@ -5,6 +5,7 @@ import me.newyith.fortress.config.ConfigManager
 import me.newyith.fortress.event.EventListener
 import me.newyith.fortress.event.TickTimer
 import me.newyith.fortress.persist.SaveLoadManager
+import me.newyith.fortress.protection.ProtectionManager
 import me.newyith.util.Log
 import org.bukkit.ChatColor
 import org.bukkit.World
@@ -58,6 +59,8 @@ object FortressPlugin {
 		eventListener = EventListener(javaPlugin)
 		tickTimer = TickTimer(javaPlugin)
 
+		ProtectionManager.enable()
+
 //		ManualCraftManager.onEnable(this)
 //		PearlGlitchFix.onEnable(this)
 
@@ -68,6 +71,8 @@ object FortressPlugin {
 	fun disable() {
 		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED)
 		Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD)
+
+		ProtectionManager.disable()
 
 		eventListener = null
 		tickTimer = null
