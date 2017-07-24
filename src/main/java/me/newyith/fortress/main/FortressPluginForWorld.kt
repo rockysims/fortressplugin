@@ -298,57 +298,10 @@ class FortressPluginForWorld(val world: World) {
 		explodeBlocks.forEach { onRuneMightHaveBeenBrokenBy(it) }
 	}
 
-
-
-
-
-
-
-//	fun onIgnite(b: Block): Boolean {
-//		var cancel = false
-//
-//		val p = Point(b)
-//		val igniteProof = isClaimed(p)
-//		if (igniteProof) {
-//			//TODO: uncomment out once issue where /reload causes delayed task to be forgotten is fixed
-//			//			BedrockManager.convert(w, p);
-//			//			Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
-//			//				BedrockManager.revert(w, p);
-//			//			}, 25 + 15);
-//
-//			//			Debug.msg("cancel ignite at " + p);
-//			//			Bukkit.getOnlinePlayers().forEach(player -> {
-//			//				player.sendMessage("cancel ignite at " + p);
-//			//			});
-//
-//			cancel = true
-//		}
-//
-//		return cancel
-//	}
-//
-//	fun onBurn(b: Block): Boolean {
-//		var cancel = false
-//
-//		val w = b.world
-//		val p = Point(b)
-//		val burnProof = FortressesManager.forWorld(w).isGenerated(p)
-//		if (burnProof) {
-//			//TODO: uncomment out once issue where /reload causes delayed task to be forgotten is fixed
-//			//			BedrockManager.convert(w, p);
-//			//			Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
-//			//				BedrockManager.revert(w, p);
-//			//			}, 25 + 15);
-//
-//			//			Debug.msg("cancel burn at " + p);
-//			//			Bukkit.getOnlinePlayers().forEach(player -> {
-//			//				player.sendMessage("cancel burn at " + p);
-//			//			});
-//			cancel = true
-//		}
-//
-//		return cancel
-//	}
+	fun onBurn(b: Block): Boolean {
+		onRuneMightHaveBeenBrokenBy(b)
+		return false //don't cancel
+	}
 
 
 

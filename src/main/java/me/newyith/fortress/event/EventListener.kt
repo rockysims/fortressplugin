@@ -111,15 +111,17 @@ class EventListener(plugin: JavaPlugin) : Listener {
 	@EventHandler(ignoreCancelled = true)
 	fun onBlockIgnite(event: BlockIgniteEvent) {
 		val block = event.block
-		val cancel = FortressPlugin.forWorld(block.world).onIgnite(block)
-		if (cancel) event.isCancelled = true
+		event.isCancelled = event.isCancelled
+			|| ProtectionManager.forWorld(block.world).onIgnite(block)
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	fun onBlockBurn(event: BlockBurnEvent) {
 		val block = event.block
-		val cancel = FortressPlugin.forWorld(block.world).onBurn(block)
-		if (cancel) event.isCancelled = true
+		val world = block.world
+		event.isCancelled = event.isCancelled
+			|| ProtectionManager.forWorld(world).onBurn(block)
+			|| FortressPlugin.forWorld(world).onBurn(block)
 	}
 
 	@EventHandler(ignoreCancelled = true)
