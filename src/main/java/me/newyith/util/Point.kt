@@ -55,6 +55,14 @@ class Point (
 		)
 	}
 
+	fun add(xAdd: Double, yAdd: Double, zAdd: Double): Point {
+		return Point(
+			x + xAdd,
+			y + yAdd,
+			z + zAdd
+		)
+	}
+
 	fun isType(mat: Material, world: World): Boolean {
 		return getBlock(world).type == mat
 	}

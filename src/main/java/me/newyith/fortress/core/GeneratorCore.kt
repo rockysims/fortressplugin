@@ -69,7 +69,11 @@ class GeneratorCore (
 	}
 
 	fun shield(shieldPoint: Point) {
-		//TODO: write
+		//TODO: write (skip if shieldPoint not in claimedWallPoints)
+	}
+
+	fun shield(shieldPoints: Set<Point>) {
+		//TODO: write (exclude points not in claimedWallPoints)
 	}
 
 }

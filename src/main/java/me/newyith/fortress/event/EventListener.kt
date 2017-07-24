@@ -80,28 +80,32 @@ class EventListener(plugin: JavaPlugin) : Listener {
 			event.direction.modZ
 		)
 
-		val cancel = ProtectionManager.forWorld(world).onPistonEvent(movedBlocks)
+		event.isCancelled = event.isCancelled
+			|| ProtectionManager.forWorld(world).onPistonEvent(movedBlocks)
 			|| FortressPlugin.forWorld(world).onPistonEvent(event.isSticky, piston, target, movedBlocks)
-		if (cancel) event.isCancelled = true
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	fun onBlockPistonRetractEvent(event: BlockPistonRetractEvent) {
 		val block = event.block
+		val world = block.world
 		val piston = Point(block)
 		val movedBlocks = HashSet(event.blocks)
 
-		val cancel = FortressPlugin.forWorld(block.world).onPistonEvent(event.isSticky, piston, null, movedBlocks)
-		if (cancel) event.isCancelled = true
+		event.isCancelled = event.isCancelled
+			|| ProtectionManager.forWorld(world).onPistonEvent(movedBlocks)
+			|| FortressPlugin.forWorld(world).onPistonEvent(event.isSticky, piston, null, movedBlocks)
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	fun onExplode(event: EntityExplodeEvent) {
 		val explodeBlocks = HashSet(event.blockList())
 		val loc = event.location
+		val world = loc.world
 
-		val cancel = FortressPlugin.forWorld(loc.world).onExplode(explodeBlocks, loc)
-		if (cancel) event.isCancelled = true
+		val explodeBlocksToExclude = ProtectionManager.forWorld(world).onExplode(explodeBlocks, loc)
+		explodeBlocks.removeAll(explodeBlocksToExclude)
+		FortressPlugin.forWorld(world).onExplode(explodeBlocks)
 	}
 
 	@EventHandler(ignoreCancelled = true)
