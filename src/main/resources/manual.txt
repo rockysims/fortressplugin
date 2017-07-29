@@ -38,8 +38,8 @@ gold block to activate.
 =======
 Redstone
 
-While powered by
-redstone, generator
+While redstone is
+powered, generator
 pauses fuel usage and
 makes structures
 breakable again.
