@@ -99,7 +99,7 @@ class FortressPluginForWorld(val world: World) {
 	fun onPlayerOpenCloseDoor(player: Player, doorBlock: Block): Boolean {
 		var cancel = false
 
-		val doorPoint = Point(doorBlock.location)
+		val doorPoint = Point(doorBlock)
 		if (doorPoint.isProtected(world)) {
 			val rune = generatorRuneByClaimedWallPoint[doorPoint]
 			when (rune) {
@@ -303,11 +303,15 @@ class FortressPluginForWorld(val world: World) {
 		return false //don't cancel
 	}
 
+	fun onEndermanPickupBlock(b: Block): Boolean {
+		onRuneMightHaveBeenBrokenBy(b)
+		return false //don't cancel
+	}
 
-
-
-
-
+	fun onZombieBreakBlock(b: Block): Boolean {
+		onRuneMightHaveBeenBrokenBy(b)
+		return false //don't cancel
+	}
 }
 
 

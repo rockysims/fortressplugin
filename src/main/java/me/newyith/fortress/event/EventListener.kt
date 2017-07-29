@@ -135,8 +135,8 @@ class EventListener(plugin: JavaPlugin) : Listener {
 			FortressPlugin.forWorld(world).onPlayerRightClickBlock(player, clickedBlock, event.blockFace)
 
 			if (clickedBlock.type.isDoor()) {
-				val cancel = FortressPlugin.forWorld(world).onPlayerOpenCloseDoor(player, clickedBlock)
-				if (cancel) event.isCancelled = true
+				event.isCancelled = event.isCancelled
+					|| FortressPlugin.forWorld(world).onPlayerOpenCloseDoor(player, clickedBlock)
 			}
 		}
 	}
@@ -148,16 +148,20 @@ class EventListener(plugin: JavaPlugin) : Listener {
 				if (event.to == Material.AIR) {
 					//picking up block
 					val block = event.block
-					val cancel = FortressPlugin.forWorld(block.world).onEndermanPickupBlock(block)
-					if (cancel) event.isCancelled = true
+					val world = block.world
+					event.isCancelled = event.isCancelled
+						|| ProtectionManager.forWorld(world).onEndermanPickupBlock(block)
+						|| FortressPlugin.forWorld(world).onEndermanPickupBlock(block)
 				}
 			}
 			is Zombie -> {
-				if (event.to == Material.AIR) {
+				if (event.to == Material.AIR) { //TODO: check if this condition is needed in the case of zombie?
 					//destroying block
 					val block = event.block
-					val cancel = FortressPlugin.forWorld(block.world).onZombieBreakBlock(block)
-					if (cancel) event.isCancelled = true
+					val world = block.world
+					event.isCancelled = event.isCancelled
+						|| ProtectionManager.forWorld(world).onZombieBreakBlock(block)
+						|| FortressPlugin.forWorld(world).onZombieBreakBlock(block)
 				}
 			}
 		}
@@ -168,7 +172,7 @@ class EventListener(plugin: JavaPlugin) : Listener {
 		val humanEntity = event.player
 		if (humanEntity is Player) {
 			val holder = event.inventory.holder
-			if (holder is Chest) { //Trap Chest is also instanceof Chest
+			if (holder is Chest) { //true for Trap Chest too
 				val block = holder.block
 				val world = block.world
 				FortressPlugin.forWorld(world).onPlayerCloseChest(humanEntity, block)

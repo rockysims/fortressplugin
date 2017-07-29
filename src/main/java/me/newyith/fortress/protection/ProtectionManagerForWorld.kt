@@ -110,8 +110,13 @@ class ProtectionManagerForWorld(val world: World) {
 		return cancel
 	}
 
+	fun onEndermanPickupBlock(block: Block): Boolean {
+		return block.isProtected() //cancel if protected
+	}
 
-
+	fun onZombieBreakBlock(block: Block): Boolean {
+		return block.isProtected() //cancel if protected
+	}
 
 
 }
