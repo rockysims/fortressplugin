@@ -14,6 +14,9 @@ import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 
 object FortressPlugin {
+	//TODO: maybe add disabled flag and throwing error if a manager gets requested after disable?
+	//	would safeguard against manager crust
+	//		maybe just display count of managers to cruft is visible? crashing might be better since it's disabled
 	val releaseBuild: Boolean = false //TODO: change this to true for release builds
 	val pluginByWorld = HashMap<String, FortressPluginForWorld>()
 	private var config: ConfigData? = null
@@ -56,6 +59,7 @@ object FortressPlugin {
 		pluginByWorld.putAll(getSaveLoadManager().createPluginByWorld())
 		pluginByWorld.values.forEach { it.load() }
 
+		//TODO: consider rewriting these 2 using much the same pattern as ProtectionManager (except use companion object)
 		eventListener = EventListener(javaPlugin)
 		tickTimer = TickTimer(javaPlugin)
 
