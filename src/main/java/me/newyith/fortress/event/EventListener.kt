@@ -204,8 +204,8 @@ class EventListener(plugin: JavaPlugin) : Listener {
 			EntityDamageEvent.DamageCause.ENTITY_EXPLOSION -> {
 				val damagee = event.entity
 				val damager = event.damager
-				val cancel = FortressPlugin.forWorld(damagee.world).onEntityDamageFromExplosion(damagee, damager)
-				if (cancel) event.isCancelled = true
+				event.isCancelled = event.isCancelled
+					|| ProtectionManager.forWorld(damagee.world).onEntityDamageFromExplosion(damagee, damager)
 			}
 			else -> {}
 		}

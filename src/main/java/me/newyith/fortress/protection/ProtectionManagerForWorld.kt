@@ -10,6 +10,7 @@ import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.Block
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.util.BlockIterator
 import java.util.HashMap
@@ -125,7 +126,7 @@ class ProtectionManagerForWorld(val world: World) {
 	fun onPlayerExitVehicle(player: Player): Boolean {
 		var cancel = false
 
-		//if (player in generated point) stuck teleport away immediately with message
+		//if (player in protected point) stuck teleport away immediately with message
 		val world = player.world
 		val eyesPoint = Point(player.eyeLocation)
 		val feetPoint = eyesPoint.add(0.0, -1.0, 0.0)
@@ -144,9 +145,33 @@ class ProtectionManagerForWorld(val world: World) {
 		return cancel
 	}
 
+	fun onEntityDamageFromExplosion(damagee: Entity, damager: Entity): Boolean {
+		var cancel = false
 
+		//SKIP?: once feet are safe from explosion, do same for eyes? no because this is for all entities which might not be 2 tall
+		//	consider doing point to bounding box check (see https://gist.github.com/aadnk/7123926)
 
+		//if (protected block between damagee and damager) cancel
+		val world = damagee.world
+		val source = Point(damager.location).add(0.0, 0.5, 0.0)
+		val target = Point(damagee.location).add(0.0, 0.5, 0.0)
+		val direction = target.toVector().subtract(source.toVector())
+		val distance = Math.max(1, source.distance(target).toInt())
+		val rayBlocks = BlockIterator(world, source.toVector(), direction, 0.0, distance)
+		while (rayBlocks.hasNext()) {
+			val rayBlock = rayBlocks.next()
+			if (rayBlock.isProtected()) {
+				cancel = true
+				Log.log("cancelled explosion damage due to protected rayPoint " + Point(rayBlock))
+//				Log.particleAtTimed(rayPoint, ParticleEffect.HEART)
+				break
+			} else {
+//				Log.particleAtTimed(rayPoint, ParticleEffect.FLAME)
+			}
+		}
 
+		return cancel
+	}
 
 
 

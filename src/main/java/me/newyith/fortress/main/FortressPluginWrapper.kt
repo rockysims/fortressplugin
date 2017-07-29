@@ -34,6 +34,8 @@ class FortressPluginWrapper : JavaPlugin() {
 
 
 
+//TODO: double check that explosion damage can break generator runes
+
 
 //TODO: prevent creating nether portal with one end inside fortress unless activating player is inside that fortress
 

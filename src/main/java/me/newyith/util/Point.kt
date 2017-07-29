@@ -39,6 +39,12 @@ class Point (
 		)
 	}
 
+	fun distance(p: Point): Double {
+		val v1 = this.toVector()
+		val v2 = p.toVector()
+		return v1.distance(v2)
+	}
+
 	fun add(p: Point): Point {
 		return Point(
 			x + p.x,
