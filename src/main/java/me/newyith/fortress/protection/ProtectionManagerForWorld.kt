@@ -1,13 +1,16 @@
 package me.newyith.fortress.protection
 
 import me.newyith.fortress.extension.block.isProtected
+import me.newyith.fortress.extension.point.isProtected
 import me.newyith.fortress.main.FortressPlugin
 import me.newyith.fortress.rune.generator.GeneratorRune
 import me.newyith.util.Log
 import me.newyith.util.Point
+import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.Block
+import org.bukkit.entity.Player
 import org.bukkit.util.BlockIterator
 import java.util.HashMap
 import java.util.HashSet
@@ -117,6 +120,44 @@ class ProtectionManagerForWorld(val world: World) {
 	fun onZombieBreakBlock(block: Block): Boolean {
 		return block.isProtected() //cancel if protected
 	}
+
+
+	fun onPlayerExitVehicle(player: Player): Boolean {
+		var cancel = false
+
+		//if (player in generated point) stuck teleport away immediately with message
+		val world = player.world
+		val eyesPoint = Point(player.eyeLocation)
+		val feetPoint = eyesPoint.add(0.0, -1.0, 0.0)
+		if (eyesPoint.isProtected(world) || feetPoint.isProtected(world)) {
+			val teleported = false //StuckPlayer.teleport(player) //TODO: write StuckPlayer.teleport() method
+			player.sendMessage(ChatColor.AQUA.toString() + "You got stuck in fortress wall.")
+			if (!teleported) {
+				player.sendMessage(ChatColor.AQUA.toString() + "Stuck teleport failed because no suitable destination was found.")
+				cancel = true //canceling would allow trap minecarts (except /spawn should get you out, right?)
+				//				not canceling would allow forced fortress entry (if enemy can scan freely above and below fortress)
+			}
+		}
+
+		cancel = false //TODO: delete this line
+
+		return cancel
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

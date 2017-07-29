@@ -190,7 +190,7 @@ class EventListener(plugin: JavaPlugin) : Listener {
 		val player = event.exited as Player
 		if (player !in playersExitingVehicle) {
 			playersExitingVehicle.add(player)
-			FortressPlugin.forWorld(player.world).onPlayerExitVehicle(player)
+			ProtectionManager.forWorld(player.world).onPlayerExitVehicle(player)
 			playersExitingVehicle.remove(player)
 		}
 	}
