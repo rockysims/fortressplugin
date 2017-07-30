@@ -20,7 +20,8 @@ import java.util.*
 class FortressPluginForWorld(val world: World) {
 	private val generatorRunes = HashSet<GeneratorRune>()
 	private val generatorRuneByPatternPoint = HashMap<Point, GeneratorRune>()
-	private val generatorRuneByClaimedWallPoint = HashMap<Point, GeneratorRune>()
+	private val generatorRuneByClaimedWallPoint = HashMap<Point, GeneratorRune>() //TODO: keep updated
+	private val claimedPoints = HashSet<Point>() //TODO: keep updated
 	private val saveLoadManager = FortressPlugin.getSaveLoadManager()
 
 	fun load() {
@@ -41,6 +42,9 @@ class FortressPluginForWorld(val world: World) {
 				generatorRuneByClaimedWallPoint.put(p, generatorRune)
 			}
 
+			//rebuild claimedPoints
+			claimedPoints.addAll(generatorRune.generatorCore.getClaimedPoints())
+
 			//TODO: all generatorRune data should be stored in generatorRune so rebuild data in ProtectionManager here
 //			//register protection granted by generatorRunes
 //			for (generatorRune in generatorRunes) {
@@ -60,6 +64,10 @@ class FortressPluginForWorld(val world: World) {
 
 	fun getGeneratorRuneByClaimedWallPoint(p: Point): GeneratorRune? {
 		return generatorRuneByClaimedWallPoint[p]
+	}
+
+	fun isClaimed(p: Point): Boolean {
+		return p in claimedPoints
 	}
 
 	fun onTick() {

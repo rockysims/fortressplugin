@@ -54,6 +54,12 @@ class GeneratorCore (
 		return HashSet()
 	}
 
+	fun getClaimedPoints(): Set<Point> {
+		//TODO: write
+		//	consider changing to a val get() =
+		return HashSet()
+	}
+
 	fun getInvalidWallMaterials(): Set<Material> {
 		//TODO: write
 		return HashSet()
