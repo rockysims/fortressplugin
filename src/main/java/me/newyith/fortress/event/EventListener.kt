@@ -199,7 +199,7 @@ class EventListener(plugin: JavaPlugin) : Listener {
 	fun onEntityDamageFromExplosion(event: EntityDamageEvent) {
 		if (event !is EntityDamageByEntityEvent) return
 
-		when (event.getCause()) {
+		when (event.cause) {
 			EntityDamageEvent.DamageCause.BLOCK_EXPLOSION,
 			EntityDamageEvent.DamageCause.ENTITY_EXPLOSION -> {
 				val damagee = event.entity
@@ -216,10 +216,14 @@ class EventListener(plugin: JavaPlugin) : Listener {
 		Log.log("onEnderPearlThrown() called")
 		if (event.cause == PlayerTeleportEvent.TeleportCause.ENDER_PEARL) {
 			val player = event.player
-			val source = Point(event.from)
-			val target = Point(event.to)
-			val cancel = FortressPlugin.forWorld(event.to.world).onEnderPearlThrown(player, source, target)
-			if (cancel) event.isCancelled = true
+			val fromLoc = event.from
+			val toLoc = event.to
+
+			val newTargetLoc = ProtectionManager.forWorld(event.to.world).onEnderPearlThrown(player, fromLoc, toLoc)
+			when (newTargetLoc) {
+				null -> event.isCancelled = true
+				else -> event.to = newTargetLoc
+			}
 		}
 	}
 }

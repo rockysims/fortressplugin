@@ -1,6 +1,9 @@
 package me.newyith.fortress.protection
 
 import me.newyith.fortress.extension.block.isProtected
+import me.newyith.fortress.extension.location.enforceMinEdgeDist
+import me.newyith.fortress.extension.point.isAiry
+import me.newyith.fortress.extension.point.isClaimed
 import me.newyith.fortress.extension.point.isProtected
 import me.newyith.fortress.main.FortressPlugin
 import me.newyith.fortress.rune.generator.GeneratorRune
@@ -8,10 +11,13 @@ import me.newyith.util.Log
 import me.newyith.util.Point
 import org.bukkit.ChatColor
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
+import org.bukkit.event.player.PlayerTeleportEvent
+import org.bukkit.inventory.ItemStack
 import org.bukkit.util.BlockIterator
 import java.util.HashMap
 import java.util.HashSet
@@ -173,16 +179,49 @@ class ProtectionManagerForWorld(val world: World) {
 		return cancel
 	}
 
+	fun onEnderPearlThrown(player: Player, sourceLoc: Location, targetLoc: Location): Location? {
+		var newTarget: Location? = targetLoc
 
+		//cancel pearl if source is protected (feet or eyes)
+		val source = when(player.isInsideVehicle) {
+			true -> Point(sourceLoc).add(0, 1, 0) //player technically has eyes in vehicle but practically speaking player has feet in vehicle
+			else -> Point(sourceLoc)
+		}
+		val world = targetLoc.world
+		val feet = source
+		val eyes = source.add(0, 1, 0)
+		if (feet.isProtected(world) || eyes.isProtected(world)) {
+			onCancelPearl(player, "Pearling while inside a fortress wall is not allowed.")
+			newTarget = null //cancel
+		}
+		if (newTarget == null) return null //cancel teleport
 
+		//cancel pearl if target or above is protected
+		val target = Point(targetLoc)
+		val above = target.add(0, 1, 0)
+		if (target.isProtected(world) || above.isProtected(world)) {
+			onCancelPearl(player, "Pearling into a fortress wall is not allowed.")
+			newTarget = null //cancel
+		}
+		if (newTarget == null) return null //cancel teleport
 
+		//enforce min edge distance if target or above is claimed (cancel if can't enforce)
+		if (target.isClaimed(world) || above.isClaimed(world)) {
+			if (target.isAiry(world)) {
+				//enforce 0.31 minimum distance from edge of block
+				newTarget.enforceMinEdgeDist(0.31)
+				newTarget.y = newTarget.blockY.toDouble() //y = y - y % 1
+			} else {
+				//cancel because can't safely floor y (player could be standing on slab)
+				onCancelPearl(player, "Pearl glitch by fortress wall is not allowed.")
+				newTarget = null //cancel
+			}
+		}
 
-
-
-
-
-
-
-
-
+		return newTarget
+	}
+	private fun onCancelPearl(player: Player, msg: String) {
+		player.sendMessage(ChatColor.AQUA.toString() + msg)
+		player.inventory.addItem(ItemStack(Material.ENDER_PEARL))
+	}
 }
