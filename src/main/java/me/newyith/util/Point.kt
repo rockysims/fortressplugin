@@ -19,9 +19,12 @@ class Point (
 
 	// --- //
 
-	private fun xInt(): Int = x.toInt()
-	private fun yInt(): Int = y.toInt()
-	private fun zInt(): Int = z.toInt()
+	val xInt
+		get() = x.toInt()
+	val yInt
+		get() = y.toInt()
+	val zInt
+		get() = z.toInt()
 
 	fun toVector(): Vector {
 		return Vector(x, y, z)
@@ -74,7 +77,7 @@ class Point (
 	}
 
 	fun getBlock(world: World): Block {
-		return world.getBlockAt(xInt(), yInt(), zInt())
+		return world.getBlockAt(xInt, yInt, zInt)
 	}
 
 	fun getType(world: World): Material {
@@ -85,11 +88,11 @@ class Point (
 
 	override fun toString(): String {
 		val s = StringBuilder()
-		s.append(xInt())
+		s.append(xInt)
 		s.append(", ")
-		s.append(yInt())
+		s.append(yInt)
 		s.append(", ")
-		s.append(zInt())
+		s.append(zInt)
 		return s.toString()
 	}
 

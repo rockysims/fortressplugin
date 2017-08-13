@@ -2,9 +2,7 @@ package me.newyith.fortress.protection
 
 import me.newyith.fortress.extension.block.isProtected
 import me.newyith.fortress.extension.location.enforceMinEdgeDist
-import me.newyith.fortress.extension.point.isAiry
-import me.newyith.fortress.extension.point.isClaimed
-import me.newyith.fortress.extension.point.isProtected
+import me.newyith.fortress.extension.point.*
 import me.newyith.fortress.main.FortressPlugin
 import me.newyith.fortress.rune.generator.GeneratorRune
 import me.newyith.util.Log
@@ -16,7 +14,6 @@ import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.BlockIterator
 import java.util.HashMap
