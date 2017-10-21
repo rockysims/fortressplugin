@@ -19,7 +19,7 @@ class FortressPluginWrapper : JavaPlugin() {
 }
 
 
-//parts full rewritten internally (I think):
+//parts fully rewritten internally (I think):
 //	GeneratorRune
 //	EventListener
 
