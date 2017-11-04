@@ -1,20 +1,21 @@
-package me.newyith.fortress.main
+package me.newyith.fortress.main_
 
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 
-/**
- * Wrapper around plugin with no fields
- * so that /reload doesn't cause memory leak.
- */
 class FortressPluginWrapper : JavaPlugin() {
 	override fun onEnable() {
-		FortressPlugin.onEnable(this)
+//		val fp = SaveLoad.load("path/to/jsonFile") as FortressPlugin
+//		fp.enable(this)
+
+
+
+		FortressPlugin.enable(this)
 	}
 
 	override fun onDisable() {
-		FortressPlugin.onDisable()
+		FortressPlugin.disable()
 	}
 
 	override fun onCommand(sender: CommandSender, cmd: Command, label: String, args: Array<String>): Boolean {

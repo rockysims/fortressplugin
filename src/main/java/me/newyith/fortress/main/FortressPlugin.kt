@@ -2,10 +2,7 @@ package me.newyith.fortress.main
 
 import me.newyith.fortress.config.ConfigData
 import me.newyith.fortress.config.ConfigManager
-import me.newyith.fortress.event.EventListener
-import me.newyith.fortress.event.TickTimer
-import me.newyith.fortress.persist.SaveLoadManager
-import me.newyith.fortress.protection.ProtectionManager
+import me.newyith.fortress.persist.SaveLoad
 import me.newyith.util.Log
 import org.bukkit.ChatColor
 import org.bukkit.World
@@ -13,23 +10,52 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 
+//TODO: finish FortressPluginForWorlds pattern even though we're trying to save things at the rune level not global level
+//	avoids refactoring later if I seem to need something at the global / world level
+//	CONSIDER: ideally by not storing things at global level (reconstruct instead) we allow world data folders to be added/removed without breaking things
+//	FortressPluginForWorlds can load all FortressPluginForWorld based on world folders rather than saving list of worldNames
+//TODO: consider having a protectionManager, etc. instance for each generatorRune
+//			world.isProtected(point) can look up runes by chunk and call isProtected() for each rune <---------------
+//	avoids multiple json files per generatorRune
+//	avoids more special cases for SaveLoad to know how to save/load
+//		which avoids complexity
+
+/**
+ * Responsible for saving/loading FortressPluginForWorlds.
+ * Also provides centralized access to some globals such as isRelease.
+ * Must set all its fields to null onDisable() to avoid memory leak when using /reload command.
+ */
 object FortressPlugin {
-	//TODO: maybe add disabled flag and throwing error if a manager gets requested after disable?
-	//	would safeguard against manager crust
-	//		maybe just display count of managers to cruft is visible? crashing might be better since it's disabled
-	val releaseBuild: Boolean = false //TODO: change this to true for release builds
-	val pluginByWorld = HashMap<String, FortressPluginForWorld>()
+	val releaseBuild get() = false //TODO: change this to true for release builds
+	var pluginForWorldsReal: FortressPluginForWorlds? = null
+	private var saveLoadReal: SaveLoad? = null
 	private var config: ConfigData? = null
 	private var plugin: JavaPlugin? = null
-	private var saveLoadManager: SaveLoadManager? = null
-	private var eventListener: EventListener? = null
-	private var tickTimer: TickTimer? = null
 
-	fun forWorld(world: World): FortressPluginForWorld {
-		return pluginByWorld.getOrPut(world.name, {
-			FortressPluginForWorld(world)
-		})
+	// save & load //
+
+	private val pluginForWorlds get() = getOrLoadOrCreatePluginForWorlds()
+	private val saveLoad get() = getOrCreateSaveLoad()
+
+	fun getOrLoadOrCreatePluginForWorlds(): FortressPluginForWorlds {
+		val pluginForWorlds = pluginForWorldsReal
+			?: saveLoad.load("fortressPluginForWorlds")
+			?: FortressPluginForWorlds()
+		pluginForWorldsReal = pluginForWorlds
+		return pluginForWorlds
 	}
+
+	fun savePluginForWorlds() {
+		saveLoad.save(pluginForWorlds, "fortressPluginForWorlds")
+	}
+
+	fun getOrCreateSaveLoad(): SaveLoad {
+		val saveLoad = saveLoadReal ?: SaveLoad()
+		saveLoadReal = saveLoad
+		return saveLoad
+	}
+
+	// getters //
 
 	fun getConfig(): ConfigData {
 		return config ?: ConfigManager.getDefaults()
@@ -39,67 +65,49 @@ object FortressPlugin {
 		return plugin
 	}
 
-	fun getSaveLoadManager(): SaveLoadManager {
-		val manager = saveLoadManager ?: SaveLoadManager()
-		saveLoadManager = manager
-		return manager
+	fun forWorld(world: World): FortressPluginForWorld {
+		return pluginForWorlds.forWorld(world)
 	}
 
-	// --- //
+	// handlers //
 
-	fun enable(javaPlugin: JavaPlugin) {
+	fun onEnable(javaPlugin: JavaPlugin) {
 		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED)
 		Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD)
 
-		config = ConfigManager.loadOrSave(javaPlugin)
-		plugin = javaPlugin
+		FortressPlugin.config = ConfigManager.loadOrSave(javaPlugin)
+		FortressPlugin.plugin = javaPlugin
 
-		//load pluginByWorld
-		pluginByWorld.clear()
-		pluginByWorld.putAll(getSaveLoadManager().createPluginByWorld())
-		pluginByWorld.values.forEach { it.load() }
-
-		//TODO: consider rewriting these 2 using much the same pattern as ProtectionManager (except use companion object)
-		eventListener = EventListener(javaPlugin)
-		tickTimer = TickTimer(javaPlugin)
-
-		ProtectionManager.enable()
-
-//		ManualCraftManager.onEnable(this)
-//		PearlGlitchFix.onEnable(this)
+		//load or create pluginForWorlds
+		getOrLoadOrCreatePluginForWorlds() //this line is not strictly necessary
+		pluginForWorlds.onEnable(javaPlugin)
 
 		Log.sendConsole("         >> ON <<           ", ChatColor.GREEN)
 		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED)
 	}
 
-	fun disable() {
+	fun onDisable() {
 		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED)
 		Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD)
 
-		ProtectionManager.disable()
+		//save pluginForWorlds
+		pluginForWorlds.onDisable()
+		savePluginForWorlds()
 
-		eventListener = null
-		tickTimer = null
-		saveLoadManager = null
-
-		//save pluginByWorld
-		//no need to actually save pluginByWorld because if {worldName} folder exists that means create pluginForWorld
-		pluginByWorld.values.forEach { it.save() }
-		pluginByWorld.clear()
-
-		config = null
-		plugin = null
+		FortressPlugin.pluginForWorldsReal = null
+		FortressPlugin.saveLoadReal = null
+		FortressPlugin.config = null
+		FortressPlugin.plugin = null
 
 		Log.sendConsole("         >> OFF <<          ", ChatColor.RED)
 		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED)
 	}
 
 	fun onCommand(sender: CommandSender, cmd: Command, label: String, args: Array<String>): Boolean {
-		Log.warn("//TODO: handle command: " + cmd.name)
-		return false
+		return pluginForWorlds.onCommand(sender, cmd, label, args)
 	}
 
 	fun onTick() {
-		pluginByWorld.values.forEach { it.onTick() }
+		pluginForWorlds.onTick()
 	}
 }

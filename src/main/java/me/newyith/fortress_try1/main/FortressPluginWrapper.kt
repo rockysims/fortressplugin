@@ -1,274 +1,84 @@
-package me.newyith.fortressOrig.main;
+package me.newyith.fortress_try1.main
 
-import me.newyith.fortressOrig.command.Commands;
-import me.newyith.fortressOrig.event.EventListener;
-import me.newyith.fortressOrig.event.TickTimer;
-import me.newyith.fortressOrig.fix.PearlGlitchFix;
-import me.newyith.fortressOrig.manual.ManualCraftManager;
-import me.newyith.fortressOrig.sandbox.jackson.SandboxSaveLoadManager;
-import me.newyith.fortressOrig.util.Debug;
-import me.newyith.fortressOrig.util.Log;
-import me.newyith.fortressOrig.util.Point;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.command.Command
+import org.bukkit.command.CommandSender
+import org.bukkit.plugin.java.JavaPlugin
 
-import java.util.Random;
-
-public class FortressPlugin extends JavaPlugin {
-	public static final boolean releaseBuild = false; //TODO: change this to true for release builds
-	private static final double saveDelayMs = 5*60*1000;
-	private static int saveWaitTicks = 0;
-
-	private static FortressPlugin instance;
-	private static SaveLoadManager saveLoadManager;
-	private static SandboxSaveLoadManager sandboxSaveLoadManager;
-
-	public static int config_glowstoneDustBurnTimeMs = 1000 * 60 * 60;
-	public static int config_stuckDelayMs = 30 * 1000;
-	public static int config_stuckCancelDistance = 4;
-	public static int config_generationRangeLimit = 128;
-	public static int config_generationBlockLimit = 40000; //roughly 125 empty 8x8x8 rooms (6x6x6 air inside)
-
-	private void loadConfig() {
-		FileConfiguration config = getConfig();
-		if (releaseBuild) {
-			config_glowstoneDustBurnTimeMs = getConfigInt(config, "glowstoneDustBurnTimeMs", config_glowstoneDustBurnTimeMs);
-			config_stuckDelayMs = getConfigInt(config, "stuckDelayMs", config_stuckDelayMs);
-			config_stuckCancelDistance = getConfigInt(config, "stuckCancelDistance", config_stuckCancelDistance);
-			config_generationRangeLimit = getConfigInt(config, "generationRangeLimit", config_generationRangeLimit);
-			config_generationBlockLimit = getConfigInt(config, "generationBlockLimit", config_generationBlockLimit);
-		}
-		saveConfig();
-	}
-	private int getConfigInt(FileConfiguration config, String key, int defaultValue) {
-		if (!config.isInt(key)) {
-			config.set(key, defaultValue);
-		}
-		return config.getInt(key);
+class FortressPluginWrapper : JavaPlugin() {
+	override fun onEnable() {
+		FortressPlugin.enable(this)
 	}
 
-	@Override
-	public void onEnable() {
-		instance = this;
-
-		loadConfig();
-
-		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
-		Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
-		Log.sendConsole("         >> ON <<           ", ChatColor.GREEN);
-		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
-
-		saveLoadManager = new SaveLoadManager(this);
-		saveLoadManager.load();
-
-		if (!releaseBuild) {
-			sandboxSaveLoadManager = new SandboxSaveLoadManager(this);
-//			sandboxSaveLoadManager.load();
-		}
-
-		EventListener.onEnable(this);
-		TickTimer.onEnable(this);
-		ManualCraftManager.onEnable(this);
-		PearlGlitchFix.onEnable(this);
+	override fun onDisable() {
+		FortressPlugin.disable()
 	}
 
-	@Override
-	public void onDisable() {
-		saveLoadManager.save();
-		if (!releaseBuild) {
-//			sandboxSaveLoadManager.save();
-		}
-
-		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
-		Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
-		Log.sendConsole("         >> OFF <<          ", ChatColor.RED);
-		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
-	}
-
-	public static void onTick() {
-		if (saveWaitTicks == 0) {
-//			saveLoadManager.save(); //TODO: uncomment out this line later (or decide not to save periodically)
-			saveWaitTicks = (int) (saveDelayMs / TickTimer.msPerTick);
-		} else {
-			saveWaitTicks--;
-		}
-	}
-
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		String commandName = cmd.getName();
-		boolean commandHandled = false;
-
-		// /stuck
-		if (commandName.equalsIgnoreCase("stuck") && sender instanceof Player) {
-			Player player = (Player)sender;
-			Commands.onStuckCommand(player);
-			commandHandled = true;
-		}
-
-		// /fort [subCommand]
-		if (commandName.equalsIgnoreCase("fort") && args.length > 0 && sender instanceof Player) {
-			String subCommand = args[0];
-
-			// /fort stuck
-			if (subCommand.equalsIgnoreCase("stuck")) {
-				Player player = (Player)sender;
-				Commands.onStuckCommand(player);
-				commandHandled = true;
-			}
-		}
-
-		if (!releaseBuild) {
-			// /test
-			if (cmd.getName().equalsIgnoreCase("test")) {
-				if (sender instanceof Player) {
-					Debug.msg("executing test command...");
-
-					/*
-					Player player = (Player) sender;
-					Point p = new Point(player.getLocation());
-					Material mat = p.getBlock(player.getWorld()).getType();
-					Debug.msg(p + " is " + mat);
-					/*/
-					int distance = 40;
-					Player player = (Player)sender;
-					World world = player.getWorld();
-					Point center = new Point(player.getLocation());
-
-					for (int xOffset = -1 * distance; xOffset <= distance; xOffset++) {
-						for (int yOffset = -1 * distance; yOffset <= distance; yOffset++) {
-							for (int zOffset = -1 * distance; zOffset <= distance; zOffset++) {
-								Point p = center.add(xOffset, yOffset, zOffset);
-								if (p.y() > 5) {
-									if (p.is(Material.BEDROCK, world)) {
-										p.getBlock(world).setType(Material.COBBLESTONE);
-									}
-								}
-							}
-						}
-					}
-					//*/
-				}
-				commandHandled = true;
-			}
-
-			// /test2
-			if (cmd.getName().equalsIgnoreCase("test2")) {
-				if (sender instanceof Player) {
-					Debug.msg("executing test2 command...");
-
-					Player player = (Player)sender;
-					World world = player.getWorld();
-					Point anchor = new Point(player.getLocation()).add(0, -1, 0);
-
-					int num = 2;
-					int size = 8;
-					for (int x = -1*num; x <= num; x++) {
-						for (int y = -1*num; y <= num; y++) {
-							for (int z = -1*num; z <= num; z++) {
-								Point p = anchor.add(x*size, y*size, z*size);
-								boxAt(p, world, size);
-							}
-						}
-					}
-
-				}
-				commandHandled = true;
-			}
-
-			// /test3
-			if (cmd.getName().equalsIgnoreCase("test3")) {
-				if (sender instanceof Player) {
-					Debug.msg("executing test3 command...");
-
-					int distance = 40;
-					Player player = (Player)sender;
-					World world = player.getWorld();
-					Point center = new Point(player.getLocation());
-
-					for (int xOffset = -1 * distance; xOffset <= distance; xOffset++) {
-						for (int yOffset = -1 * distance; yOffset <= distance; yOffset++) {
-							for (int zOffset = -1 * distance; zOffset <= distance; zOffset++) {
-								Point p = center.add(xOffset, yOffset, zOffset);
-								if (p.y() > 5) {
-									if (p.is(Material.COBBLESTONE, world)) {
-										p.getBlock(world).setType(Material.AIR);
-									}
-									if (p.is(Material.GLASS, world)) {
-										p.getBlock(world).setType(Material.AIR);
-									}
-								}
-							}
-						}
-					}
-				}
-				commandHandled = true;
-			}
-
-			// /test4
-			if (cmd.getName().equalsIgnoreCase("test4")) {
-				if (sender instanceof Player) {
-					Debug.msg("executing test4 command...");
-
-					Player player = (Player)sender;
-					Location loc = player.getLocation();
-					loc.getWorld().createExplosion(loc, 3.0f);
-				}
-				commandHandled = true;
-			}
-		}
-
-		return commandHandled;
-	}
-
-	private void boxAt(Point anchor, World world, int num) {
-		Random random = new Random();
-		for (int x = 0; x < num; x++) {
-			for (int y = 0; y < num; y++) {
-				for (int z = 0; z < num; z++) {
-
-					boolean xMatch = x == 0 || x == num-1;
-					boolean yMatch = y == 0 || y == num-1;
-					boolean zMatch = z == 0 || z == num-1;
-					if (xMatch || yMatch || zMatch) {
-						Point p = anchor.add(x, y, z);
-						Material m = Material.COBBLESTONE;
-						if (random.nextBoolean()) {
-							m = Material.MOSSY_COBBLESTONE;
-						}
-						p.getBlock(world).setType(m);
-					}
-
-				}
-			}
-		}
-	}
-
-	public static FortressPlugin getInstance() {
-		return instance;
+	override fun onCommand(sender: CommandSender, cmd: Command, label: String, args: Array<String>): Boolean {
+		return FortressPlugin.onCommand(sender, cmd, label, args)
 	}
 }
 
+//TODO: look into using gzip and bson instead of just json to save things (should be faster and smaller)
+//	Yona sent link for jackson + bson
 
 
+//parts fully rewritten internally (I think):
+//	GeneratorRune
+//	EventListener
+
+////////////////////////////////////////////
+
+
+//TODO: NEXT: finish wiring up outgoing calls from EventListener
+//	and then continue getting generator rune work again (excluding generatorCore)
+
+//TODO: refactor manager pattern? starting with TickTimer (see comment in FortressPlugin::enable() method)
+
+
+
+
+//TODO: double check that explosion damage can break generator runes
+
+
+//TODO: prevent creating nether portal with one end inside fortress unless activating player is inside that fortress
+
+//TODO: must add easing function to de/generate animation! wait is too annoying for large fortresses
+
+//TODO: make GeneratorRune rebuild as much state as possible instead of saving (so that it makes sense to not save rune's json file on state change)
+//	validate pattern, update state (paused, running, needs fuel)
+//		if needs fuel, set state else set state based on redstone power
+//	still need to save fuelTicksRemaining I think
+
+//TODO: consider saving all BlockRevertData for 30 days
+//	that way if owner reverts the world (due to griefers for example) there won't be abandoned bedrock
+//	onEnable, make sure all bedrock ever created during last 30 days has authorization or isn't bedrock else revert it
+//	PROBLEM: what if someone can place bedrock? maybe admin shop sells it
+
+//TODO: finish writing GeneratorRune (without GeneratorCore for now)
+//	get rune destruction working
+//	make rune save when turned on
+
+//onPluginEnabled,
+//	for each generatorRune check that a valid rune pattern exists in world (else destroy rune)
+//	for each bedrockSafetyAnchorPoint
+//		check that there is a generatorRune at that point (else revert safety points)
+//		if safety timestamp > 3 days ago, delete safety json file
+//onStartGenerator, save rune data to {worldName}/generatorRunes/{anchorPoint}.json
+//onDestroyGenerator && onGeneratorHasInvalidRune, delete rune save file
+//onDeleteRuneSaveFile, save block revert data to {worldName}/bedrockSafety/{anchorPoint}.json (array of {blockRevertDataByPoint, timestamp})
 
 
 
 //MVP goals:
 //fix /reload memory leak (remove all managers onDisable)
-//fast saving (take snapshot (copy) of plugin state and then save that on another thread?)
+//fast saving (take snapshot (copy) of plugin state then save on another thread? no, give each generator a save file)
 //more configuration (particularly max blocks per fortress)
 //switch meaning of redstone power (power on should mean fortress running)
-//use cobblestone to indicate ripple over bedrock
+//use particles to indicate ripple over bedrock (instead of cobblestone)
 
 
-
+//TODO: consider loading/unloading generatorRunes when some/none of the chunks rune is in are loaded
+//	or at least architect save/load system to allow adding this later
 
 
 //TODO: consider saving/loading on a different thread so it doesn't slow minecraft down
@@ -406,7 +216,7 @@ public class FortressPlugin extends JavaPlugin {
 //			could be a fun game mode though if fuel burned really fast
 //				still doesn't need ripple on unprotected to work
 
-//TODO: consider refactoring so that each world has essentially a separate instance of the plugin (and thus separate save files)
+//TODO: consider refactoring so that each world has essentially a separate launcher of the plugin (and thus separate save files)
 //	should drastically decrease the number of places the world name must be saved
 //	should make saving bedrockSafety.json faster
 
@@ -948,60 +758,60 @@ TODO: remove home and key runes
 //TODO: consider making creating rune require empty hand (again)
 //TODO: make glowstone blocks work as fuel for 4x the fuel value of glowstone dust (silk touch works on glowstone block and fortune III does not)
 
-/* New Feature:
-make pistons transmit generation when extended
-    this will serve as a switch to allow nearby buildings to connect/disconnect from fortress generation
-    pistons should have particle to indicate when the piston has been found by a fortress generator (onGeneratorStart searches)
-    pistons should not be protected (breakable)
+///* New Feature:
+//make pistons transmit generation when extended
+//    this will serve as a switch to allow nearby buildings to connect/disconnect from fortress generation
+//    pistons should have particle to indicate when the piston has been found by a fortress generator (onGeneratorStart searches)
+//    pistons should not be protected (breakable)
+////*/
+
+///*
+//pistonCores should respect even its parent generator's claims
+//pistonCores should respect other pistonCores' claims
+//	other generatorCores' claimed points including their pistonCores' claims and also any other pistonCores belonging to parent generator
+//pistonCore's wallMaterials should be based on parent generator's wallMaterials
+//
+//on piston added to claimedWallPoints:
+//	create new PistonCore
+//on piston removed from claimedWallPoints:
+//	break pistonCore
+//on generator broken:
+//	break all its pistonCores
+//
+//pistonCore:
+//	onExtend:
+//		if (parent generator is running)
+//			if (piston protected || piston extended to touch protected) tell pistonCore to generate
+//	onRetract:
+//		tell pistonCore to degenerate
+//
+//generatorCore:
+//	onProtectPiston, onProtectPistonExtensionTouchPoint:
+//		set pistonCore.layerIndex
+//		if (extended) tell pistonCore to generate
+//	onGenerate:
+//		for each pistonCore
+//			if (pistonCore is protected)
+//				tell pistonCore to generate
+//	onDegenerate:
+//		include child pistonCores' generated
+//			use pistonCore.layerIndex to merge piston's generated with generator's generated
+//
+//maybe instead of requiring piston be protected before it can work as a mini generator just require that a pistonCore has been created
+//	also create pistonCore if block piston is extended to touch is generated
 //*/
-
-/*
-pistonCores should respect even its parent generator's claims
-pistonCores should respect other pistonCores' claims
-	other generatorCores' claimed points including their pistonCores' claims and also any other pistonCores belonging to parent generator
-pistonCore's wallMaterials should be based on parent generator's wallMaterials
-
-on piston added to claimedWallPoints:
-	create new PistonCore
-on piston removed from claimedWallPoints:
-	break pistonCore
-on generator broken:
-	break all its pistonCores
-
-pistonCore:
-	onExtend:
-		if (parent generator is running)
-			if (piston protected || piston extended to touch protected) tell pistonCore to generate
-	onRetract:
-		tell pistonCore to degenerate
-
-generatorCore:
-	onProtectPiston, onProtectPistonExtensionTouchPoint:
-		set pistonCore.layerIndex
-		if (extended) tell pistonCore to generate
-	onGenerate:
-		for each pistonCore
-			if (pistonCore is protected)
-				tell pistonCore to generate
-	onDegenerate:
-		include child pistonCores' generated
-			use pistonCore.layerIndex to merge piston's generated with generator's generated
-
-maybe instead of requiring piston be protected before it can work as a mini generator just require that a pistonCore has been created
-	also create pistonCore if block piston is extended to touch is generated
-*/
 
 
 
 
 
 //for beginning for post on bukkit.org once I'm ready to release:
-/*
-Fortress is a whole new approach to self-service protection. Instead of claiming chunks, players scan a fortress out
-of ordinary blocks then protect the structure itself by building a rune (pattern of blocks). The blocks that make up
-the structure are detected automatically and protected. Runes are fueled by glowstone.
-For details, obsidian + book = manual.
-//*/
+///*
+//Fortress is a whole new approach to self-service protection. Instead of claiming chunks, players scan a fortress out
+//of ordinary blocks then protect the structure itself by building a rune (pattern of blocks). The blocks that make up
+//the structure are detected automatically and protected. Runes are fueled by glowstone.
+//For details, obsidian + book = manual.
+////*/
 
 
 
@@ -1017,51 +827,6 @@ For details, obsidian + book = manual.
 //	always prioritize shops that can fulfil buy/sell order over shops that can't
 //maybe add delivery fee based on distance (no one receives the fee)
 //	don't allow cross world delivery
-
-
-
-
-
-
-
-
-//		int taskId = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> {
-//			for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-//				Point point = new Point(player.getLocation().add(0, 2, 0));
-//				float speed = 1;
-//				int amount = 1;
-//				double range = 10;
-//				ParticleEffect.PORTAL.display(0, 0, 0, speed, amount, point, range);
-//				Bukkit.broadcastMessage("display portal at " + point);
-//			}
-//		}, 0, 20); //20 ticks per second
-//		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, () -> {
-//			//
-//			Bukkit.getServer().getScheduler().cancelTask(taskId);
-//			Bukkit.broadcastMessage("canceling taskId: " + taskId);
-//		}, 20*120);
-
-
-
-
-
-
-//class Variance {
-//	static class Vehicle {}
-//	static class WaterVehicle extends Vehicle {}
-//	static class Boat extends WaterVehicle {}
-//	static class Submarine extends WaterVehicle {}
-//	static class LandVehicle extends Vehicle {}
-//	static class Car extends LandVehicle {}
-//	static class Bike extends LandVehicle {}
-//
-//	void foo() {
-//		this.<LandVehicle>bar(new Car());
-//	}
-//
-//	<T> void bar(T t) {}
-//}
-
 
 
 

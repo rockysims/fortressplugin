@@ -7,7 +7,7 @@ import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.util.Vector
 
-class Point (
+open class Point (
 	@JsonProperty("x") val x: Double,
 	@JsonProperty("y") val y: Double,
 	@JsonProperty("z") val z: Double
