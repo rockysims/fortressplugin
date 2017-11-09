@@ -1,7 +1,7 @@
 package me.newyith.fortress.event
 
 
-import me.newyith.fortress_try1.main.FortressPlugin
+import me.newyith.fortress.main.FortressPlugin
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.*

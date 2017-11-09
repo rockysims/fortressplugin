@@ -10,16 +10,6 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 
-//TODO: finish FortressPluginForWorlds pattern even though we're trying to save things at the rune level not global level
-//	avoids refactoring later if I seem to need something at the global / world level
-//	CONSIDER: ideally by not storing things at global level (reconstruct instead) we allow world data folders to be added/removed without breaking things
-//	FortressPluginForWorlds can load all FortressPluginForWorld based on world folders rather than saving list of worldNames
-//TODO: consider having a protectionManager, etc. instance for each generatorRune
-//			world.isProtected(point) can look up runes by chunk and call isProtected() for each rune <---------------
-//	avoids multiple json files per generatorRune
-//	avoids more special cases for SaveLoad to know how to save/load
-//		which avoids complexity
-
 /**
  * Responsible for saving/loading FortressPluginForWorlds.
  * Also provides centralized access to some globals such as isRelease.
@@ -35,18 +25,15 @@ object FortressPlugin {
 	// save & load //
 
 	private val pluginForWorlds get() = getOrLoadOrCreatePluginForWorlds()
-	private val saveLoad get() = getOrCreateSaveLoad()
+	val saveLoad get() = getOrCreateSaveLoad()
 
 	fun getOrLoadOrCreatePluginForWorlds(): FortressPluginForWorlds {
+		val path by lazy { SaveLoad.getSavePathOfFortressPluginForWorlds() }
 		val pluginForWorlds = pluginForWorldsReal
-			?: saveLoad.load("fortressPluginForWorlds")
+			?: saveLoad.load(path)
 			?: FortressPluginForWorlds()
 		pluginForWorldsReal = pluginForWorlds
 		return pluginForWorlds
-	}
-
-	fun savePluginForWorlds() {
-		saveLoad.save(pluginForWorlds, "fortressPluginForWorlds")
 	}
 
 	fun getOrCreateSaveLoad(): SaveLoad {
@@ -91,8 +78,9 @@ object FortressPlugin {
 		Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD)
 
 		//save pluginForWorlds
+		val path = SaveLoad.getSavePathOfFortressPluginForWorlds()
+		saveLoad.save(pluginForWorlds, path)
 		pluginForWorlds.onDisable()
-		savePluginForWorlds()
 
 		FortressPlugin.pluginForWorldsReal = null
 		FortressPlugin.saveLoadReal = null

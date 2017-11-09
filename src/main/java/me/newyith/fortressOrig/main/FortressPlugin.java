@@ -265,7 +265,7 @@ public class FortressPlugin extends JavaPlugin {
 //fast saving (take snapshot (copy) of plugin state and then save that on another thread?)
 //more configuration (particularly max blocks per fortress)
 //switch meaning of redstone power (power on should mean fortress running)
-//use cobblestone to indicate ripple over bedrock
+//use nether particles to indicate ripple over bedrock
 
 
 

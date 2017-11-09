@@ -1,6 +1,7 @@
 package me.newyith.util
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.bukkit.Chunk
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
@@ -25,6 +26,10 @@ open class Point (
 		get() = y.toInt()
 	val zInt
 		get() = z.toInt()
+
+	fun getChunk(world: World): Chunk {
+		return toLocation(world).chunk
+	}
 
 	fun toVector(): Vector {
 		return Vector(x, y, z)

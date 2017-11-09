@@ -5,6 +5,8 @@ import me.newyith.fortress.rune.generator.GeneratorRune
 import me.newyith.fortress.rune.generator.GeneratorRuneId
 import me.newyith.util.Log
 
+//TODO: probably just delete this class? save in FortressPluginForWorld?
+
 /**
  * Serves up GeneratorRune by GeneratorRuneId.
  * Loads from file if not already loaded.

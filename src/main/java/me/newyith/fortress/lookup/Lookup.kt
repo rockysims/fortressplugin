@@ -1,13 +1,14 @@
 package me.newyith.fortress.lookup
 
-import com.fasterxml.jackson.annotation.JsonProperty
-import me.newyith.fortress.rune.generator.GeneratorRuneId
-import me.newyith.util.Point
+import org.bukkit.Bukkit
+import org.bukkit.World
 
-class Lookup(
-	@JsonProperty("worldName") val worldName: String
-) {
-	@JsonProperty("protectedPoints") val protectedPoints = HashSet<Point>() //TODO: keep updated
-//	@JsonProperty("generatorRuneIdByClaimedWallPoint") val generatorRuneIdByClaimedWallPoint = HashMap<Point, GeneratorRuneId>() //TODO: keep updated
-//	etc.
+class Lookup(val worldName: String) {
+//	private val generatorRuneIdByClaimedWallOrPatternPoint = HashMap<Point, GeneratorRuneId>() //TODO: keep updated
+
+	val world: World by lazy {
+		Bukkit.getWorld(worldName)
+	}
+
+	//
 }
