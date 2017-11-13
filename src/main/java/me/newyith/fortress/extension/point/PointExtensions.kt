@@ -8,9 +8,9 @@ import me.newyith.util.Log
 import me.newyith.util.Point
 import org.bukkit.World
 
-fun Point.getGeneratorRuneByClaimedWallOrPatternPoint(world: World): GeneratorRune? {
+fun Point.getOwnerGeneratorRune(world: World): GeneratorRune? {
 	val chunkAnchor = ChunkAnchor(this.getChunk(world))
-	val ids: Set<GeneratorRuneId> = FortressPlugin.forWorld(world).generatorRuneIdsByChunkAnchor[chunkAnchor] ?: HashSet()
+	val ids = FortressPlugin.forWorld(world).generatorRuneIdsByChunkAnchor[chunkAnchor] ?: HashSet()
 	var foundGeneratorRune: GeneratorRune? = null
 	ids.any { id ->
 		val generatorRune = id.generatorRune

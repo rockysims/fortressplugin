@@ -1,10 +1,13 @@
 package me.newyith.fortress.rune.generator
 
+import me.newyith.util.Point
 import org.bukkit.Chunk
 
-class GeneratorRune {
-	//
+class GeneratorRune(val id: GeneratorRuneId) {
+	//TODO: write
 
-	val id: GeneratorRuneId = null
 	val chunks: Set<Chunk> = HashSet()
+
+	val patternPoints: Set<Point> = HashSet()
+	val claimedWallPoints: Set<Point> = HashSet()
 }

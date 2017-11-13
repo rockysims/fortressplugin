@@ -10,8 +10,11 @@ import me.newyith.util.extension.chunk.getAnchor
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.World
+import org.bukkit.block.Block
+import org.bukkit.entity.Player
 
 //TODO: continue writing FortressPluginForWorld
+//	make list of missing pieces?
 
 class FortressPluginForWorld(
 	@JsonProperty("worldName") val worldName: String
@@ -23,6 +26,9 @@ class FortressPluginForWorld(
 	val world: World by lazy {
 		Bukkit.getWorld(worldName)
 	}
+
+	fun onEnable() {}
+	fun onDisable() {}
 
 	fun save(generatorRune: GeneratorRune) {
 		FortressPlugin.saveLoad.save(generatorRune, generatorRune.id.savePath)
@@ -61,5 +67,19 @@ class FortressPluginForWorld(
 
 	private fun idsByChunk(chunk: Chunk): Set<GeneratorRuneId> {
 		return generatorRuneIdsByChunkAnchor[chunk.getAnchor()] ?: HashSet()
+	}
+
+	//---//
+
+	fun onTick() {
+		//TODO: write
+	}
+
+	fun onSignChange(player: Player, block: Block): Boolean {
+		val cancel = false
+
+		//TODO: write
+
+		return cancel
 	}
 }

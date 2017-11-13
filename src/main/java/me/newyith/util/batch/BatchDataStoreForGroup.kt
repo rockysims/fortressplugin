@@ -29,6 +29,6 @@ class BatchDataStoreForGroup(
 	}
 
 	fun save() {
-		batchDataByUuid.values.forEach { it.save() }
+//		batchDataByUuid.values.forEach { it.save() } //TODO: uncomment out this line
 	}
 }

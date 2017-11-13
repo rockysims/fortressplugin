@@ -1,10 +1,10 @@
 package me.newyith.fortress.main
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import me.newyith.fortress.event.EventListener
 import me.newyith.fortress.event.TickTimer
 import me.newyith.fortress.persist.SaveLoad
 import me.newyith.util.Log
+import org.bukkit.ChatColor
 import org.bukkit.World
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -14,32 +14,10 @@ import org.bukkit.plugin.java.JavaPlugin
 /**
  * Singleton responsible for serving up FortressPluginForWorld by world.
  * Home of the eventListener and tickTimer singleton instances.
- * Persisted by FortressPlugin.
+ * Persisted by FortressPlugin (and by self on enable/disable).
  */
 class FortressPluginForWorlds {
-
-
-
-
-
-
-
-	//TODO: make this not a JsonProperty so we can instead save under worlds/ folder?
-	//	need to save/load pluginByWorld on disable/enable
-	//	also makes discovery of new world folders part of the default loading approach (instead of something tacked on as it is now)
-	//	also helps enable SaveLoad::getWorldNames()
-	@JsonProperty("pluginByWorld") val pluginByWorld = HashMap<String, FortressPluginForWorld>()
-
-
-
-
-
-
-
-
-
-
-
+	private val pluginByWorld = HashMap<String, FortressPluginForWorld>()
 	private var eventListener: EventListener? = null
 	private var tickTimer: TickTimer? = null
 
@@ -50,9 +28,7 @@ class FortressPluginForWorlds {
 	}
 
 	fun onEnable(javaPlugin: JavaPlugin) {
-		//TODO: once pluginByWorld is not a jackson field, load it here
-
-		//discover any new world data folders //TODO: double check that this works
+		//load pluginByWorld
 		val worldNames: Set<String> = FortressPlugin.saveLoad.getWorldNames()
 		worldNames.forEach { worldName ->
 			if (pluginByWorld[worldName] == null) {
@@ -63,7 +39,7 @@ class FortressPluginForWorlds {
 			}
 		}
 
-		pluginByWorld.forEach { it.onEnable() } //TODO: delete this line if not needed
+		pluginByWorld.values.forEach { it.onEnable() } //TODO: delete this line if not needed
 
 		eventListener = EventListener(javaPlugin)
 		tickTimer = TickTimer(javaPlugin)
@@ -72,12 +48,20 @@ class FortressPluginForWorlds {
 	}
 
 	fun onDisable() {
+		//TODO: consider not cleaning up since this whole class will be garbage collected onDisable()
 		eventListener = null
 		tickTimer = null
 
-		//TODO: once pluginByWorld is not a jackson field, save it here
+		//save pluginByWorld
+		pluginByWorld.entries.forEach {
+			val worldName = it.key
+			val plugin = it.value
+			val path = SaveLoad.getSavePathOfFortressPluginForWorld(worldName)
+			FortressPlugin.saveLoad.save(plugin, path)
+		}
 
-		pluginByWorld.forEach { it.onDisable() } //TODO: delete this line if not needed
+		pluginByWorld.values.forEach { it.onDisable() } //TODO: delete this line if not needed
+		pluginByWorld.clear()
 	}
 
 	fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
@@ -85,7 +69,7 @@ class FortressPluginForWorlds {
 
 		// /stuck
 		if (command.name.equals("stuck", ignoreCase = true) && sender is Player) {
-			Log.warn("//TODO: handle command: " + command.name)
+			Log.warn("//TODO: handle command: /" + command.name)
 //			Commands.onStuckCommand(sender)
 			commandHandled = true
 		}
@@ -96,9 +80,14 @@ class FortressPluginForWorlds {
 
 			// /fort stuck
 			if (subCommand.equals("stuck", ignoreCase = true)) {
-				Log.warn("//TODO: handle command: " + command.name)
+				Log.warn("//TODO: handle command: /" + command.name + " " + subCommand)
 //				Commands.onStuckCommand(sender)
 				commandHandled = true
+			}
+
+			if (!commandHandled) {
+				val msg = "Unknown command: /" + command.name + " " + subCommand
+				sender.sendMessage(ChatColor.AQUA.toString() + msg)
 			}
 		}
 
@@ -107,6 +96,6 @@ class FortressPluginForWorlds {
 
 	//called by tickTimer
 	fun onTick() {
-		Log.warn("//TODO: handle onTick()")
+		pluginByWorld.values.forEach { it.onTick() }
 	}
 }
