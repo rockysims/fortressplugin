@@ -1,0 +1,82 @@
+Fortress Manual
+
+1) Table of Contents
+2) Generator Rune
+3) Rune Pattern
+4) Redstone
+5) Security
+6) Doors
+7) /stuck
+=======
+Generator Rune
+
+The generator rune
+is a 3x2x1 pattern of
+blocks that can burn
+glowstone to make any
+adjacent structure
+unbreakable.
+
+Structure can be built
+of cobble and/or any
+blocks in generator's
+fuel chest.
+=======
+Rune Pattern
+
+R: redstone dust
+G: gold block
+C: chest
+D: diamond block
+I: iron block
+
+Top layer:    RGC
+Bottom layer: IDI
+
+Place a sign on side of
+gold block to activate.
+=======
+Redstone
+
+When redstone is
+unpowered, generator
+pauses fuel usage and
+makes structures
+breakable again.
+
+Cycle power to spread
+protection to newly
+placed blocks.
+=======
+Security
+
+Right click fortress
+wall with empty hand.
+Bedrock wave will pass
+over protected blocks.
+
+Particle Meanings:
+Heart: Inside
+Fire: Outside
+Smoke: Disabled
+=======
+Doors
+
+Protected doors open
+only for white listed
+players (right click).
+
+Place sign on block
+above door to white
+list player(s).
+
+If door has no white
+list signs, it looks for
+signs on rune's base.
+=======
+/stuck
+
+If you get stuck, you
+can type /stuck to
+teleport to nearby
+after a delay.
