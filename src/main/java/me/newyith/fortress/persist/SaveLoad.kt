@@ -45,7 +45,9 @@ class SaveLoad {
 		var thing: T? = null
 		try {
 			val file = File(plugin.dataFolder, path + ".json")
-			thing = mapper.readValue<T>(file, kind.java)
+			if (file.exists()) {
+				thing = mapper.readValue<T>(file, kind.java)
+			}
 		} catch (e: Exception) {
 			e.printStackTrace()
 		}
