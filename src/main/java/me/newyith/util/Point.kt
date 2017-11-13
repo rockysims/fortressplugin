@@ -16,6 +16,7 @@ open class Point (
 	constructor(x: Int, y: Int, z: Int) : this(x.toDouble(), y.toDouble(), z.toDouble())
 	constructor(loc: Location) : this(loc.x, loc.y, loc.z)
 	constructor(v: Vector) : this(v.x, v.y, v.z)
+	constructor(p: Point) : this(p.x, p.y, p.z)
 	constructor(b: Block) : this(b.location)
 
 	// --- //

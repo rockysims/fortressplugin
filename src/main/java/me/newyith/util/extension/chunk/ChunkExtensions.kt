@@ -1,8 +1,8 @@
 package me.newyith.util.extension.chunk
 
-import me.newyith.util.ChunkAnchor
+import me.newyith.util.ChunkPos
 import org.bukkit.Chunk
 
-fun Chunk.getAnchor(): ChunkAnchor {
-	return ChunkAnchor(this)
+fun Chunk.getPos(): ChunkPos {
+	return ChunkPos(this)
 }

@@ -1,17 +1,13 @@
 package me.newyith.fortress.main
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import me.newyith.fortress.extension.point.getOwnerGeneratorRune
 import me.newyith.fortress.lookup.Lookup
 import me.newyith.fortress.rune.generator.GeneratorRune
 import me.newyith.fortress.rune.generator.GeneratorRuneId
-import me.newyith.fortress.rune.generator.GeneratorRunePatterns
-import me.newyith.util.ChunkAnchor
+import me.newyith.util.ChunkPos
 import me.newyith.util.Log
-import me.newyith.util.Point
-import me.newyith.util.extension.chunk.getAnchor
+import me.newyith.util.extension.chunk.getPos
 import org.bukkit.Bukkit
-import org.bukkit.ChatColor
 import org.bukkit.Chunk
 import org.bukkit.World
 import org.bukkit.block.Block
@@ -23,7 +19,7 @@ import org.bukkit.entity.Player
 class FortressPluginForWorld(
 	@JsonProperty("worldName") val worldName: String
 ) {
-	@JsonProperty("generatorRuneIdsByChunkAnchor") val generatorRuneIdsByChunkAnchor = HashMap<ChunkAnchor, Set<GeneratorRuneId>>()
+	@JsonProperty("generatorRuneIdsByChunkPos") val generatorRuneIdsByChunkPos = HashMap<ChunkPos, Set<GeneratorRuneId>>()
 	val loadedGeneratorRuneById = HashMap<GeneratorRuneId, GeneratorRune>()
 	val lookup = Lookup(worldName) //TODO: I don't think this needs to be saved. decide later
 
@@ -70,7 +66,7 @@ class FortressPluginForWorld(
 	}
 
 	private fun idsByChunk(chunk: Chunk): Set<GeneratorRuneId> {
-		return generatorRuneIdsByChunkAnchor[chunk.getAnchor()] ?: HashSet()
+		return generatorRuneIdsByChunkPos[chunk.getPos()] ?: HashSet()
 	}
 
 	//---//
