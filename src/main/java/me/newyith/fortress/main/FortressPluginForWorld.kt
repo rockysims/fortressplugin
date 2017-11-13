@@ -1,13 +1,17 @@
 package me.newyith.fortress.main
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import me.newyith.fortress.extension.point.getOwnerGeneratorRune
 import me.newyith.fortress.lookup.Lookup
 import me.newyith.fortress.rune.generator.GeneratorRune
 import me.newyith.fortress.rune.generator.GeneratorRuneId
+import me.newyith.fortress.rune.generator.GeneratorRunePatterns
 import me.newyith.util.ChunkAnchor
 import me.newyith.util.Log
+import me.newyith.util.Point
 import me.newyith.util.extension.chunk.getAnchor
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.Chunk
 import org.bukkit.World
 import org.bukkit.block.Block
@@ -72,14 +76,38 @@ class FortressPluginForWorld(
 	//---//
 
 	fun onTick() {
-		//TODO: write
+		loadedGeneratorRuneById.values.forEach { it.onTick() }
 	}
 
-	fun onSignChange(player: Player, block: Block): Boolean {
-		val cancel = false
+	fun onSignChange(player: Player, signBlock: Block): Boolean {
+		var cancel = false
 
-		//TODO: write
+		player.sendMessage("onSignChanged() called") //TODO: delete this line
+
+		//TODO: uncomment out block and continue double checking it
+//		val runePattern = GeneratorRunePatterns.tryReadyPattern(signBlock)
+//		runePattern?.let { runePattern ->
+//			val signPoint = Point(signBlock)
+//			val runeAlreadyCreated = signPoint in signPoint.getOwnerGeneratorRune(signBlock.world)?.patternPoints ?: HashSet()
+//			if (!runeAlreadyCreated) {
+//				val generatorRune = GeneratorRune(runePattern)
+//				loadedGeneratorRuneById.put(generatorRune.id, generatorRune)
+//
+//				generatorRune.onCreated(player)
+//				cancel = true //otherwise initial text on sign is replaced by what user wrote
+//			} else {
+//				player.sendMessage(ChatColor.AQUA.toString() + "Failed to create rune because rune already created here.")
+//			}
+//		}
 
 		return cancel
 	}
+
+//	fun onSignChange(player: Player, block: Block): Boolean {
+//		val cancel = false
+//
+//		//TODO: write
+//
+//		return cancel
+//	}
 }

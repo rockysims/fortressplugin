@@ -89,6 +89,35 @@ open class Point (
 		return getBlock(world).type
 	}
 
+	fun getAdjacent6(): Set<Point> {
+		val points = HashSet<Point>()
+
+		points.add(this.add(1, 0, 0))
+		points.add(this.add(-1, 0, 0))
+		points.add(this.add(0, 1, 0))
+		points.add(this.add(0, -1, 0))
+		points.add(this.add(0, 0, 1))
+		points.add(this.add(0, 0, -1))
+
+		return points
+	}
+
+	fun getAdjacent26(): Set<Point> {
+		val points = HashSet<Point>()
+		val range = arrayOf(-1, 0, 1)
+
+		for (x in range) {
+			for (y in range) {
+				for (z in range) {
+					val isCenter = x == 0 && y == 0 && z == 0
+					if (!isCenter) points.add(this.add(x, y, z))
+				}
+			}
+		}
+
+		return points
+	}
+
 	// - Overrides - //
 
 	override fun toString(): String {

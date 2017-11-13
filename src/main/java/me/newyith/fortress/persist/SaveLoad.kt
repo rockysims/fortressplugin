@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import me.newyith.fortress.main.FortressPluginForWorld
 import me.newyith.fortress.main.FortressPluginForWorlds
 import me.newyith.fortress.rune.generator.GeneratorRuneId
-import me.newyith.fortress_try1.main.FortressPlugin
+import me.newyith.fortress.main.FortressPlugin
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.ByteArrayOutputStream

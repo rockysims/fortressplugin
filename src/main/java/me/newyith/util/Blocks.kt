@@ -2,8 +2,6 @@ package me.newyith.util
 
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Uninterruptibles
-import me.newyith.fortress_try1.extension.point.getAdjacent26
-import me.newyith.fortress_try1.extension.point.getAdjacent6
 import org.bukkit.Material
 import org.bukkit.World
 import java.util.*
