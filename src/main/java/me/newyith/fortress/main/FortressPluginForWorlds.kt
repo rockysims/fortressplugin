@@ -1,5 +1,6 @@
 package me.newyith.fortress.main
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import me.newyith.fortress.event.EventListener
 import me.newyith.fortress.event.TickTimer
 import me.newyith.fortress.persist.SaveLoad
@@ -35,7 +36,7 @@ class FortressPluginForWorlds {
 				val path = SaveLoad.getSavePathOfFortressPluginForWorld(worldName)
 				val plugin: FortressPluginForWorld? = FortressPlugin.saveLoad.load(path)
 				if (plugin != null) pluginByWorld.put(worldName, plugin)
-				else Log.warn("Failed to load path: " + path)
+				//else world doesn't have a FortressPluginForWorld instance yet (and doesn't need one yet either)
 			}
 		}
 

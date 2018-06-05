@@ -16,6 +16,28 @@ import org.bukkit.entity.Player
 //TODO: continue writing FortressPluginForWorld
 //	make list of missing pieces?
 
+
+
+class FortressPluginForWorld_(
+	@JsonProperty("worldName") val worldName: String //TODO: when in constructor params, worldName is not saved. maybe try https://github.com/FasterXML/jackson-module-kotlin
+) {
+	val generatorRuneIdsByChunkPos = HashMap<ChunkPos, Set<GeneratorRuneId>>()
+	val loadedGeneratorRuneById = HashMap<GeneratorRuneId, GeneratorRune>()
+
+	fun onEnable() {}
+	fun onDisable() {}
+	fun onChunkLoad(chunk: Chunk) {}
+	fun onChunkUnload(chunk: Chunk) {}
+	//---//
+	fun onTick() {}
+	fun onSignChange(player: Player, signBlock: Block): Boolean {
+		player.sendMessage("fake onSignChanged() called")
+		return false
+	}
+}
+
+
+
 class FortressPluginForWorld(
 	@JsonProperty("worldName") val worldName: String
 ) {

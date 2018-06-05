@@ -6,6 +6,7 @@ import me.newyith.fortress.main.FortressPluginForWorld
 import me.newyith.fortress.main.FortressPluginForWorlds
 import me.newyith.fortress.rune.generator.GeneratorRuneId
 import me.newyith.fortress.main.FortressPlugin
+import me.newyith.util.Log
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.ByteArrayOutputStream
@@ -32,7 +33,9 @@ class SaveLoad {
 		val worldsFolder = File(plugin.dataFolder, "worlds")
 
 		return if (worldsFolder.exists()) {
-			worldsFolder.list().toSet()
+			worldsFolder.list()
+				.filter { Bukkit.getWorld(it) != null }
+				.toSet()
 		} else HashSet()
 	}
 
