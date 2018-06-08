@@ -30,6 +30,7 @@ public class CoreAnimator {
 		private BedrockAuthToken bedrockAuthToken;
 		private ProtectionAuthToken protectionAuthToken;
 		private boolean skipAnimation = false;
+		private boolean fastAnimation = false;
 		private boolean animationInProgress = false;
 		private int curIndex = 0;
 		private String worldName = null;
@@ -46,6 +47,7 @@ public class CoreAnimator {
 					 @JsonProperty("bedrockAuthToken") BedrockAuthToken bedrockAuthToken,
 					 @JsonProperty("protectionAuthToken") ProtectionAuthToken protectionAuthToken,
 					 @JsonProperty("skipAnimation") boolean skipAnimation,
+					 @JsonProperty("fastAnimation") boolean fastAnimation,
 					 @JsonProperty("animationInProgress") boolean animationInProgress,
 					 @JsonProperty("curIndex") int curIndex,
 					 @JsonProperty("worldName") String worldName) {
@@ -57,6 +59,7 @@ public class CoreAnimator {
 			this.bedrockAuthToken = bedrockAuthToken;
 			this.protectionAuthToken = protectionAuthToken;
 			this.skipAnimation = skipAnimation;
+			this.fastAnimation = fastAnimation;
 			this.animationInProgress = animationInProgress;
 			this.curIndex = curIndex;
 			this.worldName = worldName;
@@ -79,11 +82,12 @@ public class CoreAnimator {
 		List<ProtectionBatch> curProtectionBatches = new ArrayList<>();
 		List<WallLayer> wallLayers = new ArrayList<>();
 		boolean skipAnimation = false;
+		boolean fastAnimation = false;
 		boolean animationInProgress = false;
 		int curIndex = 0;
 		String worldName = world.getName();
 		model = new Model(allOldProtectionBatches, curProtectionBatches, anchorPoint, wallLayers, coreMats,
-				bedrockAuthToken, protectionAuthToken, skipAnimation, animationInProgress, curIndex, worldName);
+				bedrockAuthToken, protectionAuthToken, skipAnimation, fastAnimation, animationInProgress, curIndex, worldName);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -96,6 +100,8 @@ public class CoreAnimator {
 		model.wallLayers = wallLayers;
 		model.curIndex = 0;
 		model.animationInProgress = true;
+
+		model.fastAnimation = model.coreMats.getFastAnimationFlag();
 	}
 
 	public void degenerate(boolean skipAnimation) {
@@ -105,6 +111,8 @@ public class CoreAnimator {
 		model.wallLayers = new ArrayList<>();
 		model.curIndex = 0;
 		model.animationInProgress = true;
+
+		model.fastAnimation = model.coreMats.getFastAnimationFlag();
 
 		if (skipAnimation) {
 			model.skipAnimation = true;
@@ -133,6 +141,7 @@ public class CoreAnimator {
 			if (model.animationWaitTicks >= model.ticksPerFrame || model.skipAnimation) {
 				model.animationWaitTicks = 0;
 
+				int frameUpdatesLimit = (model.fastAnimation)?3:1;
 				while (true) {
 					//try to update to next frame
 					boolean updatedFrame = updateToNextFrame();
@@ -142,8 +151,11 @@ public class CoreAnimator {
 						break;
 					}
 					if (updatedFrame && !model.skipAnimation) {
-						//updated to next frame so we're done for now
-						break;
+						frameUpdatesLimit--;
+						if (frameUpdatesLimit <= 0) {
+							//updated to next frame(s) so we're done for now
+							break;
+						}
 					}
 				}
 			}

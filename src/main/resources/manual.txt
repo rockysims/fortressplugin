@@ -6,7 +6,8 @@ Fortress Manual
 4) Redstone
 5) Security
 6) Doors
-7) /stuck
+7) Directives
+8) /stuck
 =======
 Generator Rune
 
@@ -66,13 +67,23 @@ Protected doors open
 only for white listed
 players (right click).
 
-Place sign on block
+Place a sign on block
 above door to white
 list player(s).
 
 If door has no white
 list signs, it looks for
 signs on rune's base.
+=======
+Directives
+
+Certain items can be
+placed in generator's
+fuel chest to enable
+special behaviors.
+
+Blaze Rod:
+Fast un/protection
 =======
 /stuck
 

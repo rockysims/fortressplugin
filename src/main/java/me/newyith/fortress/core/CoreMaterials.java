@@ -23,6 +23,7 @@ public class CoreMaterials {
 		private final transient Set<Material> generatableWallMaterials;
 		private final transient Set<Material> protectableWallMaterials;
 		private final transient Set<Material> alterableWallMaterials;
+		private final transient Set<String> flags;
 
 		@JsonCreator
 		public Model(@JsonProperty("chestPoint") Point chestPoint,
@@ -35,6 +36,7 @@ public class CoreMaterials {
 			this.generatableWallMaterials = new HashSet<>();
 			this.protectableWallMaterials = new HashSet<>();
 			this.alterableWallMaterials = new HashSet<>();
+			this.flags = new HashSet<>();
 		}
 	}
 	private Model model = null;
@@ -84,11 +86,16 @@ public class CoreMaterials {
 		return refresh();
 	}
 
+	public boolean getFastAnimationFlag() {
+		refresh(); //needed in case items in chest have changed (such as when items are added by hopper)
+		return model.flags.contains("fastAnimation");
+	}
+
 	// - Refreshing -
 
 	public Set<Material> refresh() {
 		//Debug.msg("CoreMaterials refresh()ed. chest: " + chestPoint);
-		resetToBaseBlockTypes();
+		resetToDefaultBlockTypesAndFlags();
 
 		Set<Material> invalidWallMaterials = new HashSet<>();
 
@@ -160,6 +167,9 @@ public class CoreMaterials {
 					case REDSTONE:
 						addProtectable(Material.REDSTONE_WIRE);
 						break;
+					case BLAZE_ROD:
+						model.flags.add("fastAnimation");
+						break;
 					default:
 						if (mat.isBlock()) {
 							addProtectable(item.getType());
@@ -190,11 +200,12 @@ public class CoreMaterials {
 		model.generatableWallMaterials.add(mat);
 	}
 
-	private void resetToBaseBlockTypes() {
+	private void resetToDefaultBlockTypesAndFlags() {
 		//clear all
 		model.protectableWallMaterials.clear();
 		model.alterableWallMaterials.clear();
 		model.generatableWallMaterials.clear();
+		model.flags.clear();
 
 		//fill alterableWallMaterials
 		model.alterableWallMaterials.add(Material.COBBLESTONE);
