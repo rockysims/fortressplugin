@@ -258,9 +258,9 @@ public class GeneratorRune {
 
 		if (model.fuelTicksRemaining > 0) {
 			if (isPowered()) {
-				setState(GeneratorState.PAUSED);
-			} else {
 				setState(GeneratorState.RUNNING);
+			} else {
+				setState(GeneratorState.PAUSED);
 			}
 		} else {
 			setState(GeneratorState.NEEDS_FUEL);
