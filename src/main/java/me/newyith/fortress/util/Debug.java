@@ -12,14 +12,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Debug {
-	public static boolean showTimerMessages = true;
+	public static boolean showTimerMessages = !FortressPlugin.releaseBuild;
 
 	public static void msg(String s) {
-		/*
-		Bukkit.broadcastMessage(s);
-		/*/
-		System.out.println(s);
-		//*/
+		if (!FortressPlugin.releaseBuild) {
+			/*
+			Bukkit.broadcastMessage(s);
+			/*/
+			System.out.println(s);
+			//*/
+		}
 	}
 
 	public static void error(String s) {
