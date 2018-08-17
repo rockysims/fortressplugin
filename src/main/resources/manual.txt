@@ -39,7 +39,7 @@ gold block to activate.
 =======
 Redstone
 
-While not powered by
+When not powered by
 redstone, generator
 pauses fuel usage and
 makes structures
