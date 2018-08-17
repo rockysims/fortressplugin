@@ -265,7 +265,6 @@ public class FortressPlugin extends JavaPlugin {
 //fix /reload memory leak (remove all managers onDisable)
 //fast saving (take snapshot (copy) of plugin state and then save that on another thread?)
 //more configuration (particularly max blocks per fortress)
-//use cobblestone to indicate ripple over bedrock (or maybe particles would be better?)
 
 
 
