@@ -199,7 +199,7 @@ public class GeneratorCore extends BaseCore {
 						Set<Point> cobbleInLayer = layer.stream().filter(p ->
 								BedrockManager.forWorld(model.world).getMaterialOrNull(p) == Material.COBBLESTONE
 						).collect(Collectors.toSet());
-						TimedBedrockManager.forWorld(model.world).forceReversion(model.bedrockAuthToken, cobbleInLayer, msDurationFinal);
+						TimedBedrockManager.forWorld(model.world).forceReversion(model.bedrockAuthToken, cobbleInLayer, 300);
 					}
 				}, layerIndex * 3); //ticks (50 ms per tick)
 
