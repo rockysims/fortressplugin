@@ -95,7 +95,6 @@ public class SaveLoadManager implements Listener {
 //			Debug.msg("load obj (FM) type: " + obj.getClass().getName());
 			FortressesManager fortressesManager = mapper.convertValue(obj, FortressesManager.class);
 			FortressesManager.setInstance(fortressesManager);
-			FortressesManager.secondStageLoad();
 		}
 
 		//load BedrockManager
@@ -107,6 +106,8 @@ public class SaveLoadManager implements Listener {
 			BedrockManager bedrockManager = mapper.convertValue(obj, BedrockManager.class);
 			BedrockManager.setInstance(bedrockManager);
 		}
+
+		FortressesManager.secondStageLoad();
 	}
 
 	public void save() {
