@@ -22,6 +22,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
@@ -169,7 +170,8 @@ public class EventListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void onPlayerInteractEvent(PlayerInteractEvent event) {
 		Action action = event.getAction();
-		if (action == Action.RIGHT_CLICK_BLOCK) {
+		EquipmentSlot hand = event.getHand();
+		if (action == Action.RIGHT_CLICK_BLOCK && hand == EquipmentSlot.HAND) { //as opposed to OFF_HAND
 			Block clicked = event.getClickedBlock();
 			World world = clicked.getWorld();
 
