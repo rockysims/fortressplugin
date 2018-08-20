@@ -385,8 +385,8 @@ public class FortressesManagerForWorld {
 			if (rune != null) {
 				Point aboveDoorPoint = new Point(doorPoint).add(0, 1, 0);
 				switch (aboveDoorPoint.getBlock(world).getType()) {
-					case IRON_DOOR_BLOCK:
-					case WOODEN_DOOR:
+					case IRON_DOOR:
+					case OAK_DOOR:
 					case ACACIA_DOOR:
 					case BIRCH_DOOR:
 					case DARK_OAK_DOOR:
@@ -401,7 +401,7 @@ public class FortressesManagerForWorld {
 				} else {
 					//if iron door, open for player
 					Material doorType = doorPoint.getBlock(world).getType();
-					boolean isIronDoor = doorType == Material.IRON_DOOR_BLOCK;
+					boolean isIronDoor = doorType == Material.IRON_DOOR;
 					boolean isIronTrap = doorType == Material.IRON_TRAPDOOR;
 					if (isIronDoor || isIronTrap) {
 						BlockState state = doorBlock.getState();
@@ -413,19 +413,29 @@ public class FortressesManagerForWorld {
 								state = bottomDoorBlock.getState();
 								door = (Door) state.getData();
 							}
+//							Debug.msg("wasOpen: " + door.isOpen());
 							door.setOpen(!door.isOpen());
+							state.setData(door);
 							state.update();
 							nowOpen = door.isOpen();
+//							Debug.msg("nowOpen: " + nowOpen);
 						} else {
 							TrapDoor door = (TrapDoor) state.getData();
 							door.setOpen(!door.isOpen());
+							state.setData(door);
 							state.update();
 							nowOpen = door.isOpen();
 						}
 						if (nowOpen) {
-							player.playSound(doorPoint.toLocation(world), Sound.DOOR_OPEN, 1.0F, 1.0F);
+							Sound sound = (isIronDoor)
+									? Sound.BLOCK_IRON_DOOR_OPEN
+									: Sound.BLOCK_WOODEN_DOOR_OPEN;
+							player.playSound(doorPoint.toLocation(world), sound, 1.0F, 1.0F);
 						} else {
-							player.playSound(doorPoint.toLocation(world), Sound.DOOR_CLOSE, 1.0F, 1.0F);
+							Sound sound = (isIronDoor)
+									? Sound.BLOCK_IRON_DOOR_CLOSE
+									: Sound.BLOCK_WOODEN_DOOR_CLOSE;
+							player.playSound(doorPoint.toLocation(world), sound, 1.0F, 1.0F);
 						}
 					}
 				}
@@ -496,8 +506,8 @@ public class FortressesManagerForWorld {
 		boolean cancel = false;
 
 		switch (replacedMaterial) {
-			case STATIONARY_WATER:
-			case STATIONARY_LAVA:
+			case WATER:
+			case LAVA:
 				Point placedPoint = new Point(placedBlock);
 				boolean isGenerated = isGenerated(placedPoint);
 				boolean inCreative = player.getGameMode() == GameMode.CREATIVE;

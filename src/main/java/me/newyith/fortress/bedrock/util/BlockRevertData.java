@@ -2,22 +2,22 @@ package me.newyith.fortress.bedrock.util;
 
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.material.MaterialData;
+import org.bukkit.block.data.BlockData;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class BlockRevertData {
 	private static class Model {
 		private final Material material;
-		private byte data;
+		private String data;
 
 		@JsonCreator
 		public Model(@JsonProperty("material") Material material,
-					 @JsonProperty("data") byte data) {
+					 @JsonProperty("data") String data) {
 			this.material = material;
 			this.data = data;
 
@@ -34,7 +34,7 @@ public class BlockRevertData {
 	public BlockRevertData(World world, Point p) {
 		Block b = p.getBlock(world);
 		Material material = b.getType();
-		byte data = b.getState().getData().getData();
+		String data = b.getBlockData().getAsString();
 		model = new Model(material, data);
 		if (material == Material.BEDROCK) {
 			Debug.warn("Saved BEDROCK as revertData material at " + p);
@@ -46,22 +46,9 @@ public class BlockRevertData {
 
 	public void revert(World world, Point p) {
 		Block b = p.getBlock(world);
-
-		switch (model.material) {
-			case TORCH:
-			case REDSTONE_TORCH_ON:
-			case REDSTONE_TORCH_OFF:
-				//set material and data at the same time so torches on walls don't fall down
-				b.setTypeIdAndData(model.material.getId(), model.data, false);
-				break;
-			default:
-				b.setType(model.material);
-				BlockState state = b.getState();
-				MaterialData materialData = new MaterialData(model.material, model.data);
-				state.setData(materialData);
-				state.update();
-				break;
-		}
+		b.setType(model.material);
+		BlockData blockData = Bukkit.getServer().createBlockData(model.data);
+		b.setBlockData(blockData);
 	}
 
 	public Material getMaterial() {

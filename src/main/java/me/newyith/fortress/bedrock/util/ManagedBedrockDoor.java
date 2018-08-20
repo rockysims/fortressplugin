@@ -112,18 +112,17 @@ public class ManagedBedrockDoor extends ManagedBedrockBase {
 				model.topRevertData = new BlockRevertData(world, model.top);
 				if (model.bottom != null) {
 					model.bottomRevertData = new BlockRevertData(world, model.bottom);
-					model.bottom.setType(Material.BEDROCK, world);
+					model.bottom.getBlock(world).setType(Material.BEDROCK, false);
 				}
 				model.top.setType(Material.BEDROCK, world);
 			}
 		} else if (!isConverted && isBedrock) {
 			//revert
-
+			model.topRevertData.revert(world, model.top);
 			//isBedrock condition is to prevent chance of duplicating blocks if plugin save gets out of sync with world save
 			if (model.bottom != null && model.bottom.is(Material.BEDROCK, world)) {
 				model.bottomRevertData.revert(world, model.bottom);
 			}
-			model.topRevertData.revert(world, model.top);
 		}
 	}
 

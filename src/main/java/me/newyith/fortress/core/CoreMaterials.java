@@ -117,36 +117,11 @@ public class CoreMaterials {
 						invalidWallMaterials.add(mat);
 						break;
 					//special protectable
-					case IRON_DOOR:
-						addProtectable(Material.IRON_DOOR_BLOCK);
-						break;
-					case WOOD_DOOR:
-						addProtectable(Material.WOODEN_DOOR);
-						break;
-					case ACACIA_DOOR_ITEM:
-						addProtectable(Material.ACACIA_DOOR);
-						break;
-					case BIRCH_DOOR_ITEM:
-						addProtectable(Material.BIRCH_DOOR);
-						break;
-					case DARK_OAK_DOOR_ITEM:
-						addProtectable(Material.DARK_OAK_DOOR);
-						break;
-					case JUNGLE_DOOR_ITEM:
-						addProtectable(Material.JUNGLE_DOOR);
-						break;
-					case SPRUCE_DOOR_ITEM:
-						addProtectable(Material.SPRUCE_DOOR);
-						break;
 					case WATER_BUCKET:
-						addProtectable(Material.STATIONARY_WATER);
+						addProtectable(Material.WATER);
 						break;
 					case LAVA_BUCKET:
-						addProtectable(Material.STATIONARY_LAVA);
-						break;
-					case STEP:
-						addProtectable(Material.STEP);
-						addProtectable(Material.DOUBLE_STEP);
+						addProtectable(Material.LAVA);
 						break;
 					//pistons not protectable because bedrock ripple and shield don't seem to play nice with pistons
 					//had piston turn into piston extension (invisible) when toggling switch controlling piston with empty hand (causing ripple)
@@ -160,10 +135,18 @@ public class CoreMaterials {
 //						addProtectable(Material.PISTON_MOVING_PIECE);
 //						break;
 					/*/
-					case PISTON_BASE:
-					case PISTON_STICKY_BASE:
+					case PISTON:
+					case STICKY_PISTON:
 						break;
 					//*/
+					case TORCH:
+						addProtectable(Material.TORCH);
+						addProtectable(Material.WALL_TORCH);
+						break;
+					case REDSTONE_TORCH:
+						addProtectable(Material.REDSTONE_TORCH);
+						addProtectable(Material.REDSTONE_WALL_TORCH);
+						break;
 					case REDSTONE:
 						addProtectable(Material.REDSTONE_WIRE);
 						break;
