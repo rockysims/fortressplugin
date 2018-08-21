@@ -374,53 +374,45 @@ public class FortressesManagerForWorld {
 		return cancel;
 	}
 
-	public boolean onPlayerOpenCloseDoor(Player player, Block doorBlock) {
+	public boolean onPlayerOpenCloseDoor(Player player, Block activatedDoorBlock) {
 		boolean cancel = false;
 
-		Point doorPoint = new Point(doorBlock.getLocation());
-		World world = doorBlock.getWorld();
+		Point activatedDoorPoint = new Point(activatedDoorBlock.getLocation());
+		World world = activatedDoorBlock.getWorld();
 
-		if (isGenerated(doorPoint)) {
-			GeneratorRune rune = getRuneByClaimedWallPoint(doorPoint);
+		if (isGenerated(activatedDoorPoint)) {
+			GeneratorRune rune = getRuneByClaimedWallPoint(activatedDoorPoint);
 			if (rune != null) {
-				Point aboveDoorPoint = new Point(doorPoint).add(0, 1, 0);
-				switch (aboveDoorPoint.getBlock(world).getType()) {
-					case IRON_DOOR:
-					case OAK_DOOR:
-					case ACACIA_DOOR:
-					case BIRCH_DOOR:
-					case DARK_OAK_DOOR:
-					case JUNGLE_DOOR:
-					case SPRUCE_DOOR:
-						//ignore trap doors since they're only 1 high
-						doorPoint = aboveDoorPoint;
-				}
-				boolean canOpen = rune.getGeneratorCore().playerCanOpenDoor(player, doorPoint);
+				//set topDoorPoint
+				Point aboveActivatedDoorPoint = new Point(activatedDoorPoint).add(0, 1, 0);
+				boolean aboveIsAlsoDoor = Blocks.isTallDoor(aboveActivatedDoorPoint.getType(world));
+				Point topDoorPoint = (aboveIsAlsoDoor)
+						? aboveActivatedDoorPoint
+						: activatedDoorPoint;
+
+				boolean canOpen = rune.getGeneratorCore().playerCanOpenDoor(player, topDoorPoint);
 				if (!canOpen) {
 					cancel = true;
 				} else {
 					//if iron door, open for player
-					Material doorType = doorPoint.getBlock(world).getType();
+					Material doorType = topDoorPoint.getType(world);
 					boolean isIronDoor = doorType == Material.IRON_DOOR;
 					boolean isIronTrap = doorType == Material.IRON_TRAPDOOR;
 					if (isIronDoor || isIronTrap) {
-						BlockState state = doorBlock.getState();
 						boolean nowOpen;
 						if (isIronDoor) {
+							Block bottomDoorBlock = topDoorPoint.add(0, -1, 0).getBlock(world);
+							BlockState state = bottomDoorBlock.getState();
 							Door door = (Door) state.getData();
-							if (door.isTopHalf()) {
-								Block bottomDoorBlock = (new Point(doorPoint).add(0, -1, 0)).getBlock(world);
-								state = bottomDoorBlock.getState();
-								door = (Door) state.getData();
-							}
-//							Debug.msg("wasOpen: " + door.isOpen());
+
 							door.setOpen(!door.isOpen());
 							state.setData(door);
 							state.update();
 							nowOpen = door.isOpen();
-//							Debug.msg("nowOpen: " + nowOpen);
 						} else {
+							BlockState state = activatedDoorPoint.getBlock(world).getState();
 							TrapDoor door = (TrapDoor) state.getData();
+
 							door.setOpen(!door.isOpen());
 							state.setData(door);
 							state.update();
@@ -429,18 +421,18 @@ public class FortressesManagerForWorld {
 						if (nowOpen) {
 							Sound sound = (isIronDoor)
 									? Sound.BLOCK_IRON_DOOR_OPEN
-									: Sound.BLOCK_WOODEN_DOOR_OPEN;
-							player.playSound(doorPoint.toLocation(world), sound, 1.0F, 1.0F);
+									: Sound.BLOCK_IRON_TRAPDOOR_OPEN;
+							player.playSound(topDoorPoint.toLocation(world), sound, 1.0F, 1.0F);
 						} else {
 							Sound sound = (isIronDoor)
 									? Sound.BLOCK_IRON_DOOR_CLOSE
-									: Sound.BLOCK_WOODEN_DOOR_CLOSE;
-							player.playSound(doorPoint.toLocation(world), sound, 1.0F, 1.0F);
+									: Sound.BLOCK_IRON_TRAPDOOR_CLOSE;
+							player.playSound(topDoorPoint.toLocation(world), sound, 1.0F, 1.0F);
 						}
 					}
 				}
 			} else {
-				Debug.error("FortressesManagerForWorld::onPlayerOpenCloseDoor() failed to find rune from doorPoint " + doorPoint);
+				Debug.error("FortressesManagerForWorld::onPlayerOpenCloseDoor() failed to find rune from activatedDoorPoint " + activatedDoorPoint);
 			}
 		}
 

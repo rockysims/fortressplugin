@@ -259,9 +259,12 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
+//1.13 MVP goals:
+//fix protected doors closing with redstone bug
+//get particles working again
+//handle slime blocks
 
-
-//MVP goals:
+//old MVP goals:
 //fix /reload memory leak (remove all managers onDisable)
 //fast saving (take snapshot (copy) of plugin state and then save that on another thread?)
 //more configuration (particularly max blocks per fortress)
