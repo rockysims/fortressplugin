@@ -1,7 +1,6 @@
 package me.newyith.fortress.util;
 
 import me.newyith.fortress.main.FortressPlugin;
-import me.newyith.fortress.util.particle.ParticleEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
