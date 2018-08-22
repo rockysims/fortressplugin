@@ -224,7 +224,7 @@ public class StuckPlayer {
 			Collections.shuffle(nearbyPoints);
 
 			//nearbyPoints = first limit points in nearbyPoints
-			nearbyPoints = new ArrayList<>(nearbyPoints.subList(0, limit)); //creating new list allows garbage collection of old list
+			nearbyPoints = new ArrayList<>(nearbyPoints.subList(0, Math.min(limit, nearbyPoints.size() - 1))); //creating new list allows garbage collection of old list
 		}
 
 		return nearbyPoints;
@@ -278,7 +278,7 @@ public class StuckPlayer {
 		List<Point> nearbyPoints = new ArrayList<>(cuboid.getPointsAtHeight(a.y()));
 		Collections.shuffle(nearbyPoints);
 		//nearbyPoints = first attemptLimit points in nearbyPoints
-		nearbyPoints = new ArrayList<>(nearbyPoints.subList(0, attemptLimit)); //creating new list allows garbage collection of old list
+		nearbyPoints = new ArrayList<>(nearbyPoints.subList(0, Math.min(attemptLimit, nearbyPoints.size() - 1))); //creating new list allows garbage collection of old list
 
 		return nearbyPoints;
 	}
@@ -300,7 +300,7 @@ public class StuckPlayer {
 			//check if valid teleport destination
 			if (p.getBlock(world).getType().isSolid()) {
 				Point dest = p.add(0, 1, 0);
-				Point aboveDest = dest.add(0, 1, 0);
+				Point aboveDest = dest.add(0, 2, 0);
 				if (Blocks.isAiry(dest, world) && Blocks.isAiry(aboveDest, world)) {
 					validDest = dest;
 				}
