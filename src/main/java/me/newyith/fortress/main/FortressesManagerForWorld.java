@@ -9,6 +9,7 @@ import me.newyith.fortress.util.Blocks;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.*;
+import org.bukkit.block.data.Openable;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -239,12 +240,8 @@ public class FortressesManagerForWorld {
 
 		//if door is generated, ignore redstone event
 		if (Blocks.isDoor(block.getType()) && isGenerated(p)) {
-			Openable openableDoor = (Openable)block.getState().getData();
-			if (openableDoor.isOpen()) {
-				event.setNewCurrent(1);
-			} else {
-				event.setNewCurrent(0);
-			}
+			Openable openableDoor = (Openable)block.getBlockData();
+			event.setNewCurrent((openableDoor.isOpen())?15:0);
 		}
 	}
 
@@ -394,41 +391,23 @@ public class FortressesManagerForWorld {
 				if (!canOpen) {
 					cancel = true;
 				} else {
-					//if iron door, open for player
+					//if iron trap/door, open for player
 					Material doorType = topDoorPoint.getType(world);
 					boolean isIronDoor = doorType == Material.IRON_DOOR;
 					boolean isIronTrap = doorType == Material.IRON_TRAPDOOR;
 					if (isIronDoor || isIronTrap) {
-						boolean nowOpen;
-						if (isIronDoor) {
-							Block bottomDoorBlock = topDoorPoint.add(0, -1, 0).getBlock(world);
-							BlockState state = bottomDoorBlock.getState();
-							Door door = (Door) state.getData();
+						Block mainDoorBlock = (isIronDoor)
+								? topDoorPoint.add(0, -1, 0).getBlock(world)
+								: topDoorPoint.getBlock(world);
+						Openable openable = (Openable)mainDoorBlock.getBlockData();
+						openable.setOpen(!openable.isOpen());
+						mainDoorBlock.setBlockData(openable);
+						boolean nowOpen = openable.isOpen();
 
-							door.setOpen(!door.isOpen());
-							state.setData(door);
-							state.update();
-							nowOpen = door.isOpen();
-						} else {
-							BlockState state = activatedDoorPoint.getBlock(world).getState();
-							TrapDoor door = (TrapDoor) state.getData();
-
-							door.setOpen(!door.isOpen());
-							state.setData(door);
-							state.update();
-							nowOpen = door.isOpen();
-						}
-						if (nowOpen) {
-							Sound sound = (isIronDoor)
-									? Sound.BLOCK_IRON_DOOR_OPEN
-									: Sound.BLOCK_IRON_TRAPDOOR_OPEN;
-							player.playSound(topDoorPoint.toLocation(world), sound, 1.0F, 1.0F);
-						} else {
-							Sound sound = (isIronDoor)
-									? Sound.BLOCK_IRON_DOOR_CLOSE
-									: Sound.BLOCK_IRON_TRAPDOOR_CLOSE;
-							player.playSound(topDoorPoint.toLocation(world), sound, 1.0F, 1.0F);
-						}
+						Sound sound = (isIronDoor)
+								? (nowOpen)?Sound.BLOCK_IRON_DOOR_OPEN:Sound.BLOCK_IRON_DOOR_CLOSE
+								: (nowOpen)?Sound.BLOCK_IRON_TRAPDOOR_OPEN:Sound.BLOCK_IRON_TRAPDOOR_CLOSE;
+						player.playSound(topDoorPoint.toLocation(world), sound, 1.0F, 1.0F);
 					}
 				}
 			} else {

@@ -260,7 +260,6 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //1.13 MVP goals:
-//fix protected doors closing with redstone bug
 //get particles working again
 //handle slime blocks
 
