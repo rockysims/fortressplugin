@@ -9,11 +9,10 @@ import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.protection.ProtectionAuthToken;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.util.Blocks;
-import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
-import me.newyith.fortress.util.particle.ParticleEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -116,19 +115,19 @@ public class GeneratorCore extends BaseCore {
 			Point origin = new Point(block);
 			Point towardFace = origin.add(face.getModX(), face.getModY(), face.getModZ());
 
-			//particleEffect = heart/flame/smoke (inside/outside/disabled)
+			//particle = heart/flame/smoke (inside/outside/disabled)
 			Set<Point> generatedPoints = getGeneratedPoints();
 			boolean originGenerated = generatedPoints.contains(origin);
-			ParticleEffect particleEffect = ParticleEffect.SMOKE_NORMAL;
+			Particle particle = Particle.SMOKE_NORMAL;
 			if (originGenerated) {
 				boolean inside = getPointsInsideFortress().contains(towardFace);
-				if (inside) particleEffect = ParticleEffect.HEART;
-				else particleEffect = ParticleEffect.FLAME;
+				if (inside) particle = Particle.HEART;
+				else particle = Particle.FLAME;
 			}
 
-			//display particleEffect
+			//display particle
 			Pair<Point, Point> wallOutside = new Pair<>(origin, towardFace);
-			model.coreParticles.showParticleForWallOutsidePair(model.world, wallOutside, particleEffect, 3);
+			model.coreParticles.showParticleForWallOutsidePair(model.world, wallOutside, particle, 3);
 
 			//show bedrock ripple
 			if (originGenerated) {

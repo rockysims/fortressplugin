@@ -3,9 +3,10 @@ package me.newyith.fortress.core;
 import javafx.util.Pair;
 import me.newyith.fortress.event.TickTimer;
 import me.newyith.fortress.util.Blocks;
+import me.newyith.fortress.util.Particles;
 import me.newyith.fortress.util.Point;
-import me.newyith.fortress.util.particle.ParticleEffect;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.World;
 
 import java.util.*;
@@ -81,7 +82,7 @@ public class CoreParticles {
 
 //					Debug.msg("wallOutsideIndex: " + wallOutsideIndex);
 
-					showParticleForWallOutsidePair(core.getWorld(), wallOutsidePairs.get(wallOutsideIndex), ParticleEffect.PORTAL, 1);
+					showParticleForWallOutsidePair(core.getWorld(), wallOutsidePairs.get(wallOutsideIndex), Particle.PORTAL, 1);
 				}
 			}
 
@@ -89,7 +90,7 @@ public class CoreParticles {
 		}
 	}
 
-	public void showParticleForWallOutsidePair(World world, Pair<Point, Point> wallOutside, ParticleEffect particleEffect, int amount) {
+	public void showParticleForWallOutsidePair(World world, Pair<Point, Point> wallOutside, Particle particle, int amount) {
 		//display particles for wall face of outsidePoint
 		Point wall = wallOutside.getKey();
 		Point outsidePoint = wallOutside.getValue();
@@ -106,18 +107,12 @@ public class CoreParticles {
 		float yRand = 0.22F;
 		float zRand = 0.22F;
 		//don't randomize particle placement in the axis we moved in to go from wall point to adjacent point
-		if (towardWallAdjusted.x() != 0) {
-			xRand = 0;
-		}
-		if (towardWallAdjusted.y() != 0) {
-			yRand = 0;
-		}
-		if (towardWallAdjusted.z() != 0) {
-			zRand = 0;
-		}
+		if (towardWallAdjusted.x() != 0) xRand = 0;
+		if (towardWallAdjusted.y() != 0) yRand = 0;
+		if (towardWallAdjusted.z() != 0) zRand = 0;
 
 		Point p = outsidePoint.add(towardWallAdjusted).add(0.5, 0.5, 0.5);
-		particleEffect.display(xRand, yRand, zRand, 0, amount, p.toLocation(world), 20);
+		Particles.display(particle, amount, world, p, xRand, yRand, zRand);
 	}
 
 	private void tickAnchorParticles(BaseCore core) {
@@ -133,10 +128,7 @@ public class CoreParticles {
 
 	public void displayAnchorParticle(BaseCore core) {
 		Point point = core.model.anchorPoint.add(0, 1, 0);
-		float speed = 0;
-		int amount = 1;
-		double range = 15;
 		point = point.add(0.5, -0.4, 0.5);
-		ParticleEffect.PORTAL.display(0.2F, 0.0F, 0.2F, speed, amount, point.toLocation(core.model.world), range);
+		Particles.display(Particle.PORTAL, 1, core.model.world, point, 0.2F, 0.0F, 0.2F);
 	}
 }

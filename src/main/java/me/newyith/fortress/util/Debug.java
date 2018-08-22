@@ -4,6 +4,7 @@ import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.util.particle.ParticleEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -32,21 +33,18 @@ public class Debug {
 		Bukkit.broadcastMessage(ChatColor.YELLOW + "Warning: " + s);
 	}
 
-	public static void particleAt(Point point, ParticleEffect particleEffect) {
+	public static void particleAt(Point point, Particle particle) {
 		Player player = getPlayer();
 		if (player != null) {
 			World world = player.getWorld();
-			float speed = 0;
-			int amount = 1;
-			double range = 25;
-			Point p = new Point(point).add(0.5, 0.5, 0.5);
-			particleEffect.display(0.0F, 0.0F, 0.0F, speed, amount, p.toLocation(world), range);
+			point = point.add(0.5, 0.5, 0.5);
+			Particles.display(particle, 1, world, point, 0);
 		}
 	}
 
-	public static void particleAtTimed(Point point, ParticleEffect particleEffect) {
+	public static void particleAtTimed(Point point, Particle particle) {
 		int repeatingTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(FortressPlugin.getInstance(), () -> {
-			particleAt(point, particleEffect);
+			particleAt(point, particle);
 		}, 0, 20); //delay, period
 
 		Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {

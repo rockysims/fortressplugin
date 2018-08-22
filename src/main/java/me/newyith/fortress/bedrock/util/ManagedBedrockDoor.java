@@ -1,9 +1,9 @@
 package me.newyith.fortress.bedrock.util;
 
+import me.newyith.fortress.util.Particles;
 import me.newyith.fortress.util.Point;
-import me.newyith.fortress.util.particle.ParticleEffect;
-import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -133,8 +133,7 @@ public class ManagedBedrockDoor extends ManagedBedrockBase {
 	}
 
 	private void showParticles(World world, Point p) {
-		float rand = 0.25F;
-		Location loc = p.add(0.5, 0.0, 0.5).toLocation(world);
-		ParticleEffect.PORTAL.display(rand, rand, rand, 0, 35, loc, 20);
+		p = p.add(0.5, 0.0, 0.5);
+		Particles.display(Particle.PORTAL, 35, world, p, 0.25F);
 	}
 }
