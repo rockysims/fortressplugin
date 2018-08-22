@@ -59,18 +59,11 @@ public class Blocks {
 	}
 
 	public static boolean isAiry(Point dest, World world) {
-		boolean airy = false;
+		boolean airy = true;
 		Material mat = dest.getBlock(world).getType();
-		airy = airy || mat == Material.AIR;
-		airy = airy || mat == Material.LONG_GRASS;
-		airy = airy || mat == Material.RED_ROSE;
-		airy = airy || mat == Material.YELLOW_FLOWER;
-		airy = airy || mat == Material.DOUBLE_PLANT;
-		airy = airy || mat == Material.DEAD_BUSH;
-		airy = airy || mat == Material.SUGAR_CANE_BLOCK;
-		airy = airy || mat == Material.SAPLING;
-		airy = airy || mat == Material.CROPS;
-		airy = airy || mat == Material.POTATO;
+		airy = airy && !mat.isSolid();
+		airy = airy && mat != Material.WATER;
+		airy = airy && mat != Material.LAVA;
 		return airy;
 	}
 
@@ -81,8 +74,8 @@ public class Blocks {
 	public static boolean isTallDoor(Material mat) {
 		boolean isTallDoor = false;
 		switch (mat) {
-			case IRON_DOOR_BLOCK:
-			case WOODEN_DOOR:
+			case IRON_DOOR:
+			case OAK_DOOR:
 			case ACACIA_DOOR:
 			case BIRCH_DOOR:
 			case DARK_OAK_DOOR:
@@ -96,8 +89,13 @@ public class Blocks {
 	public static boolean isTrapDoor(Material mat) {
 		boolean isTrapDoor = false;
 		switch (mat) {
-			case TRAP_DOOR:
 			case IRON_TRAPDOOR:
+			case OAK_TRAPDOOR:
+			case ACACIA_TRAPDOOR:
+			case BIRCH_TRAPDOOR:
+			case DARK_OAK_TRAPDOOR:
+			case JUNGLE_TRAPDOOR:
+			case SPRUCE_TRAPDOOR:
 				isTrapDoor = true;
 		}
 		return isTrapDoor;
@@ -107,7 +105,7 @@ public class Blocks {
 		boolean isSign = false;
 		switch (mat) {
 			case WALL_SIGN:
-			case SIGN_POST:
+			case SIGN:
 				isSign = true;
 		}
 		return isSign;
@@ -115,7 +113,7 @@ public class Blocks {
 
 	public static Set<Material> getSignMaterials() {
 		Set<Material> mats = new HashSet<>();
-		mats.add(Material.SIGN_POST);
+		mats.add(Material.SIGN);
 		mats.add(Material.WALL_SIGN);
 		return mats;
 	}
