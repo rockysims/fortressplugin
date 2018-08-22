@@ -408,6 +408,8 @@ public class FortressesManagerForWorld {
 								? (nowOpen)?Sound.BLOCK_IRON_DOOR_OPEN:Sound.BLOCK_IRON_DOOR_CLOSE
 								: (nowOpen)?Sound.BLOCK_IRON_TRAPDOOR_OPEN:Sound.BLOCK_IRON_TRAPDOOR_CLOSE;
 						player.playSound(topDoorPoint.toLocation(world), sound, 1.0F, 1.0F);
+
+						cancel = true; //prevent placing items when right clicking with item to open door
 					}
 				}
 			} else {
