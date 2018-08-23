@@ -201,6 +201,9 @@ public class FortressPlugin extends JavaPlugin {
 									if (p.is(Material.COBBLESTONE, world)) {
 										p.getBlock(world).setType(Material.AIR);
 									}
+									if (p.is(Material.MOSSY_COBBLESTONE, world)) {
+										p.getBlock(world).setType(Material.AIR);
+									}
 									if (p.is(Material.GLASS, world)) {
 										p.getBlock(world).setType(Material.AIR);
 									}
@@ -239,9 +242,9 @@ public class FortressPlugin extends JavaPlugin {
 					boolean zMatch = z == 0 || z == num-1;
 					if (xMatch || yMatch || zMatch) {
 						Point p = anchor.add(x, y, z);
-						Material m = Material.COBBLESTONE;
+						Material m = Material.MOSSY_COBBLESTONE;
 						if (random.nextBoolean()) {
-							m = Material.MOSSY_COBBLESTONE;
+							m = Material.COBBLESTONE;
 						}
 						p.getBlock(world).setType(m);
 					}
@@ -260,8 +263,8 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //1.13 MVP goals:
-//get particles working again
-//handle slime blocks
+//fix bug where glowstone fuel is not consumed
+//consider making doors not trigger bedrock ripple when right clicked (at least when player can open door)
 
 //old MVP goals:
 //fix /reload memory leak (remove all managers onDisable)

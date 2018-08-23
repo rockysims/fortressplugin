@@ -12,6 +12,7 @@ import org.bukkit.World;
 import java.util.*;
 
 public class CoreParticles {
+	private int animationWaitTicks = 0;
 	private int anchorWaitTicks = 0;
 	private int wallWaitTicks = 0;
 	private List<Pair<Point, Point>> wallOutsidePairs = null;
@@ -118,7 +119,7 @@ public class CoreParticles {
 	private void tickAnchorParticles(BaseCore core) {
 		if (core.isActive()) {
 			if (anchorWaitTicks <= 0) {
-				long now = (new Date()).getTime();
+				long now = System.currentTimeMillis();
 				anchorWaitTicks = (1000 + (int)(now % 5000)) / TickTimer.msPerTick;
 				displayAnchorParticle(core);
 			}
@@ -130,5 +131,14 @@ public class CoreParticles {
 		Point point = core.model.anchorPoint.add(0, 1, 0);
 		point = point.add(0.5, -0.4, 0.5);
 		Particles.display(Particle.PORTAL, 1, core.model.world, point, 0.2F, 0.0F, 0.2F);
+	}
+
+	public void tickAnimationParticles(BaseCore core) {
+		if (animationWaitTicks <= 0) {
+			long now = System.currentTimeMillis();
+			animationWaitTicks = (300 + (int)(now % 150)) / TickTimer.msPerTick;
+			displayAnchorParticle(core);
+		}
+		animationWaitTicks--;
 	}
 }

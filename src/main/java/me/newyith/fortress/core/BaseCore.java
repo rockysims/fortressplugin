@@ -331,6 +331,7 @@ public abstract class BaseCore {
 
 				//*/
 			} else {
+				//indicate search for what to generate is in progress
 				model.coreParticles.displayAnchorParticle(this);
 			}
 		}
@@ -340,6 +341,11 @@ public abstract class BaseCore {
 		boolean waitingForGenPrepData = future != null && !future.isDone();
 		if (!waitingForGenPrepData) {
 			model.animator.tick();
+
+			if (model.animator.isAnimating()) {
+				//indicate de/generation is in progress
+				model.coreParticles.tickAnimationParticles(this);
+			}
 		}
 	}
 

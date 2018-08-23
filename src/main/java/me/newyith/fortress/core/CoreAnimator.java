@@ -135,13 +135,18 @@ public class CoreAnimator {
 		return model.coreMats.getInvalidWallMaterials();
 	}
 
+	public boolean isAnimating() {
+		return model.animationInProgress;
+	}
+
 	public void tick() {
 		if (model.animationInProgress) {
 			model.animationWaitTicks++;
 			if (model.animationWaitTicks >= model.ticksPerFrame || model.skipAnimation) {
 				model.animationWaitTicks = 0;
 
-				int frameUpdatesLimit = (model.fastAnimation)?3:1;
+				long startMs = System.currentTimeMillis();
+				int frameUpdatesLimit = (model.fastAnimation)?8:1;
 				while (true) {
 					//try to update to next frame
 					boolean updatedFrame = updateToNextFrame();
@@ -154,6 +159,14 @@ public class CoreAnimator {
 						frameUpdatesLimit--;
 						if (frameUpdatesLimit <= 0) {
 							//updated to next frame(s) so we're done for now
+//							Debug.msg("END NORMALLY msElapsed: " + (System.currentTimeMillis() - startMs));
+							break;
+						}
+
+						float msElapsed = System.currentTimeMillis() - startMs;
+						if (msElapsed > 10) {
+							//taking kind of a long time so we've updated enough frames for this tick
+//							Debug.msg("END EARLY (" + frameUpdatesLimit + " frames remaining) ===========>> msElapsed: " + msElapsed);
 							break;
 						}
 					}
