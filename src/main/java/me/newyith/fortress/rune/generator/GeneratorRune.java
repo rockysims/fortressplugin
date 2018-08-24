@@ -7,6 +7,7 @@ import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Cuboid;
 import me.newyith.fortress.util.Debug;
+import me.newyith.fortress.util.Items;
 import me.newyith.fortress.util.Point;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -241,10 +242,8 @@ public class GeneratorRune {
 		Chest chest = getChest();
 		if (chest != null) {
 			Inventory inv = chest.getInventory();
-			if (inv.contains(Material.GLOWSTONE_DUST)) {
-				inv.removeItem(new ItemStack(Material.GLOWSTONE_DUST, 1));
-				chest.update(true);
-
+			boolean consumedFuel = Items.tryToRemoveOneInventoryItem(inv, Material.GLOWSTONE_DUST);
+			if (consumedFuel) {
 				model.fuelTicksRemaining = FortressPlugin.config_glowstoneDustBurnTimeMs / TickTimer.msPerTick;
 				updateFuelRemainingDisplay(model.fuelTicksRemaining * TickTimer.msPerTick);
 			}

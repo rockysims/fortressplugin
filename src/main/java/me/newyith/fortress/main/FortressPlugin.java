@@ -263,7 +263,6 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //1.13 MVP goals:
-//fix bug where glowstone fuel is not consumed
 //consider making doors not trigger bedrock ripple when right clicked (at least when player can open door)
 
 //old MVP goals:
