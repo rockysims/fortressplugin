@@ -110,7 +110,7 @@ public class GeneratorCore extends BaseCore {
 	}
 
 	public void onPlayerRightClickWall(Player player, Block block, BlockFace face) {
-		Material materialInHand = player.getItemInHand().getType();
+		Material materialInHand = player.getInventory().getItemInMainHand().getType();
 		if (materialInHand == Material.AIR) {
 			Point origin = new Point(block);
 			Point towardFace = origin.add(face.getModX(), face.getModY(), face.getModZ());
@@ -129,9 +129,21 @@ public class GeneratorCore extends BaseCore {
 			Pair<Point, Point> wallOutside = new Pair<>(origin, towardFace);
 			model.coreParticles.showParticleForWallOutsidePair(model.world, wallOutside, particle, 3);
 
-			//show bedrock ripple
+			//show bedrock ripple (unless opening/closing door)
 			if (originGenerated) {
-				showRipple(origin, generatedPoints);
+				//skip bedrock ripple if opening protected door (hacky solution)
+				boolean openingOrClosingDoor = false;
+				if (Blocks.isDoor(block.getType())) {
+					Block aboveBlock = block.getRelative(0, 1, 0);
+					Block topDoorBlock = (Blocks.isTallDoor(block.getType()) && Blocks.isTallDoor(aboveBlock.getType()))
+							? aboveBlock
+							: block;
+					if (playerCanOpenDoor(player, new Point(topDoorBlock))) {
+						openingOrClosingDoor = true;
+					}
+				}
+
+				if (!openingOrClosingDoor) showRipple(origin, generatedPoints);
 			}
 		}
 	}
