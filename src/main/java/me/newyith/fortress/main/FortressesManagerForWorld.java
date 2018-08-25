@@ -576,9 +576,13 @@ public class FortressesManagerForWorld {
 		return cancel;
 	}
 
-	public void onPlayerCloseChest(Player player, Block block) {
+	public void onPlayerCloseChest(Player player, Block block, Block block2) {
 		Point p = new Point(block);
 		GeneratorRune rune = getRuneByPatternPoint(p);
+		if (rune == null && block2 != null) {
+			p = new Point(block2);
+			rune = getRuneByPatternPoint(p);
+		}
 		if (rune != null) {
 			rune.onPlayerCloseChest(player, p);
 		}

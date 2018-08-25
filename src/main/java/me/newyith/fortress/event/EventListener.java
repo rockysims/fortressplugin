@@ -10,6 +10,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
+import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -228,7 +229,16 @@ public class EventListener implements Listener {
 				Block block = chest.getBlock();
 				Player player = (Player) humanEntity;
 				World world = block.getWorld();
-				FortressesManager.forWorld(world).onPlayerCloseChest(player, block);
+				FortressesManager.forWorld(world).onPlayerCloseChest(player, block, null);
+			} else if (holder instanceof DoubleChest) {
+				DoubleChest doubleChest = (DoubleChest) holder;
+				Chest leftChest = (Chest) doubleChest.getLeftSide();
+				Chest rightChest = (Chest) doubleChest.getRightSide();
+				Block leftBlock = leftChest.getBlock();
+				Block rightBlock = rightChest.getBlock();
+				Player player = (Player) humanEntity;
+				World world = leftBlock.getWorld();
+				FortressesManager.forWorld(world).onPlayerCloseChest(player, leftBlock, rightBlock);
 			}
 		}
 	}
