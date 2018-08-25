@@ -106,12 +106,19 @@ public class CoreMaterials {
 				switch (mat) {
 					//non protectable
 					//* //TODO: leave this block enabled (except when debugging)
-					case GRASS:
+					case GRASS_BLOCK:
 					case DIRT:
 					case STONE:
 					case GRAVEL:
 					case SAND:
+					case RED_SAND:
 					case NETHERRACK:
+					case END_STONE:
+
+					case SIGN: //text removed by bedrock wave
+					case CHEST: //chest items ejected on ground by bedrock wave
+					case TRAPPED_CHEST: //chest items ejected on ground by bedrock wave
+
 					//*/
 					case BEDROCK:
 						invalidWallMaterials.add(mat);
@@ -150,6 +157,11 @@ public class CoreMaterials {
 					case REDSTONE:
 						addProtectable(Material.REDSTONE_WIRE);
 						break;
+//					case SIGN:
+//						addProtectable(Material.SIGN);
+//						addProtectable(Material.WALL_SIGN);
+//						break;
+					//flags
 					case BLAZE_ROD:
 						model.flags.add("fastAnimation");
 						break;
