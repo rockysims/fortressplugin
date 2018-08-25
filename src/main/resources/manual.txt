@@ -3,11 +3,13 @@ Fortress Manual
 1) Table of Contents
 2) Generator Rune
 3) Rune Pattern
-4) Redstone
-5) Security
-6) Doors
-7) Directives
-8) /stuck
+4) Placing Generator
+5) Redstone
+6) Security
+7) Doors
+8) Directives
+9) /stuck
++) Details
 =======
 Generator Rune
 
@@ -34,8 +36,21 @@ I: iron block
 Top layer:    RGC
 Bottom layer: IDI
 
-Place a sign on side of
+Place sign on front of
 gold block to activate.
+=======
+Placing Generator
+
+Place in the world (not
+the crafting table) the
+six block rune pattern
+(see page 3).
+
+Then place a blank
+sign on the front or
+back of the gold block.
+Text will appear on the
+sign.
 =======
 Redstone
 
@@ -91,3 +106,54 @@ If you get stuck, you
 can type /stuck to
 teleport to nearby
 after a delay.
+=======
+If a door leads from
+outside the fortress
+to inside, the whitelist
+sign must be inside.
+
+If you're not sure
+what's inside, see
+Security (page 6).
+=======
+Trapdoor whitelist
+signs must be *in* one
+of the six adjacent
+blocks.
+
+Unlike whitelist signs
+for normal doors
+which must be *in* the
+block above the door
+or one of the six
+blocks adjacent to it.
+=======
+Signs adjacent to
+whitelist signs are also
+considered whitelist
+signs (recursive).
+
+Whitelist signs can
+contain one name per
+line or a comma
+separated list of
+names. If comma
+separated, a name can
+span multiple lines.
+=======
+No bedrock wave is
+shown when opening
+a door with right click
+even if hand is empty.
+=======
+Got feedback for me?
+I'd be glad to hear it.
+
+Like the plugin and
+want to say thank
+you? Send me a
+screenshot of your
+fortress.
+
+mc.fortress.mod@gmail
+.com

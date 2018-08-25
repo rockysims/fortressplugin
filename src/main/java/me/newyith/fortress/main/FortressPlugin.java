@@ -263,7 +263,7 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //1.13 MVP goals:
-//consider making doors not trigger bedrock ripple when right clicked (at least when player can open door)
+//consider preventing going to/from nether inside running fortresses
 
 //old MVP goals:
 //fix /reload memory leak (remove all managers onDisable)
