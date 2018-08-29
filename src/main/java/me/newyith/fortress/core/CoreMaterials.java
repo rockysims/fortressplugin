@@ -109,6 +109,9 @@ public class CoreMaterials {
 					case GRASS_BLOCK:
 					case DIRT:
 					case STONE:
+					case GRANITE:
+					case DIORITE:
+					case ANDESITE:
 					case GRAVEL:
 					case SAND:
 					case RED_SAND:
@@ -124,12 +127,14 @@ public class CoreMaterials {
 						invalidWallMaterials.add(mat);
 						break;
 					//special protectable
-					case WATER_BUCKET:
-						addProtectable(Material.WATER);
-						break;
-					case LAVA_BUCKET:
-						addProtectable(Material.LAVA);
-						break;
+
+//					case WATER_BUCKET:
+//						addProtectable(Material.WATER);
+//						break;
+//					case LAVA_BUCKET:
+//						addProtectable(Material.LAVA);
+//						break;
+
 					//pistons not protectable because bedrock ripple and shield don't seem to play nice with pistons
 					//had piston turn into piston extension (invisible) when toggling switch controlling piston with empty hand (causing ripple)
 					/*
