@@ -139,6 +139,13 @@ public class Blocks {
 		});
 	}
 
+	public static CompletableFuture<Set<Point>> getPointsConnected(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, int layerLimit, Set<Point> ignorePoints, ConnectedThreshold connectedThreshold) {
+		return CompletableFuture.supplyAsync(() -> {
+			List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, -1, rangeLimit, layerLimit, ignorePoints, null, null, connectedThreshold).join();
+			return flattenLayers(layers);
+		});
+	}
+
 	public static CompletableFuture<List<Set<Point>>> getPointsConnectedAsLayers(World world, Point origin, int layerLimit, Set<Point> searchablePoints) {
 		Set<Point> originLayer = new HashSet<>();
 		originLayer.add(origin);

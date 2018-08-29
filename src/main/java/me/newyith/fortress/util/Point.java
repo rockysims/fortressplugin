@@ -142,6 +142,10 @@ public class Point {
 		return new Point(x, y, z);
 	}
 
+	public Point center() {
+		return new Point(xInt() + 0.5, yInt() + 0.5, zInt() + 0.5);
+	}
+
 	public boolean is(Material mat, World world) {
 		return getBlock(world).getType() == mat;
 	}
