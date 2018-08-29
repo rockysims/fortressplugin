@@ -2,6 +2,7 @@ package me.newyith.fortress.main;
 
 import me.newyith.fortress.command.StuckPlayer;
 import me.newyith.fortress.core.BaseCore;
+import me.newyith.fortress.core.GeneratorCore;
 import me.newyith.fortress.protection.ProtectionManager;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.rune.generator.GeneratorRunePattern;
@@ -12,19 +13,18 @@ import org.bukkit.*;
 import org.bukkit.block.data.Openable;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.*;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class FortressesManagerForWorld {
 	private static FortressesManager instance = null;
@@ -325,11 +325,11 @@ public class FortressesManagerForWorld {
 		return cancel;
 	}
 
-	public boolean onIgnite(Block b) {
+	public boolean onIgnite(Player player, Block b) {
 		boolean cancel = false;
 
 		Point p = new Point(b);
-		boolean igniteProof = isClaimed(p);
+		boolean igniteProof = isClaimed(p) && player == null; //allow players to ignite to avoid confusing failures to ignite nether portal
 		if (igniteProof) {
 			//TODO: uncomment out once issue where /reload causes delayed task to be forgotten is fixed
 //			BedrockManager.convert(w, p);
@@ -418,6 +418,35 @@ public class FortressesManagerForWorld {
 		}
 
 		return cancel;
+	}
+
+	public boolean playerCanUseNetherPortal(Player player, Point point) {
+		boolean canUse = true;
+
+		//sometimes point is off by one (player moving while entering) so fallback to closest adjacent portal (if any)
+		if (!point.is(Material.NETHER_PORTAL, model.world)) {
+			final Point finalPoint = point;
+			List<Point> adjacentPortalPoints = Blocks.getAdjacent6(point).stream()
+					.filter(p -> p.is(Material.NETHER_PORTAL, model.world))
+					.map(Point::center)
+					.sorted((p1, p2) -> (int)(p1.distance(finalPoint)*100 - p2.distance(finalPoint)*100)) //closest first
+					.collect(Collectors.toList());
+			Iterator<Point> it = adjacentPortalPoints.iterator();
+			if (it.hasNext()) {
+//				Debug.warn("point was: " + point.toStringDoubles()); //TODO: delete this line
+				point = it.next();
+//				Debug.warn("point now: " + point.toStringDoubles()); //TODO: delete this line
+			}
+		}
+
+		for (GeneratorRune rune : model.generatorRunes) {
+			GeneratorCore core = rune.getGeneratorCore();
+			if (core.isActive() && core.getPointsInsideFortress().contains(point)) {
+				canUse = canUse && core.playerCanUseNetherPortal(player, point);
+			}
+		}
+
+		return canUse;
 	}
 
 	public void onPlayerRightClickBlock(Player player, Block block, BlockFace face) {

@@ -153,7 +153,7 @@ public class EventListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockIgnite(BlockIgniteEvent event) {
 		World world = event.getBlock().getWorld();
-		boolean cancel = FortressesManager.forWorld(world).onIgnite(event.getBlock());
+		boolean cancel = FortressesManager.forWorld(world).onIgnite(event.getPlayer(), event.getBlock());
 		if (cancel) {
 			event.setCancelled(true);
 		}
@@ -294,4 +294,31 @@ public class EventListener implements Listener {
 			}
 		}
 	}
+
+	//TODO: consider merging onEnderPearlThrown() and onNetherPortalTeleport() handlers since both handle PlayerTeleportEvent
+	@EventHandler(ignoreCancelled = true)
+	public void onNetherPortalTeleport(PlayerTeleportEvent event) {
+		if (event.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) {
+			Player player = event.getPlayer();
+			Location fromLoc = event.getFrom();
+			Location toLoc = event.getTo();
+			World fromWorld = fromLoc.getWorld();
+			Point fromPoint = new Point(fromLoc);
+			World toWorld = toLoc.getWorld();
+			Point toPoint = new Point(toLoc);
+			boolean cancel = FortressesManager.onNetherPortalTeleport(player, fromWorld, fromPoint, toWorld, toPoint);
+			if (cancel) {
+				event.setCancelled(true);
+			}
+		}
+	}
+
+	//TODO: consider preventing creation of exit portals inside fortress
+//	@EventHandler(ignoreCancelled = true)
+//	public void onNetherPortalCreate(PortalCreateEvent event) {
+//		ArrayList<Block> blocks = event.getBlocks();
+//
+//		Debug.msg("onNetherPortalCreate() blocks " + blocks.size());
+//		event.setCancelled(true);
+//	}
 }

@@ -18,18 +18,18 @@ import me.newyith.fortress.util.Cuboid;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import me.newyith.fortress.util.Blocks;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Orientable;
 import org.bukkit.entity.Player;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public abstract class BaseCore {
 	public static class Model {
@@ -120,34 +120,47 @@ public abstract class BaseCore {
 	}
 
 	public boolean playerCanOpenDoor(Player player, Point doorPoint) {
-		String playerName = player.getName();
 		Set<Point> actualSigns = getDoorWhitelistSignPoints(doorPoint);
 		if (actualSigns.isEmpty()) {
 			actualSigns = getFallbackWhitelistSignPoints();
 		}
 
+		return isWhitelistedBy(player, actualSigns);
+	}
+
+	public boolean playerCanUseNetherPortal(Player player, Point portalPoint) {
+		Set<Point> actualSigns = getNetherPortalWhitelistSignPoints(portalPoint);
+		if (actualSigns.isEmpty()) {
+			actualSigns = getFallbackWhitelistSignPoints();
+		}
+
+		return isWhitelistedBy(player, actualSigns);
+	}
+
+	private boolean isWhitelistedBy(Player player, Set<Point> signs) {
+		String playerName = player.getName();
 		Set<String> names = new HashSet<>();
-		for (Point p : actualSigns) {
-			if (Blocks.isSign(p.getBlock(model.world).getType())) {
+		for (Point p : signs) {
+			if (Blocks.isSign(p.getType(model.world))) {
 				Block signBlock = p.getBlock(model.world);
 				Sign sign = (Sign)signBlock.getState();
 				names.addAll(getNamesFromSign(sign));
 			}
 		}
 
-		boolean canOpenDoor = false;
+		boolean isWhitelisted = false;
 		for (String name : names) {
 			if (name.equalsIgnoreCase(playerName)) {
-				canOpenDoor = true;
+				isWhitelisted = true;
 				break;
 			}
 		}
 
-		return canOpenDoor;
+		return isWhitelisted;
 	}
 
 	protected Set<Point> getFallbackWhitelistSignPoints() {
-		//this method exists so GeneratorCore can override it
+		//this method exists only so GeneratorCore can override it
 		return new HashSet<>();
 	}
 
@@ -190,6 +203,81 @@ public abstract class BaseCore {
 		actualSigns.addAll(connectedSigns);
 
 		return actualSigns;
+	}
+
+	private Set<Point> getNetherPortalWhitelistSignPoints(Point portalPoint) {
+		Set<Point> actualSignPoints = new HashSet<>();
+
+		World world = model.world;
+		if (portalPoint.is(Material.NETHER_PORTAL, world)) {
+			BlockData blockData = portalPoint.getBlock(world).getBlockData();
+			if (blockData instanceof Orientable) {
+				Orientable orientable = (Orientable)blockData;
+				Axis portalAxis = orientable.getAxis();
+
+				//find portalPoints
+				Set<Point> originLayer = new HashSet<>();
+				originLayer.add(portalPoint);
+				Set<Material> traverseReturnMaterials = new HashSet<>();
+				traverseReturnMaterials.add(Material.NETHER_PORTAL);
+				int rangeLimit = FortressPlugin.config_generationRangeLimit;
+				Set<Point> portalPoints = Blocks.getPointsConnected(
+						world,
+						portalPoint,
+						originLayer,
+						traverseReturnMaterials,
+						traverseReturnMaterials,
+						rangeLimit,
+						null,
+						Blocks.ConnectedThreshold.FACES
+				).join().stream()
+						.filter(p -> {
+							if (portalAxis == Axis.X) return p.zInt() == portalPoint.zInt();
+							if (portalAxis == Axis.Z) return p.xInt() == portalPoint.xInt();
+							return false;
+						})
+						.collect(Collectors.toSet());
+				portalPoints.add(portalPoint);
+
+				//find framePoints
+				traverseReturnMaterials.clear();
+				traverseReturnMaterials.add(Material.OBSIDIAN);
+				Set<Point> framePoints = Blocks.getPointsConnected(
+						world,
+						portalPoint,
+						portalPoints,
+						traverseReturnMaterials,
+						traverseReturnMaterials,
+						rangeLimit,
+						1,
+						null,
+						Blocks.ConnectedThreshold.POINTS
+				).join().stream()
+						.filter(p -> {
+							if (portalAxis == Axis.X) return p.zInt() == portalPoint.zInt();
+							if (portalAxis == Axis.Z) return p.xInt() == portalPoint.xInt();
+							return false;
+						})
+						.collect(Collectors.toSet());
+
+				//find signPoints
+				traverseReturnMaterials = Blocks.getSignMaterials();
+				Set<Point> signPoints = Blocks.getPointsConnected(
+						world,
+						portalPoint,
+						framePoints,
+						traverseReturnMaterials,
+						traverseReturnMaterials,
+						rangeLimit,
+						null,
+						Blocks.ConnectedThreshold.FACES
+				).join();
+
+				actualSignPoints.addAll(signPoints);
+			}
+		}
+
+		return actualSignPoints;
 	}
 
 	private boolean signMustBeInside(Point doorPoint) {

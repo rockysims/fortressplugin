@@ -263,7 +263,21 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //1.13 MVP goals:
-//consider preventing going to/from nether inside running fortresses
+//done: prevent teleport via nether portal unless both portals involved have whitelist signs or are not inside fortress
+//	todo: test portal inside fortress inside fortress case
+//	todo: test fortresses around both portals case
+//if (not whitelisted on toPortal && player in sneak) instant stuck teleport relative to toPortal
+//		if stuck teleport fails, do nothing except send message to player (not ideal but not sure what else to do)
+//look at "consider todos" regarding nether portals near bottom of EventListener
+
+//TODO: handle nether portals better
+//More Ideas:
+//ideally also make entering protected portal cause returning through exit portal to go to entry portal
+//	on enter protected portal, save map (per player) of all exitPortalPortals to entryPortalPoint
+//prevent creating exit portals inside fortress (if active/protected)? maybe... but only if player can still teleport to world via portal + sneak
+//	FIXES: creating exit portals in fortress and sending through TNT and also grief portal creation
+
+
 
 //old MVP goals:
 //fix /reload memory leak (remove all managers onDisable)

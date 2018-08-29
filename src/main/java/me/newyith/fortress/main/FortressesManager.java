@@ -1,9 +1,11 @@
 package me.newyith.fortress.main;
 
 import me.newyith.fortress.rune.generator.GeneratorRune;
+import me.newyith.fortress.util.Point;
 import org.bukkit.*;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.bukkit.entity.Player;
 
 import java.util.*;
 
@@ -93,5 +95,35 @@ public class FortressesManager {
 		instance.model.managerByWorld.forEach((worldName, manager) -> {
 			manager.onTick();
 		});
+	}
+
+	public static boolean onNetherPortalTeleport(Player player, World fromWorld, Point fromPoint, World toWorld, Point toPoint) {
+		boolean cancel = false;
+
+		FortressesManagerForWorld fromWorldManager = forWorld(fromWorld);
+		FortressesManagerForWorld toWorldManager = forWorld(toWorld);
+		cancel = cancel || !fromWorldManager.playerCanUseNetherPortal(player, fromPoint);
+		cancel = cancel || !toWorldManager.playerCanUseNetherPortal(player, toPoint);
+
+		if (cancel) {
+			if (player.isSneaking()) {
+
+
+
+				player.sendMessage("//TODO: stuck teleport relative to " + toPoint + " in " + toWorld.getName());
+
+
+
+			} else {
+				String msgLine1 = "Teleport to " + toPoint + " in " + toWorld.getName() + " failed.";
+				String msgLine2 = "To enter/exit a nether portal inside a fortress, you must place whitelist sign(s) on the portal frame inside the fortress.";
+				String msgLine3 = "To "+ChatColor.DARK_AQUA+"force teleport"+ChatColor.AQUA+" to a location nearby destination portal, sneak (hold shift) while entering portal.";
+				player.sendMessage(ChatColor.AQUA + msgLine1);
+				player.sendMessage(ChatColor.AQUA + msgLine2);
+				player.sendMessage(ChatColor.AQUA + msgLine3);
+			}
+		}
+
+		return cancel;
 	}
 }
