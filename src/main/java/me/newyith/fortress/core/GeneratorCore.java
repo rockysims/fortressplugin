@@ -1,19 +1,14 @@
 package me.newyith.fortress.core;
 
 import javafx.util.Pair;
-import me.newyith.fortress.bedrock.BedrockAuthToken;
 import me.newyith.fortress.bedrock.BedrockManager;
 import me.newyith.fortress.bedrock.timed.TimedBedrockManager;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
-import me.newyith.fortress.protection.ProtectionAuthToken;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.util.Blocks;
 import me.newyith.fortress.util.Point;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -25,42 +20,26 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class GeneratorCore extends BaseCore {
-	private static class Model extends BaseCore.Model {
+	private static class Model {
+		private BaseCore.Model superModel = null;
 		private String datum = null; //placeholder since GeneratorCore doesn't need its own data (at least not yet)
 		private final transient Random random = new Random(); //showRipple() needs model.random to be final
 
 		@JsonCreator
-		public Model(@JsonProperty("anchorPoint") Point anchorPoint,
-					 @JsonProperty("claimedPoints") Set<Point> claimedPoints,
-					 @JsonProperty("claimedWallPoints") Set<Point> claimedWallPoints,
-					 @JsonProperty("bedrockAuthToken") BedrockAuthToken bedrockAuthToken,
-					 @JsonProperty("protectionAuthToken") ProtectionAuthToken protectionAuthToken,
-					 @JsonProperty("animator") CoreAnimator animator,
-					 @JsonProperty("active") boolean active,
-					 @JsonProperty("placedByPlayerId") UUID placedByPlayerId,
-					 @JsonProperty("layerOutsideFortress") Set<Point> layerOutsideFortress,
-					 @JsonProperty("pointsInsideFortress") Set<Point> pointsInsideFortress,
-					 @JsonProperty("worldName") String worldName,
+		public Model(@JsonProperty("superModel") BaseCore.Model superModel,
 					 @JsonProperty("datum") String datum) {
-			super(anchorPoint, claimedPoints, claimedWallPoints, bedrockAuthToken, protectionAuthToken,
-					animator, active, placedByPlayerId, layerOutsideFortress, pointsInsideFortress, worldName);
+			this.superModel = superModel;
 			this.datum = datum;
 
 			//rebuild transient fields
 			//this.random = new Random(); //this.random is final so can't init here
-		}
-
-		//should this be JsonCreator instead? if not, delete this comment
-		public Model(BaseCore.Model model, String datum) {
-			super(model);
-			this.datum = datum;
 		}
 	}
 	private Model model = null;
 
 	@JsonCreator
 	public GeneratorCore(@JsonProperty("model") Model model) {
-		super(model);
+		super(model.superModel);
 		this.model = model;
 	}
 
@@ -75,13 +54,13 @@ public class GeneratorCore extends BaseCore {
 	protected Set<Point> getFallbackWhitelistSignPoints() {
 		Set<Point> fallbackSigns = new HashSet<>();
 
-		GeneratorRune rune = FortressesManager.forWorld(model.world).getRuneByPatternPoint(model.anchorPoint);
+		GeneratorRune rune = FortressesManager.forWorld(super.model.world).getRuneByPatternPoint(super.model.anchorPoint);
 		if (rune != null) {
 			Set<Point> potentialSigns = getLayerAround(rune.getPattern().getPoints(), Blocks.ConnectedThreshold.FACES).join();
 
 			//fill fallbackSigns (from potentialSigns)
 			for (Point potentialSign : potentialSigns) {
-				Material mat = potentialSign.getBlock(model.world).getType();
+				Material mat = potentialSign.getBlock(super.model.world).getType();
 				if (Blocks.isSign(mat)) {
 					fallbackSigns.add(potentialSign);
 				}
@@ -89,14 +68,14 @@ public class GeneratorCore extends BaseCore {
 
 			if (!fallbackSigns.isEmpty()) {
 				//fallbackSigns.addAll(connected signs)
-				Point origin = model.anchorPoint;
+				Point origin = super.model.anchorPoint;
 				Set<Point> originLayer = fallbackSigns;
 				Set<Material> traverseMaterials = Blocks.getSignMaterials();
 				Set<Material> returnMaterials = Blocks.getSignMaterials();
-				int rangeLimit = model.generationRangeLimit * 2;
+				int rangeLimit = super.model.generationRangeLimit * 2;
 				Set<Point> ignorePoints = null;
 				Set<Point> searchablePoints = null;
-				Set<Point> connectedSigns = Blocks.getPointsConnected(model.world, origin, originLayer,
+				Set<Point> connectedSigns = Blocks.getPointsConnected(super.model.world, origin, originLayer,
 						traverseMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints).join();
 				fallbackSigns.addAll(connectedSigns);
 			}
@@ -106,7 +85,7 @@ public class GeneratorCore extends BaseCore {
 	}
 
 	public Set<Material> getInvalidWallMaterials() {
-		return model.animator.getInvalidWallMaterials();
+		return super.model.animator.getInvalidWallMaterials();
 	}
 
 	public void onPlayerRightClickWall(Player player, Block block, BlockFace face) {
@@ -127,7 +106,7 @@ public class GeneratorCore extends BaseCore {
 
 			//display particle
 			Pair<Point, Point> wallOutside = new Pair<>(origin, towardFace);
-			model.coreParticles.showParticleForWallOutsidePair(model.world, wallOutside, particle, 3);
+			super.model.coreParticles.showParticleForWallOutsidePair(super.model.world, wallOutside, particle, 3);
 
 			//show bedrock ripple (unless opening/closing door)
 			if (originGenerated) {
@@ -152,7 +131,7 @@ public class GeneratorCore extends BaseCore {
 		//get rippleLayers
 		int layerLimit = 20;
 		Set<Point> searchablePoints = generatedPoints;
-		CompletableFuture<List<Set<Point>>> future = Blocks.getPointsConnectedAsLayers(model.world, origin, layerLimit - 1, searchablePoints);
+		CompletableFuture<List<Set<Point>>> future = Blocks.getPointsConnectedAsLayers(super.model.world, origin, layerLimit - 1, searchablePoints);
 		future.join(); //wait for future to resolve
 		List<Set<Point>> rippleLayersFromFuture = future.getNow(null);
 
@@ -200,17 +179,17 @@ public class GeneratorCore extends BaseCore {
 				final int msDurationFinal = msDuration;
 				Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
 					//TODO: consider fixing hacky call to getRuneByPatternPoint() here. GeneratorCore shouldn't need to know about rune
-					//	maybe add BaseCore::onBroken() should set model.isBroken = true?
+					//	maybe add BaseCore::onBroken() should set super.model.isBroken = true?
 
-					boolean runeStillExists = FortressesManager.forWorld(model.world).getRuneByPatternPoint(model.anchorPoint) != null;
+					boolean runeStillExists = FortressesManager.forWorld(super.model.world).getRuneByPatternPoint(super.model.anchorPoint) != null;
 					if (runeStillExists) { //rune might have been destroyed before ripple ended
-						TimedBedrockManager.forWorld(model.world).convert(model.bedrockAuthToken, layer, msDurationFinal);
+						TimedBedrockManager.forWorld(super.model.world).convert(super.model.bedrockAuthToken, layer, msDurationFinal);
 
 						//force reversion of cobble in layer
 						Set<Point> cobbleInLayer = layer.stream().filter(p ->
-								BedrockManager.forWorld(model.world).getMaterialOrNull(p) == Material.COBBLESTONE
+								BedrockManager.forWorld(super.model.world).getMaterialOrNull(p) == Material.COBBLESTONE
 						).collect(Collectors.toSet());
-						TimedBedrockManager.forWorld(model.world).forceReversion(model.bedrockAuthToken, cobbleInLayer, 300);
+						TimedBedrockManager.forWorld(super.model.world).forceReversion(super.model.bedrockAuthToken, cobbleInLayer, 300);
 					}
 				}, layerIndex * 3); //ticks (50 ms per tick)
 
@@ -222,17 +201,17 @@ public class GeneratorCore extends BaseCore {
 
 	/* Yona's version
 	protected Set<Point> getFallbackWhitelistSignPoints() {
-		GeneratorRune rune = FortressesManager.getRuneByPatternPoint(model.anchorPoint);
+		GeneratorRune rune = FortressesManager.getRuneByPatternPoint(super.model.anchorPoint);
 		if (rune != null) {
 			Set<Point> potentialSigns = getLayerAround(rune.getPattern().getPoints(), Blocks.ConnectedThreshold.FACES).join();
 
 			final Set<Point> fallbackSigns = potentialSigns.stream()
-					.filter(sign -> Blocks.isSign(sign.getBlock(model.world).getType()))
+					.filter(sign -> Blocks.isSign(sign.getBlock(super.model.world).getType()))
 					.collect(Collectors.toSet());
 
 			//fill fallbackSigns (from potentialSigns)
 			for (Point potentialSign : potentialSigns) {
-				Material mat = potentialSign.getBlock(model.world).getType();
+				Material mat = potentialSign.getBlock(super.model.world).getType();
 				if (Blocks.isSign(mat)) {
 					fallbackSigns.add(potentialSign);
 				}
@@ -240,14 +219,14 @@ public class GeneratorCore extends BaseCore {
 
 			if (!fallbackSigns.isEmpty()) {
 				//fallbackSigns.addAll(connected signs)
-				Point origin = model.anchorPoint;
+				Point origin = super.model.anchorPoint;
 				Set<Point> originLayer = fallbackSigns;
 				Set<Material> traverseMaterials = Blocks.getSignMaterials();
 				Set<Material> returnMaterials = Blocks.getSignMaterials();
-				int rangeLimit = model.generationRangeLimit * 2;
+				int rangeLimit = super.model.generationRangeLimit * 2;
 				Set<Point> ignorePoints = null;
 				Set<Point> searchablePoints = null;
-				Set<Point> connectedSigns = Blocks.getPointsConnected(model.world, origin, originLayer,
+				Set<Point> connectedSigns = Blocks.getPointsConnected(super.model.world, origin, originLayer,
 						traverseMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints).join();
 
 				return Sets.union(fallbackSigns, connectedSigns);
@@ -261,7 +240,7 @@ public class GeneratorCore extends BaseCore {
 //*/
 	@Override
 	protected void onSearchingChanged(boolean searching) {
-		GeneratorRune rune = FortressesManager.forWorld(model.world).getRuneByPatternPoint(model.anchorPoint);
+		GeneratorRune rune = FortressesManager.forWorld(super.model.world).getRuneByPatternPoint(super.model.anchorPoint);
 		if (rune != null) {
 			rune.onSearchingChanged(searching);
 		}
@@ -269,7 +248,7 @@ public class GeneratorCore extends BaseCore {
 
 	@Override
 	protected Set<Point> getOriginPoints() {
-		GeneratorRune rune = FortressesManager.forWorld(model.world).getRuneByPatternPoint(model.anchorPoint);
+		GeneratorRune rune = FortressesManager.forWorld(super.model.world).getRuneByPatternPoint(super.model.anchorPoint);
 		return rune.getPattern().getPoints();
 	}
 }

@@ -270,7 +270,7 @@ public class FortressPlugin extends JavaPlugin {
 //		if stuck teleport fails, do nothing except send message to player (not ideal but not sure what else to do)
 //look at "consider todos" regarding nether portals near bottom of EventListener
 //MUST fix stuck teleport in nether (/stuck, vehicle, portal) so it doesn't teleport to above bedrock ceiling
-//MUST fix bug where genCore.model.active != baseCore.model.active sometimes
+//done: MUST fix bug where genCore.model.active != baseCore.model.active sometimes
 //	maybe add subModel field instead of extending GeneratorCore's Model from BaseCore's Model?
 //REALLY SHOULD add mcStats: http://mcstats.org/learn-more/
 

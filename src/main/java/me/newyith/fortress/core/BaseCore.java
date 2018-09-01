@@ -14,10 +14,7 @@ import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.protection.ProtectionAuthToken;
 import me.newyith.fortress.protection.ProtectionManager;
-import me.newyith.fortress.util.Cuboid;
-import me.newyith.fortress.util.Debug;
-import me.newyith.fortress.util.Point;
-import me.newyith.fortress.util.Blocks;
+import me.newyith.fortress.util.*;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -78,11 +75,6 @@ public abstract class BaseCore {
 			this.generationRangeLimit = FortressPlugin.config_generationRangeLimit;
 			this.coreParticles = new CoreParticles();
 			this.genPrepDataFuture = null;
-		}
-
-		public Model(Model m) {
-			this(m.anchorPoint, m.claimedPoints, m.claimedWallPoints, m.bedrockAuthToken, m.protectionAuthToken,
-					m.animator, m.active, m.placedByPlayerId, m.layerOutsideFortress, m.pointsInsideFortress, m.worldName);
 		}
 	}
 	protected Model model = null;
