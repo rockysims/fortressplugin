@@ -177,7 +177,8 @@ public class StuckPlayer {
 			p = getValidTeleportDest(world, p);
 			if (p != null) {
 				p = p.add(0.5F, 0, 0.5F);
-				teleportPlayer(player, p);
+				Point origin = new Point(player.getLocation());
+				teleportPlayer(player, world, p, origin);
 				teleported = true;
 				break;
 			}
@@ -232,40 +233,43 @@ public class StuckPlayer {
 
 	// static //
 
-	private static void teleportPlayer(Player player, Point target) {
-		World world = player.getWorld();
-		Location playerLoc = player.getLocation();
+	private static void teleportPlayer(Player player, World world, Point target, Point origin) {
+		Location originLoc = origin.toLocation(world);
 		Location targetLoc = target.toLocation(world);
-		targetLoc = faceLocationToward(targetLoc, playerLoc);
+		targetLoc = faceLocationToward(targetLoc, originLoc);
 		player.teleport(targetLoc);
 	}
 
 	public static boolean teleport(Player player) {
 		World world = player.getWorld();
-		Point playerPoint = new Point(player.getLocation());
+		Point origin = new Point(player.getLocation());
+		return teleport(player, world, origin);
+	}
 
+	public static boolean teleport(Player player, World world, Point origin) {
 		int radius = 16;
 		boolean teleported = false;
 		int attemptLimit = 50;
-		List<Point> nearbyPoints = getNearbyPoints(world, playerPoint, radius, attemptLimit);
+		List<Point> nearbyPoints = getNearbyPoints(world, origin, radius, attemptLimit);
 		for (Point p : nearbyPoints) {
 			p = getValidTeleportDest(world, p);
 			if (p != null) {
 				p = p.add(0.5F, 0, 0.5F);
-				teleportPlayer(player, p);
+				teleportPlayer(player, world, p, origin);
 				teleported = true;
 				break;
 			}
 		}
 
-		if (!teleported) {
-			//fallback to player's bed
-			Location bedLoc = player.getBedSpawnLocation();
-			if (bedLoc != null) {
-				player.teleport(bedLoc);
-				teleported = true;
-			}
-		}
+		//decided falling back to bed location isn't a good idea
+//		if (!teleported) {
+//			//fallback to player's bed
+//			Location bedLoc = player.getBedSpawnLocation();
+//			if (bedLoc != null) {
+//				player.teleport(bedLoc);
+//				teleported = true;
+//			}
+//		}
 
 		return teleported;
 	}
