@@ -263,16 +263,15 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //1.13 MVP goals:
+//MUST fix stuck teleport in nether (/stuck, vehicle, portal) so it doesn't teleport to above bedrock ceiling
+//	same algorithm except look for y value closest to origin's y?
 //done: prevent teleport via nether portal unless both portals involved have whitelist signs or are not inside fortress
 //	todo: test portal inside fortress inside fortress case
-//	todo: test fortresses around both portals case
 //done: if (not whitelisted on toPortal && player in sneak) instant stuck teleport relative to toPortal
 //		if stuck teleport fails, do nothing except send message to player (not ideal but not sure what else to do)
-//look at "consider todos" regarding nether portals near bottom of EventListener
-//MUST fix stuck teleport in nether (/stuck, vehicle, portal) so it doesn't teleport to above bedrock ceiling
 //done: MUST fix bug where genCore.model.active != baseCore.model.active sometimes
-//	maybe add subModel field instead of extending GeneratorCore's Model from BaseCore's Model?
 //REALLY SHOULD add mcStats: http://mcstats.org/learn-more/
+//look at "consider todos" regarding nether portals near bottom of EventListener
 
 //TODO: handle nether portals better
 //More Ideas:
