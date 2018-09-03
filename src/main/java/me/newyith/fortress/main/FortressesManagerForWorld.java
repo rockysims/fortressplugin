@@ -1,11 +1,12 @@
 package me.newyith.fortress.main;
 
-import me.newyith.fortress.command.StuckPlayer;
 import me.newyith.fortress.core.BaseCore;
 import me.newyith.fortress.core.GeneratorCore;
 import me.newyith.fortress.protection.ProtectionManager;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.rune.generator.GeneratorRunePattern;
+import me.newyith.fortress.stuck.StuckTeleport;
+import me.newyith.fortress.stuck.StuckTeleportResult;
 import me.newyith.fortress.util.Blocks;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
@@ -627,12 +628,11 @@ public class FortressesManagerForWorld {
 		boolean eyesInGenerated = FortressesManager.forWorld(w).isGenerated(eyesPoint);
 		boolean feetInGenerated = FortressesManager.forWorld(w).isGenerated(feetPoint);
 		if (eyesInGenerated || feetInGenerated) {
-			boolean teleported = StuckPlayer.teleport(player);
 			player.sendMessage(ChatColor.AQUA + "You got stuck in fortress wall.");
-			if (!teleported) {
-				player.sendMessage(ChatColor.AQUA + "Stuck teleport failed because no suitable destination was found.");
-				cancel = true; //canceling would allow trap minecarts (except /spawn should get you out, right?)
-//									not canceling would allow forced fortress entry (if enemy can scan freely above and below fortress)
+			StuckTeleportResult teleportResult = StuckTeleport.teleport(player, "Stuck teleport");
+			if (teleportResult != StuckTeleportResult.SUCCESS) {
+				cancel = true;	//canceling would allow trap minecarts (except /spawn should get you out, right?)
+								//	not canceling would allow forced fortress entry (if enemy can scan freely above and below fortress)
 			}
 		}
 

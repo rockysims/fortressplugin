@@ -272,6 +272,11 @@ public class FortressPlugin extends JavaPlugin {
 //done: MUST fix bug where genCore.model.active != baseCore.model.active sometimes
 //REALLY SHOULD add mcStats: http://mcstats.org/learn-more/
 //look at "consider todos" regarding nether portals near bottom of EventListener
+//TODO: make sure /stuck teleport doesn't consider fire a valid destination
+//maybe check that ghasts can't break protected glass
+//maybe double check stuck teleport when exiting vehicle still works
+
+
 
 //TODO: handle nether portals better
 //More Ideas:

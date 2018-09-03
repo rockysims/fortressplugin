@@ -110,7 +110,7 @@ public class GeneratorRune {
 
 		Set<Point> points = new HashSet<>();
 		points.addAll(model.pattern.getPoints());
-		points.addAll(model.core.getClaimedWallPoints());
+		points.addAll(model.core.getLayerOutsideFortress());
 		for (Point p : points) {
 			min.setX(Math.min(min.getX(), p.x()));
 			min.setY(Math.min(min.getY(), p.y()));
@@ -120,11 +120,7 @@ public class GeneratorRune {
 			max.setZ(Math.max(max.getZ(), p.z()));
 		}
 
-		//min-- and max++ (so as to include claimed points)
-		Point minPoint = new Point(min).add(-1, -1, -1);
-		Point maxPoint = new Point(max).add(1, 1, 1);
-
-		return new Cuboid(minPoint, maxPoint, model.pattern.getWorld());
+		return new Cuboid(min, max, model.pattern.getWorld());
 	}
 
 	// - Events -

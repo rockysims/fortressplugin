@@ -3,11 +3,9 @@ package me.newyith.fortress.command;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
-import me.newyith.fortress.util.Cuboid;
+import me.newyith.fortress.stuck.StuckTeleport;
 import me.newyith.fortress.util.Point;
-import me.newyith.fortress.util.Blocks;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -22,7 +20,6 @@ public class StuckPlayer {
 
 	private Map<Integer, String> messages;
 
-	private final int distBeyondFortress = 10; //how far outside combinedCuboid to teleport
 	private final int stuckDelayMs = FortressPlugin.config_stuckDelayMs;
 	private final int cancelDistance = FortressPlugin.config_stuckCancelDistance;
 	private Set<GeneratorRune> nearbyGeneratorRunes;
@@ -169,184 +166,6 @@ public class StuckPlayer {
 	}
 
 	public void stuckTeleport() {
-		boolean teleported = false;
-		int attemptLimit = 50;
-
-		List<Point> nearbyPoints = getRandomNearbyPoints(attemptLimit);
-		for (Point p : nearbyPoints) {
-			p = getValidTeleportDest(world, p);
-			if (p != null) {
-				p = p.add(0.5F, 0, 0.5F);
-				Point origin = new Point(player.getLocation());
-				teleportPlayer(player, world, p, origin);
-				teleported = true;
-				break;
-			}
-		}
-
-		if (!teleported) {
-			//fallback to player's bed
-			Location bedLoc = player.getBedSpawnLocation();
-			if (bedLoc != null) {
-				player.teleport(bedLoc);
-				teleported = true;
-			}
-		}
-
-		if (!teleported) {
-			this.sendMessage("/stuck failed because no suitable destination was found.");
-		}
-	}
-
-	private List<Point> getRandomNearbyPoints(int limit) {
-		List<Point> nearbyPoints = new ArrayList<>();
-
-		if (nearbyGeneratorRunes.size() > 0) {
-			//set combinedCuboid (cuboid enclosing all nearby generators)
-			List<Cuboid> runeCuboids = new ArrayList<>();
-			nearbyGeneratorRunes.stream().forEach(nearbyRune -> {
-				runeCuboids.add(nearbyRune.getFortressCuboid());
-			});
-			Cuboid combinedCuboid = Cuboid.fromCuboids(runeCuboids, world);
-
-			//set outerCuboid (same as combinedCuboid except distBeyondFortress bigger in all directions)
-			Point outerMin = combinedCuboid.getMin().add(-1 * distBeyondFortress, -1 * distBeyondFortress, -1 * distBeyondFortress);
-			Point outerMax = combinedCuboid.getMax().add(distBeyondFortress, distBeyondFortress, distBeyondFortress);
-			Cuboid outerCuboid = new Cuboid(outerMin, outerMax, world);
-
-			//set combinedSheet and outerSheet
-			double y = combinedCuboid.getMax().y();
-			Set<Point> combinedSheet = combinedCuboid.getPointsAtHeight(y);
-			Set<Point> outerSheet = outerCuboid.getPointsAtHeight(y);
-
-			//set nearbyPoints
-			nearbyPoints.addAll(outerSheet);
-			nearbyPoints.removeAll(combinedSheet);
-			Collections.shuffle(nearbyPoints);
-
-			//nearbyPoints = first limit points in nearbyPoints
-			nearbyPoints = new ArrayList<>(nearbyPoints.subList(0, Math.min(limit, nearbyPoints.size() - 1))); //creating new list allows garbage collection of old list
-		}
-
-		return nearbyPoints;
-	}
-
-	// static //
-
-	private static void teleportPlayer(Player player, World world, Point target, Point origin) {
-		Location originLoc = origin.toLocation(world);
-		Location targetLoc = target.toLocation(world);
-		targetLoc = faceLocationToward(targetLoc, originLoc);
-		player.teleport(targetLoc);
-	}
-
-	public static boolean teleport(Player player) {
-		World world = player.getWorld();
-		Point origin = new Point(player.getLocation());
-		return teleport(player, world, origin);
-	}
-
-	public static boolean teleport(Player player, World world, Point origin) {
-		int radius = 16;
-		boolean teleported = false;
-		int attemptLimit = 50;
-		List<Point> nearbyPoints = getNearbyPoints(world, origin, radius, attemptLimit);
-		for (Point p : nearbyPoints) {
-			p = getValidTeleportDest(world, p);
-			if (p != null) {
-				p = p.add(0.5F, 0, 0.5F);
-				teleportPlayer(player, world, p, origin);
-				teleported = true;
-				break;
-			}
-		}
-
-		//decided falling back to bed location isn't a good idea
-//		if (!teleported) {
-//			//fallback to player's bed
-//			Location bedLoc = player.getBedSpawnLocation();
-//			if (bedLoc != null) {
-//				player.teleport(bedLoc);
-//				teleported = true;
-//			}
-//		}
-
-		return teleported;
-	}
-
-	private static List<Point> getNearbyPoints(World world, Point center, int radius, int attemptLimit) {
-		int r = radius;
-		Point a = center.add(r, r, r);
-		Point b = center.add(-1 * r, -1 * r, -1 * r);
-		Cuboid cuboid = new Cuboid(a, b, world);
-		List<Point> nearbyPoints = new ArrayList<>(cuboid.getPointsAtHeight(a.y()));
-		Collections.shuffle(nearbyPoints);
-		//nearbyPoints = first attemptLimit points in nearbyPoints
-		nearbyPoints = new ArrayList<>(nearbyPoints.subList(0, Math.min(attemptLimit, nearbyPoints.size() - 1))); //creating new list allows garbage collection of old list
-
-		return nearbyPoints;
-	}
-
-	private static Point getValidTeleportDest(World world, Point p) {
-		Point validDest = null;
-
-		if (p != null) {
-			//p = highest non air block at p.x, p.z
-			int maxHeight = world.getMaxHeight();
-			for (int y = maxHeight-2; y >= 0; y--) {
-				p = new Point(p.xInt(), y, p.zInt());
-				if (!Blocks.isAiry(p, world)) {
-					//first non airy block
-					break;
-				}
-			}
-
-			//check if valid teleport destination
-			if (p.getBlock(world).getType().isSolid()) {
-				Point dest = p.add(0, 1, 0);
-				Point aboveDest = dest.add(0, 2, 0);
-				if (Blocks.isAiry(dest, world) && Blocks.isAiry(aboveDest, world)) {
-					validDest = dest;
-				}
-			}
-		}
-
-		return validDest;
-	}
-
-	//bergerkiller's method lookAt() (https://bukkit.org/threads/lookat-and-move-functions.26768/)
-	public static Location faceLocationToward(Location loc, Location lookat) {
-		//Clone the loc to prevent applied changes to the input loc
-		loc = loc.clone();
-
-		// Values of change in distance (make it relative)
-		double dx = lookat.getX() - loc.getX();
-		double dy = lookat.getY() - loc.getY();
-		double dz = lookat.getZ() - loc.getZ();
-
-		// Set yaw
-		if (dx != 0) {
-			// Set yaw start value based on dx
-			if (dx < 0) {
-				loc.setYaw((float) (1.5 * Math.PI));
-			} else {
-				loc.setYaw((float) (0.5 * Math.PI));
-			}
-			loc.setYaw((float) loc.getYaw() - (float) Math.atan(dz / dx));
-		} else if (dz < 0) {
-			loc.setYaw((float) Math.PI);
-		}
-
-		// Get the distance from dx/dz
-		double dxz = Math.sqrt(Math.pow(dx, 2) + Math.pow(dz, 2));
-
-		// Set pitch
-		loc.setPitch((float) -Math.atan(dy / dxz));
-
-		// Set values, convert to degrees (invert the yaw since Bukkit uses a different yaw dimension format)
-		loc.setYaw(-loc.getYaw() * 180f / (float) Math.PI);
-		loc.setPitch(loc.getPitch() * 180f / (float) Math.PI);
-
-		return loc;
+		StuckTeleport.teleport(player, "/stuck");
 	}
 }

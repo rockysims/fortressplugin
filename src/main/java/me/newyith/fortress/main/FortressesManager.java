@@ -1,8 +1,7 @@
 package me.newyith.fortress.main;
 
-import me.newyith.fortress.command.StuckPlayer;
 import me.newyith.fortress.rune.generator.GeneratorRune;
-import me.newyith.fortress.util.Debug;
+import me.newyith.fortress.stuck.StuckTeleport;
 import me.newyith.fortress.util.Point;
 import org.bukkit.*;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -107,19 +106,14 @@ public class FortressesManager {
 		boolean canUseFromPortal = player.isSneaking() || fromWorldManager.playerCanUseNetherPortal(player, fromPoint);
 		boolean canUseToPortal = toWorldManager.playerCanUseNetherPortal(player, toPoint);
 
-		Debug.msg("canUseToPortal: " + canUseToPortal); //TODO:: delete this line
-
 		if (!canUseFromPortal || !canUseToPortal) {
 			cancel = true;
 
 			if (player.isSneaking()) {
-				boolean teleported = StuckPlayer.teleport(player, toWorld, toPoint);
 				player.sendMessage(ChatColor.AQUA + "You were not whitelisted on destination portal. Forcing teleport to nearby.");
-				if (!teleported) {
-					player.sendMessage(ChatColor.AQUA + "Force teleport failed because no suitable destination was found.");
-				}
+				StuckTeleport.teleport(player, toWorld, toPoint, "Force teleport");
 			} else {
-				String msgLine1 = "To enter/exit nether portal inside fortress, you must place whitelist sign(s) on the portal frame inside fortress.";
+				String msgLine1 = "To enter/exit nether portal inside fortress, you must place whitelist sign(s) on the portal frame inside the fortress.";
 				String msgLine2 = "To "+ChatColor.DARK_AQUA+"force teleport"+ChatColor.AQUA+" to a location nearby destination portal, sneak (hold shift) while entering portal.";
 				player.sendMessage(ChatColor.AQUA + msgLine1);
 				player.sendMessage(ChatColor.AQUA + msgLine2);
