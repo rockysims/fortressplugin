@@ -15,6 +15,10 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
 	protected World world;
 	protected final Vector minimumPoint, maximumPoint;
 
+	public static Cuboid fromCuboids(Set<Cuboid> cuboids, World world) {
+		return Cuboid.fromCuboids(new ArrayList<>(cuboids), world);
+	}
+
 	public static Cuboid fromCuboids(List<Cuboid> cuboids, World world) {
 		Cuboid resultCuboid = null;
 
@@ -130,6 +134,12 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
 //		Debug.end("CuboidFromPoints");
 	}
 
+	public Cuboid grow(int delta) {
+		Point min = getMin().add(-1 * delta, -1 * delta, -1 * delta);
+		Point max = getMax().add(delta, delta, delta);
+		return new Cuboid(min, max, getWorld());
+	}
+
 	public int countBlocks() {
 		Point min = new Point(minimumPoint);
 		Point max = new Point(maximumPoint);
@@ -164,11 +174,7 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
 	}
 
 	public boolean contains(Point point) {
-		return containsLocation(point.toLocation(getWorld()));
-	}
-
-	public boolean containsLocation(Location location) {
-		return location != null && location.toVector().isInAABB(this.minimumPoint, this.maximumPoint);
+		return containsVector(point.floored().toVector());
 	}
 
 	public boolean containsVector(Vector vector) {
@@ -193,9 +199,10 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
 	}
 
 	public List<Block> getBlocks() {
-		return getPoints().stream().map(p -> {
-			return world.getBlockAt(p.xInt(), p.yInt(), p.zInt());
-		}).collect(Collectors.toList());
+		World world = getWorld();
+		return getPoints().stream()
+				.map(p -> p.getBlock(world))
+				.collect(Collectors.toList());
 	}
 
 	public Location getLowerLocation() {

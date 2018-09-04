@@ -146,6 +146,10 @@ public class Point {
 		return new Point(xInt() + 0.5, yInt() + 0.5, zInt() + 0.5);
 	}
 
+	public Point floored() {
+		return new Point(xInt(), yInt(), zInt());
+	}
+
 	public boolean is(Material mat, World world) {
 		return getBlock(world).getType() == mat;
 	}
