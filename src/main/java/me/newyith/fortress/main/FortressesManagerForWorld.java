@@ -122,7 +122,7 @@ public class FortressesManagerForWorld {
 	}
 
 	//during /stuck, we need all generators player might be inside so we can search by fortress cuboids
-	public Set<GeneratorRune> getGeneratorRunesNear(Point center) {
+	public Set<GeneratorRune> getGeneratorRunesAround(Point center) {
 		Set<GeneratorRune> overlapRunes = new HashSet<>();
 
 		//overlapRunes = runes where fortress cuboid contains 'center' point
@@ -137,6 +137,12 @@ public class FortressesManagerForWorld {
 
 	//during generation, we need all potentially conflicting generators (not just known ones) so search by radius
 	public Set<BaseCore> getOtherCoresInRadius(Point center, int radius) {
+		Set<BaseCore> coresInRange = getCoresInRadius(center, radius);
+		coresInRange.remove(getRuneByPatternPoint(center).getGeneratorCore());
+		return coresInRange;
+	}
+
+	public Set<BaseCore> getCoresInRadius(Point center, int radius) {
 		Set<BaseCore> coresInRange = new HashSet<>();
 
 		//fill runesInRange
@@ -152,7 +158,6 @@ public class FortressesManagerForWorld {
 				coresInRange.add(rune.getGeneratorCore());
 			}
 		}
-		coresInRange.remove(getRuneByPatternPoint(center).getGeneratorCore());
 		return coresInRange;
 	}
 
