@@ -267,15 +267,17 @@ public class FortressPlugin extends JavaPlugin {
 
 //1.13 MVP goals:
 //TODO: figure out why fastAnimation directive only works for generation and not degeneration now
-//MUST fix stuck teleport in nether (/stuck, vehicle, portal) so it doesn't teleport to above bedrock ceiling
-//	done except theoretically could stuck teleport to inside fortress not close enough to be considered "nearby" (distBeyond further away)
-//		TODO: fix by changing distBeyond to 0 and only removing runeSheets if remaining points => limit
+//	its because buildBatchPoints() is taking a long time due to batches belonging to destroyed runes being kept (not cleaned up after plugin crashes?)
+//	TODO: figure out how to reproduce orphaned batches issue
+//	TODO: probably need to add Bedrock/ProtectionManager.clean() (called onEnable) to remove all batches without an associated rune
+//		might also be worth separating bedrock/protection batches by rune (authToken) so that buildBatchPoints() and such run fast even when many fortresses
+//	TODO: search for "Model extends" and change to new system where super model is field
 //TODO: make sure /stuck teleport doesn't consider fire a valid destination
 //done: prevent teleport via nether portal unless both portals involved have whitelist signs or are not inside fortress
 //	todo: test case of portal inside fortress inside fortress
 //done: if (not whitelisted on toPortal && player in sneak) instant stuck teleport relative to toPortal
 //		if stuck teleport fails, do nothing except send message to player (not ideal but not sure what else to do)
-//TODO: finish adding bStats: https://bstats.org/plugin/bukkit/Fortress
+//TODO: finish adding bStats: https://bstats.org/plugin/bukkit/Fortress (just need to confirm stats actually are being sent)
 //todo: check that ghasts can't break protected glass
 //todo: look at "consider todos" regarding nether portals near bottom of EventListener
 //todo: double check stuck teleport when exiting vehicle still works

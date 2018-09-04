@@ -1,24 +1,27 @@
 package me.newyith.fortress.stuck;
 
+import me.newyith.fortress.core.BaseCore;
+import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
-import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.util.Blocks;
 import me.newyith.fortress.util.Cuboid;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class StuckTeleport {
 	private Player player;
 	private World world;
 	private Point origin;
 
-	private final int distBeyond = 10; //how far outside fortress (or origin) to teleport
+	private final int distBeyond = 10; //how far outside fortress to teleport
 
 	public StuckTeleport(Player player, World world, Point origin) {
 		this.player = player;
@@ -41,7 +44,7 @@ public class StuckTeleport {
 		if (actionName != null) {
 			if (result == StuckTeleportResult.NO_VALID_DESTINATION) {
 				player.sendMessage(ChatColor.AQUA + actionName + " failed because no suitable destination was found.");
-			} else if (result == StuckTeleportResult.NO_NEARBY_RUNES) {
+			} else if (result == StuckTeleportResult.NO_NEARBY_CORES) {
 				player.sendMessage(ChatColor.AQUA + actionName + " failed because no nearby fortress was found.");
 			}
 		}
@@ -52,16 +55,21 @@ public class StuckTeleport {
 	private StuckTeleportResult execute() {
 		StuckTeleportResult result;
 
-		Debug.start("getGeneratorRunesNear");
-		Set<GeneratorRune> nearbyGeneratorRunes = FortressesManager.forWorld(world).getGeneratorRunesNear(origin);
-		Debug.end("getGeneratorRunesNear");
-		if (nearbyGeneratorRunes.isEmpty()) {
-			result = StuckTeleportResult.NO_NEARBY_RUNES;
+		int radius = FortressPlugin.config_generationRangeLimit * 3 + distBeyond; //the '* 3' is to get diameter + radius
+		Set<BaseCore> coresInRadius = FortressesManager.forWorld(world).getCoresInRadius(origin, radius);
+
+		Set<Cuboid> coreCuboidsContainingOrigin = coresInRadius.stream()
+				.map(BaseCore::buildCuboid)
+				.filter(cuboid -> cuboid.contains(origin))
+				.collect(Collectors.toSet());
+
+		if (coreCuboidsContainingOrigin.isEmpty()) {
+			result = StuckTeleportResult.NO_NEARBY_CORES;
 		} else {
-			Set<Point> insidePoints = buildPointsInside(nearbyGeneratorRunes);
+			Set<Point> insidePoints = buildPointsInside(coresInRadius);
 
 			boolean teleported = false;
-			List<Point> nearbyPoints = getRandomNearbyPointsAtOriginHeight(50, nearbyGeneratorRunes);
+			List<Point> nearbyPoints = getRandomNearbyPointsAtOriginHeight(50, coreCuboidsContainingOrigin);
 			double tryCount = 0;
 			double maxCount = nearbyPoints.size();
 			double sqrtDeltaLimitMax = Math.sqrt(world.getMaxHeight());
@@ -87,31 +95,28 @@ public class StuckTeleport {
 		return result;
 	}
 
-	private List<Point> getRandomNearbyPointsAtOriginHeight(int limit, Set<GeneratorRune> nearbyGeneratorRunes) {
-		//set combinedCuboid (cuboid enclosing all nearby generators)
-		List<Cuboid> runeCuboids = new ArrayList<>();
-		nearbyGeneratorRunes.forEach(nearbyRune -> {
-			runeCuboids.add(nearbyRune.getFortressCuboid());
-		});
-		Cuboid combinedCuboid = Cuboid.fromCuboids(runeCuboids, world);
-
-		//set outerCuboid (same as combinedCuboid except distBeyond bigger in all directions)
-		Point outerMin = combinedCuboid.getMin().add(-1 * distBeyond, -1 * distBeyond, -1 * distBeyond);
-		Point outerMax = combinedCuboid.getMax().add(distBeyond, distBeyond, distBeyond);
-		Cuboid outerCuboid = new Cuboid(outerMin, outerMax, world);
-
+	private List<Point> getRandomNearbyPointsAtOriginHeight(int limit, Set<Cuboid> coreCuboidsContainingOrigin) {
 		int y = origin.yInt();
-		Set<Point> outerSheet = outerCuboid.getPointsAtHeight(y);
+		Cuboid combinedCuboid = Cuboid.fromCuboids(coreCuboidsContainingOrigin, world);
+		Set<Point> outerSheet = combinedCuboid.grow(distBeyond).getPointsAtHeight(y);
 
-		final List<Point> nearbyPoints = new ArrayList<>();
+		final Set<Point> nearbyPoints = new HashSet<>();
 		nearbyPoints.addAll(outerSheet);
-		runeCuboids.forEach(runeCuboid -> {
-			nearbyPoints.removeAll(runeCuboid.getPointsAtHeight(y));
+		coreCuboidsContainingOrigin.forEach(coreCuboid -> {
+			nearbyPoints.removeAll(coreCuboid.getPointsAtHeight(y));
 		});
-		Collections.shuffle(nearbyPoints);
+
+		//if distBeyond is small, we may need to add back some outerSheet points
+		for (Point pOuter : outerSheet) {
+			if (nearbyPoints.size() >= limit) break;
+			else nearbyPoints.add(pOuter);
+		}
+
+		List<Point> nearbyPointsList = new ArrayList<>(nearbyPoints);
+		Collections.shuffle(nearbyPointsList);
 
 		//return first limit points in nearbyPoints
-		return new ArrayList<>(nearbyPoints.subList(0, Math.min(limit, nearbyPoints.size() - 1))); //creating new list allows garbage collection of old list
+		return new ArrayList<>(nearbyPointsList.subList(0, Math.min(limit, nearbyPoints.size() - 1))); //creating new list allows garbage collection of old list
 	}
 
 	private Point findValidTeleportDest(Point start, Set<Point> insidePoints, int maxDelta) {
@@ -119,7 +124,6 @@ public class StuckTeleport {
 		int maxDestHeight = (isNether())
 			? 123 //lowest ceiling bedrock layer
 			: world.getMaxHeight();
-		Debug.msg("findValidTeleportDest() maxDelta: " + maxDelta);
 
 		//find closest solid block at p.x, p.z with two airy blocks immediately above it (return point above it)
 		for (int delta = 0; delta <= maxDelta; delta++) {
@@ -136,7 +140,8 @@ public class StuckTeleport {
 	private boolean isValidDest(Point dest) {
 		if (Blocks.isAiry(dest, world)) { //dest is airy
 			Point belowDest = dest.add(0, -1, 0);
-			if (belowDest.getType(world).isSolid()) { //belowDest is solid
+			Material belowDestMat = belowDest.getType(world);
+			if (belowDestMat.isSolid() && belowDestMat.isOccluding()) { //belowDest is solid and not see through (trap doors, signs, etc. are see through)
 				Point aboveDest = dest.add(0, 1, 0);
 				if (Blocks.isAiry(aboveDest, world)) {
 					return true; //belowDest solid, dest airy, aboveDest airy
@@ -190,13 +195,13 @@ public class StuckTeleport {
 	}
 
 
-	private Set<Point> buildPointsInside(Set<GeneratorRune> nearbyGeneratorRunes) {
-		Set<Point> pointsInsideNearbyGeneratorRunes = new HashSet<>();
-		for (GeneratorRune rune : nearbyGeneratorRunes) {
-			pointsInsideNearbyGeneratorRunes.addAll(rune.getGeneratorCore().getPointsInsideFortress());
+	private Set<Point> buildPointsInside(Set<BaseCore> cores) {
+		Set<Point> pointsInside = new HashSet<>();
+		for (BaseCore core : cores) {
+			pointsInside.addAll(core.getPointsInsideFortress());
 		}
 
-		return pointsInsideNearbyGeneratorRunes;
+		return pointsInside;
 	}
 
 	private boolean isNether() {
