@@ -266,6 +266,7 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //1.13 MVP goals:
+//TODO: figure out why fastAnimation directive only works for generation and not degeneration now
 //MUST fix stuck teleport in nether (/stuck, vehicle, portal) so it doesn't teleport to above bedrock ceiling
 //	done except theoretically could stuck teleport to inside fortress not close enough to be considered "nearby" (distBeyond further away)
 //		TODO: fix by changing distBeyond to 0 and only removing runeSheets if remaining points => limit
@@ -274,7 +275,7 @@ public class FortressPlugin extends JavaPlugin {
 //	todo: test case of portal inside fortress inside fortress
 //done: if (not whitelisted on toPortal && player in sneak) instant stuck teleport relative to toPortal
 //		if stuck teleport fails, do nothing except send message to player (not ideal but not sure what else to do)
-//TODO: REALLY SHOULD add mcStats: http://mcstats.org/learn-more/
+//TODO: finish adding bStats: https://bstats.org/plugin/bukkit/Fortress
 //todo: check that ghasts can't break protected glass
 //todo: look at "consider todos" regarding nether portals near bottom of EventListener
 //todo: double check stuck teleport when exiting vehicle still works
