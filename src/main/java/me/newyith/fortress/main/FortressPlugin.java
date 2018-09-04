@@ -9,6 +9,7 @@ import me.newyith.fortress.sandbox.jackson.SandboxSaveLoadManager;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Log;
 import me.newyith.fortress.util.Point;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -65,6 +66,8 @@ public class FortressPlugin extends JavaPlugin {
 		Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
 		Log.sendConsole("         >> ON <<           ", ChatColor.GREEN);
 		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
+
+//		new Metrics(this); //bStats
 
 		saveLoadManager = new SaveLoadManager(this);
 		saveLoadManager.load();
@@ -264,25 +267,25 @@ public class FortressPlugin extends JavaPlugin {
 
 //1.13 MVP goals:
 //MUST fix stuck teleport in nether (/stuck, vehicle, portal) so it doesn't teleport to above bedrock ceiling
-//	same algorithm except look for y value closest to origin's y?
+//	done except theoretically could stuck teleport to inside fortress not close enough to be considered "nearby" (distBeyond further away)
+//		TODO: fix by changing distBeyond to 0 and only removing runeSheets if remaining points => limit
+//TODO: make sure /stuck teleport doesn't consider fire a valid destination
 //done: prevent teleport via nether portal unless both portals involved have whitelist signs or are not inside fortress
-//	todo: test portal inside fortress inside fortress case
+//	todo: test case of portal inside fortress inside fortress
 //done: if (not whitelisted on toPortal && player in sneak) instant stuck teleport relative to toPortal
 //		if stuck teleport fails, do nothing except send message to player (not ideal but not sure what else to do)
-//done: MUST fix bug where genCore.model.active != baseCore.model.active sometimes
-//REALLY SHOULD add mcStats: http://mcstats.org/learn-more/
-//look at "consider todos" regarding nether portals near bottom of EventListener
-//TODO: make sure /stuck teleport doesn't consider fire a valid destination
-//maybe check that ghasts can't break protected glass
-//maybe double check stuck teleport when exiting vehicle still works
+//TODO: REALLY SHOULD add mcStats: http://mcstats.org/learn-more/
+//todo: check that ghasts can't break protected glass
+//todo: look at "consider todos" regarding nether portals near bottom of EventListener
+//todo: double check stuck teleport when exiting vehicle still works
 
 
 
 //TODO: handle nether portals better
 //More Ideas:
-//ideally also make entering protected portal cause returning through exit portal to go to entry portal
+//skip: ideally also make entering protected portal cause returning through exit portal to go to entry portal
 //	on enter protected portal, save map (per player) of all exitPortalPortals to entryPortalPoint
-//prevent creating exit portals inside fortress (if active/protected)? maybe... but only if player can still teleport to world via portal + sneak
+//skip: prevent creating exit portals inside fortress (if active/protected)? maybe... but only if player can still teleport to world via portal + sneak
 //	FIXES: creating exit portals in fortress and sending through TNT and also grief portal creation
 
 
