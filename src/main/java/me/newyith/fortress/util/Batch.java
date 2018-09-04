@@ -37,6 +37,10 @@ public abstract class Batch extends BaseUUID {
 		return model.batchData.getAuthToken().equals(otherAuthToken);
 	}
 
+	public AuthToken getAuthToken() {
+		return model.batchData.getAuthToken();
+	}
+
 	public Set<Point> getPoints() {
 		return model.batchData.getPoints();
 	}
