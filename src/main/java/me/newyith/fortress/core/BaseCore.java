@@ -111,6 +111,10 @@ public abstract class BaseCore {
 		TimedBedrockManager.forWorld(model.world).convert(model.bedrockAuthToken, shieldPoints);
 	}
 
+	public Cuboid buildCuboid() {
+		return new Cuboid(model.world, model.layerOutsideFortress);
+	}
+
 	public boolean playerCanOpenDoor(Player player, Point doorPoint) {
 		Set<Point> actualSigns = getDoorWhitelistSignPoints(doorPoint);
 		if (actualSigns.isEmpty()) {
