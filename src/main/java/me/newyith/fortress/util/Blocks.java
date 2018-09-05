@@ -62,6 +62,7 @@ public class Blocks {
 		boolean airy = true;
 		Material mat = dest.getBlock(world).getType();
 		airy = airy && !mat.isSolid();
+		airy = airy && mat != Material.FIRE;
 		airy = airy && mat != Material.WATER;
 		airy = airy && mat != Material.LAVA;
 		return airy;

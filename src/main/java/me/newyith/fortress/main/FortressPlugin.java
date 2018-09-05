@@ -271,7 +271,7 @@ public class FortressPlugin extends JavaPlugin {
 //	TODO: probably need to add Bedrock/ProtectionManager.clean() (called onEnable) to remove all batches without an associated rune
 //		might also be worth separating bedrock/protection batches by rune (authToken) so that buildBatchPoints() and such run fast even when many fortresses
 //TODO: search for "Model extends" and change to new system where super model is field
-//TODO: make sure /stuck teleport doesn't consider fire a valid destination
+//done: make sure /stuck teleport doesn't consider fire a valid destination
 //done: prevent teleport via nether portal unless both portals involved have whitelist signs or are not inside fortress
 //	todo: test case of portal inside fortress inside fortress
 //done: if (not whitelisted on toPortal && player in sneak) instant stuck teleport relative to toPortal
