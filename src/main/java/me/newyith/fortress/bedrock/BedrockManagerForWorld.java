@@ -167,14 +167,14 @@ public class BedrockManagerForWorld {
 		Set<Point> allForceReversionPoints = new HashSet<>();
 		Set<Point> shouldBeConverted;
 		synchronized (model.mutex) {
-			Debug.start("fillAllBatchPoints");
+//			Debug.start("fillAllBatchPoints");
 			for (BedrockBatch batch : model.batches) {
 				allBatchPoints.addAll(batch.getPoints());
 			}
 			for (ForceReversionBatch forceReversionBatch : model.forceReversionBatches) {
 				allForceReversionPoints.addAll(forceReversionBatch.getPoints());
 			}
-			Debug.end("fillAllBatchPoints");
+//			Debug.end("fillAllBatchPoints");
 
 			shouldBeConverted = model.updatePoints.parallelStream()
 					.filter(allBatchPoints::contains)

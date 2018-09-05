@@ -16,7 +16,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -67,7 +66,7 @@ public class FortressPlugin extends JavaPlugin {
 		Log.sendConsole("         >> ON <<           ", ChatColor.GREEN);
 		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
 
-//		new Metrics(this); //bStats
+		new Metrics(this); //bStats
 
 		saveLoadManager = new SaveLoadManager(this);
 		saveLoadManager.load();
@@ -271,13 +270,14 @@ public class FortressPlugin extends JavaPlugin {
 //	TODO: figure out how to reproduce orphaned batches issue
 //	TODO: probably need to add Bedrock/ProtectionManager.clean() (called onEnable) to remove all batches without an associated rune
 //		might also be worth separating bedrock/protection batches by rune (authToken) so that buildBatchPoints() and such run fast even when many fortresses
-//	TODO: search for "Model extends" and change to new system where super model is field
+//TODO: search for "Model extends" and change to new system where super model is field
 //TODO: make sure /stuck teleport doesn't consider fire a valid destination
 //done: prevent teleport via nether portal unless both portals involved have whitelist signs or are not inside fortress
 //	todo: test case of portal inside fortress inside fortress
 //done: if (not whitelisted on toPortal && player in sneak) instant stuck teleport relative to toPortal
 //		if stuck teleport fails, do nothing except send message to player (not ideal but not sure what else to do)
 //TODO: finish adding bStats: https://bstats.org/plugin/bukkit/Fortress (just need to confirm stats actually are being sent)
+//	maybe add custom stat for number of generators?
 //todo: check that ghasts can't break protected glass
 //todo: look at "consider todos" regarding nether portals near bottom of EventListener
 //todo: double check stuck teleport when exiting vehicle still works

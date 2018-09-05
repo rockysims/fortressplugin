@@ -89,7 +89,7 @@ public class BedrockHandler {
 	}
 
 	public Map<Point, Material> getMaterialByPointMap() {
-		Debug.start("getMaterialByPointMap");
+//		Debug.start("getMaterialByPointMap");
 
 		Map<Point, Material> matByPointMap = new HashMap<>();
 		for (Point p : model.managedBedrockByPoint.keySet()) {
@@ -98,7 +98,7 @@ public class BedrockHandler {
 			matByPointMap.put(p, mat);
 		}
 
-		Debug.end("getMaterialByPointMap");
+//		Debug.end("getMaterialByPointMap");
 
 		return matByPointMap;
 	}
