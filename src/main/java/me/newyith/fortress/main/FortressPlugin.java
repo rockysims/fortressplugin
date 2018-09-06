@@ -265,26 +265,31 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //1.13 MVP goals:
-//done: figure out why fastAnimation directive only works for generation and not degeneration now
-//	its because buildBatchPoints() is taking a long time due to batches belonging to destroyed runes being kept (not cleaned up after plugin crashes?)
-//	TODO: figure out how to reproduce orphaned batches issue
-//	TODO: probably need to add Bedrock/ProtectionManager.clean() (called onEnable) to remove all batches without an associated rune
-//		might also be worth separating bedrock/protection batches by rune (authToken) so that buildBatchPoints() and such run fast even when many fortresses
 //TODO: search for "Model extends" and change to new system where super model is field
-//done: make sure /stuck teleport doesn't consider fire a valid destination
+//TODO: finish adding bStats: https://bstats.org/plugin/bukkit/Fortress (just need to confirm stats actually are being sent)
+//	maybe add custom stat for number of generators?
+//todo: look at "consider todos" regarding nether portals near bottom of EventListener
+//todo: look into bug where whitelist signs on doors of inner fortress are respected even though signs are only inside outer fortress not inside inner fortress (and door leads into fortress)
+
+//1.13 stretch goals:
 //done: prevent teleport via nether portal unless both portals involved have whitelist signs or are not inside fortress
 //	done: test case of portal inside fortress inside fortress
 //		todo: keep an eye out for bugs related to this case (first couple tries crashed server but now can't reproduce the issue)
+//TODO: figure out how to reproduce orphaned protection batches issue (reload during plugin compile maybe?)
+//TODO: add Bedrock/ProtectionManager.clean() (called onEnable) to remove all batches without an associated rune
+//	might also be worth separating bedrock/protection batches by rune (authToken) so that buildBatchPoints() and such run fast even when many fortresses
+
+//1.13 MVP goals done:
+//done: figure out why fastAnimation directive only works for generation and not degeneration now
+//	its because buildBatchPoints() is taking a long time due to batches belonging to destroyed runes being kept (not cleaned up after plugin crashes?)
+//		fixed by replacing buildBatchPoints() with buildProtectedPointsByAuthToken(batch's authToken)
+//		note: also can't seem to reproduce orphaned batch data issue
 //done: if (not whitelisted on toPortal && player in sneak) instant stuck teleport relative to toPortal
 //		if stuck teleport fails, do nothing except send message to player (not ideal but not sure what else to do)
-//TODO: finish adding bStats: https://bstats.org/plugin/bukkit/Fortress (just need to confirm stats actually are being sent)
-//	maybe add custom stat for number of generators?
+//done: make sure stuck teleport when exiting vehicle still works
+//done: make sure /stuck teleport doesn't consider fire a valid destination
 //done: check that ghasts can't break protected glass
 //	they can't (handled as explosion damage like tnt)
-//todo: look at "consider todos" regarding nether portals near bottom of EventListener
-//done: make sure stuck teleport when exiting vehicle still works
-//todo: look into bug where whitelist signs on doors of inner fortress are respected even though signs are only inside outer fortress not inside inner fortress (and door leads into fortress)
-
 
 //TODO: handle nether portals better
 //More Ideas:
