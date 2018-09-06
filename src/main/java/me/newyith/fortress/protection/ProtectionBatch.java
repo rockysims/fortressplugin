@@ -2,23 +2,22 @@ package me.newyith.fortress.protection;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.ImmutableSet;
 import me.newyith.fortress.bedrock.BedrockBatch;
 import me.newyith.fortress.util.Batch;
 import me.newyith.fortress.util.Point;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 public class ProtectionBatch extends Batch {
-	protected static class Model extends Batch.Model {
+	protected static class Model {
+		private Batch.Model superModel = null;
 		private final Set<BedrockBatch> bedrockBatches;
 
 		@JsonCreator
-		public Model(@JsonProperty("uuid") UUID uuid,
+		public Model(@JsonProperty("superModel") Batch.Model superModel,
 					 @JsonProperty("bedrockBatches") Set<BedrockBatch> bedrockBatches) {
-			super(uuid);
+			this.superModel = superModel;
 			this.bedrockBatches = bedrockBatches;
 
 			//rebuild transient fields
@@ -28,13 +27,13 @@ public class ProtectionBatch extends Batch {
 
 	@JsonCreator
 	public ProtectionBatch(@JsonProperty("model") Model model) {
-		super(model);
+		super(model.superModel);
 		this.model = model;
 	}
 
 	public ProtectionBatch(ProtectionAuthToken authToken, Set<Point> points) {
 		super(authToken, points);
-		model = new Model(super.getUuid(), new HashSet<>());
+		model = new Model(super.model, new HashSet<>());
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

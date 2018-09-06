@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public abstract class BaseUUID {
 	protected static class Model {
-		private final UUID uuid;
+		protected final UUID uuid;
 
 		@JsonCreator
 		public Model(@JsonProperty("uuid") UUID uuid) {
@@ -16,7 +16,7 @@ public abstract class BaseUUID {
 			//rebuild transient fields
 		}
 	}
-	private Model model = null;
+	protected Model model = null;
 
 	@JsonCreator
 	public BaseUUID(@JsonProperty("model") Model model) {
@@ -29,10 +29,6 @@ public abstract class BaseUUID {
 
 	//-----------------------------------------------------------------------
 
-	public UUID getUuid() {
-		return model.uuid;
-	}
-
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -40,7 +36,9 @@ public abstract class BaseUUID {
 
 		BaseUUID that = (BaseUUID) o;
 
-		return !(model.uuid != null ? !model.uuid.equals(that.getUuid()) : that.getUuid() != null);
+		return (model.uuid == null)
+				? that.model.uuid == null
+				: model.uuid.equals(that.model.uuid);
 	}
 
 	@Override

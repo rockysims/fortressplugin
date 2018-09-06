@@ -7,29 +7,30 @@ import me.newyith.fortress.util.Batch;
 import me.newyith.fortress.util.Point;
 
 import java.util.Set;
-import java.util.UUID;
 
 @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
 public class ForceReversionBatch extends Batch {
-	protected static class Model extends Batch.Model {
+	protected static class Model {
+		private Batch.Model superModel = null;
+
 		@JsonCreator
-		public Model(@JsonProperty("uuid") UUID uuid) {
-			super(uuid);
+		public Model(@JsonProperty("superModel") Batch.Model superModel) {
+			this.superModel = superModel;
 
 			//rebuild transient fields
 		}
 	}
-	private Model model = null;
+	protected Model model = null;
 
 	@JsonCreator
 	public ForceReversionBatch(@JsonProperty("model") Model model) {
-		super(model);
+		super(model.superModel);
 		this.model = model;
 	}
 
 	public ForceReversionBatch(BedrockAuthToken authToken, Set<Point> points) {
 		super(authToken, points);
-		model = new Model(super.getUuid());
+		model = new Model(super.model);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

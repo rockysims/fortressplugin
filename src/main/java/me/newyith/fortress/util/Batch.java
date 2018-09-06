@@ -7,28 +7,30 @@ import java.util.Set;
 import java.util.UUID;
 
 public abstract class Batch extends BaseUUID {
-	protected static class Model extends BaseUUID.Model {
+	protected static class Model {
+		private BaseUUID.Model superModel = null;
 		private final transient BatchData batchData;
 
 		@JsonCreator
-		public Model(@JsonProperty("uuid") UUID uuid) {
-			super(uuid);
+		public Model(@JsonProperty("superModel") BaseUUID.Model superModel) {
+			this.superModel = superModel;
 
 			//rebuild transient fields
-			this.batchData = BatchDataStore.get(uuid);
+			this.batchData = BatchDataStore.get(superModel.uuid);
 		}
 	}
-	private Model model = null;
+	protected Model model = null;
 
 	@JsonCreator
 	public Batch(@JsonProperty("model") Model model) {
-		super(model);
+		super(model.superModel);
 		this.model = model;
 	}
 
 	public Batch(AuthToken authToken, Set<Point> points) {
-		BatchDataStore.put(super.getUuid(), new BatchData(authToken, points));
-		model = new Model(super.getUuid());
+		super(); //sets super.model
+		BatchDataStore.put(super.model.uuid, new BatchData(authToken, points));
+		model = new Model(super.model);
 	}
 
 	//-----------------------------------------------------------------------
@@ -50,6 +52,6 @@ public abstract class Batch extends BaseUUID {
 	}
 
 	public void destroy() {
-		BatchDataStore.remove(super.getUuid());
+		BatchDataStore.remove(super.model.uuid);
 	}
 }

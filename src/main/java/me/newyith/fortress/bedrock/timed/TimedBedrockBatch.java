@@ -7,16 +7,16 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Set;
-import java.util.UUID;
 
 public class TimedBedrockBatch extends BedrockBatch implements Comparable<TimedBedrockBatch> {
-	private static class Model extends BedrockBatch.Model {
+	private static class Model {
+		private BedrockBatch.Model superModel = null;
 		private int endTick = 0;
 
 		@JsonCreator
-		public Model(@JsonProperty("uuid") UUID uuid,
+		public Model(@JsonProperty("superModel") BedrockBatch.Model superModel,
 					 @JsonProperty("endTick") int endTick) {
-			super(uuid);
+			this.superModel = superModel;
 			this.endTick = endTick;
 
 			//rebuild transient fields
@@ -26,13 +26,13 @@ public class TimedBedrockBatch extends BedrockBatch implements Comparable<TimedB
 
 	@JsonCreator
 	public TimedBedrockBatch(@JsonProperty("model") Model model) {
-		super(model);
+		super(model.superModel);
 		this.model = model;
 	}
 
 	public TimedBedrockBatch(BedrockAuthToken authToken, Set<Point> points, int endTick) {
 		super(authToken, points);
-		model = new Model(super.getUuid(), endTick);
+		model = new Model(super.model, endTick);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
