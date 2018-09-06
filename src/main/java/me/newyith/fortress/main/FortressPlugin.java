@@ -5,7 +5,6 @@ import me.newyith.fortress.event.EventListener;
 import me.newyith.fortress.event.TickTimer;
 import me.newyith.fortress.fix.PearlGlitchFix;
 import me.newyith.fortress.manual.ManualCraftManager;
-import me.newyith.fortress.sandbox.jackson.SandboxSaveLoadManager;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Log;
 import me.newyith.fortress.util.Point;
@@ -29,7 +28,6 @@ public class FortressPlugin extends JavaPlugin {
 
 	private static FortressPlugin instance;
 	private static SaveLoadManager saveLoadManager;
-	private static SandboxSaveLoadManager sandboxSaveLoadManager;
 
 	public static int config_glowstoneDustBurnTimeMs = 1000 * 60 * 60;
 	public static int config_stuckDelayMs = 30 * 1000;
@@ -70,11 +68,6 @@ public class FortressPlugin extends JavaPlugin {
 
 		saveLoadManager = new SaveLoadManager(this);
 		saveLoadManager.load();
-
-		if (!releaseBuild) {
-			sandboxSaveLoadManager = new SandboxSaveLoadManager(this);
-//			sandboxSaveLoadManager.load();
-		}
 
 		EventListener.onEnable(this);
 		TickTimer.onEnable(this);
@@ -269,7 +262,7 @@ public class FortressPlugin extends JavaPlugin {
 //TODO: finish adding bStats: https://bstats.org/plugin/bukkit/Fortress (just need to confirm stats actually are being sent)
 //	maybe add custom stat for number of generators?
 //todo: look at "consider todos" regarding nether portals near bottom of EventListener
-//todo: look into bug where whitelist signs on doors of inner fortress are respected even though signs are only inside outer fortress not inside inner fortress (and door leads into fortress)
+//TODO: change to v1.12.2
 
 //1.13 stretch goals:
 //done: prevent teleport via nether portal unless both portals involved have whitelist signs or are not inside fortress
