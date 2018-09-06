@@ -282,7 +282,7 @@ public class FortressPlugin extends JavaPlugin {
 //done: check that ghasts can't break protected glass
 //	they can't (handled as explosion damage like tnt)
 //todo: look at "consider todos" regarding nether portals near bottom of EventListener
-//todo: double check stuck teleport when exiting vehicle still works
+//done: make sure stuck teleport when exiting vehicle still works
 //todo: look into bug where whitelist signs on doors of inner fortress are respected even though signs are only inside outer fortress not inside inner fortress (and door leads into fortress)
 
 

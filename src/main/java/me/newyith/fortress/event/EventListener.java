@@ -243,25 +243,13 @@ public class EventListener implements Listener {
 		}
 	}
 
-
-
-	Set<Player> playersExitingVehicle = new HashSet<>();
-
-
-
 	@EventHandler(ignoreCancelled = true)
 	public void onExitVehicle(VehicleExitEvent event) {
 		if (!(event.getExited() instanceof Player)) return; //if player
 
-		//holding shift to exit vehicle calls this event many times very fast
-		//so wait for handler method to finish before allowing it to be called again (per player)
 		Player player = (Player) event.getExited();
-		if (!playersExitingVehicle.contains(player)) {
-			playersExitingVehicle.add(player);
-			World world = player.getWorld();
-			FortressesManager.forWorld(world).onPlayerExitVehicle(player);
-			playersExitingVehicle.remove(player);
-		}
+		World world = player.getWorld();
+		FortressesManager.forWorld(world).onPlayerExitVehicle(player);
 	}
 
 	@EventHandler(ignoreCancelled = true)

@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -155,7 +156,7 @@ public class StuckTeleport {
 		Location originLoc = origin.toLocation(world);
 		Location targetLoc = target.toLocation(world);
 		targetLoc = faceLocationToward(targetLoc, originLoc);
-		player.teleport(targetLoc);
+		player.teleport(targetLoc, PlayerTeleportEvent.TeleportCause.PLUGIN);
 	}
 
 	//bergerkiller's method lookAt() (https://bukkit.org/threads/lookat-and-move-functions.26768/)

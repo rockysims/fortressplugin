@@ -623,25 +623,20 @@ public class FortressesManagerForWorld {
 		}
 	}
 
-	public boolean onPlayerExitVehicle(Player player) {
-		boolean cancel = false;
-
-		//if (player in generated point) stuck teleport away immediately with message
-		World w = player.getWorld();
-		Point eyesPoint = new Point(player.getEyeLocation());
-		Point feetPoint = eyesPoint.add(0, -1, 0);
-		boolean eyesInGenerated = FortressesManager.forWorld(w).isGenerated(eyesPoint);
-		boolean feetInGenerated = FortressesManager.forWorld(w).isGenerated(feetPoint);
-		if (eyesInGenerated || feetInGenerated) {
-			player.sendMessage(ChatColor.AQUA + "You got stuck in fortress wall.");
-			StuckTeleportResult teleportResult = StuckTeleport.teleport(player, "Stuck teleport");
-			if (teleportResult != StuckTeleportResult.SUCCESS) {
-				cancel = true;	//canceling would allow trap minecarts (except /spawn should get you out, right?)
-								//	not canceling would allow forced fortress entry (if enemy can scan freely above and below fortress)
+	public void onPlayerExitVehicle(Player player) {
+		//need to wait 1 tick otherwise teleport(s) involved in exiting vehicle come after stuck teleport
+		Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
+			//if (player in generated point) stuck teleport away immediately with message
+			World world = player.getWorld();
+			Point eyesPoint = new Point(player.getEyeLocation());
+			Point feetPoint = eyesPoint.add(0, -1, 0);
+			boolean eyesInGenerated = FortressesManager.forWorld(world).isGenerated(eyesPoint);
+			boolean feetInGenerated = FortressesManager.forWorld(world).isGenerated(feetPoint);
+			if (eyesInGenerated || feetInGenerated) {
+				player.sendMessage(ChatColor.AQUA + "You got stuck in fortress wall.");
+				StuckTeleport.teleport(player, "Stuck teleport");
 			}
-		}
-
-		return cancel;
+		}, 1); //20 ticks per second
 	}
 
 	public boolean onEntityDamageFromExplosion(Entity damagee, Entity damager) {
