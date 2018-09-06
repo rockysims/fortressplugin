@@ -38,9 +38,9 @@ public class StuckTeleport {
 
 	public static StuckTeleportResult teleport(Player player, World world, Point origin, String actionName) {
 		StuckTeleport stuckTeleport = new StuckTeleport(player, world, origin);
-		Debug.start("stuckTeleport.execute()");
+//		Debug.start("stuckTeleport.execute()");
 		StuckTeleportResult result = stuckTeleport.execute();
-		Debug.end("stuckTeleport.execute()");
+//		Debug.end("stuckTeleport.execute()");
 
 		if (actionName != null) {
 			if (result == StuckTeleportResult.NO_VALID_DESTINATION) {

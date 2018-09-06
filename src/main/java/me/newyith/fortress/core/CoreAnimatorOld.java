@@ -123,14 +123,14 @@ public class CoreAnimatorOld {
 	public Set<Point> getAlteredPoints() {
 		//TODO: add model.alteredPoints and keep it updated (so we don't need to recalculate here all the time)
 		//	maybe test first to make sure its worth improving performance here?
-		Debug.start("CoreAnimator::getAlteredPoints()");
+//		Debug.start("CoreAnimator::getAlteredPoints()");
 		Set<Point> alteredPoints = new HashSet<>();
 		for (Set<BedrockBatch> alteredBatches : model.alteredBatchesByLayerIndex.values()) {
 			for (BedrockBatch batch : alteredBatches) {
 				alteredPoints.addAll(batch.getPoints());
 			}
 		}
-		Debug.end("CoreAnimator::getAlteredPoints()");
+//		Debug.end("CoreAnimator::getAlteredPoints()");
 
 		return alteredPoints;
 	}

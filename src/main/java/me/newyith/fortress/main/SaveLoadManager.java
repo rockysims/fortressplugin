@@ -111,7 +111,7 @@ public class SaveLoadManager implements Listener {
 	}
 
 	public void save() {
-		Debug.start("save");
+//		Debug.start("save");
 		try {
 			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 			saveToBuffer(buffer);
@@ -122,13 +122,13 @@ public class SaveLoadManager implements Listener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Debug.end("save");
+//		Debug.end("save");
 
 		Log.success("Saved " + FortressesManager.getRuneCountForAllWorlds() + " rune(s).");
 	}
 
 	public void load() {
-		Debug.start("load");
+//		Debug.start("load");
 		try {
 			//if (data.json doesn't exist) make an empty data.json
 			if (! dataFile.exists()) {
@@ -140,7 +140,7 @@ public class SaveLoadManager implements Listener {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Debug.end("load");
+//		Debug.end("load");
 
 		Log.success("Loaded " + FortressesManager.getRuneCountForAllWorlds() + " rune(s).");
 
