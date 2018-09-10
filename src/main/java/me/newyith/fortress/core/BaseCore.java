@@ -211,7 +211,7 @@ public abstract class BaseCore {
 				Orientable orientable = (Orientable)blockData;
 				Axis portalAxis = orientable.getAxis();
 
-				int rangeLimit = 32;
+				int rangeLimit = 16;
 
 				//loadAndPreventUnload of chunks within rangeLimit (Blocks.getPointsConnected() treats points in unloaded chunks as having a material type of null)
 				ChunkBatch chunksInRange = Chunks.inRange(world, portalPoint, rangeLimit);
