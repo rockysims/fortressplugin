@@ -212,7 +212,6 @@ public class GeneratorRune {
 	public void onPlayerCloseChest(Player player, Point chestPoint) {
 		if (chestPoint.equals(model.pattern.getChestPoint())) {
 			Set<Material> invalidMaterials = model.core.getInvalidWallMaterials();
-			invalidMaterials = invalidMaterials.stream().filter(material -> material.isBlock()).collect(Collectors.toSet());
 			if (invalidMaterials.size() > 0) {
 				String msg = "Fortress generator can't protect: ";
 				for (Material mat : invalidMaterials) {

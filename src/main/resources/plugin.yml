@@ -3,7 +3,7 @@ main: me.newyith.fortress.main.FortressPlugin
 version: 0.1
 author: NewYith
 
-api-version: 1.13
+api-version: 1.12.2
   
 commands:
   stuck:

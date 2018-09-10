@@ -6,19 +6,21 @@ import me.newyith.fortress.protection.ProtectionManager;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.rune.generator.GeneratorRunePattern;
 import me.newyith.fortress.stuck.StuckTeleport;
-import me.newyith.fortress.stuck.StuckTeleportResult;
 import me.newyith.fortress.util.Blocks;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.*;
-import org.bukkit.block.data.Openable;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Door;
+import org.bukkit.material.Openable;
+import org.bukkit.material.TrapDoor;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -246,7 +248,7 @@ public class FortressesManagerForWorld {
 
 		//if door is generated, ignore redstone event
 		if (Blocks.isDoor(block.getType()) && isGenerated(p)) {
-			Openable openableDoor = (Openable)block.getBlockData();
+			Openable openableDoor = (Openable)block.getState().getData();
 			event.setNewCurrent((openableDoor.isOpen())?15:0);
 		}
 	}
@@ -399,15 +401,22 @@ public class FortressesManagerForWorld {
 				} else {
 					//if iron trap/door, open for player
 					Material doorType = topDoorPoint.getType(world);
-					boolean isIronDoor = doorType == Material.IRON_DOOR;
+					boolean isIronDoor = doorType == Material.IRON_DOOR_BLOCK;
 					boolean isIronTrap = doorType == Material.IRON_TRAPDOOR;
 					if (isIronDoor || isIronTrap) {
 						Block mainDoorBlock = (isIronDoor)
 								? topDoorPoint.add(0, -1, 0).getBlock(world)
 								: topDoorPoint.getBlock(world);
-						Openable openable = (Openable)mainDoorBlock.getBlockData();
+
+						BlockState state = mainDoorBlock.getState();
+						Openable openable = (Openable) state.getData();
 						openable.setOpen(!openable.isOpen());
-						mainDoorBlock.setBlockData(openable);
+						if (isIronDoor) {
+							state.setData((Door)openable);
+						} else {
+							state.setData((TrapDoor)openable);
+						}
+						state.update();
 						boolean nowOpen = openable.isOpen();
 
 						Sound sound = (isIronDoor)
@@ -430,10 +439,10 @@ public class FortressesManagerForWorld {
 		boolean canUse = true;
 
 		//sometimes point is off by one (player moving while entering) so fallback to closest adjacent portal (if any)
-		if (!point.is(Material.NETHER_PORTAL, model.world)) {
+		if (!point.is(Material.PORTAL, model.world)) {
 			final Point finalPoint = point;
 			List<Point> adjacentPortalPoints = Blocks.getAdjacent6(point).stream()
-					.filter(p -> p.is(Material.NETHER_PORTAL, model.world))
+					.filter(p -> p.is(Material.PORTAL, model.world))
 					.map(Point::center)
 					.sorted((p1, p2) -> (int)(p1.distance(finalPoint)*100 - p2.distance(finalPoint)*100)) //closest first
 					.collect(Collectors.toList());

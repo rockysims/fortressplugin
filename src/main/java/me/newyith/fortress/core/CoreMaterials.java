@@ -106,39 +106,58 @@ public class CoreMaterials {
 				switch (mat) {
 					//non protectable
 					//* //TODO: leave this block enabled (except when debugging)
-					case GRASS_BLOCK:
+					case GRASS:
 					case DIRT:
 					case STONE:
-					case GRANITE:
-					case DIORITE:
-					case ANDESITE:
 					case GRAVEL:
 					case SAND:
-					case RED_SAND:
 					case NETHERRACK:
-					case END_STONE:
+					case ENDER_STONE:
 
 					case SIGN: //text removed by bedrock wave
 					case CHEST: //chest items ejected on ground by bedrock wave
 					case TRAPPED_CHEST: //chest items ejected on ground by bedrock wave
+					//pistons not protectable because bedrock ripple and shield don't seem to play nice with pistons
+					//had piston turn into piston extension (invisible) when toggling switch controlling piston with empty hand (causing ripple)
+					case PISTON_BASE:
+					case PISTON_STICKY_BASE:
 
 					//*/
 					case BEDROCK:
 						invalidWallMaterials.add(mat);
 						break;
 					//special protectable
-
 //					case WATER_BUCKET:
-//						addProtectable(Material.WATER);
+//						addProtectable(Material.STATIONARY_WATER);
 //						break;
 //					case LAVA_BUCKET:
-//						addProtectable(Material.LAVA);
+//						addProtectable(Material.STATIONARY_LAVA);
 //						break;
-
-					//pistons not protectable because bedrock ripple and shield don't seem to play nice with pistons
-					//had piston turn into piston extension (invisible) when toggling switch controlling piston with empty hand (causing ripple)
-					/*
-					case PISTON_BASE:
+					case IRON_DOOR:
+						addProtectable(Material.IRON_DOOR_BLOCK);
+						break;
+					case WOOD_DOOR:
+						addProtectable(Material.WOODEN_DOOR);
+						break;
+					case ACACIA_DOOR_ITEM:
+						addProtectable(Material.ACACIA_DOOR);
+						break;
+					case BIRCH_DOOR_ITEM:
+						addProtectable(Material.BIRCH_DOOR);
+						break;
+					case DARK_OAK_DOOR_ITEM:
+						addProtectable(Material.DARK_OAK_DOOR);
+						break;
+					case JUNGLE_DOOR_ITEM:
+						addProtectable(Material.JUNGLE_DOOR);
+						break;
+					case SPRUCE_DOOR_ITEM:
+						addProtectable(Material.SPRUCE_DOOR);
+						break;
+					case STEP:
+						addProtectable(Material.STEP);
+						addProtectable(Material.DOUBLE_STEP);
+//					case PISTON_BASE:
 //						addProtectable(Material.PISTON_BASE);
 //						addProtectable(Material.PISTON_EXTENSION);
 //						break;
@@ -146,24 +165,11 @@ public class CoreMaterials {
 //						addProtectable(Material.PISTON_STICKY_BASE);
 //						addProtectable(Material.PISTON_MOVING_PIECE);
 //						break;
-					/*/
-					case PISTON:
-					case STICKY_PISTON:
-						break;
-					//*/
-					case TORCH:
-						addProtectable(Material.TORCH);
-						addProtectable(Material.WALL_TORCH);
-						break;
-					case REDSTONE_TORCH:
-						addProtectable(Material.REDSTONE_TORCH);
-						addProtectable(Material.REDSTONE_WALL_TORCH);
-						break;
 					case REDSTONE:
 						addProtectable(Material.REDSTONE_WIRE);
 						break;
 //					case SIGN:
-//						addProtectable(Material.SIGN);
+//						addProtectable(Material.SIGN_POST);
 //						addProtectable(Material.WALL_SIGN);
 //						break;
 					//flags

@@ -65,6 +65,8 @@ public class Blocks {
 		airy = airy && mat != Material.FIRE;
 		airy = airy && mat != Material.WATER;
 		airy = airy && mat != Material.LAVA;
+		airy = airy && mat != Material.STATIONARY_WATER;
+		airy = airy && mat != Material.STATIONARY_LAVA;
 		return airy;
 	}
 
@@ -75,8 +77,8 @@ public class Blocks {
 	public static boolean isTallDoor(Material mat) {
 		boolean isTallDoor = false;
 		switch (mat) {
-			case IRON_DOOR:
-			case OAK_DOOR:
+			case IRON_DOOR_BLOCK:
+			case WOODEN_DOOR:
 			case ACACIA_DOOR:
 			case BIRCH_DOOR:
 			case DARK_OAK_DOOR:
@@ -91,12 +93,7 @@ public class Blocks {
 		boolean isTrapDoor = false;
 		switch (mat) {
 			case IRON_TRAPDOOR:
-			case OAK_TRAPDOOR:
-			case ACACIA_TRAPDOOR:
-			case BIRCH_TRAPDOOR:
-			case DARK_OAK_TRAPDOOR:
-			case JUNGLE_TRAPDOOR:
-			case SPRUCE_TRAPDOOR:
+			case TRAP_DOOR:
 				isTrapDoor = true;
 		}
 		return isTrapDoor;
@@ -106,7 +103,7 @@ public class Blocks {
 		boolean isSign = false;
 		switch (mat) {
 			case WALL_SIGN:
-			case SIGN:
+			case SIGN_POST:
 				isSign = true;
 		}
 		return isSign;
@@ -114,7 +111,7 @@ public class Blocks {
 
 	public static Set<Material> getSignMaterials() {
 		Set<Material> mats = new HashSet<>();
-		mats.add(Material.SIGN);
+		mats.add(Material.SIGN_POST);
 		mats.add(Material.WALL_SIGN);
 		return mats;
 	}
