@@ -3,6 +3,7 @@ package me.newyith.fortress.event;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Blocks;
+import me.newyith.fortress.util.Chunks;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,6 +24,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -309,4 +311,12 @@ public class EventListener implements Listener {
 //		Debug.msg("onNetherPortalCreate() blocks " + blocks.size());
 //		event.setCancelled(true);
 //	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void chunkUnload(ChunkUnloadEvent event) {
+		boolean cancel = Chunks.onChunkUnload(event.getChunk());
+		if (cancel) {
+			event.setCancelled(true);
+		}
+	}
 }
