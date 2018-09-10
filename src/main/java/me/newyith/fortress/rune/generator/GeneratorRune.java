@@ -10,6 +10,7 @@ import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Items;
 import me.newyith.fortress.util.Point;
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.*;
@@ -32,6 +33,8 @@ public class GeneratorRune {
 		private boolean powered = false;
 		private GeneratorState state = GeneratorState.NULL;
 
+		private transient Chunk signChunk = null;
+		private transient Chunk chestChunk = null;
 		private transient List<Long> powerToggleTimeStamps = null;
 
 		@JsonCreator
@@ -48,6 +51,8 @@ public class GeneratorRune {
 
 			//rebuild transient fields
 			powerToggleTimeStamps = new ArrayList<>();
+			signChunk = pattern.getSignPoint().toChunk(pattern.getWorld());
+			chestChunk = pattern.getChestPoint().toChunk(pattern.getWorld());
 		}
 	}
 	private Model model = null;
@@ -126,8 +131,10 @@ public class GeneratorRune {
 	// - Events -
 
 	public void onTick() {
-		tickFuel();
-		model.core.tick();
+		if (model.signChunk.isLoaded() && model.chestChunk.isLoaded()) {
+			tickFuel();
+			model.core.tick();
+		}
 	}
 
 	public void onCreated(Player player) {
