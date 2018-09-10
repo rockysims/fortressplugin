@@ -283,7 +283,12 @@ public class Blocks {
 							if (finalPretendPoints.containsKey(p)) {
 								mat = finalPretendPoints.get(p);
 							} else {
-								mat = p.getBlock(world).getType();
+
+								//trying to get block in unloaded chunk causes thread to hang and thus can crash server
+								//so just consider such blocks to have material type of null
+								boolean pInLoadedChunk = world.isChunkLoaded(p.xInt() >> 4, p.zInt() >> 4);
+								mat = pInLoadedChunk?p.getBlock(world).getType():null;
+								if (!pInLoadedChunk) Debug.msg("gpcal: FOUND UNLOADED POINT p: " + p); //TODO:: delete this line
 							}
 
 							//add to matchesAsLayers if it matches a returnMaterials type
@@ -314,15 +319,8 @@ public class Blocks {
 				}
 			} //end of outer while
 
-
 			return ImmutableList.copyOf(matchesAsLayers);
 		});
-
-
-//		List<Set<Point>> matchesAsLayers = new ArrayList<>();
-
-
-//		return matchesAsLayers;
 	}
 
 	private static boolean isInRange(Point p, Point origin, int rangeLimit) {

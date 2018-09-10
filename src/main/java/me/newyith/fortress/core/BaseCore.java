@@ -211,12 +211,17 @@ public abstract class BaseCore {
 				Orientable orientable = (Orientable)blockData;
 				Axis portalAxis = orientable.getAxis();
 
+				int rangeLimit = 32;
+
+				//loadAndPreventUnload of chunks within rangeLimit (Blocks.getPointsConnected() treats points in unloaded chunks as having a material type of null)
+				ChunkBatch chunksInRange = Chunks.inRange(world, portalPoint, rangeLimit);
+				Chunks.loadAndPreventUnload(world, chunksInRange);
+
 				//find portalPoints
 				Set<Point> originLayer = new HashSet<>();
 				originLayer.add(portalPoint);
 				Set<Material> traverseReturnMaterials = new HashSet<>();
 				traverseReturnMaterials.add(Material.NETHER_PORTAL);
-				int rangeLimit = FortressPlugin.config_generationRangeLimit;
 				Set<Point> portalPoints = Blocks.getPointsConnected(
 						world,
 						portalPoint,
@@ -268,6 +273,8 @@ public abstract class BaseCore {
 						null,
 						Blocks.ConnectedThreshold.FACES
 				).join();
+
+				Chunks.allowUnload(world, chunksInRange);
 
 				actualSignPoints.addAll(signPoints);
 			}
