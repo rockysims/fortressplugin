@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.base.Splitter;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -115,6 +116,10 @@ public class Point {
 
 	public Vector toVector() {
 		return new Vector(x(), y(), z());
+	}
+
+	public Chunk toChunk(World world) {
+		return world.getChunkAt(xInt() >> 4, zInt() >> 4);
 	}
 
 	public Point difference(Point p) {

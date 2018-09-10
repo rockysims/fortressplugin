@@ -107,7 +107,7 @@ public class Debug {
 			}
 			durations.put(key, durations.get(key) + durationNs);
 
-			if (showTimerMessages && print) Debug.print("Timer " + key + ": " + String.valueOf(durationNs / 1000000) + "ms.");
+			if (showTimerMessages && print) Debug.print("Timer " + key + ": " + String.valueOf((durationNs / 1000) / 1000F) + "ms for a total of " + String.valueOf((durations.get(key) / 1000) / 1000F) + "ms.");
 		} else {
 			if (showTimerMessages && print) Debug.print("Timer \"" + key + "\" stopped WITHOUT HAVING BEEN STARTED");
 		}
