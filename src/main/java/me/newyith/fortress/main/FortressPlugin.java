@@ -257,25 +257,24 @@ public class FortressPlugin extends JavaPlugin {
 
 
 
-//1.13 MVP goals:
+//1.12.2 MVP goals:
 //done: fix bug where server crashes due to world.getBlockAt() being called on block in unloaded chunk from async thread
 //	fixed most of the way by treating all blocks in unloaded chunks as if they have material type of null during Blocks.getPointsConnect...
 //	done: add chunksInRange.loadAndPreventUnload() so canUsePortal search isn't limited to just 1 chunk sometimes
-//TODO: finish adding bStats: https://bstats.org/plugin/bukkit/Fortress (just need to confirm stats actually are being sent)
-//	maybe add custom stat for number of generators?
-//todo: look at "consider todos" regarding nether portals near bottom of EventListener
-//TODO: change to v1.12.2
 //TODO: search for "//TODO::" and decide what to do about them
 
-//1.13 stretch goals:
-//done: prevent teleport via nether portal unless both portals involved have whitelist signs or are not inside fortress
-//	done: test case of portal inside fortress inside fortress
-//		todo: keep an eye out for bugs related to this case (first couple tries crashed server but now can't reproduce the issue)
+//1.12.2 stretch goals:
+//todo: look at "consider todos" regarding nether portals near bottom of EventListener
+//TODO: finish adding bStats: https://bstats.org/plugin/bukkit/Fortress (just need to confirm stats actually are being sent)
+//	maybe add custom stat for number of generators?
 //TODO: figure out how to reproduce orphaned protection batches issue (reload during plugin compile maybe?)
 //TODO: add Bedrock/ProtectionManager.clean() (called onEnable) to remove all batches without an associated rune
 //	might also be worth separating bedrock/protection batches by rune (authToken) so that buildBatchPoints() and such run fast even when many fortresses
 
-//1.13 MVP goals done:
+//1.12.2 MVP goals done:
+//done: change to v1.12.2
+//done: prevent teleport via nether portal unless both portals involved have whitelist signs or are not inside fortress
+//	done: test case of portal inside fortress inside fortress
 //done: search for "Model extends" and change to new system where super model is field
 //done: figure out why fastAnimation directive only works for generation and not degeneration now
 //	its because buildBatchPoints() is taking a long time due to batches belonging to destroyed runes being kept (not cleaned up after plugin crashes?)
