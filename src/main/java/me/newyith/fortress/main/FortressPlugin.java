@@ -258,14 +258,14 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //1.12.2 MVP goals:
-//TODO: consider allowing player who created fortress to break (or unprotect?) protected blocks by right clicking with blaze powder
-//	or maybe right click with ghast tear to break generator?
 //done: fix bug where server crashes due to world.getBlockAt() being called on block in unloaded chunk from async thread
 //	fixed most of the way by treating all blocks in unloaded chunks as if they have material type of null during Blocks.getPointsConnect...
 //	done: add chunksInRange.loadAndPreventUnload() so canUsePortal search isn't limited to just 1 chunk sometimes
 //TODO: search for "//TODO::" and decide what to do about them
 
 //1.12.2 stretch goals:
+//TODO: consider allowing player who created fortress to break (or unprotect?) protected blocks by right clicking with blaze powder
+//	or maybe right click with ghast tear to break generator?
 //todo: look at "consider todos" regarding nether portals near bottom of EventListener
 //TODO: finish adding bStats: https://bstats.org/plugin/bukkit/Fortress (just need to confirm stats actually are being sent)
 //	maybe add custom stat for number of generators?
