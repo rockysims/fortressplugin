@@ -5,6 +5,8 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.bukkit.material.Button;
+import org.bukkit.material.PressureSensor;
 
 public class ManagedBedrock extends ManagedBedrockBase {
 	private static class Model {
@@ -63,7 +65,34 @@ public class ManagedBedrock extends ManagedBedrockBase {
 		if (isConverted && !isBedrock) {
 			//convert
 			model.revertData = new BlockRevertData(world, model.point);
-			model.point.setType(Material.BEDROCK, world);
+
+			boolean showParticlesInstead;
+			switch (model.revertData.getMaterial()) {
+				case WOOD_BUTTON: //buttons can get stuck in pressed state
+				case STONE_BUTTON:
+					Button button = (Button) model.point.getBlock(world).getState().getData();
+					showParticlesInstead = button.isPowered();
+					break;
+				case DETECTOR_RAIL: //rail with pressure plate can get stuck in pressed state
+				case WOOD_PLATE: //pressure plates can get stuck in pressed state
+				case STONE_PLATE:
+					PressureSensor pressureSensor = (PressureSensor) model.point.getBlock(world).getState().getData();
+					showParticlesInstead = pressureSensor.isPressed();
+					break;
+				case IRON_PLATE: //weighted pressure plates can get stuck in pressed state
+				case GOLD_PLATE:
+					//can't cast to PressureSensor so just check if it's powered instead
+					showParticlesInstead = model.point.getBlock(world).getBlockPower() > 0;
+					break;
+				default:
+					showParticlesInstead = false;
+			}
+
+			if (showParticlesInstead) {
+				showParticles(world, model.point);
+			} else {
+				model.point.setType(Material.BEDROCK, world);
+			}
 		} else if (!isConverted && isBedrock) {
 			//revert
 			model.revertData.revert(world, model.point);

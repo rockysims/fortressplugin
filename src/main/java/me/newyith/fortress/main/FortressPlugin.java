@@ -258,6 +258,8 @@ public class FortressPlugin extends JavaPlugin {
 
 
 //1.12.2 MVP goals:
+//TODO: consider allowing player who created fortress to break (or unprotect?) protected blocks by right clicking with blaze powder
+//	or maybe right click with ghast tear to break generator?
 //done: fix bug where server crashes due to world.getBlockAt() being called on block in unloaded chunk from async thread
 //	fixed most of the way by treating all blocks in unloaded chunks as if they have material type of null during Blocks.getPointsConnect...
 //	done: add chunksInRange.loadAndPreventUnload() so canUsePortal search isn't limited to just 1 chunk sometimes
@@ -272,6 +274,8 @@ public class FortressPlugin extends JavaPlugin {
 //	might also be worth separating bedrock/protection batches by rune (authToken) so that buildBatchPoints() and such run fast even when many fortresses
 
 //1.12.2 MVP goals done:
+//done: fix issue where right clicking protected button/pressurePlate causes it to get stuck in the pressed position
+//	bedrock wave passes over it while it's pressed and when time is up and it should be unpressed it can't be because its still bedrock
 //done: change to v1.12.2
 //done: prevent teleport via nether portal unless both portals involved have whitelist signs or are not inside fortress
 //	done: test case of portal inside fortress inside fortress
