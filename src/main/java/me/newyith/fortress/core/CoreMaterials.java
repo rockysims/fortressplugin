@@ -165,6 +165,11 @@ public class CoreMaterials {
 //						addProtectable(Material.PISTON_STICKY_BASE);
 //						addProtectable(Material.PISTON_MOVING_PIECE);
 //						break;
+					case REDSTONE_TORCH_ON:
+					case REDSTONE_TORCH_OFF:
+						addProtectable(Material.REDSTONE_TORCH_ON);
+						addProtectable(Material.REDSTONE_TORCH_OFF);
+						break;
 					case REDSTONE:
 						addProtectable(Material.REDSTONE_WIRE);
 						break;
