@@ -620,6 +620,17 @@ public class FortressesManagerForWorld {
 		return cancel;
 	}
 
+	public boolean onSilverfishBreakBlock(Block block) {
+		boolean cancel = false;
+
+		Point p = new Point(block);
+		if (isGenerated(p)) {
+			cancel = true;
+		}
+
+		return cancel;
+	}
+
 	public void onPlayerCloseChest(Player player, Block block, Block block2) {
 		Point p = new Point(block);
 		GeneratorRune rune = getRuneByPatternPoint(p);

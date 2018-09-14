@@ -215,6 +215,15 @@ public class EventListener implements Listener {
 					event.setCancelled(true);
 				}
 			}
+		} else if (entity instanceof Silverfish) {
+			if (event.getTo() == Material.AIR) {
+				Block block = event.getBlock();
+				World world = block.getWorld();
+				cancel = FortressesManager.forWorld(world).onSilverfishBreakBlock(block);
+				if (cancel) {
+					event.setCancelled(true);
+				}
+			}
 		}
 
 		return cancel;
