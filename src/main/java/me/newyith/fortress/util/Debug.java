@@ -134,7 +134,7 @@ public class Debug {
 		long durationNs = durations.get(key);
 		double durationMs = (durationNs / 1000) / 1000F;
 		if (showTimerMessages) {
-			Debug.print("Timer '" + key + "' total duration: " + String.valueOf(durationMs) + "ms.");
+			Debug.print("Timer '" + key + "' total duration: " + String.valueOf((durationNs / 1000) / 1000F) + "ms.");
 		}
 		return durationMs;
 	}
