@@ -8,11 +8,15 @@ import org.bukkit.World;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Debug {
 	public static boolean showTimerMessages = !FortressPlugin.releaseBuild;
+	private static List<String> queuedPrints = new ArrayList<>();
+	public static boolean queuePrints = false;
 
 	public static void msg(String s) {
 		if (!FortressPlugin.releaseBuild) {
@@ -61,8 +65,17 @@ public class Debug {
 		return player;
 	}
 
-	public static void print(String s) {
-		Debug.msg(s);
+	private static void print(String s) {
+		if (queuePrints) {
+			queuedPrints.add(s);
+		} else {
+			Debug.msg(s);
+		}
+	}
+
+	public static void flushQueuedPrints(boolean print) {
+		if (print) queuedPrints.forEach(Debug::msg);
+		queuedPrints.clear();
 	}
 
 	private static Map<String, Long> timestamps = new HashMap<>();
@@ -117,11 +130,13 @@ public class Debug {
 		durations.remove(key);
 	}
 
-	public static void duration(String key) {
+	public static double duration(String key) {
 		long durationNs = durations.get(key);
+		double durationMs = (durationNs / 1000) / 1000F;
 		if (showTimerMessages) {
-			Debug.print("Timer '" + key + "' total duration: " + String.valueOf((durationNs / 1000) / 1000F) + "ms.");
+			Debug.print("Timer '" + key + "' total duration: " + String.valueOf(durationMs) + "ms.");
 		}
+		return durationMs;
 	}
 
 	public static void console(String s) {
