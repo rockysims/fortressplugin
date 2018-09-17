@@ -43,6 +43,7 @@ public abstract class BaseCore {
 		protected final transient int generationRangeLimit;
 		protected transient CoreParticles coreParticles;
 		protected transient CompletableFuture<GenPrepData> genPrepDataFuture;
+		protected final transient List<Runnable> actionsToRunOnNextTick;
 
 		@JsonCreator
 		public Model(@JsonProperty("anchorPoint") Point anchorPoint,
@@ -73,6 +74,7 @@ public abstract class BaseCore {
 			this.generationRangeLimit = FortressPlugin.config_generationRangeLimit;
 			this.coreParticles = new CoreParticles();
 			this.genPrepDataFuture = null;
+			this.actionsToRunOnNextTick = new ArrayList<>();
 		}
 	}
 	protected Model model = null;
@@ -384,19 +386,42 @@ public abstract class BaseCore {
 	}
 
 	public void tick() {
+		Debug.start("BaseCore::tick()"); //TODO:: delete this line
+		Debug.start("BaseCore::tick() run actionsToRunOnNextTick"); //TODO:: delete this line
+		synchronized (model.actionsToRunOnNextTick) {
+			/*  //TODO:: switch back to this version
+			model.actionsToRunOnNextTick.forEach(Runnable::run);
+			/*/
+			model.actionsToRunOnNextTick.forEach(action -> {
+				Debug.msg("ran action"); //TODO:: delete this line
+				action.run();
+			});
+			//*/
+			model.actionsToRunOnNextTick.clear();
+		}
+		Debug.end("BaseCore::tick() run actionsToRunOnNextTick"); //TODO:: delete this line
+
 		CompletableFuture<GenPrepData> future = model.genPrepDataFuture;
 		if (future != null) {
 			GenPrepData data = future.getNow(null);
 			if (data != null) {
 				model.genPrepDataFuture = null;
 
+
+				Debug.start("BaseCore::tick() a"); //TODO:: delete this line
+
 				//* Generate
 				//data.wallLayers should already be merged with any old wallLayers that are still generated
 				ImmutableList<WallLayer> wallLayers = data.wallLayers;
-				Set<Point> wallPoints = WallLayers.getAllPointsIn(wallLayers);
+				ImmutableSet<Point> wallPoints = data.wallPoints;
+
+				Debug.end("BaseCore::tick() a"); //TODO:: delete this line
+				Debug.start("BaseCore::tick() b1"); //TODO:: delete this line
 
 				//update claimed points
 				updateClaimedPoints(wallPoints, data.layerAroundWall);
+				Debug.end("BaseCore::tick() b1"); //TODO:: delete this line
+				Debug.start("BaseCore::tick() b2"); //TODO:: delete this line
 
 				//update inside & outside
 				model.pointsInsideFortress.clear();
@@ -404,10 +429,28 @@ public abstract class BaseCore {
 				model.layerOutsideFortress.clear();
 				model.layerOutsideFortress.addAll(data.layerOutside);
 
-				//bedrock safety
-				BedrockSafety.record(model.world, wallPoints);
+				Debug.end("BaseCore::tick() b2"); //TODO:: delete this line
+				Debug.start("BaseCore::tick() c. BedrockSafety.record()"); //TODO:: delete this line
 
-				model.animator.generate(wallLayers);
+				//record bedrock safety then queue up generate() to run on next tick
+				BedrockSafety.record(model.world, wallPoints).thenRun(() -> {
+					Runnable generateAction = () -> model.animator.generate(wallLayers);
+					synchronized (model.actionsToRunOnNextTick) {
+						model.actionsToRunOnNextTick.add(generateAction);
+					}
+				});
+
+
+				//TODO:: delete next 2 lines
+//				//bedrock safety
+//				BedrockSafety.record(model.world, wallPoints).join();
+
+				Debug.end("BaseCore::tick() c. BedrockSafety.record()"); //TODO:: delete this line
+
+				//TODO:: delete next 3 lines
+//				Debug.start("BaseCore::tick() d");
+//				model.animator.generate(wallLayers);
+//				Debug.end("BaseCore::tick() d");
 
 				//*/
 			} else {
@@ -416,7 +459,12 @@ public abstract class BaseCore {
 			}
 		}
 
+		Debug.start("BaseCore::tick() e"); //TODO:: delete this line
 		model.coreParticles.tick(this);
+		Debug.end("BaseCore::tick() e"); //TODO:: delete this line
+
+
+		Debug.start("BaseCore::tick() f"); //TODO:: delete this line
 
 		boolean waitingForGenPrepData = future != null && !future.isDone();
 		if (!waitingForGenPrepData) {
@@ -427,6 +475,8 @@ public abstract class BaseCore {
 				model.coreParticles.tickAnimationParticles(this);
 			}
 		}
+		Debug.end("BaseCore::tick() f"); //TODO:: delete this line
+		Debug.end("BaseCore::tick()"); //TODO:: delete this line
 	}
 
 	// --------- Internal Methods ---------

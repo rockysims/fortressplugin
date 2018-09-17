@@ -17,15 +17,18 @@ import java.util.concurrent.CompletableFuture;
 
 public class GenPrepData {
 	public final ImmutableList<WallLayer> wallLayers;
+	public final ImmutableSet<Point> wallPoints;
 	public final ImmutableSet<Point> layerAroundWall;
 	public final ImmutableSet<Point> pointsInside;
 	public final ImmutableSet<Point> layerOutside;
 
 	private GenPrepData(ImmutableList<WallLayer> wallLayers,
+						ImmutableSet<Point> wallPoints,
 						ImmutableSet<Point> layerAroundWall,
 						ImmutableSet<Point> pointsInside,
 						ImmutableSet<Point> layerOutside) {
 		this.wallLayers = wallLayers;
+		this.wallPoints = wallPoints;
 		this.layerAroundWall = layerAroundWall;
 		this.pointsInside = pointsInside;
 		this.layerOutside = layerOutside;
@@ -57,7 +60,7 @@ public class GenPrepData {
 					getPointsInside(world, layerOutside, layerAroundWall, wallPoints)
 			);
 
-			return new GenPrepData(wallLayers, layerAroundWall, pointsInside, layerOutside);
+			return new GenPrepData(wallLayers, wallPoints, layerAroundWall, pointsInside, layerOutside);
 		});
 
 		return future;

@@ -16,13 +16,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class SaveLoadManager implements Listener {
 	private final int saveWithWorldsCooldownMs = 500;
 	private long lastSaveTimestamp = 0;
-	private File dataFile = new File(FortressPlugin.getInstance().getDataFolder(), "data.json");
-	private static File bedrockSafetyFile = new File(FortressPlugin.getInstance().getDataFolder(), "bedrockSafety.json");
-	private static ObjectMapper mapper = new ObjectMapper();
+	private final File dataFile = new File(FortressPlugin.getInstance().getDataFolder(), "data.json");
+	private static final File bedrockSafetyFile = new File(FortressPlugin.getInstance().getDataFolder(), "bedrockSafety.json");
+	private static final ObjectMapper mapper = new ObjectMapper();
 
 	public SaveLoadManager(FortressPlugin plugin) {
 		mapper.setVisibilityChecker(mapper.getSerializationConfig().getDefaultVisibilityChecker()
@@ -132,7 +133,7 @@ public class SaveLoadManager implements Listener {
 		try {
 			//if (data.json doesn't exist) make an empty data.json
 			if (! dataFile.exists()) {
-				(new ObjectMapper()).writeValue(dataFile, new LinkedHashMap<String, Object>());
+				mapper.writeValue(dataFile, new LinkedHashMap<String, Object>());
 			}
 
 			Map<String, Object> data = mapper.readValue(dataFile, Map.class);
@@ -164,33 +165,50 @@ public class SaveLoadManager implements Listener {
 
 	// Bedrock Safety //
 
-	public static void saveBedrockSafety() {
-		try {
-			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+	public static CompletableFuture<Void> saveBedrockSafety() {
+		final BedrockSafety bedrockSafetyInstance = BedrockSafety.getInstance();
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
-			Map<String, Object> data = new HashMap<>();
-			data.put("BedrockSafety", BedrockSafety.getInstance());
-			Debug.msg("Saved BedrockSafety"); //LATER: delete this line?
+				Debug.start("saveBedrockSafety() write to buffer"); //TODO:: delete this line
+				//synchronized to prevent changes to BedrockSafety during writeValue(buffer, data)
+				synchronized (BedrockSafety.mutex) {
+					Map<String, Object> data = new HashMap<>();
+					data.put("BedrockSafety", bedrockSafetyInstance);
+					mapper.writer().writeValue(buffer, data);
+				}
+				Debug.end("saveBedrockSafety() write to buffer"); //TODO:: delete this line
 
-			mapper.writeValue(buffer, data);
+				Debug.start("saveBedrockSafety() write to file"); //TODO:: delete this line
+				synchronized (bedrockSafetyFile) {
+					//write buffer to file
+					FileOutputStream fos = new FileOutputStream(bedrockSafetyFile);
+					fos.write(buffer.toByteArray(), 0, buffer.size());
+					fos.close();
+				}
+				Debug.end("saveBedrockSafety() write to file"); //TODO:: delete this line
 
-			//write buffer to file
-			FileOutputStream fos = new FileOutputStream(bedrockSafetyFile);
-			fos.write(buffer.toByteArray(), 0, buffer.size());
-			fos.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+				Debug.msg("Saved BedrockSafety"); //LATER: delete this line?
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			return null;
+		});
 	}
 
 	private void onAfterLoad() {
 		try {
-			//if (bedrockSafety.json doesn't exist) make an empty bedrockSafety.json
-			if (! bedrockSafetyFile.exists()) {
-				(new ObjectMapper()).writeValue(bedrockSafetyFile, new LinkedHashMap<String, Object>());
-			}
+			Map<String, Object> data;
+			synchronized (bedrockSafetyFile) {
+				//if (bedrockSafety.json doesn't exist) make an empty bedrockSafety.json
+				if (! bedrockSafetyFile.exists()) {
+					mapper.writeValue(bedrockSafetyFile, new LinkedHashMap<String, Object>());
+				}
 
-			Map<String, Object> data = mapper.readValue(bedrockSafetyFile, Map.class);
+				data = mapper.readValue(bedrockSafetyFile, Map.class);
+			}
 
 			//load BedrockSafety
 			Object obj = data.get("BedrockSafety");

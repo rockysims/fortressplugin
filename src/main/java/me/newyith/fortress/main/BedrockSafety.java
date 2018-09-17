@@ -11,8 +11,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class BedrockSafety {
+	protected static final transient Object mutex = new Object();
+
 	private static BedrockSafety instance = null;
 	public static BedrockSafety getInstance() {
 		if (instance == null) {
@@ -40,11 +43,15 @@ public class BedrockSafety {
 
 	@JsonCreator
 	public BedrockSafety(@JsonProperty("model") Model model) {
-		this.model = model;
+		synchronized (mutex) { //really shouldn't need to synchronize here but do it anyway just in case
+			this.model = model;
+		}
 	}
 
 	public BedrockSafety() {
-		model = new Model(new HashMap<>());
+		synchronized (mutex) { //really shouldn't need to synchronize here but do it anyway just in case
+			model = new Model(new HashMap<>());
+		}
 	}
 
 	//-----------------------------------------------------------------------
@@ -52,81 +59,90 @@ public class BedrockSafety {
 	public static void safetySync() {
 		getInstance().doSafetySync();
 	}
-	public void doSafetySync() {
-		//revert any bedrock in materialByPoint that is not supposed to be bedrock
-		//	allowed to be bedrock if a generator claims point as claimed wall point
+	private void doSafetySync() {
+		synchronized (mutex) {
+			//revert any bedrock in materialByPoint that is not supposed to be bedrock
+			//	allowed to be bedrock if a generator claims point as claimed wall point
 
-		//Debug.msg("doSafetySync() called");
+			//Debug.msg("doSafetySync() called");
 
-		//fill claimedWallPointsByWorld
-		Map<String, Set<Point>> claimedWallPointsByWorld = new HashMap<>();
-		Set<GeneratorRune> runes = FortressesManager.getRunesInAllWorlds();
-		for (GeneratorRune rune : runes) {
-			String worldName = rune.getPattern().getWorld().getName();
-			if (!claimedWallPointsByWorld.containsKey(worldName)) {
-				claimedWallPointsByWorld.put(worldName, new HashSet<>());
+			//fill claimedWallPointsByWorld
+			Map<String, Set<Point>> claimedWallPointsByWorld = new HashMap<>();
+			Set<GeneratorRune> runes = FortressesManager.getRunesInAllWorlds();
+			for (GeneratorRune rune : runes) {
+				String worldName = rune.getPattern().getWorld().getName();
+				if (!claimedWallPointsByWorld.containsKey(worldName)) {
+					claimedWallPointsByWorld.put(worldName, new HashSet<>());
+				}
+
+				Set<Point> claimedWallPoints = rune.getGeneratorCore().getClaimedWallPoints();
+				claimedWallPointsByWorld.get(worldName).addAll(claimedWallPoints);
 			}
 
-			Set<Point> claimedWallPoints = rune.getGeneratorCore().getClaimedWallPoints();
-			claimedWallPointsByWorld.get(worldName).addAll(claimedWallPoints);
-		}
-
-		//revert any unsafe bedrock
-		for (String worldName : model.materialMapByWorld.keySet()) {
-			Map<Point, Material> materialByPoint = model.materialMapByWorld.get(worldName);
-			Set<Point> claimedWallPoints = claimedWallPointsByWorld.get(worldName);
-			if (claimedWallPoints == null) {
-				claimedWallPoints = new HashSet<>();
-			}
-			World world = Bukkit.getWorld(worldName);
-			Set<Point> unsafeBedrock = new HashSet<>();
-			Set<Point> materialByPointKeys = new HashSet<>(materialByPoint.keySet()); //copy to avoid concurrent modification
-			for (Point p : materialByPointKeys) {
-				if (p.is(Material.BEDROCK, world)) {
-					boolean managedBedrock = BedrockManager.forWorld(world).getMaterialOrNull(p) != null;
-					boolean safeBedrock = claimedWallPoints.contains(p) && managedBedrock;
-					if (!safeBedrock) {
-						unsafeBedrock.add(p);
+			//revert any unsafe bedrock
+			for (String worldName : model.materialMapByWorld.keySet()) {
+				Map<Point, Material> materialByPoint = model.materialMapByWorld.get(worldName);
+				Set<Point> claimedWallPoints = claimedWallPointsByWorld.get(worldName);
+				if (claimedWallPoints == null) {
+					claimedWallPoints = new HashSet<>();
+				}
+				World world = Bukkit.getWorld(worldName);
+				Set<Point> unsafeBedrock = new HashSet<>();
+				Set<Point> materialByPointKeys = new HashSet<>(materialByPoint.keySet()); //copy to avoid concurrent modification
+				for (Point p : materialByPointKeys) {
+					if (p.is(Material.BEDROCK, world)) {
+						boolean managedBedrock = BedrockManager.forWorld(world).getMaterialOrNull(p) != null;
+						boolean safeBedrock = claimedWallPoints.contains(p) && managedBedrock;
+						if (!safeBedrock) {
+							unsafeBedrock.add(p);
+						}
 					}
 				}
-			}
 
-			//give BedrockManager a chance to revert unsafeBedrock (try to handle tall doors gracefully)
-			Set<Point> forceRevertedPoints = BedrockManager.forWorld(world).forceRevertBatchesContaining(unsafeBedrock);
+				//give BedrockManager a chance to revert unsafeBedrock (try to handle tall doors gracefully)
+				Set<Point> forceRevertedPoints = BedrockManager.forWorld(world).forceRevertBatchesContaining(unsafeBedrock);
 
-			//ensure unsafeBedrock is really reverted
-			for (Point p : unsafeBedrock) {
-				Material mat = materialByPoint.remove(p);
-				p.setType(mat, world);
-				Debug.warn("set !safeBedrock at " + p + " back to " + mat + " (force reverted " + (forceRevertedPoints.size() - 1) + " other points)");
+				//ensure unsafeBedrock is really reverted
+				for (Point p : unsafeBedrock) {
+					Material mat = materialByPoint.remove(p);
+					p.setType(mat, world);
+					Debug.warn("set !safeBedrock at " + p + " back to " + mat + " (force reverted " + (forceRevertedPoints.size() - 1) + " other points)");
+				}
 			}
+			model.materialMapByWorld.clear();
 		}
-		model.materialMapByWorld.clear();
 	}
 
-	public static void record(World world, Set<Point> wallPoints) {
-		getInstance().doRecord(world, wallPoints);
+	public static CompletableFuture<Void> record(World world, Set<Point> wallPoints) {
+		return getInstance().doRecord(world, wallPoints);
 	}
-	public void doRecord(World world, Set<Point> wallPoints) {
-		for (Point p : wallPoints) {
-			Material mat = BedrockManager.forWorld(world).getMaterialOrNull(p);
-			if (mat == null) mat = p.getType(world);
-
+	private CompletableFuture<Void> doRecord(World world, Set<Point> wallPoints) {
+		synchronized (mutex) {
+			Debug.start("doRecord() before saveBedrockSafety()"); //TODO:: delete this line
 			String worldName = world.getName();
 			if (!model.materialMapByWorld.containsKey(worldName)) {
 				model.materialMapByWorld.put(worldName, new HashMap<>());
 			}
-			model.materialMapByWorld.get(worldName).put(p, mat);
+			final Map<Point, Material> matMapForWorld = model.materialMapByWorld.get(worldName);
+			final Map<Point, Material> pretendMatByPoint = BedrockManager.forWorld(world).getMaterialByPointMap();
 
-			//LATER: delete debug if statement later?
-			if (mat == Material.BEDROCK) {
-				String ANSI_RESET = "\u001B[0m";
-				String ANSI_RED = "\u001B[31m";
-				Debug.msg(ANSI_RED + "WARNING: BedrockSafety recorded bedrock as original material at " + p + ANSI_RESET);
-			}
+			wallPoints.parallelStream().forEach(p -> {
+				Material mat = pretendMatByPoint.get(p);
+				if (mat == null) mat = p.getType(world);
+				matMapForWorld.put(p, mat);
+
+				//LATER: delete debug if statement later?
+				if (mat == Material.BEDROCK) {
+					String ANSI_RESET = "\u001B[0m";
+					String ANSI_RED = "\u001B[31m";
+					Debug.msg(ANSI_RED + "WARNING: BedrockSafety recorded bedrock as original material at " + p + ANSI_RESET);
+				}
+			});
+			Debug.end("doRecord() before saveBedrockSafety()"); //TODO:: delete this line
 		}
 
-		SaveLoadManager.saveBedrockSafety();
+		//TODO: check if comment on next line is accurate
+		return SaveLoadManager.saveBedrockSafety(); //this need to be outside synchronized(mutex) because it synchronizes on the mutex internally
 	}
 }
 
