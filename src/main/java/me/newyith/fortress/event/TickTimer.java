@@ -45,7 +45,7 @@ public class TickTimer extends BukkitRunnable {
 
 		Debug.stop("tick", false);
 		double duration = Debug.duration("tick");
-		Debug.end("tick");
+		Debug.clear("tick");
 
 		Debug.flushQueuedPrints(duration > 10);
 		Debug.queuePrints = false;
