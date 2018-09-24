@@ -2,8 +2,7 @@ package me.newyith.fortress.main;
 
 import me.newyith.fortress.bedrock.BedrockManager;
 import me.newyith.fortress.rune.generator.GeneratorRune;
-import me.newyith.fortress.util.Debug;
-import me.newyith.fortress.util.Point;
+import me.newyith.fortress.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -126,7 +125,28 @@ public class BedrockSafety {
 			final Map<Point, Material> matMapForWorld = model.materialMapByWorld.get(worldName);
 			final Map<Point, Material> pretendMatByPoint = BedrockManager.forWorld(world).getMaterialByPointMap();
 
-			wallPoints.parallelStream().forEach(p -> {
+
+
+
+
+			//TODO:: delete this commented out block
+//			Debug.start("cuboid");
+//			Cuboid cuboid = new Cuboid(world, layerOutside);
+//			cuboid.getChunks();
+//			Chunk chunk;
+//			chunk.getChunkSnapshot().getBlockType()
+//			Debug.end("cuboid");
+//			Debug.start("chunksInRange");
+//			ChunkBatch chunksInRange = Chunks.inRange(world, anchorPoint, FortressPlugin.config_generationRangeLimit);
+//			Chunks.loadAndPreventUnload(world, chunksInRange);
+//			Chunks.allowUnload(world, chunksInRange);
+//			Debug.end("chunksInRange");
+
+
+
+
+
+			wallPoints.forEach(p -> {
 				Material mat = pretendMatByPoint.get(p);
 				if (mat == null) mat = p.getType(world);
 				matMapForWorld.put(p, mat);
@@ -141,11 +161,9 @@ public class BedrockSafety {
 			Debug.end("doRecord() before saveBedrockSafety()"); //TODO:: delete this line
 		}
 
-		//TODO: check if comment on next line is accurate
-		return SaveLoadManager.saveBedrockSafety(); //this need to be outside synchronized(mutex) because it synchronizes on the mutex internally
+		return SaveLoadManager.saveBedrockSafety();
 	}
 }
-
 
 
 
