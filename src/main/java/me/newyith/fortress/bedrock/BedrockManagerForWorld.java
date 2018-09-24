@@ -163,11 +163,13 @@ public class BedrockManagerForWorld {
 	// utils //
 
 	private void update() {
+		Debug.start("BedrockManagerForWorld::update() a"); //TODO:: delete this line
 		Set<Point> allBatchPoints = new HashSet<>();
 		Set<Point> allForceReversionPoints = new HashSet<>();
 		Set<Point> shouldBeConverted;
 		synchronized (model.mutex) {
 //			Debug.start("fillAllBatchPoints");
+			//TODO:: consider trying to filter forceReversion/Batches by AuthToken (track updateAuthTokens along with updatePoints)
 			for (BedrockBatch batch : model.batches) {
 				allBatchPoints.addAll(batch.getPoints());
 			}
@@ -181,7 +183,9 @@ public class BedrockManagerForWorld {
 					.filter(p -> !allForceReversionPoints.contains(p))
 					.collect(Collectors.toSet());
 		}
+		Debug.end("BedrockManagerForWorld::update() a"); //TODO:: delete this line
 
+		Debug.start("BedrockManagerForWorld::update() b"); //TODO:: delete this line
 		//convert/revert updatedPoints
 		for (Point p : model.updatePoints) {
 			boolean shouldBeConv = shouldBeConverted.contains(p);
@@ -205,8 +209,11 @@ public class BedrockManagerForWorld {
 				model.bedrockHandler.revert(p);
 			}
 		}
+		Debug.end("BedrockManagerForWorld::update() b"); //TODO:: delete this line
 
+		Debug.start("BedrockManagerForWorld::update() c"); //TODO:: delete this line
 		model.materialByPoint = ImmutableMap.copyOf(model.bedrockHandler.getMaterialByPointMap());
+		Debug.end("BedrockManagerForWorld::update() c"); //TODO:: delete this line
 	}
 
 	private Point getOtherHalfOfDoor(Point p) {
