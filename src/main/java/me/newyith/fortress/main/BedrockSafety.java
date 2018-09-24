@@ -1,5 +1,6 @@
 package me.newyith.fortress.main;
 
+import com.google.common.collect.ImmutableSet;
 import me.newyith.fortress.bedrock.BedrockManager;
 import me.newyith.fortress.rune.generator.GeneratorRune;
 import me.newyith.fortress.util.*;
@@ -74,7 +75,7 @@ public class BedrockSafety {
 					claimedWallPointsByWorld.put(worldName, new HashSet<>());
 				}
 
-				Set<Point> claimedWallPoints = rune.getGeneratorCore().getClaimedWallPoints();
+				ImmutableSet<Point> claimedWallPoints = rune.getGeneratorCore().getClaimedWallPoints();
 				claimedWallPointsByWorld.get(worldName).addAll(claimedWallPoints);
 			}
 

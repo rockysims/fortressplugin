@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
 public abstract class BaseCore {
 	public static class Model {
 		protected final Point anchorPoint; //GeneratorCore::showRipple() needs model.anchorPoint to be final (I think)
-		protected final Set<Point> claimedPoints;
-		protected final Set<Point> claimedWallPoints;
+		protected ImmutableSet<Point> claimedPoints;
+		protected ImmutableSet<Point> claimedWallPoints;
 		protected final BedrockAuthToken bedrockAuthToken;
 		protected final ProtectionAuthToken protectionAuthToken;
 		protected final CoreAnimator animator;
@@ -47,8 +47,8 @@ public abstract class BaseCore {
 
 		@JsonCreator
 		public Model(@JsonProperty("anchorPoint") Point anchorPoint,
-					 @JsonProperty("claimedPoints") Set<Point> claimedPoints,
-					 @JsonProperty("claimedWallPoints") Set<Point> claimedWallPoints,
+					 @JsonProperty("claimedPoints") ImmutableSet<Point> claimedPoints,
+					 @JsonProperty("claimedWallPoints") ImmutableSet<Point> claimedWallPoints,
 					 @JsonProperty("bedrockAuthToken") BedrockAuthToken bedrockAuthToken,
 					 @JsonProperty("protectionAuthToken") ProtectionAuthToken protectionAuthToken,
 					 @JsonProperty("animator") CoreAnimator animator,
@@ -85,8 +85,8 @@ public abstract class BaseCore {
 	}
 
 	public BaseCore(World world, Point anchorPoint, CoreMaterials coreMats) {
-		Set<Point> claimedPoints = new HashSet<>();
-		Set<Point> claimedWallPoints = new HashSet<>();
+		ImmutableSet<Point> claimedPoints = ImmutableSet.copyOf(new HashSet<>());
+		ImmutableSet<Point> claimedWallPoints = ImmutableSet.copyOf(new HashSet<>());
 		BedrockAuthToken bedrockAuthToken = new BedrockAuthToken();
 		ProtectionAuthToken protectionAuthToken = new ProtectionAuthToken();
 		CoreAnimator animator = new CoreAnimator(world, anchorPoint, coreMats, bedrockAuthToken, protectionAuthToken);
@@ -527,17 +527,15 @@ public abstract class BaseCore {
 
 	protected abstract Set<Point> getOriginPoints();
 
-	private void updateClaimedPoints(Set<Point> claimedPoints, Set<Point> claimedWallPoints) {
+	private void updateClaimedPoints(ImmutableSet<Point> claimedPoints, ImmutableSet<Point> claimedWallPoints) {
 		Debug.start("updateClaimedPoints() a");
 		FortressesManager.forWorld(model.world).removeClaimedWallPoints(model.claimedWallPoints);
 		Debug.end("updateClaimedPoints() a");
 
 		Debug.start("updateClaimedPoints() b");
 		//TODO: consider model.claimed(Wall)Points = claimed(Wall)Points instead of addAll()
-		model.claimedPoints.clear();
-		model.claimedPoints.addAll(claimedPoints);
-		model.claimedWallPoints.clear();
-		model.claimedWallPoints.addAll(claimedWallPoints);
+		model.claimedPoints = claimedPoints;
+		model.claimedWallPoints = claimedWallPoints;
 		Debug.end("updateClaimedPoints() b");
 
 		Debug.start("updateClaimedPoints() c");
@@ -557,11 +555,11 @@ public abstract class BaseCore {
 		return nearbyClaimedPoints;
 	}
 
-	public Set<Point> getClaimedPoints() {
+	public ImmutableSet<Point> getClaimedPoints() {
 		return model.claimedPoints;
 	}
 
-	public Set<Point> getClaimedWallPoints() {
+	public ImmutableSet<Point> getClaimedWallPoints() {
 		return model.claimedWallPoints;
 	}
 

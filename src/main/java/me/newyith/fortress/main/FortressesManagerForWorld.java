@@ -1,6 +1,7 @@
 package me.newyith.fortress.main;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import me.newyith.fortress.core.BaseCore;
 import me.newyith.fortress.core.GeneratorCore;
 import me.newyith.fortress.protection.ProtectionManager;
@@ -164,7 +165,7 @@ public class FortressesManagerForWorld {
 		return coresInRange;
 	}
 
-	public void addClaimedWallPoints(Set<Point> claimedWallPoints, Point anchor) {
+	public void addClaimedWallPoints(ImmutableSet<Point> claimedWallPoints, Point anchor) {
 //		Debug.msg("addClaimedWallPoints() claimedWallPoints.size(): " + claimedWallPoints.size());
 		GeneratorRune rune = getRuneByPatternPoint(anchor);
 		if (rune != null) {
@@ -180,7 +181,7 @@ public class FortressesManagerForWorld {
 		}
 	}
 
-	public void removeClaimedWallPoints(Set<Point> claimedWallPoints) {
+	public void removeClaimedWallPoints(ImmutableSet<Point> claimedWallPoints) {
 //		Debug.msg("removeClaimedWallPoints() claimedWallPoints.size(): " + claimedWallPoints.size());
 		model.generatorRuneByClaimedWallPoint.keySet().removeAll(claimedWallPoints);
 	}
