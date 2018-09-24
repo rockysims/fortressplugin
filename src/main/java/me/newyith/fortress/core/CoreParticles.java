@@ -27,7 +27,7 @@ public class CoreParticles {
 
 	public void onGeneratedChanges() {
 		if (refreshWaitTicks <= 0) {
-			refreshWaitTicks = 3000 / TickTimer.msPerTick; //schedule wallOutSidePairs refresh in 3 seconds
+			refreshWaitTicks = 3000 / TickTimer.msPerTick; //schedule wallOutsidePairs refresh in 3 seconds
 		} //else refresh already pending
 	}
 
