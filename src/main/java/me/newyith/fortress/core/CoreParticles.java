@@ -15,6 +15,7 @@ public class CoreParticles {
 	private int animationWaitTicks = 0;
 	private int anchorWaitTicks = 0;
 	private int wallWaitTicks = 0;
+	private int refreshWaitTicks = 0; //0 means no refresh scheduled
 	private List<Pair<Point, Point>> wallOutsidePairs = null;
 	private int wallOutsideIndex = 0;
 	private long maxTimeNsPerParticleTick = 1000000 * 2; //2ms (per core)
@@ -25,10 +26,19 @@ public class CoreParticles {
 	}
 
 	public void onGeneratedChanges() {
-		wallOutsidePairs = null; //mark wallOutSidePairs as needing refresh
+		if (refreshWaitTicks <= 0) {
+			refreshWaitTicks = 3000 / TickTimer.msPerTick; //schedule wallOutSidePairs refresh in 3 seconds
+		} //else refresh already pending
 	}
 
 	private void tickWallParticles(BaseCore core) {
+		if (refreshWaitTicks > 0) {
+			refreshWaitTicks--;
+			if (refreshWaitTicks <= 0) {
+				wallOutsidePairs = null; //mark wallOutsidePairs as needing refresh
+			}
+		}
+
 		wallWaitTicks--;
 		if (wallWaitTicks <= 0) {
 			wallWaitTicks = (500) / TickTimer.msPerTick;
@@ -44,9 +54,9 @@ public class CoreParticles {
 				if (generated.size() > 0) {
 					Set<Point> layerOutsideFortress = core.getLayerOutsideFortress();
 
-					layerOutsideFortress.stream().forEach((outsidePoint) -> {
+					layerOutsideFortress.forEach((outsidePoint) -> {
 						Set<Point> adjacents = Blocks.getAdjacent6(outsidePoint);
-						adjacents.stream().forEach((adj) -> {
+						adjacents.forEach((adj) -> {
 							if (generated.contains(adj) && adj.getBlock(core.model.world).getType() != Material.AIR) {
 								wallOutsidePairs.add(new Pair<>(adj, outsidePoint));
 							}
@@ -57,8 +67,6 @@ public class CoreParticles {
 				}
 
 				//Debug.msg("tickWallParticles() filled wallOutsidePairs: " + wallOutsidePairs.size());
-
-//				Debug.end("tickWallParticles() shuffle");
 			}
 
 			if (!wallOutsidePairs.isEmpty()) {
