@@ -36,8 +36,8 @@ public abstract class BaseCore {
 		protected final CoreAnimator animator;
 		protected boolean active;
 		protected UUID placedByPlayerId;
-		protected final Set<Point> layerOutsideFortress;
-		protected final Set<Point> pointsInsideFortress;
+		protected Set<Point> layerOutsideFortress;
+		protected Set<Point> pointsInsideFortress;
 		protected final String worldName;
 		protected final transient World world; //GeneratorCore::showRipple() needs model.world to be final (I think)
 		protected final transient int generationRangeLimit;
@@ -340,9 +340,7 @@ public abstract class BaseCore {
 		if (canPlace) {
 			makeGenPrepDataFuture().thenAccept((data) -> {
 				//update claimed points
-				ImmutableList<WallLayer> wallLayers = data.wallLayers;
-				Set<Point> wallPoints = WallLayers.getAllPointsIn(wallLayers);
-				updateClaimedPoints(wallPoints, data.layerAroundWall);
+				updateClaimedPoints(data.claimedPoints, data.wallPoints);
 
 				//update inside & outside
 				model.pointsInsideFortress.clear();
@@ -351,7 +349,7 @@ public abstract class BaseCore {
 				model.layerOutsideFortress.addAll(data.layerOutside);
 
 				//tell player how many wall blocks were found
-				sendMessage("Fortress generator found " + wallPoints.size() + " wall blocks.");
+				sendMessage("Fortress generator found " + data.wallPoints.size() + " wall blocks.");
 			});
 		} else {
 			sendMessage("Fortress generator is too close to another generator's wall.");
@@ -389,14 +387,7 @@ public abstract class BaseCore {
 		Debug.start("BaseCore::tick()"); //TODO:: delete this line
 		Debug.start("BaseCore::tick() run actionsToRunOnNextTick"); //TODO:: delete this line
 		synchronized (model.actionsToRunOnNextTick) {
-			/*  //TODO:: switch back to this version
 			model.actionsToRunOnNextTick.forEach(Runnable::run);
-			/*/
-			model.actionsToRunOnNextTick.forEach(action -> {
-				Debug.msg("ran action"); //TODO:: delete this line
-				action.run();
-			});
-			//*/
 			model.actionsToRunOnNextTick.clear();
 		}
 		Debug.end("BaseCore::tick() run actionsToRunOnNextTick"); //TODO:: delete this line
@@ -419,15 +410,13 @@ public abstract class BaseCore {
 				Debug.start("BaseCore::tick() b1"); //TODO:: delete this line
 
 				//update claimed points
-				updateClaimedPoints(wallPoints, data.layerAroundWall);
+				updateClaimedPoints(data.claimedPoints, data.wallPoints);
 				Debug.end("BaseCore::tick() b1"); //TODO:: delete this line
 				Debug.start("BaseCore::tick() b2"); //TODO:: delete this line
 
 				//update inside & outside
-				model.pointsInsideFortress.clear();
-				model.pointsInsideFortress.addAll(data.pointsInside);
-				model.layerOutsideFortress.clear();
-				model.layerOutsideFortress.addAll(data.layerOutside);
+				model.pointsInsideFortress = data.pointsInside;
+				model.layerOutsideFortress = data.layerOutside;
 
 				Debug.end("BaseCore::tick() b2"); //TODO:: delete this line
 				Debug.start("BaseCore::tick() c. BedrockSafety.record()"); //TODO:: delete this line
@@ -439,19 +428,7 @@ public abstract class BaseCore {
 						model.actionsToRunOnNextTick.add(generateAction);
 					}
 				});
-
-
-				//TODO:: delete next 2 lines
-//				//bedrock safety
-//				BedrockSafety.record(model.world, wallPoints).join();
-
 				Debug.end("BaseCore::tick() c. BedrockSafety.record()"); //TODO:: delete this line
-
-				//TODO:: delete next 3 lines
-//				Debug.start("BaseCore::tick() d");
-//				model.animator.generate(wallLayers);
-//				Debug.end("BaseCore::tick() d");
-
 				//*/
 			} else {
 				//indicate search for what to generate is in progress
@@ -519,9 +496,6 @@ public abstract class BaseCore {
 		model.genPrepDataFuture = makeGenPrepDataFuture();
 	}
 
-
-
-
 	private CompletableFuture<GenPrepData> makeGenPrepDataFuture() {
 		//prepare to make future
 		ImmutableSet<Material> wallMaterials = ImmutableSet.copyOf(model.animator.getGeneratableWallMaterials());
@@ -541,9 +515,6 @@ public abstract class BaseCore {
 		return future;
 	}
 
-
-
-
 	protected abstract void onSearchingChanged(boolean searching);
 
 	public World getWorld() {
@@ -554,123 +525,25 @@ public abstract class BaseCore {
 		return Bukkit.getPlayer(model.placedByPlayerId);
 	}
 
-	private Set<Point> getLayerOutside(Set<Point> wallPoints, Set<Point> layerAroundWall) {
-		Set<Point> layerOutside = new HashSet<>();
-
-		if (!layerAroundWall.isEmpty()) {
-			//find a top block in layerAroundWall
-			Point top = layerAroundWall.iterator().next();
-			for (Point p : layerAroundWall) {
-				if (p.y() > top.y()) {
-					top = p;
-				}
-			}
-
-			//fill layerOutside
-			Point origin = top;
-			Set<Point> originLayer = new HashSet<>();
-			originLayer.add(origin);
-			Set<Material> traverseMaterials = null; //traverse all block types
-			Set<Material> returnMaterials = null; //return all block types
-			int rangeLimit = 2 * model.generationRangeLimit + 2;
-			Set<Point> ignorePoints = wallPoints;
-			Set<Point> searchablePoints = new HashSet<>(layerAroundWall);
-			searchablePoints.addAll(getOriginPoints());
-			layerOutside = Blocks.getPointsConnected(model.world, origin, originLayer,
-					traverseMaterials, returnMaterials, rangeLimit, ignorePoints, searchablePoints).join();
-			layerOutside.addAll(originLayer);
-			layerOutside.retainAll(layerAroundWall); //this is needed because we add origin points to searchablePoints
-		}
-
-//		Debug.msg("layerOutside.size(): " + layerOutside.size());
-		return layerOutside;
-	}
 	protected abstract Set<Point> getOriginPoints();
 
-	private Set<Point> getPointsInside(Set<Point> layerOutside, Set<Point> layerAroundWall, Set<Point> wallPoints) {
-		Set<Point> pointsInside = new HashSet<>();
-
-		if (!layerAroundWall.isEmpty()) {
-			//get layerInside
-			Set<Point> layerInside = new HashSet<>(layerAroundWall);
-			layerInside.removeAll(layerOutside);
-
-			//fill pointsInside
-			if (!layerInside.isEmpty()) {
-				Point origin = layerInside.iterator().next();
-				Set<Point> originLayer = layerInside;
-				Set<Material> traverseMaterials = null; //traverse all block types
-				Set<Material> returnMaterials = null; //all block types
-				int maxReturns = (new Cuboid(model.world, layerInside)).countBlocks() + 1; //set maxReturns as anti near infinite search (just in case)
-				int rangeLimit = 2 * model.generationRangeLimit;
-				Set<Point> ignorePoints = wallPoints;
-				Set<Point> searchablePoints = null; //search all points
-				pointsInside = Blocks.getPointsConnected(model.world, origin, originLayer,
-						traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints, searchablePoints).join();
-				if (pointsInside.size() == maxReturns) {
-					Debug.error("BaseCore::getPointsInside() tried to do infinite search.");
-				}
-				pointsInside.addAll(originLayer);
-			}
-		}
-
-//		Debug.msg("pointsInside.size(): " + pointsInside.size());
-		return pointsInside;
-	}
-
-	protected void updateClaimedPoints(Set<Point> wallPoints, Set<Point> layerAroundWall) {
+	private void updateClaimedPoints(Set<Point> claimedPoints, Set<Point> claimedWallPoints) {
+		Debug.start("updateClaimedPoints() a");
 		FortressesManager.forWorld(model.world).removeClaimedWallPoints(model.claimedWallPoints);
+		Debug.end("updateClaimedPoints() a");
 
+		Debug.start("updateClaimedPoints() b");
+		//TODO: consider model.claimed(Wall)Points = claimed(Wall)Points instead of addAll()
 		model.claimedPoints.clear();
+		model.claimedPoints.addAll(claimedPoints);
 		model.claimedWallPoints.clear();
+		model.claimedWallPoints.addAll(claimedWallPoints);
+		Debug.end("updateClaimedPoints() b");
 
-		//claim wallPoints
-		model.claimedPoints.addAll(wallPoints);
-		model.claimedWallPoints.addAll(wallPoints);
-
-		//claim layerAroundWall
-		model.claimedPoints.addAll(layerAroundWall);
-
-		//claim originPoints and layer around
-		Set<Point> originPoints = getOriginPoints();
-		Set<Point> layerAroundOrigins = getLayerAround(originPoints, Blocks.ConnectedThreshold.POINTS).join(); //should be nearly instant so ok to wait
-		model.claimedPoints.addAll(originPoints);
-		model.claimedPoints.addAll(layerAroundOrigins);
-
+		Debug.start("updateClaimedPoints() c");
 		FortressesManager.forWorld(model.world).addClaimedWallPoints(model.claimedWallPoints, model.anchorPoint);
+		Debug.end("updateClaimedPoints() c");
 	}
-
-	//TODO: delete commented out getGeneratableWallLayers() method
-//	private List<Set<Point>> getGeneratableWallLayers() {
-//		CoreMaterials coreMats = model.animator.getCoreMats();
-//		coreMats.refresh(); //refresh protectable blocks list based on chest contents
-//
-//		Set<Point> nearbyClaimedPoints = buildClaimedPointsOfNearbyCores();
-//
-//		//return all connected wall points ignoring (and not traversing) nearbyClaimedPoints (generationRangeLimit search range)
-//		Point origin = model.anchorPoint;
-//		Set<Point> originLayer = new HashSet<>(getOriginPoints());
-//		originLayer.addAll(getGeneratedPoints());
-//		Set<Material> traverseMaterials = coreMats.getGeneratableWallMaterials();
-//		Set<Material> returnMaterials = coreMats.getGeneratableWallMaterials();
-//		int maxReturns = Math.max(0, FortressPlugin.config_generationBlockLimit - getGeneratedPoints().size());
-//		int rangeLimit = model.generationRangeLimit;
-//		Set<Point> ignorePoints = nearbyClaimedPoints;
-//		Map<Point, Material> pretendPoints = BedrockManager.forWorld(model.world).getMaterialByPointMap();
-//		List<Set<Point>> foundLayers = Blocks.getPointsConnectedAsLayers(model.world, origin, originLayer, traverseMaterials, returnMaterials, maxReturns, rangeLimit, ignorePoints, pretendPoints).join();
-//
-//		//correct layer indexes (first non already generated layer is not always layer 0)
-//		List<Set<Point>> layers = new ArrayList<>();
-//		int dummyLayerCount = model.animator.getGeneratedLayers().stream()
-//				.map((layer) -> (layer.isEmpty()) ? 0 : 1)
-//				.reduce((a, b) -> a + b).orElse(0);
-//		for (int i = 0; i < dummyLayerCount; i++) {
-//			layers.add(new HashSet<>());
-//		}
-//		layers.addAll(foundLayers);
-//
-//		return layers;
-//	}
 
 	private Set<Point> buildClaimedPointsOfNearbyCores() {
 		int radius = model.generationRangeLimit * 2 + 1; //not sure if the + 1 is needed

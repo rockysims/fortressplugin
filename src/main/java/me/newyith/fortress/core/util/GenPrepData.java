@@ -18,17 +18,20 @@ import java.util.concurrent.CompletableFuture;
 public class GenPrepData {
 	public final ImmutableList<WallLayer> wallLayers;
 	public final ImmutableSet<Point> wallPoints;
+	public final ImmutableSet<Point> claimedPoints;
 	public final ImmutableSet<Point> layerAroundWall;
 	public final ImmutableSet<Point> pointsInside;
 	public final ImmutableSet<Point> layerOutside;
 
 	private GenPrepData(ImmutableList<WallLayer> wallLayers,
 						ImmutableSet<Point> wallPoints,
+						ImmutableSet<Point> claimedPoints,
 						ImmutableSet<Point> layerAroundWall,
 						ImmutableSet<Point> pointsInside,
 						ImmutableSet<Point> layerOutside) {
 		this.wallLayers = wallLayers;
 		this.wallPoints = wallPoints;
+		this.claimedPoints = claimedPoints;
 		this.layerAroundWall = layerAroundWall;
 		this.pointsInside = pointsInside;
 		this.layerOutside = layerOutside;
@@ -52,6 +55,11 @@ public class GenPrepData {
 					getLayerAround(world, anchorPoint, wallPoints, Blocks.ConnectedThreshold.POINTS).join()
 			);
 
+			//set claimedPoints
+			ImmutableSet<Point> claimedPoints = ImmutableSet.copyOf(
+					getClaimedPoints(world, anchorPoint, originPoints, wallPoints, layerAroundWall)
+			);
+
 			//set layerOutside and pointsInside
 			ImmutableSet<Point> layerOutside = ImmutableSet.copyOf(
 					getLayerOutside(world, originPoints, wallPoints, layerAroundWall)
@@ -60,10 +68,29 @@ public class GenPrepData {
 					getPointsInside(world, layerOutside, layerAroundWall, wallPoints)
 			);
 
-			return new GenPrepData(wallLayers, wallPoints, layerAroundWall, pointsInside, layerOutside);
+			return new GenPrepData(wallLayers, wallPoints, claimedPoints, layerAroundWall, pointsInside, layerOutside);
 		});
 
 		return future;
+	}
+
+	private static Set<Point> getClaimedPoints(World world, Point anchorPoint, ImmutableSet<Point> originPoints, ImmutableSet<Point> wallPoints, ImmutableSet<Point> layerAroundWall) {
+		Debug.start("GenPrepData::getClaimedPoints()"); //TODO:: delete this line
+		Set<Point> claimedPoints = new HashSet<>();
+
+		//claim wallPoints
+		claimedPoints.addAll(wallPoints);
+
+		//claim layerAroundWall
+		claimedPoints.addAll(layerAroundWall);
+
+		//claim originPoints and layer around
+		Set<Point> layerAroundOrigins = getLayerAround(world, anchorPoint, originPoints, Blocks.ConnectedThreshold.POINTS).join(); //should be nearly instant so ok to wait
+		claimedPoints.addAll(originPoints);
+		claimedPoints.addAll(layerAroundOrigins);
+		Debug.end("GenPrepData::getClaimedPoints()"); //TODO:: delete this line
+
+		return claimedPoints;
 	}
 
 	private static CompletableFuture<Set<Point>> getLayerAround(World world, Point origin, Set<Point> originLayer, Blocks.ConnectedThreshold threshold) {
