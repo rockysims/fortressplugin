@@ -1,5 +1,6 @@
 package me.newyith.fortress.main;
 
+import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import me.newyith.fortress.bedrock.BedrockManager;
 import me.newyith.fortress.bedrock.timed.TimedBedrockManager;
 import me.newyith.fortress.protection.ProtectionManager;
@@ -26,6 +27,7 @@ public class SaveLoadManager implements Listener {
 	private static final ObjectMapper mapper = new ObjectMapper();
 
 	public SaveLoadManager(FortressPlugin plugin) {
+		mapper.registerModule(new GuavaModule());
 		mapper.setVisibilityChecker(mapper.getSerializationConfig().getDefaultVisibilityChecker()
 				.withFieldVisibility(JsonAutoDetect.Visibility.ANY)
 				.withSetterVisibility(JsonAutoDetect.Visibility.NONE)
