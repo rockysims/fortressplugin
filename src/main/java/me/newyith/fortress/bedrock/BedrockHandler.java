@@ -1,5 +1,6 @@
 package me.newyith.fortress.bedrock;
 
+import com.google.common.collect.ImmutableMap;
 import javafx.util.Pair;
 import me.newyith.fortress.bedrock.util.ManagedBedrock;
 import me.newyith.fortress.bedrock.util.ManagedBedrockBase;
@@ -90,20 +91,17 @@ public class BedrockHandler {
 
 	public Map<Point, Material> getMaterialByPointMap() {
 //		Debug.start("getMaterialByPointMap");
-
-		Map<Point, Material> matByPointMap = new HashMap<>();
+		ImmutableMap.Builder<Point, Material> builder = ImmutableMap.builder();
 		for (Point p : model.managedBedrockByPoint.keySet()) {
-			ManagedBedrockBase managedBedrock = model.managedBedrockByPoint.get(p);
-			Material mat = managedBedrock.getMaterial(p);
-			matByPointMap.put(p, mat);
+			builder.put(p, model.managedBedrockByPoint.get(p).getMaterial(p));
 		}
-
+		Map<Point, Material> matByPointMap = builder.build();
 //		Debug.end("getMaterialByPointMap");
 
 		return matByPointMap;
 	}
 
-	public Material getMaterialOrNull(Point p) {
+	private Material getMaterialOrNull(Point p) {
 		ManagedBedrockBase managedBedrock = model.managedBedrockByPoint.get(p);
 		return (managedBedrock == null)?null:managedBedrock.getMaterial(p);
 	}
