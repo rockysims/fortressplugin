@@ -1,5 +1,6 @@
 package me.newyith.fortress.main;
 
+import com.google.common.collect.ImmutableMap;
 import me.newyith.fortress.core.BaseCore;
 import me.newyith.fortress.core.GeneratorCore;
 import me.newyith.fortress.protection.ProtectionManager;
@@ -167,9 +168,13 @@ public class FortressesManagerForWorld {
 //		Debug.msg("addClaimedWallPoints() claimedWallPoints.size(): " + claimedWallPoints.size());
 		GeneratorRune rune = getRuneByPatternPoint(anchor);
 		if (rune != null) {
+			//use map builder for improved performance (instead of just for with map.put()
+			//	not sure how much it really helps but it seems to help some
+			ImmutableMap.Builder<Point, GeneratorRune> builder = ImmutableMap.builder();
 			for (Point p : claimedWallPoints) {
-				model.generatorRuneByClaimedWallPoint.put(p, rune);
+				builder.put(p, rune);
 			}
+			model.generatorRuneByClaimedWallPoint.putAll(builder.build());
 		} else {
 			Debug.error("FortressesManagerForWorld::addClaimedWallPoints() failed to find rune associated with anchor: " + anchor);
 		}
@@ -177,7 +182,7 @@ public class FortressesManagerForWorld {
 
 	public void removeClaimedWallPoints(Set<Point> claimedWallPoints) {
 //		Debug.msg("removeClaimedWallPoints() claimedWallPoints.size(): " + claimedWallPoints.size());
-		claimedWallPoints.forEach(model.generatorRuneByClaimedWallPoint::remove);
+		model.generatorRuneByClaimedWallPoint.keySet().removeAll(claimedWallPoints);
 	}
 
 	//TODO: remove this method and call isProtected() directly
