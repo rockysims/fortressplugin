@@ -132,7 +132,7 @@ public class FortressPlugin extends JavaPlugin {
 					Material mat = p.getBlock(player.getWorld()).getType();
 					Debug.msg(p + " is " + mat);
 					/*/
-					int distance = 40;
+					int distance = 80;
 					Player player = (Player)sender;
 					World world = player.getWorld();
 					Point center = new Point(player.getLocation());

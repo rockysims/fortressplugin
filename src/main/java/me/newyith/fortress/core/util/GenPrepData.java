@@ -75,7 +75,6 @@ public class GenPrepData {
 	}
 
 	private static Set<Point> getClaimedPoints(World world, Point anchorPoint, ImmutableSet<Point> originPoints, ImmutableSet<Point> wallPoints, ImmutableSet<Point> layerAroundWall) {
-		Debug.start("GenPrepData::getClaimedPoints()"); //TODO:: delete this line
 		Set<Point> claimedPoints = new HashSet<>();
 
 		//claim wallPoints
@@ -88,7 +87,6 @@ public class GenPrepData {
 		Set<Point> layerAroundOrigins = getLayerAround(world, anchorPoint, originPoints, Blocks.ConnectedThreshold.POINTS).join(); //should be nearly instant so ok to wait
 		claimedPoints.addAll(originPoints);
 		claimedPoints.addAll(layerAroundOrigins);
-		Debug.end("GenPrepData::getClaimedPoints()"); //TODO:: delete this line
 
 		return claimedPoints;
 	}

@@ -425,9 +425,6 @@ public abstract class BaseCore {
 		model.coreParticles.tick(this);
 		Debug.end("BaseCore::tick() e"); //TODO:: delete this line
 
-
-		Debug.start("BaseCore::tick() f"); //TODO:: delete this line
-
 		boolean waitingForGenPrepData = future != null && !future.isDone();
 		if (!waitingForGenPrepData) {
 			model.animator.tick();
@@ -437,7 +434,6 @@ public abstract class BaseCore {
 				model.coreParticles.tickAnimationParticles(this);
 			}
 		}
-		Debug.end("BaseCore::tick() f"); //TODO:: delete this line
 		Debug.end("BaseCore::tick()"); //TODO:: delete this line
 	}
 
