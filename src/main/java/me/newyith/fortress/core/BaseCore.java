@@ -8,7 +8,6 @@ import me.newyith.fortress.bedrock.BedrockManager;
 import me.newyith.fortress.bedrock.timed.TimedBedrockManager;
 import me.newyith.fortress.core.util.GenPrepData;
 import me.newyith.fortress.core.util.WallLayer;
-import me.newyith.fortress.core.util.WallLayers;
 import me.newyith.fortress.main.BedrockSafety;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
@@ -501,7 +500,7 @@ public abstract class BaseCore {
 		ImmutableSet<Material> wallMaterials = ImmutableSet.copyOf(model.animator.getGeneratableWallMaterials());
 		ImmutableSet<Point> originPoints = ImmutableSet.copyOf(getOriginPoints());
 		ImmutableSet<Point> nearbyClaimedPoints = ImmutableSet.copyOf(buildClaimedPointsOfNearbyCores());
-		ImmutableMap<Point, Material> pretendPoints = ImmutableMap.copyOf(BedrockManager.forWorld(model.world).getMaterialByPointMap());
+		ImmutableMap<Point, Material> pretendPoints = ImmutableMap.copyOf(BedrockManager.forWorld(model.world).getOrBuildMaterialByPointMap());
 
 		//make future
 		CompletableFuture<GenPrepData> future = GenPrepData.makeFuture(

@@ -124,7 +124,7 @@ public class BedrockSafety {
 				model.materialMapByWorld.put(worldName, new HashMap<>());
 			}
 			final Map<Point, Material> matMapForWorld = model.materialMapByWorld.get(worldName);
-			final Map<Point, Material> pretendMatByPoint = BedrockManager.forWorld(world).getMaterialByPointMap();
+			final Map<Point, Material> pretendMatByPoint = BedrockManager.forWorld(world).getOrBuildMaterialByPointMap();
 
 
 

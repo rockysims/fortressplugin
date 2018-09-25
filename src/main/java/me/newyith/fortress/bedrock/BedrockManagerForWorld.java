@@ -158,14 +158,23 @@ public class BedrockManagerForWorld {
 			update();
 			model.updatePoints.clear();
 			model.updateAuthTokens.clear();
+		} else if (model.materialByPoint == null) {
+			//not currently updating and materialByPoint map isn't cached so build and cache it now
+			Debug.msg(ANSI_RED + "JIC cache materialByPoint ~~~~~~~~~~~~~~~~~" + ANSI_RESET); //TODO:: delete this line
+			getOrBuildMaterialByPointMap();
 		}
 	}
 
 	public Material getMaterialOrNull(Point p) {
-		return model.materialByPoint.get(p);
+		return getOrBuildMaterialByPointMap().get(p);
 	}
 
-	public Map<Point, Material> getMaterialByPointMap() {
+	public Map<Point, Material> getOrBuildMaterialByPointMap() {
+		if (model.materialByPoint == null) {
+			model.materialByPoint = ImmutableMap.copyOf(model.bedrockHandler.buildMaterialByPointMap());
+			Debug.msg(ANSI_RED + "build materialByPoint ~~~~~~~~~~~~~~~~~" + ANSI_RESET); //TODO:: delete this line
+		}
+
 		return model.materialByPoint;
 	}
 
@@ -222,9 +231,13 @@ public class BedrockManagerForWorld {
 		Debug.end("BedrockManagerForWorld::update() b"); //TODO:: delete this line
 
 		Debug.start("BedrockManagerForWorld::update() c"); //TODO:: delete this line
-		model.materialByPoint = ImmutableMap.copyOf(model.bedrockHandler.buildMaterialByPointMap());
+		model.materialByPoint = null;
+		Debug.msg(ANSI_RED + "materialByPoint = null ~~~~~~~~~~~~~~~~~" + ANSI_RESET); //TODO:: delete this line
 		Debug.end("BedrockManagerForWorld::update() c"); //TODO:: delete this line
 	}
+
+	String ANSI_RESET = "\u001B[0m"; //TODO:: delete this line
+	String ANSI_RED = "\u001B[31m"; //TODO:: delete this line
 
 	private Point getOtherHalfOfDoor(Point p) {
 		Point pOtherHalf = null;
