@@ -164,6 +164,8 @@ public class GeneratorCore extends BaseCore {
 				}
 			}
 
+			final Map<Point, Material> pretendMatByPoint = BedrockManager.forWorld(super.model.world).getOrBuildMaterialByPointMap();
+
 			int layerIndex = 0;
 			for (Set<Point> layer : rippleLayers) {
 				int msDuration = 2000;
@@ -187,7 +189,7 @@ public class GeneratorCore extends BaseCore {
 
 						//force reversion of cobble in layer
 						Set<Point> cobbleInLayer = layer.stream().filter(p ->
-								BedrockManager.forWorld(super.model.world).getMaterialOrNull(p) == Material.COBBLESTONE
+								pretendMatByPoint.get(p) == Material.COBBLESTONE
 						).collect(Collectors.toSet());
 						TimedBedrockManager.forWorld(super.model.world).forceReversion(super.model.bedrockAuthToken, cobbleInLayer, 300);
 					}
