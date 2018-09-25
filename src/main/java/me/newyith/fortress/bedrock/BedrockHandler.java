@@ -89,14 +89,14 @@ public class BedrockHandler {
 		}
 	}
 
-	public Map<Point, Material> getMaterialByPointMap() {
-//		Debug.start("getMaterialByPointMap");
+	public Map<Point, Material> buildMaterialByPointMap() {
+//		Debug.start("buildMaterialByPointMap");
 		ImmutableMap.Builder<Point, Material> builder = ImmutableMap.builder();
 		for (Point p : model.managedBedrockByPoint.keySet()) {
 			builder.put(p, model.managedBedrockByPoint.get(p).getMaterial(p));
 		}
 		Map<Point, Material> matByPointMap = builder.build();
-//		Debug.end("getMaterialByPointMap");
+//		Debug.end("buildMaterialByPointMap");
 
 		return matByPointMap;
 	}

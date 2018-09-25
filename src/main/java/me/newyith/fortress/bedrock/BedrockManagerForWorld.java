@@ -3,6 +3,7 @@ package me.newyith.fortress.bedrock;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import javafx.util.Pair;
+import me.newyith.fortress.util.AuthToken;
 import me.newyith.fortress.util.Blocks;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
@@ -25,6 +26,7 @@ public class BedrockManagerForWorld {
 		private final Set<ForceReversionBatch> forceReversionBatches;
 		private final Set<BedrockBatch> batches;
 		private final Set<Point> updatePoints;
+		private final Set<AuthToken> updateAuthTokens;
 		private final String worldName;
 		private final transient World world;
 		private final transient Object mutex;
@@ -35,12 +37,14 @@ public class BedrockManagerForWorld {
 					 @JsonProperty("forceReversionBatches") Set<ForceReversionBatch> forceReversionBatches,
 					 @JsonProperty("batches") Set<BedrockBatch> batches,
 					 @JsonProperty("updatePoints") Set<Point> updatePoints,
+					 @JsonProperty("updateAuthTokens") Set<AuthToken> updateAuthTokens,
 					 @JsonProperty("worldName") String worldName) {
 			this.bedrockHandler = bedrockHandler;
 			this.materialByPoint = ImmutableMap.copyOf(materialByPoint);
 			this.forceReversionBatches = forceReversionBatches;
 			this.batches = batches;
 			this.updatePoints = updatePoints;
+			this.updateAuthTokens = updateAuthTokens;
 			this.worldName = worldName;
 
 			//rebuild transient fields
@@ -56,7 +60,7 @@ public class BedrockManagerForWorld {
 	}
 
 	public BedrockManagerForWorld(World world) {
-		model = new Model(new BedrockHandler(world), ImmutableMap.of(), new HashSet<>(), new HashSet<>(), new HashSet<>(), world.getName());
+		model = new Model(new BedrockHandler(world), ImmutableMap.of(), new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), world.getName());
 	}
 
 	//-----------------------------------------------------------------------
@@ -66,6 +70,7 @@ public class BedrockManagerForWorld {
 		synchronized (model.mutex) {
 			model.forceReversionBatches.add(batch);
 			model.updatePoints.addAll(batch.getPoints());
+			model.updateAuthTokens.add(batch.getAuthToken());
 		}
 	}
 
@@ -74,6 +79,7 @@ public class BedrockManagerForWorld {
 		synchronized (model.mutex) {
 			model.forceReversionBatches.remove(batch);
 			model.updatePoints.addAll(batch.getPoints());
+			model.updateAuthTokens.add(batch.getAuthToken());
 			batch.destroy();
 		}
 	}
@@ -96,6 +102,7 @@ public class BedrockManagerForWorld {
 	private void addBatch(BedrockBatch batch) {
 		model.batches.add(batch);
 		model.updatePoints.addAll(batch.getPoints());
+		model.updateAuthTokens.add(batch.getAuthToken());
 	}
 
 	//this method is (or should be) thread safe
@@ -107,6 +114,7 @@ public class BedrockManagerForWorld {
 	private void removeBatch(BedrockBatch batch) {
 		model.batches.remove(batch);
 		model.updatePoints.addAll(batch.getPoints());
+		model.updateAuthTokens.add(batch.getAuthToken());
 		batch.destroy();
 	}
 
@@ -149,6 +157,7 @@ public class BedrockManagerForWorld {
 		if (model.updatePoints.size() > 0) {
 			update();
 			model.updatePoints.clear();
+			model.updateAuthTokens.clear();
 		}
 	}
 
@@ -164,23 +173,24 @@ public class BedrockManagerForWorld {
 
 	private void update() {
 		Debug.start("BedrockManagerForWorld::update() a"); //TODO:: delete this line
-		Set<Point> allBatchPoints = new HashSet<>();
-		Set<Point> allForceReversionPoints = new HashSet<>();
+		Set<Point> allRelatedBatchPoints = new HashSet<>();
+		Set<Point> allRelatedForceReversionPoints = new HashSet<>();
 		Set<Point> shouldBeConverted;
 		synchronized (model.mutex) {
 //			Debug.start("fillAllBatchPoints");
-			//TODO:: consider trying to filter forceReversion/Batches by AuthToken (track updateAuthTokens along with updatePoints)
 			for (BedrockBatch batch : model.batches) {
-				allBatchPoints.addAll(batch.getPoints());
+				boolean relatedToUpdatedPoints = model.updateAuthTokens.contains(batch.getAuthToken());
+				if (relatedToUpdatedPoints) allRelatedBatchPoints.addAll(batch.getPoints());
 			}
 			for (ForceReversionBatch forceReversionBatch : model.forceReversionBatches) {
-				allForceReversionPoints.addAll(forceReversionBatch.getPoints());
+				boolean relatedToUpdatedPoints = model.updateAuthTokens.contains(forceReversionBatch.getAuthToken());
+				if (relatedToUpdatedPoints) allRelatedForceReversionPoints.addAll(forceReversionBatch.getPoints());
 			}
 //			Debug.end("fillAllBatchPoints");
 
 			shouldBeConverted = model.updatePoints.parallelStream()
-					.filter(allBatchPoints::contains)
-					.filter(p -> !allForceReversionPoints.contains(p))
+					.filter(allRelatedBatchPoints::contains)
+					.filter(p -> !allRelatedForceReversionPoints.contains(p))
 					.collect(Collectors.toSet());
 		}
 		Debug.end("BedrockManagerForWorld::update() a"); //TODO:: delete this line
@@ -198,7 +208,7 @@ public class BedrockManagerForWorld {
 			if (isTallDoor) {
 				Point pOtherHalf = getOtherHalfOfDoor(p);
 				if (pOtherHalf != null) {
-					boolean otherHalfShouldBeConv = allBatchPoints.contains(pOtherHalf);
+					boolean otherHalfShouldBeConv = allRelatedBatchPoints.contains(pOtherHalf);
 					shouldBeConv = shouldBeConv || otherHalfShouldBeConv;
 				}
 			}
@@ -212,7 +222,7 @@ public class BedrockManagerForWorld {
 		Debug.end("BedrockManagerForWorld::update() b"); //TODO:: delete this line
 
 		Debug.start("BedrockManagerForWorld::update() c"); //TODO:: delete this line
-		model.materialByPoint = ImmutableMap.copyOf(model.bedrockHandler.getMaterialByPointMap());
+		model.materialByPoint = ImmutableMap.copyOf(model.bedrockHandler.buildMaterialByPointMap());
 		Debug.end("BedrockManagerForWorld::update() c"); //TODO:: delete this line
 	}
 
