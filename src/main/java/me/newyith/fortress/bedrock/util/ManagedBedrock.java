@@ -34,7 +34,7 @@ public class ManagedBedrock extends ManagedBedrockBase {
 
 	public ManagedBedrock(World world, Point p) {
 		boolean isConverted = false;
-		BlockRevertData revertData = new BlockRevertData(world, p); //TODO: consider setting to null here instead
+		BlockRevertData revertData = new BlockRevertData(world, p);
 		model = new Model(p, isConverted, revertData);
 	}
 
@@ -64,7 +64,6 @@ public class ManagedBedrock extends ManagedBedrockBase {
 
 		if (isConverted && !isBedrock) {
 			//convert
-			model.revertData = new BlockRevertData(world, model.point);
 
 			boolean showParticlesInstead;
 			switch (model.revertData.getMaterial()) {
