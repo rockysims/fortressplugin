@@ -15,8 +15,8 @@ public class CoreParticles {
 	private int animationWaitTicks = 0;
 	private int anchorWaitTicks = 0;
 	private int wallWaitTicks = 0;
-	private int refreshWaitTicks = 0; //0 means no refresh scheduled
-	private List<Pair<Point, Point>> wallOutsidePairs = null;
+	private int refreshWaitTicks = 1 + new Random().nextInt(5000 / TickTimer.msPerTick); //randomize so fortresses don't all refresh at once when plugin enabled
+	private List<Pair<Point, Point>> wallOutsidePairs = new ArrayList<>();
 	private int wallOutsideIndex = 0;
 	private long maxTimeNsPerParticleTick = 1000000 * 2; //2ms (per core)
 
