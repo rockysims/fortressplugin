@@ -72,10 +72,9 @@ public class BedrockHandler {
 	}
 
 	public void revert(Point p) {
-		ManagedBedrockBase managedBedrock = model.managedBedrockByPoint.get(p);
+		ManagedBedrockBase managedBedrock = model.managedBedrockByPoint.remove(p);
 		if (managedBedrock != null) {
 			managedBedrock.revert(model.world);
-			model.managedBedrockByPoint.remove(p);
 
 			if (managedBedrock instanceof ManagedBedrockDoor) {
 				ManagedBedrockDoor managedBedrockDoor = (ManagedBedrockDoor) managedBedrock;
