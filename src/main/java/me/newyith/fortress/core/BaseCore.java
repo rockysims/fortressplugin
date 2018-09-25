@@ -384,12 +384,10 @@ public abstract class BaseCore {
 
 	public void tick() {
 		Debug.start("BaseCore::tick()"); //TODO:: delete this line
-		Debug.start("BaseCore::tick() run actionsToRunOnNextTick"); //TODO:: delete this line
 		synchronized (model.actionsToRunOnNextTick) {
 			model.actionsToRunOnNextTick.forEach(Runnable::run);
 			model.actionsToRunOnNextTick.clear();
 		}
-		Debug.end("BaseCore::tick() run actionsToRunOnNextTick"); //TODO:: delete this line
 
 		CompletableFuture<GenPrepData> future = model.genPrepDataFuture;
 		if (future != null) {
@@ -397,28 +395,17 @@ public abstract class BaseCore {
 			if (data != null) {
 				model.genPrepDataFuture = null;
 
-
-				Debug.start("BaseCore::tick() a"); //TODO:: delete this line
-
 				//* Generate
 				//data.wallLayers should already be merged with any old wallLayers that are still generated
 				ImmutableList<WallLayer> wallLayers = data.wallLayers;
 				ImmutableSet<Point> wallPoints = data.wallPoints;
 
-				Debug.end("BaseCore::tick() a"); //TODO:: delete this line
-				Debug.start("BaseCore::tick() b1"); //TODO:: delete this line
-
 				//update claimed points
 				updateClaimedPoints(data.claimedPoints, data.wallPoints);
-				Debug.end("BaseCore::tick() b1"); //TODO:: delete this line
-				Debug.start("BaseCore::tick() b2"); //TODO:: delete this line
 
 				//update inside & outside
 				model.pointsInsideFortress = data.pointsInside;
 				model.layerOutsideFortress = data.layerOutside;
-
-				Debug.end("BaseCore::tick() b2"); //TODO:: delete this line
-				Debug.start("BaseCore::tick() c. BedrockSafety.record()"); //TODO:: delete this line
 
 				//record bedrock safety then queue up generate() to run on next tick
 				BedrockSafety.record(model.world, wallPoints).thenRun(() -> {
@@ -427,7 +414,6 @@ public abstract class BaseCore {
 						model.actionsToRunOnNextTick.add(generateAction);
 					}
 				});
-				Debug.end("BaseCore::tick() c. BedrockSafety.record()"); //TODO:: delete this line
 				//*/
 			} else {
 				//indicate search for what to generate is in progress
@@ -527,19 +513,12 @@ public abstract class BaseCore {
 	protected abstract Set<Point> getOriginPoints();
 
 	private void updateClaimedPoints(ImmutableSet<Point> claimedPoints, ImmutableSet<Point> claimedWallPoints) {
-		Debug.start("updateClaimedPoints() a");
 		FortressesManager.forWorld(model.world).removeClaimedWallPoints(model.claimedWallPoints);
-		Debug.end("updateClaimedPoints() a");
 
-		Debug.start("updateClaimedPoints() b");
-		//TODO: consider model.claimed(Wall)Points = claimed(Wall)Points instead of addAll()
 		model.claimedPoints = claimedPoints;
 		model.claimedWallPoints = claimedWallPoints;
-		Debug.end("updateClaimedPoints() b");
 
-		Debug.start("updateClaimedPoints() c");
 		FortressesManager.forWorld(model.world).addClaimedWallPoints(model.claimedWallPoints, model.anchorPoint);
-		Debug.end("updateClaimedPoints() c");
 	}
 
 	private Set<Point> buildClaimedPointsOfNearbyCores() {

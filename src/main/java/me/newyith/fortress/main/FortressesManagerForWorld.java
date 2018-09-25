@@ -169,7 +169,7 @@ public class FortressesManagerForWorld {
 //		Debug.msg("addClaimedWallPoints() claimedWallPoints.size(): " + claimedWallPoints.size());
 		GeneratorRune rune = getRuneByPatternPoint(anchor);
 		if (rune != null) {
-			//use map builder for improved performance (instead of just for with map.put()
+			//use map builder for improved performance (instead of just for loop with map.put()
 			//	not sure how much it really helps but it seems to help some
 			ImmutableMap.Builder<Point, GeneratorRune> builder = ImmutableMap.builder();
 			for (Point p : claimedWallPoints) {
