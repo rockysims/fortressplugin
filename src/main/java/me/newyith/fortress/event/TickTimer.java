@@ -18,36 +18,10 @@ public class TickTimer extends BukkitRunnable {
 
 	@Override
 	public void run() {
-		//TODO:: delete all uses of Debug in this method
-		Debug.queuePrints = true;
-
-		Debug.start("tick");
-
-		Debug.start("FortressesManager.onTick()");
 		FortressesManager.onTick();
-		Debug.end("FortressesManager.onTick()");
-
-		Debug.start("TimedBedrockManager.onTick()");
 		TimedBedrockManager.onTick();
-		Debug.end("TimedBedrockManager.onTick()");
-
-		Debug.start("BedrockManager.onTick()");
 		BedrockManager.onTick();
-		Debug.end("BedrockManager.onTick()");
-
-		Debug.start("Commands.onTick()");
 		Commands.onTick();
-		Debug.end("Commands.onTick()");
-
-		Debug.start("FortressPlugin.onTick()");
 		FortressPlugin.onTick();
-		Debug.end("FortressPlugin.onTick()");
-
-		Debug.stop("tick", false);
-		double duration = Debug.duration("tick");
-		Debug.clear("tick");
-
-		Debug.flushQueuedPrints(duration > 10);
-		Debug.queuePrints = false;
 	}
 }

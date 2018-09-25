@@ -176,7 +176,7 @@ public class BedrockManagerForWorld {
 	// utils //
 
 	private void update() {
-		Debug.start("BedrockManagerForWorld::update() a"); //TODO:: delete this line
+//		Debug.start("BedrockManagerForWorld::update() a");
 		Set<Point> allRelatedBatchPoints = new HashSet<>();
 		Set<Point> allRelatedForceReversionPoints = new HashSet<>();
 		Set<Point> shouldBeConverted;
@@ -197,9 +197,9 @@ public class BedrockManagerForWorld {
 					.filter(p -> !allRelatedForceReversionPoints.contains(p))
 					.collect(Collectors.toSet());
 		}
-		Debug.end("BedrockManagerForWorld::update() a"); //TODO:: delete this line
+//		Debug.end("BedrockManagerForWorld::update() a");
 
-		Debug.start("BedrockManagerForWorld::update() b"); //TODO:: delete this line
+//		Debug.start("BedrockManagerForWorld::update() b");
 		//convert/revert updatedPoints
 		for (Point p : model.updatePoints) {
 			boolean shouldBeConv = shouldBeConverted.contains(p);
@@ -223,7 +223,7 @@ public class BedrockManagerForWorld {
 				model.bedrockHandler.revert(p);
 			}
 		}
-		Debug.end("BedrockManagerForWorld::update() b"); //TODO:: delete this line
+//		Debug.end("BedrockManagerForWorld::update() b");
 
 		model.materialByPoint = null; //mark as requiring refresh
 	}

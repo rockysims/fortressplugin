@@ -118,34 +118,13 @@ public class BedrockSafety {
 	}
 	private CompletableFuture<Void> doRecord(World world, Set<Point> wallPoints) {
 		synchronized (mutex) {
-			Debug.start("doRecord() before saveBedrockSafety()"); //TODO:: delete this line
+//			Debug.start("doRecord() before saveBedrockSafety()");
 			String worldName = world.getName();
 			if (!model.materialMapByWorld.containsKey(worldName)) {
 				model.materialMapByWorld.put(worldName, new HashMap<>());
 			}
 			final Map<Point, Material> matMapForWorld = model.materialMapByWorld.get(worldName);
 			final Map<Point, Material> pretendMatByPoint = BedrockManager.forWorld(world).getOrBuildMaterialByPointMap();
-
-
-
-
-
-			//TODO:: delete this commented out block
-//			Debug.start("cuboid");
-//			Cuboid cuboid = new Cuboid(world, layerOutside);
-//			cuboid.getChunks();
-//			Chunk chunk;
-//			chunk.getChunkSnapshot().getBlockType()
-//			Debug.end("cuboid");
-//			Debug.start("chunksInRange");
-//			ChunkBatch chunksInRange = Chunks.inRange(world, anchorPoint, FortressPlugin.config_generationRangeLimit);
-//			Chunks.loadAndPreventUnload(world, chunksInRange);
-//			Chunks.allowUnload(world, chunksInRange);
-//			Debug.end("chunksInRange");
-
-
-
-
 
 			wallPoints.forEach(p -> {
 				Material mat = pretendMatByPoint.get(p);
@@ -159,7 +138,7 @@ public class BedrockSafety {
 					Debug.msg(ANSI_RED + "WARNING: BedrockSafety recorded bedrock as original material at " + p + ANSI_RESET);
 				}
 			});
-			Debug.end("doRecord() before saveBedrockSafety()"); //TODO:: delete this line
+//			Debug.end("doRecord() before saveBedrockSafety()");
 		}
 
 		return SaveLoadManager.saveBedrockSafety();

@@ -180,23 +180,19 @@ public class SaveLoadManager implements Listener {
 			try {
 				ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
-				Debug.start("saveBedrockSafety() write to buffer"); //TODO:: delete this line
 				//synchronized to prevent changes to BedrockSafety during writeValue(buffer, data)
 				synchronized (BedrockSafety.mutex) {
 					Map<String, Object> data = new HashMap<>();
 					data.put("BedrockSafety", bedrockSafetyInstance);
 					mapper.writer().writeValue(buffer, data);
 				}
-				Debug.end("saveBedrockSafety() write to buffer"); //TODO:: delete this line
 
-				Debug.start("saveBedrockSafety() write to file"); //TODO:: delete this line
 				synchronized (bedrockSafetyFile) {
 					//write buffer to file
 					FileOutputStream fos = new FileOutputStream(bedrockSafetyFile);
 					fos.write(buffer.toByteArray(), 0, buffer.size());
 					fos.close();
 				}
-				Debug.end("saveBedrockSafety() write to file"); //TODO:: delete this line
 
 				Debug.msg("Saved BedrockSafety"); //LATER: delete this line?
 			} catch (IOException e) {
