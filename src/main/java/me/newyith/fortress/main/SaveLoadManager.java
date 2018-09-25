@@ -62,6 +62,7 @@ public class SaveLoadManager implements Listener {
 	private void loadFromMap(Map<String, Object> data) {
 		Object obj;
 
+		Log.progress("Loading ==-----");
 		//load BatchDataStore
 		obj = data.get("BatchDataStore");
 		if (obj == null) {
@@ -71,6 +72,7 @@ public class SaveLoadManager implements Listener {
 			BatchDataStore.setInstance(batchDataStore);
 		}
 
+		Log.progress("Loading ===----");
 		//load TimedBedrockManager
 		obj = data.get("TimedBedrockManager");
 		if (obj == null) {
@@ -80,6 +82,7 @@ public class SaveLoadManager implements Listener {
 			TimedBedrockManager.setInstance(timedBedrockManager);
 		}
 
+		Log.progress("Loading ====---");
 		//load ProtectionManager
 		obj = data.get("ProtectionManager");
 		if (obj == null) {
@@ -90,6 +93,7 @@ public class SaveLoadManager implements Listener {
 			ProtectionManager.setInstance(protectionManager);
 		}
 
+		Log.progress("Loading =====--");
 		//load FortressesManager
 		obj = data.get("FortressesManager");
 		if (obj == null) {
@@ -100,6 +104,7 @@ public class SaveLoadManager implements Listener {
 			FortressesManager.setInstance(fortressesManager);
 		}
 
+		Log.progress("Loading ======-");
 		//load BedrockManager
 		obj = data.get("BedrockManager");
 		if (obj == null) {
@@ -110,6 +115,7 @@ public class SaveLoadManager implements Listener {
 			BedrockManager.setInstance(bedrockManager);
 		}
 
+		Log.progress("Loading =======");
 		FortressesManager.secondStageLoad();
 	}
 
@@ -138,6 +144,7 @@ public class SaveLoadManager implements Listener {
 				mapper.writeValue(dataFile, new LinkedHashMap<String, Object>());
 			}
 
+			Log.progress("Loading =------");
 			Map<String, Object> data = mapper.readValue(dataFile, Map.class);
 			loadFromMap(data);
 		} catch (Exception e) {

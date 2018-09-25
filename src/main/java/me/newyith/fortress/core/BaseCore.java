@@ -383,7 +383,6 @@ public abstract class BaseCore {
 	}
 
 	public void tick() {
-		Debug.start("BaseCore::tick()"); //TODO:: delete this line
 		synchronized (model.actionsToRunOnNextTick) {
 			model.actionsToRunOnNextTick.forEach(Runnable::run);
 			model.actionsToRunOnNextTick.clear();
@@ -421,9 +420,7 @@ public abstract class BaseCore {
 			}
 		}
 
-		Debug.start("BaseCore::tick() e"); //TODO:: delete this line
 		model.coreParticles.tick(this);
-		Debug.end("BaseCore::tick() e"); //TODO:: delete this line
 
 		boolean waitingForGenPrepData = future != null && !future.isDone();
 		if (!waitingForGenPrepData) {
@@ -434,7 +431,6 @@ public abstract class BaseCore {
 				model.coreParticles.tickAnimationParticles(this);
 			}
 		}
-		Debug.end("BaseCore::tick()"); //TODO:: delete this line
 	}
 
 	// --------- Internal Methods ---------

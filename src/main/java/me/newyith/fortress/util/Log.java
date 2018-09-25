@@ -5,6 +5,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
 
 public class Log {
+	public static void progress(String s) {
+		sendConsole(s, ChatColor.DARK_GREEN);
+	}
+
 	public static void success(String s) {
 		sendConsole(s, ChatColor.GREEN);
 	}
