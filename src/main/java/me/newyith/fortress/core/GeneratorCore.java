@@ -164,9 +164,32 @@ public class GeneratorCore extends BaseCore {
 				}
 			}
 
+			//fill otherDoorPointByDoorPoint
 			final Map<Point, Material> pretendMatByPoint = BedrockManager.forWorld(super.model.world).getOrBuildMaterialByPointMap();
+			final Map<Point, Point> otherDoorPointByDoorPoint = new HashMap<>();
+			for (Set<Point> layer : rippleLayers) {
+				for (Point p : layer) {
+					Material mat = pretendMatByPoint.getOrDefault(p, p.getType(super.model.world));
+					if (Blocks.isTallDoor(mat)) {
+						Point above = p.add(0, 1, 0);
+						Point below = p.add(0, -1, 0);
+						Material matAbove = pretendMatByPoint.getOrDefault(above, above.getType(super.model.world));
+						Material matBelow = pretendMatByPoint.getOrDefault(below, below.getType(super.model.world));
+						Point otherDoorPoint = null;
+						if (Blocks.isTallDoor(matAbove)) {
+							otherDoorPoint = above;
+						} else if (Blocks.isTallDoor(matBelow)) {
+							otherDoorPoint = below;
+						}
+						if (otherDoorPoint != null) {
+							otherDoorPointByDoorPoint.put(p, otherDoorPoint);
+						}
+					}
+				}
+			}
 
 			int layerIndex = 0;
+			Set<Point> lastLayer = new HashSet<>();
 			for (Set<Point> layer : rippleLayers) {
 				int msDuration = 2000;
 
@@ -178,6 +201,7 @@ public class GeneratorCore extends BaseCore {
 					msDuration += msPerLayer;
 				}
 
+				final Set<Point> lastLayerFinal = lastLayer;
 				final int msDurationFinal = msDuration;
 				Bukkit.getScheduler().scheduleSyncDelayedTask(FortressPlugin.getInstance(), () -> {
 					//TODO: consider fixing hacky call to getRuneByPatternPoint() here. GeneratorCore shouldn't need to know about rune
@@ -185,16 +209,23 @@ public class GeneratorCore extends BaseCore {
 
 					boolean runeStillExists = FortressesManager.forWorld(super.model.world).getRuneByPatternPoint(super.model.anchorPoint) != null;
 					if (runeStillExists) { //rune might have been destroyed before ripple ended
-						TimedBedrockManager.forWorld(super.model.world).convert(super.model.bedrockAuthToken, layer, msDurationFinal);
+						Set<Point> layerWithoutDoorsAlsoInLastLayer = layer.stream().filter(p -> {
+							Point otherDoorPoint = otherDoorPointByDoorPoint.get(p);
+							return otherDoorPoint == null || !lastLayerFinal.contains(otherDoorPoint);
+						}).collect(Collectors.toSet());
 
-						//force reversion of cobble in layer
-						Set<Point> cobbleInLayer = layer.stream().filter(p ->
-								pretendMatByPoint.get(p) == Material.COBBLESTONE
+						//force reversion
+						Set<Point> layerForceRevertPoints = layerWithoutDoorsAlsoInLastLayer.stream().filter(p ->
+								p.is(Material.BEDROCK, super.model.world)
 						).collect(Collectors.toSet());
-						TimedBedrockManager.forWorld(super.model.world).forceReversion(super.model.bedrockAuthToken, cobbleInLayer, 300);
+						TimedBedrockManager.forWorld(super.model.world).forceReversion(super.model.bedrockAuthToken, layerForceRevertPoints, 300);
+
+						//conversion
+						TimedBedrockManager.forWorld(super.model.world).convert(super.model.bedrockAuthToken, layerWithoutDoorsAlsoInLastLayer, msDurationFinal);
 					}
 				}, layerIndex * 3); //ticks (50 ms per tick)
 
+				lastLayer = layer;
 				layerIndex++;
 			}
 		}
