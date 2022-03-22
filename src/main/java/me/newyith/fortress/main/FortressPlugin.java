@@ -8,7 +8,6 @@ import me.newyith.fortress.manual.ManualCraftManager;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Log;
 import me.newyith.fortress.util.Point;
-import org.bstats.bukkit.Metrics;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -66,8 +65,6 @@ public class FortressPlugin extends JavaPlugin {
 		Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
 		Log.sendConsole("         >> ON <<           ", ChatColor.GREEN);
 		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
-
-		new Metrics(this); //bStats
 
 		saveLoadManager = new SaveLoadManager(this);
 		saveLoadManager.load();
