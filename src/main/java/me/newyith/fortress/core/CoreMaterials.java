@@ -1,5 +1,6 @@
 package me.newyith.fortress.core;
 
+import me.newyith.fortress.util.Blocks;
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Bukkit;
@@ -114,7 +115,6 @@ public class CoreMaterials {
 					case NETHERRACK:
 					case LEGACY_ENDER_STONE:
 
-					case LEGACY_SIGN: //text removed by bedrock wave
 					case CHEST: //chest items ejected on ground by bedrock wave
 					case TRAPPED_CHEST: //chest items ejected on ground by bedrock wave
 					//pistons not protectable because bedrock ripple and shield don't seem to play nice with pistons
@@ -133,9 +133,6 @@ public class CoreMaterials {
 //					case LAVA_BUCKET:
 //						addProtectable(Material.STATIONARY_LAVA);
 //						break;
-					case LEGACY_STEP:
-						addProtectable(Material.LEGACY_STEP);
-						addProtectable(Material.LEGACY_DOUBLE_STEP);
 //					case PISTON_BASE:
 //						addProtectable(Material.PISTON_BASE);
 //						addProtectable(Material.PISTON_EXTENSION);
@@ -144,24 +141,25 @@ public class CoreMaterials {
 //						addProtectable(Material.PISTON_STICKY_BASE);
 //						addProtectable(Material.PISTON_MOVING_PIECE);
 //						break;
-					case LEGACY_REDSTONE_TORCH_ON:
-					case LEGACY_REDSTONE_TORCH_OFF:
-						addProtectable(Material.LEGACY_REDSTONE_TORCH_ON);
-						addProtectable(Material.LEGACY_REDSTONE_TORCH_OFF);
-						break;
 					case REDSTONE:
 						addProtectable(Material.REDSTONE_WIRE);
 						break;
-//					case SIGN:
-//						addProtectable(Material.SIGN_POST);
-//						addProtectable(Material.WALL_SIGN);
-//						break;
+					case TORCH:
+						addProtectable(Material.TORCH);
+						addProtectable(Material.WALL_TORCH);
+						break;
+					case REDSTONE_TORCH:
+						addProtectable(Material.REDSTONE_TORCH);
+						addProtectable(Material.REDSTONE_WALL_TORCH);
+						break;
 					//flags
 					case BLAZE_ROD:
 						model.flags.add("fastAnimation");
 						break;
 					default:
-						if (mat.isBlock()) {
+						boolean isProtectable = mat.isBlock()
+							&& !Blocks.isSign(mat); //text removed by bedrock wave
+						if (isProtectable) {
 							addProtectable(item.getType());
 						} else if (mat != Material.GLOWSTONE_DUST) {
 							invalidWallMaterials.add(mat);
