@@ -75,38 +75,15 @@ public class Blocks {
 	}
 
 	public static boolean isTallDoor(Material mat) {
-		boolean isTallDoor = false;
-		switch (mat) {
-			case LEGACY_IRON_DOOR_BLOCK:
-			case LEGACY_WOODEN_DOOR:
-			case ACACIA_DOOR:
-			case BIRCH_DOOR:
-			case DARK_OAK_DOOR:
-			case JUNGLE_DOOR:
-			case SPRUCE_DOOR:
-				isTallDoor = true;
-		}
-		return isTallDoor;
+		return ("" + mat).endsWith("_DOOR");
 	}
 
 	public static boolean isTrapDoor(Material mat) {
-		boolean isTrapDoor = false;
-		switch (mat) {
-			case IRON_TRAPDOOR:
-			case LEGACY_TRAP_DOOR:
-				isTrapDoor = true;
-		}
-		return isTrapDoor;
+		return ("" + mat).endsWith("_TRAPDOOR");
 	}
 
 	public static boolean isSign(Material mat) {
-		boolean isSign = false;
-		switch (mat) {
-			case LEGACY_WALL_SIGN:
-			case LEGACY_SIGN_POST:
-				isSign = true;
-		}
-		return isSign;
+		return ("" + mat).endsWith("_SIGN");
 	}
 
 	public static Set<Material> getSignMaterials() {

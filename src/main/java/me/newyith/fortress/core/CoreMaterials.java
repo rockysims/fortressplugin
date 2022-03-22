@@ -133,27 +133,6 @@ public class CoreMaterials {
 //					case LAVA_BUCKET:
 //						addProtectable(Material.STATIONARY_LAVA);
 //						break;
-					case IRON_DOOR:
-						addProtectable(Material.LEGACY_IRON_DOOR_BLOCK);
-						break;
-					case LEGACY_WOOD_DOOR:
-						addProtectable(Material.LEGACY_WOODEN_DOOR);
-						break;
-					case LEGACY_ACACIA_DOOR_ITEM:
-						addProtectable(Material.ACACIA_DOOR);
-						break;
-					case LEGACY_BIRCH_DOOR_ITEM:
-						addProtectable(Material.BIRCH_DOOR);
-						break;
-					case LEGACY_DARK_OAK_DOOR_ITEM:
-						addProtectable(Material.DARK_OAK_DOOR);
-						break;
-					case LEGACY_JUNGLE_DOOR_ITEM:
-						addProtectable(Material.JUNGLE_DOOR);
-						break;
-					case LEGACY_SPRUCE_DOOR_ITEM:
-						addProtectable(Material.SPRUCE_DOOR);
-						break;
 					case LEGACY_STEP:
 						addProtectable(Material.LEGACY_STEP);
 						addProtectable(Material.LEGACY_DOUBLE_STEP);
