@@ -117,31 +117,43 @@ public class Blocks {
 	}
 
 	public static CompletableFuture<Set<Point>> getPointsConnected(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int maxReturns, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
-		return CompletableFuture.supplyAsync(() -> {
+		// return CompletableFuture.supplyAsync(() -> {
+		
 			List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, maxReturns, rangeLimit, -1, ignorePoints, searchablePoints, null, ConnectedThreshold.FACES).join();
-			return flattenLayers(layers);
-		});
+			return CompletableFuture.completedFuture(flattenLayers(layers));
+
+			// return flattenLayers(layers);
+		// });
 	}
 
 	public static CompletableFuture<Set<Point>> getPointsConnected(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, Set<Point> searchablePoints) {
-		return CompletableFuture.supplyAsync(() -> {
+		// return CompletableFuture.supplyAsync(() -> {
+		
 			List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, -1, rangeLimit, -1, ignorePoints, searchablePoints, null, ConnectedThreshold.FACES).join();
-			return flattenLayers(layers);
-		});
+			return CompletableFuture.completedFuture(flattenLayers(layers));
+
+			// return flattenLayers(layers);
+		// });
 	}
 
 	public static CompletableFuture<Set<Point>> getPointsConnected(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, Set<Point> ignorePoints, ConnectedThreshold connectedThreshold) {
-		return CompletableFuture.supplyAsync(() -> {
+		// return CompletableFuture.supplyAsync(() -> {
+
 			List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, -1, rangeLimit, -1, ignorePoints, null, null, connectedThreshold).join();
-			return flattenLayers(layers);
-		});
+			return CompletableFuture.completedFuture(flattenLayers(layers));
+		
+			// return flattenLayers(layers);
+		// });
 	}
 
 	public static CompletableFuture<Set<Point>> getPointsConnected(World world, Point origin, Set<Point> originLayer, Set<Material> traverseMaterials, Set<Material> returnMaterials, int rangeLimit, int layerLimit, Set<Point> ignorePoints, ConnectedThreshold connectedThreshold) {
-		return CompletableFuture.supplyAsync(() -> {
+		// return CompletableFuture.supplyAsync(() -> {
+
 			List<Set<Point>> layers = getPointsConnectedAsLayers(world, origin, originLayer, traverseMaterials, returnMaterials, -1, rangeLimit, layerLimit, ignorePoints, null, null, connectedThreshold).join();
-			return flattenLayers(layers);
-		});
+			return CompletableFuture.completedFuture(flattenLayers(layers));
+		
+			// return flattenLayers(layers);
+		// });
 	}
 
 	public static CompletableFuture<List<Set<Point>>> getPointsConnectedAsLayers(World world, Point origin, int layerLimit, Set<Point> searchablePoints) {
@@ -185,7 +197,10 @@ public class Blocks {
 			pretendPoints = new HashMap<>();
 		final Map<Point, Material> finalPretendPoints = pretendPoints;
 
-		return CompletableFuture.supplyAsync(() -> {
+		// return CompletableFuture.supplyAsync(() -> {
+
+
+
 			List<Set<Point>> matchesAsLayers = new ArrayList<>();
 			Set<Point> connected = new HashSet<>();
 
@@ -316,8 +331,12 @@ public class Blocks {
 				}
 			} //end of outer while
 
-			return ImmutableList.copyOf(matchesAsLayers);
-		});
+			return CompletableFuture.completedFuture(ImmutableList.copyOf(matchesAsLayers));
+
+
+
+			// return ImmutableList.copyOf(matchesAsLayers);
+		// });
 	}
 
 	private static boolean isInRange(Point p, Point origin, int rangeLimit) {
