@@ -21,6 +21,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Random;
 
+//!!!
+//TODO: search project for all instances of "LEGACY_" and figure out how to do without the "LEGACY_" part
+
 public class FortressPlugin extends JavaPlugin {
 	public static final boolean releaseBuild = false; //TODO: change this to true for release builds
 	private static final double saveDelayMs = 5*60*1000;
