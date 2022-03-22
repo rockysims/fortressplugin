@@ -49,8 +49,8 @@ public class BlockRevertData {
 
 		switch (model.material) {
 			case TORCH:
-			case REDSTONE_TORCH_ON:
-			case REDSTONE_TORCH_OFF:
+			case LEGACY_REDSTONE_TORCH_ON:
+			case LEGACY_REDSTONE_TORCH_OFF:
 				//set material and data at the same time so torches on walls don't fall down
 				b.setTypeIdAndData(model.material.getId(), model.data, false);
 				break;

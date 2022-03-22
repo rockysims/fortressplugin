@@ -204,7 +204,7 @@ public abstract class BaseCore {
 		Set<Point> actualSignPoints = new HashSet<>();
 
 		World world = model.world;
-		if (portalPoint.is(Material.PORTAL, world)) {
+		if (portalPoint.is(Material.LEGACY_PORTAL, world)) {
 			final boolean portalAxisX = portalPoint.getBlock(world).getData() == 1;
 			int rangeLimit = 16;
 
@@ -216,7 +216,7 @@ public abstract class BaseCore {
 			Set<Point> originLayer = new HashSet<>();
 			originLayer.add(portalPoint);
 			Set<Material> traverseReturnMaterials = new HashSet<>();
-			traverseReturnMaterials.add(Material.PORTAL);
+			traverseReturnMaterials.add(Material.LEGACY_PORTAL);
 			Set<Point> portalPoints = Blocks.getPointsConnected(
 					world,
 					portalPoint,

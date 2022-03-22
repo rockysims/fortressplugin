@@ -112,15 +112,15 @@ public class CoreMaterials {
 					case GRAVEL:
 					case SAND:
 					case NETHERRACK:
-					case ENDER_STONE:
+					case LEGACY_ENDER_STONE:
 
-					case SIGN: //text removed by bedrock wave
+					case LEGACY_SIGN: //text removed by bedrock wave
 					case CHEST: //chest items ejected on ground by bedrock wave
 					case TRAPPED_CHEST: //chest items ejected on ground by bedrock wave
 					//pistons not protectable because bedrock ripple and shield don't seem to play nice with pistons
 					//had piston turn into piston extension (invisible) when toggling switch controlling piston with empty hand (causing ripple)
-					case PISTON_BASE:
-					case PISTON_STICKY_BASE:
+					case LEGACY_PISTON_BASE:
+					case LEGACY_PISTON_STICKY_BASE:
 
 					//*/
 					case BEDROCK:
@@ -134,29 +134,29 @@ public class CoreMaterials {
 //						addProtectable(Material.STATIONARY_LAVA);
 //						break;
 					case IRON_DOOR:
-						addProtectable(Material.IRON_DOOR_BLOCK);
+						addProtectable(Material.LEGACY_IRON_DOOR_BLOCK);
 						break;
-					case WOOD_DOOR:
-						addProtectable(Material.WOODEN_DOOR);
+					case LEGACY_WOOD_DOOR:
+						addProtectable(Material.LEGACY_WOODEN_DOOR);
 						break;
-					case ACACIA_DOOR_ITEM:
+					case LEGACY_ACACIA_DOOR_ITEM:
 						addProtectable(Material.ACACIA_DOOR);
 						break;
-					case BIRCH_DOOR_ITEM:
+					case LEGACY_BIRCH_DOOR_ITEM:
 						addProtectable(Material.BIRCH_DOOR);
 						break;
-					case DARK_OAK_DOOR_ITEM:
+					case LEGACY_DARK_OAK_DOOR_ITEM:
 						addProtectable(Material.DARK_OAK_DOOR);
 						break;
-					case JUNGLE_DOOR_ITEM:
+					case LEGACY_JUNGLE_DOOR_ITEM:
 						addProtectable(Material.JUNGLE_DOOR);
 						break;
-					case SPRUCE_DOOR_ITEM:
+					case LEGACY_SPRUCE_DOOR_ITEM:
 						addProtectable(Material.SPRUCE_DOOR);
 						break;
-					case STEP:
-						addProtectable(Material.STEP);
-						addProtectable(Material.DOUBLE_STEP);
+					case LEGACY_STEP:
+						addProtectable(Material.LEGACY_STEP);
+						addProtectable(Material.LEGACY_DOUBLE_STEP);
 //					case PISTON_BASE:
 //						addProtectable(Material.PISTON_BASE);
 //						addProtectable(Material.PISTON_EXTENSION);
@@ -165,10 +165,10 @@ public class CoreMaterials {
 //						addProtectable(Material.PISTON_STICKY_BASE);
 //						addProtectable(Material.PISTON_MOVING_PIECE);
 //						break;
-					case REDSTONE_TORCH_ON:
-					case REDSTONE_TORCH_OFF:
-						addProtectable(Material.REDSTONE_TORCH_ON);
-						addProtectable(Material.REDSTONE_TORCH_OFF);
+					case LEGACY_REDSTONE_TORCH_ON:
+					case LEGACY_REDSTONE_TORCH_OFF:
+						addProtectable(Material.LEGACY_REDSTONE_TORCH_ON);
+						addProtectable(Material.LEGACY_REDSTONE_TORCH_OFF);
 						break;
 					case REDSTONE:
 						addProtectable(Material.REDSTONE_WIRE);

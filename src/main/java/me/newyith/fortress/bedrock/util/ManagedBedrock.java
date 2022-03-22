@@ -67,19 +67,19 @@ public class ManagedBedrock extends ManagedBedrockBase {
 
 			boolean showParticlesInstead;
 			switch (model.revertData.getMaterial()) {
-				case WOOD_BUTTON: //buttons can get stuck in pressed state
+				case LEGACY_WOOD_BUTTON: //buttons can get stuck in pressed state
 				case STONE_BUTTON:
 					Button button = (Button) model.point.getBlock(world).getState().getData();
 					showParticlesInstead = button.isPowered();
 					break;
 				case DETECTOR_RAIL: //rail with pressure plate can get stuck in pressed state
-				case WOOD_PLATE: //pressure plates can get stuck in pressed state
-				case STONE_PLATE:
+				case LEGACY_WOOD_PLATE: //pressure plates can get stuck in pressed state
+				case LEGACY_STONE_PLATE:
 					PressureSensor pressureSensor = (PressureSensor) model.point.getBlock(world).getState().getData();
 					showParticlesInstead = pressureSensor.isPressed();
 					break;
-				case IRON_PLATE: //weighted pressure plates can get stuck in pressed state
-				case GOLD_PLATE:
+				case LEGACY_IRON_PLATE: //weighted pressure plates can get stuck in pressed state
+				case LEGACY_GOLD_PLATE:
 					//can't cast to PressureSensor so just check if it's powered instead
 					showParticlesInstead = model.point.getBlock(world).getBlockPower() > 0;
 					break;

@@ -407,7 +407,7 @@ public class FortressesManagerForWorld {
 				} else {
 					//if iron trap/door, open for player
 					Material doorType = topDoorPoint.getType(world);
-					boolean isIronDoor = doorType == Material.IRON_DOOR_BLOCK;
+					boolean isIronDoor = doorType == Material.LEGACY_IRON_DOOR_BLOCK;
 					boolean isIronTrap = doorType == Material.IRON_TRAPDOOR;
 					if (isIronDoor || isIronTrap) {
 						Block mainDoorBlock = (isIronDoor)
@@ -445,10 +445,10 @@ public class FortressesManagerForWorld {
 		boolean canUse = true;
 
 		//sometimes point is off by one (player moving while entering) so fallback to closest adjacent portal (if any)
-		if (!point.is(Material.PORTAL, model.world)) {
+		if (!point.is(Material.LEGACY_PORTAL, model.world)) {
 			final Point finalPoint = point;
 			List<Point> adjacentPortalPoints = Blocks.getAdjacent6(point).stream()
-					.filter(p -> p.is(Material.PORTAL, model.world))
+					.filter(p -> p.is(Material.LEGACY_PORTAL, model.world))
 					.map(Point::center)
 					.sorted((p1, p2) -> (int)(p1.distance(finalPoint)*100 - p2.distance(finalPoint)*100)) //closest first
 					.collect(Collectors.toList());

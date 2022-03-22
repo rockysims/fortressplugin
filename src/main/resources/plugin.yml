@@ -1,10 +1,10 @@
 name: FortressPlugin
 main: me.newyith.fortress.main.FortressPlugin
-version: 1.0.1
+version: 1.0.2
 author: NewYith
 
-api-version: 1.12.2
-  
+api-version: 1.18
+
 commands:
   stuck:
     description: Teleports you away after a delay.
