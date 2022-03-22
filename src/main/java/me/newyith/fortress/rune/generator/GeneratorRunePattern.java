@@ -6,7 +6,10 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.material.Sign;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.type.WallSign;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -113,8 +116,9 @@ public class GeneratorRunePattern {
 	public static GeneratorRunePattern tryReadyPattern(Block signBlock) {
 		GeneratorRunePattern pattern = null;
 
-		//if (found sign)
-		if (signBlock.getType() == Material.WALL_SIGN) {
+		BlockData signBlockData = signBlock.getBlockData();
+		boolean isWallSign = signBlockData instanceof WallSign;
+		if (isWallSign) {
 			World world = signBlock.getWorld();
 			Point s = new Point(signBlock.getLocation());
 			Point a = getPointSignAttachedTo(signBlock);
@@ -167,11 +171,14 @@ public class GeneratorRunePattern {
 
 	public static Point getPointSignAttachedTo(Block signBlock) {
 		Point s = new Point(signBlock);
-		Sign sign = (Sign) signBlock.getState().getData();
-		BlockFace af = sign.getAttachedFace();
-		int x = af.getModX();
-		int y = af.getModY();
-		int z = af.getModZ();
+		BlockData signBlockData = signBlock.getBlockData();
+		BlockFace af = BlockFace.DOWN;
+		if (signBlockData instanceof WallSign) {
+			af = ((Directional) signBlockData).getFacing();
+		}
+		int x = -1 * af.getModX();
+		int y = -1 * af.getModY();
+		int z = -1 * af.getModZ();
 		return s.add(x, y, z);
 	}
 
