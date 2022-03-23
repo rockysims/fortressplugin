@@ -35,7 +35,7 @@ public class FortressPlugin extends JavaPlugin {
 	public static int config_stuckDelayMs = 30 * 1000;
 	public static int config_stuckCancelDistance = 4;
 	public static int config_generationRangeLimit = 128;
-	public static int config_generationBlockLimit = 40000; //roughly 125 empty 8x8x8 rooms (6x6x6 air inside)
+	public static int config_generationBlockLimit = 10000; //40000 is roughly 125 empty 8x8x8 rooms (6x6x6 air inside)
 
 	private void loadConfig() {
 		FileConfiguration config = getConfig();
