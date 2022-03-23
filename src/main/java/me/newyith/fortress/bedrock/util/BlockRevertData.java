@@ -2,6 +2,8 @@ package me.newyith.fortress.bedrock.util;
 
 import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -13,13 +15,13 @@ import org.bukkit.block.data.BlockData;
 public class BlockRevertData {
 	private static class Model {
 		private final Material material;
-		private BlockData data;
+		private String dataStr;
 
 		@JsonCreator
 		public Model(@JsonProperty("material") Material material,
-					 @JsonProperty("data") BlockData data) {
+					 @JsonProperty("dataStr") String dataStr) {
 			this.material = material;
-			this.data = data;
+			this.dataStr = dataStr;
 
 			//rebuild transient fields
 		}
@@ -35,7 +37,7 @@ public class BlockRevertData {
 		Block b = p.getBlock(world);
 		Material material = b.getType();
 		BlockData data = b.getBlockData().clone();
-		model = new Model(material, data);
+		model = new Model(material, data.getAsString());
 		if (material == Material.BEDROCK) {
 			Debug.warn("Saved BEDROCK as revertData material at " + p);
 //			throw new RuntimeException("Saved BEDROCK as revert material.");
@@ -48,7 +50,7 @@ public class BlockRevertData {
 		Block b = p.getBlock(world);
 		b.setType(model.material);
 		BlockState state = b.getState();
-		state.setBlockData(model.data);
+		state.setBlockData(Bukkit.createBlockData(model.dataStr));
 		state.update();
 	}
 
