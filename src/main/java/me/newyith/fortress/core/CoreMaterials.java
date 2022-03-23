@@ -109,18 +109,18 @@ public class CoreMaterials {
 					//* //TODO: leave this block enabled (except when debugging)
 					case GRASS:
 					case DIRT:
+					case DIRT_PATH:
 					case STONE:
 					case GRAVEL:
 					case SAND:
 					case NETHERRACK:
-					case LEGACY_ENDER_STONE:
-
-					case CHEST: //chest items ejected on ground by bedrock wave
-					case TRAPPED_CHEST: //chest items ejected on ground by bedrock wave
+					case END_STONE:
+					case CHEST: //chest items ejected by bedrock wave
+					case TRAPPED_CHEST: //chest items ejected by bedrock wave
 					//pistons not protectable because bedrock ripple and shield don't seem to play nice with pistons
 					//had piston turn into piston extension (invisible) when toggling switch controlling piston with empty hand (causing ripple)
-					case LEGACY_PISTON_BASE:
-					case LEGACY_PISTON_STICKY_BASE:
+					case PISTON:
+					case STICKY_PISTON:
 
 					//*/
 					case BEDROCK:
