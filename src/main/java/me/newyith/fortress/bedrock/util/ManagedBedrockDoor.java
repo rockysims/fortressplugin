@@ -3,12 +3,8 @@ package me.newyith.fortress.bedrock.util;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.Collection;
 
 public class ManagedBedrockDoor extends ManagedBedrockBase {
 	private static class Model {
@@ -123,11 +119,5 @@ public class ManagedBedrockDoor extends ManagedBedrockBase {
 				model.bottomRevertData.revert(world, model.bottom);
 			}
 		}
-	}
-
-	private int livingEntitiesInRange(World world, Point p, double range) {
-		Collection<Entity> entities =  world.getNearbyEntities(p.add(0.5, 0.5, 0.5).toLocation(world), range, range, range);
-		entities.removeIf(entity -> !(entity instanceof LivingEntity));
-		return entities.size();
 	}
 }
