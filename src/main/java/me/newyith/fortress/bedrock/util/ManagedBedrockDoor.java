@@ -99,7 +99,7 @@ public class ManagedBedrockDoor extends ManagedBedrockBase {
 		if (isConverted && !isBedrock) {
 			//convert
 			int range = 2; //range of 2 so that low to the ground animals are not ignored
-			boolean potentialSecurityBreach = livingEntitiesInRange(world, model.top, range) > 0;
+			boolean potentialSecurityBreach = getLivingEntitiesInRange(world, model.top, range).size() > 0;
 			if (potentialSecurityBreach) {
 				//show particles instead of changing to bedrock
 				showParticles(world, model.top);
