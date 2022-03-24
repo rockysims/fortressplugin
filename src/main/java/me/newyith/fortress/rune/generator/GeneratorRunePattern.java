@@ -184,7 +184,7 @@ public class GeneratorRunePattern {
 
 	public boolean isValid() {
 		boolean valid = true;
-		valid = valid && model.signPoint.is(Material.LEGACY_WALL_SIGN, model.world);
+		valid = valid && (model.signPoint.getBlock(model.world).getBlockData() instanceof WallSign);
 		valid = valid && model.anchorPoint.is(Material.DIAMOND_BLOCK, model.world);
 		valid = valid && model.wirePoint.is(Material.REDSTONE_WIRE, model.world);
 		valid = valid && (model.chestPoint.is(Material.CHEST, model.world) || model.chestPoint.is(Material.TRAPPED_CHEST, model.world));
