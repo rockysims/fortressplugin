@@ -88,8 +88,25 @@ public class Blocks {
 
 	public static Set<Material> getSignMaterials() {
 		Set<Material> mats = new HashSet<>();
-		mats.add(Material.LEGACY_SIGN_POST);
-		mats.add(Material.LEGACY_WALL_SIGN);
+
+		mats.add(Material.OAK_SIGN);
+		mats.add(Material.SPRUCE_SIGN);
+		mats.add(Material.BIRCH_SIGN);
+		mats.add(Material.JUNGLE_SIGN);
+		mats.add(Material.ACACIA_SIGN);
+		mats.add(Material.DARK_OAK_SIGN);
+		mats.add(Material.CRIMSON_SIGN);
+		mats.add(Material.WARPED_SIGN);
+
+		mats.add(Material.OAK_WALL_SIGN);
+		mats.add(Material.SPRUCE_WALL_SIGN);
+		mats.add(Material.JUNGLE_WALL_SIGN);
+		mats.add(Material.ACACIA_WALL_SIGN);
+		mats.add(Material.DARK_OAK_WALL_SIGN);
+		mats.add(Material.BIRCH_WALL_SIGN);
+		mats.add(Material.CRIMSON_WALL_SIGN);
+		mats.add(Material.WARPED_WALL_SIGN);
+
 		return mats;
 	}
 
