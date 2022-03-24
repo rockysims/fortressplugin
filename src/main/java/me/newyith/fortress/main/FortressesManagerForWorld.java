@@ -14,15 +14,13 @@ import me.newyith.fortress.util.Point;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Openable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Door;
-import org.bukkit.material.Openable;
-import org.bukkit.material.TrapDoor;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -254,8 +252,11 @@ public class FortressesManagerForWorld {
 
 		//if door is generated, ignore redstone event
 		if (Blocks.isDoor(block.getType()) && isGenerated(p)) {
-			Openable openableDoor = (Openable)block.getState().getData();
-			event.setNewCurrent((openableDoor.isOpen())?15:0);
+			BlockData blockData = block.getBlockData();
+			if (blockData instanceof Openable) {
+				Openable openable = (Openable)blockData;
+				event.setNewCurrent((openable.isOpen())?15:0);
+			}
 		}
 	}
 
@@ -407,30 +408,26 @@ public class FortressesManagerForWorld {
 				} else {
 					//if iron trap/door, open for player
 					Material doorType = topDoorPoint.getType(world);
-					boolean isIronDoor = doorType == Material.LEGACY_IRON_DOOR_BLOCK;
+					boolean isIronDoor = doorType == Material.IRON_DOOR;
 					boolean isIronTrap = doorType == Material.IRON_TRAPDOOR;
 					if (isIronDoor || isIronTrap) {
 						Block mainDoorBlock = (isIronDoor)
 								? topDoorPoint.add(0, -1, 0).getBlock(world)
 								: topDoorPoint.getBlock(world);
+						BlockData blockData = mainDoorBlock.getBlockData();
+						if (blockData instanceof Openable) {
+							Openable openable = (Openable)blockData;
+							openable.setOpen(!openable.isOpen());
+							mainDoorBlock.setBlockData(openable);
+							boolean nowOpen = openable.isOpen();	
 
-						BlockState state = mainDoorBlock.getState();
-						Openable openable = (Openable) state.getData();
-						openable.setOpen(!openable.isOpen());
-						if (isIronDoor) {
-							state.setData((Door)openable);
-						} else {
-							state.setData((TrapDoor)openable);
+							Sound sound = (isIronDoor)
+									? (nowOpen)?Sound.BLOCK_IRON_DOOR_OPEN:Sound.BLOCK_IRON_DOOR_CLOSE
+									: (nowOpen)?Sound.BLOCK_IRON_TRAPDOOR_OPEN:Sound.BLOCK_IRON_TRAPDOOR_CLOSE;
+							player.playSound(topDoorPoint.toLocation(world), sound, 1.0F, 1.0F);
+							
+							cancel = true; //prevent placing items when right clicking with item to open door
 						}
-						state.update();
-						boolean nowOpen = openable.isOpen();
-
-						Sound sound = (isIronDoor)
-								? (nowOpen)?Sound.BLOCK_IRON_DOOR_OPEN:Sound.BLOCK_IRON_DOOR_CLOSE
-								: (nowOpen)?Sound.BLOCK_IRON_TRAPDOOR_OPEN:Sound.BLOCK_IRON_TRAPDOOR_CLOSE;
-						player.playSound(topDoorPoint.toLocation(world), sound, 1.0F, 1.0F);
-
-						cancel = true; //prevent placing items when right clicking with item to open door
 					}
 				}
 			} else {
