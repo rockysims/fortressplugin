@@ -45,7 +45,7 @@ public class StuckPlayer {
 		this.messages.put(ms, "/stuck teleport in " + String.valueOf(ms/1000) + " seconds.");
 		ms = 10*1000;
 		this.messages.put(ms, "/stuck teleport in " + String.valueOf(ms/1000) + " seconds.");
-		ms = 15*1000;
+		ms = 20*1000;
 		this.messages.put(ms, "/stuck teleport in " + String.valueOf(ms/1000) + " seconds.");
 		ms = 30*1000;
 		this.messages.put(ms, "/stuck teleport in " + String.valueOf(ms/1000) + " seconds.");
