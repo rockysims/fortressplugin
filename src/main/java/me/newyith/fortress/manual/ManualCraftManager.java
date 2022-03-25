@@ -3,6 +3,7 @@ package me.newyith.fortress.manual;
 import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.util.Debug;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.BookMeta;
@@ -28,7 +29,8 @@ public class ManualCraftManager {
 		bm.setPages(pages);
 		manualStack.setItemMeta(bm);
 
-		ShapelessRecipe manualRecipe = new ShapelessRecipe(manualStack);
+		NamespacedKey key = new NamespacedKey(plugin, "manual");
+		ShapelessRecipe manualRecipe = new ShapelessRecipe(key, manualStack);
 		manualRecipe.addIngredient(1, Material.OBSIDIAN);
 		manualRecipe.addIngredient(1, Material.BOOK);
 		plugin.getServer().addRecipe(manualRecipe);
