@@ -2,7 +2,6 @@ package me.newyith.fortress.bedrock.timed;
 
 import me.newyith.fortress.bedrock.BedrockAuthToken;
 import me.newyith.fortress.bedrock.BedrockManager;
-import me.newyith.fortress.bedrock.ForceReversionBatch;
 import me.newyith.fortress.event.TickTimer;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Bukkit;
