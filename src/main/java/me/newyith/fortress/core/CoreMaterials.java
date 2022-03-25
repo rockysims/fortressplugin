@@ -115,8 +115,6 @@ public class CoreMaterials {
 					case SAND:
 					case NETHERRACK:
 					case END_STONE:
-					case CHEST: //chest items ejected by bedrock wave
-					case TRAPPED_CHEST: //chest items ejected by bedrock wave
 					//pistons not protectable because bedrock ripple and shield don't seem to play nice with pistons
 					//had piston turn into piston extension (invisible) when toggling switch controlling piston with empty hand (causing ripple)
 					case PISTON:

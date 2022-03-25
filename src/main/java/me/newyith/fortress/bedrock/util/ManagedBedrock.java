@@ -3,6 +3,9 @@ package me.newyith.fortress.bedrock.util;
 import me.newyith.fortress.util.Point;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.Container;
+import org.bukkit.block.data.AnaloguePowerable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Slab;
 import org.bukkit.block.data.type.Stairs;
@@ -69,31 +72,46 @@ public class ManagedBedrock extends ManagedBedrockBase {
 		if (isConverted && !isBedrock) {
 			//convert
 
-			BlockData blockData = model.point.getBlock(world).getBlockData();
+			Block block = model.point.getBlock(world);
+			BlockData blockData = block.getBlockData();
 			Material mat = model.revertData.getMaterial();
 			boolean showParticlesInstead = false;
 
-			boolean showParticlesInsteadWhenPressed = false
-				|| blockData instanceof PressureSensor //detector rail is considered a PressureSensor
-				|| mat == Material.LIGHT_WEIGHTED_PRESSURE_PLATE
-				|| mat == Material.HEAVY_WEIGHTED_PRESSURE_PLATE;
-			if (showParticlesInsteadWhenPressed) {
-				showParticlesInstead = ((PressureSensor)blockData).isPressed(); //otherwise pressure plates can get stuck in pressed state
+			showParticlesInstead = block.getState() instanceof Container;
+
+			if (!showParticlesInstead) {
+				boolean showParticlesInsteadWhenPressed = false
+					|| blockData instanceof PressureSensor; //detector rail is considered a PressureSensor
+				if (showParticlesInsteadWhenPressed) {
+					showParticlesInstead = ((PressureSensor)blockData).isPressed(); //otherwise pressure plates can get stuck in pressed state
+				}
 			}
-			
-			boolean showParticlesInsteadWhenPowered = false
-				|| blockData instanceof Switch; //buttons are considered a Switch
-			if (showParticlesInsteadWhenPowered) {
-				showParticlesInstead = ((Switch)blockData).isPowered(); //otherwise buttons can get stuck in pressed state
+
+			if (!showParticlesInstead) {
+				boolean showParticlesInsteadWhenPowered = false
+					|| blockData instanceof Switch; //buttons are considered a Switch
+				if (showParticlesInsteadWhenPowered) {
+					showParticlesInstead = ((Switch)blockData).isPowered(); //otherwise buttons can get stuck in pressed state
+				}
 			}
-			
-			boolean showParticlesInsteadWhenNearbyLivingEntities = false
-				|| blockData instanceof Switch
-				|| blockData instanceof Stairs
-				|| blockData instanceof Slab
-				|| mat == Material.DIRT_PATH;
-			if (!showParticlesInstead && showParticlesInsteadWhenNearbyLivingEntities) {
-				showParticlesInstead = getLivingEntitiesInRange(world, model.point, 2).size() > 0; //otherwise potential security breach (due to entities getting pushed around)
+
+			if (!showParticlesInstead) {
+				boolean showParticlesInsteadWhenAnalogPowered = false
+					|| blockData instanceof AnaloguePowerable; //light/heavy pressure plate is considered an AnaloguePowerable
+				if (showParticlesInsteadWhenAnalogPowered) {
+					showParticlesInstead = ((AnaloguePowerable)blockData).getPower() > 0; //otherwise buttons can get stuck in pressed state
+				}
+			}
+
+			if (!showParticlesInstead) {
+				boolean showParticlesInsteadWhenNearbyLivingEntities = false
+					|| blockData instanceof Switch
+					|| blockData instanceof Stairs
+					|| blockData instanceof Slab
+					|| mat == Material.DIRT_PATH;
+				if (showParticlesInsteadWhenNearbyLivingEntities) {
+					showParticlesInstead = getLivingEntitiesInRange(world, model.point, 2).size() > 0; //otherwise potential security breach (due to entities getting pushed around)
+				}
 			}
 
 			if (showParticlesInstead) {
