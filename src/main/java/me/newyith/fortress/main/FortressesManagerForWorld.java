@@ -534,6 +534,9 @@ public class FortressesManagerForWorld {
 				if (isGenerated && !inCreative) {
 					cancel = true;
 				}
+				break;
+			default:
+				cancel = false;
 		}
 
 		if (!cancel) {
