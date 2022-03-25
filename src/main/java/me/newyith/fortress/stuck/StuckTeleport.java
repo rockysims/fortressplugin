@@ -5,7 +5,6 @@ import me.newyith.fortress.main.FortressPlugin;
 import me.newyith.fortress.main.FortressesManager;
 import me.newyith.fortress.util.Blocks;
 import me.newyith.fortress.util.Cuboid;
-import me.newyith.fortress.util.Debug;
 import me.newyith.fortress.util.Point;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -139,17 +138,24 @@ public class StuckTeleport {
 	}
 
 	private boolean isValidDest(Point dest) {
-		if (Blocks.isAiry(dest, world)) { //dest is airy
+		boolean destValid = Blocks.isAiry(dest, world);
+		boolean destValidAbove = false;
+		boolean destValidBelow = false;
+
+		if (destValid) {
 			Point belowDest = dest.add(0, -1, 0);
 			Material belowDestMat = belowDest.getType(world);
-			if (belowDestMat.isSolid() && belowDestMat.isOccluding()) { //belowDest is solid and not see through (trap doors, signs, etc. are see through)
+			destValidBelow = false
+				|| belowDestMat == Material.WATER
+				|| (belowDestMat.isSolid() && belowDestMat.isOccluding()); //belowDest is solid and occluding (trap doors, signs, etc. are not occluding)
+
+			if (destValidBelow) {
 				Point aboveDest = dest.add(0, 1, 0);
-				if (Blocks.isAiry(aboveDest, world)) {
-					return true; //belowDest solid, dest airy, aboveDest airy
-				}
+				destValidAbove = Blocks.isAiry(aboveDest, world);
 			}
 		}
-		return false;
+
+		return destValidBelow && destValid && destValidAbove;
 	}
 
 	private void teleportAndFaceOrigin(Point target) {
