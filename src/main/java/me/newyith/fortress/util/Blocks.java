@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Uninterruptibles;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.Levelled;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
