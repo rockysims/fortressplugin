@@ -28,7 +28,7 @@ public class SaveLoadManager implements Listener {
 
 	public SaveLoadManager(FortressPlugin plugin) {
 		mapper.registerModule(new GuavaModule());
-		mapper.setVisibilityChecker(mapper.getSerializationConfig().getDefaultVisibilityChecker()
+		mapper.setVisibility(mapper.getSerializationConfig().getDefaultVisibilityChecker()
 				.withFieldVisibility(JsonAutoDetect.Visibility.ANY)
 				.withSetterVisibility(JsonAutoDetect.Visibility.NONE)
 				.withGetterVisibility(JsonAutoDetect.Visibility.NONE)
