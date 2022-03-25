@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Set;
-import java.util.UUID;
 
 public abstract class Batch extends BaseUUID {
 	protected static class Model {
