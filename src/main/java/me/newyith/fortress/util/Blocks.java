@@ -59,15 +59,12 @@ public class Blocks {
 	}
 
 	public static boolean isAiry(Point dest, World world) {
-		boolean airy = true;
-		Material mat = dest.getBlock(world).getType();
-		airy = airy && !mat.isSolid();
-		airy = airy && mat != Material.FIRE;
-		airy = airy && mat != Material.WATER;
-		airy = airy && mat != Material.LAVA;
-		airy = airy && mat != Material.LEGACY_STATIONARY_WATER;
-		airy = airy && mat != Material.LEGACY_STATIONARY_LAVA;
-		return airy;
+		Block block = dest.getBlock(world);
+		Material mat = block.getType();
+		return true
+			&& !mat.isSolid()
+			&& mat != Material.FIRE
+			&& !(block.getBlockData() instanceof Levelled); //water and lava are considered Levelled
 	}
 
 	public static boolean isDoor(Material mat) {
