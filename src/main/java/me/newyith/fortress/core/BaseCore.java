@@ -17,6 +17,8 @@ import me.newyith.fortress.util.*;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Orientable;
 import org.bukkit.entity.Player;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -204,8 +206,12 @@ public abstract class BaseCore {
 		Set<Point> actualSignPoints = new HashSet<>();
 
 		World world = model.world;
-		if (portalPoint.is(Material.LEGACY_PORTAL, world)) {
-			final boolean portalAxisX = portalPoint.getBlock(world).getData() == 1;
+		if (portalPoint.is(Material.NETHER_PORTAL, world)) {
+			BlockData blockData = portalPoint.getBlock(world).getBlockData();
+			final boolean portalAxisX = blockData instanceof Orientable
+				? ((Orientable)blockData).getAxis() == Axis.X
+				: false;
+
 			int rangeLimit = 16;
 
 			//loadAndPreventUnload of chunks within rangeLimit (Blocks.getPointsConnected() treats points in unloaded chunks as having a material type of null)
@@ -216,7 +222,7 @@ public abstract class BaseCore {
 			Set<Point> originLayer = new HashSet<>();
 			originLayer.add(portalPoint);
 			Set<Material> traverseReturnMaterials = new HashSet<>();
-			traverseReturnMaterials.add(Material.LEGACY_PORTAL);
+			traverseReturnMaterials.add(Material.NETHER_PORTAL);
 			Set<Point> portalPoints = Blocks.getPointsConnected(
 					world,
 					portalPoint,

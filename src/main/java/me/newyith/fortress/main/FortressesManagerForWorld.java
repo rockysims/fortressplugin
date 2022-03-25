@@ -442,10 +442,10 @@ public class FortressesManagerForWorld {
 		boolean canUse = true;
 
 		//sometimes point is off by one (player moving while entering) so fallback to closest adjacent portal (if any)
-		if (!point.is(Material.LEGACY_PORTAL, model.world)) {
+		if (!point.is(Material.NETHER_PORTAL, model.world)) {
 			final Point finalPoint = point;
 			List<Point> adjacentPortalPoints = Blocks.getAdjacent6(point).stream()
-					.filter(p -> p.is(Material.LEGACY_PORTAL, model.world))
+					.filter(p -> p.is(Material.NETHER_PORTAL, model.world))
 					.map(Point::center)
 					.sorted((p1, p2) -> (int)(p1.distance(finalPoint)*100 - p2.distance(finalPoint)*100)) //closest first
 					.collect(Collectors.toList());
