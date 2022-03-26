@@ -214,9 +214,14 @@ public abstract class BaseCore {
 
 			int rangeLimit = 16;
 
+			//NOTE: Commented out because, now that getPointsConnected() runs synchronously, ensuring chunks are loaded is no longer necessary
 			//loadAndPreventUnload of chunks within rangeLimit (Blocks.getPointsConnected() treats points in unloaded chunks as having a material type of null)
-			ChunkBatch chunksInRange = Chunks.inRange(world, portalPoint, rangeLimit);
-			Chunks.loadAndPreventUnload(world, chunksInRange);
+			// ChunkBatch chunksInRange = Chunks.inRange(world, portalPoint, rangeLimit);
+			// boolean foundNonLoaded = Set.copyOf(chunksInRange.getChunks(world)).stream().filter(c -> !c.isLoaded()).collect(Collectors.toSet()).size() > 0;
+			// Debug.msg("found non loaded chunk: " + foundNonLoaded);
+			// Chunks.loadAndPreventUnload(world, chunksInRange);
+			// boolean stillNonLoaded = Set.copyOf(chunksInRange.getChunks(world)).stream().filter(c -> !c.isLoaded()).collect(Collectors.toSet()).size() > 0;
+			// Debug.msg("still non loaded chunk: " + stillNonLoaded);
 
 			//find portalPoints
 			Set<Point> originLayer = new HashSet<>();
@@ -271,7 +276,8 @@ public abstract class BaseCore {
 					Blocks.ConnectedThreshold.FACES
 			).join();
 
-			Chunks.allowUnload(world, chunksInRange);
+			//NOTE: Commented out because, now that getPointsConnected() runs synchronously, ensuring chunks are loaded is no longer necessary
+			// Chunks.allowUnload(world, chunksInRange);
 
 			actualSignPoints.addAll(signPoints);
 		}

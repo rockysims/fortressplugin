@@ -288,12 +288,19 @@ public class Blocks {
 							if (finalPretendPoints.containsKey(p)) {
 								mat = finalPretendPoints.get(p);
 							} else {
-
+								/*
 								//trying to get block in unloaded chunk causes thread to hang and thus can crash server
 								//so just consider such blocks to have material type of null
 								boolean pInLoadedChunk = world.isChunkLoaded(p.xInt() >> 4, p.zInt() >> 4);
 								mat = pInLoadedChunk?p.getBlock(world).getType():null;
-								if (!pInLoadedChunk) Debug.msg("gpcal: FOUND UNLOADED POINT p: " + p); //TODO:: delete this line
+								if (!pInLoadedChunk) Debug.msg("gpcal: FOUND UNLOADED POINT p: " + p);
+								/*/
+								//don't need to worry about if chunk is loaded since this code now runs synchronously
+								//	running it async results in all types being null even if chunk is already loaded
+								mat = p.getBlock(world).getType();
+								if (mat == null) Debug.msg("gpcal: FOUND NULL MAT @ " + p);
+								//*/
+								
 							}
 
 							//add to matchesAsLayers if it matches a returnMaterials type
