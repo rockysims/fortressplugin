@@ -1,0 +1,24 @@
+Instead of a separate disruptor rune:
+
+When tnt explodes
+	if tnt was lit while touching a protected block && that block's generator has glowstone block(s) in fuel chest
+		the tnt can destroy protected blocks (and adds 5 minutes of unprotectability to the blocks in a small radius)
+		if any protected blocks were destroy (or a protected block gained unprotectability)
+			a glowstone block is removed from the fuel chest of the generator the tnt was touching when lit
+
+PROBLEM: how to link lit tnt with a specific explosion event
+SOLUTION?: track location of tnt entity once lit (recheck every 200ms)
+		then, on explosion event, find the closest nearby, tracked tnt entity that was removed within the last 1 second
+			assume that closest tnt entity was the entity that caused the explosion
+
+
+
+MAYBE: instead of glowstone block in fuel chest that is used when tnt explodes:
+		when tnt explodes, if a glowstone block was destroyed
+			protected blocks can be destroyed
+			each destroyed glowstone block adds unprotectability to all 6 neighbors for 5 minutes
+
+MAYBE: ghast's tear in fuel chest (when tnt explodes) results in 24 hour reinforced mode followed by 2 hour vulnerable mode
+	reinforced mode means protected blocks can't be destroyed by tnt (nor gain unprotectability)
+		also, in reinforced mode, new blocks can't be protected that were not protected when fortress went into reinforced mode
+	vulnerable mode means it can't go into reinforced mode
