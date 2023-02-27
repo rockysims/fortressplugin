@@ -20,6 +20,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Random;
 
+
+
+//MAYBE: players whitelisted on rune itself can break protected blocks?
+//	when broken, protection is removed from point? or maybe just leave it protected?
+
+//villager opening protected doors issue
+//cycle generator after removing an item from fuel chest doesn't always result in unprotecting blocks of that type
+//	issue seems to happen when the wave doesn't reach any of the blocks past the block that should now be unprotected
+
+
+
 public class FortressPlugin extends JavaPlugin {
 	public static final boolean releaseBuild = false; //TODO: change this to true for release builds
 	private static final double saveDelayMs = 5*60*1000;
