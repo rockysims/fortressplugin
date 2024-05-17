@@ -36,6 +36,7 @@ public class CoreAnimatorOld {
 		private boolean skipAnimation = false;
 		private boolean animationInProgress = false;
 		private boolean isGeneratingWall = false;
+		@SuppressWarnings("unused")
 		private String worldName = null;
 		private transient World world = null;
 		private final transient int ticksPerFrame;

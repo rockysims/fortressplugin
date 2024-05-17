@@ -24,6 +24,7 @@ public class BedrockManagerForWorld {
 		private final Set<BedrockBatch> batches;
 		private final Set<Point> updatePoints;
 		private final Set<AuthToken> updateAuthTokens;
+		@SuppressWarnings("unused")
 		private final String worldName;
 		private final transient World world;
 		private final transient Object mutex;

@@ -21,6 +21,7 @@ public class GeneratorRunePattern {
 	private static class Model {
 		private transient Set<Point> pointsInPattern = null;
 		private transient World world = null;
+		@SuppressWarnings("unused")
 		private String worldName = "";
 		private Point signPoint = null;
 		private Point wirePoint = null;

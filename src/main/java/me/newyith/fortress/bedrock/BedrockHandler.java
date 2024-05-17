@@ -20,6 +20,7 @@ import java.util.Map;
 public class BedrockHandler {
 	private static class Model {
 		private final Map<Point, ManagedBedrockBase> managedBedrockByPoint;
+		@SuppressWarnings("unused")
 		private final String worldName;
 		private final transient World world;
 

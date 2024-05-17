@@ -33,6 +33,7 @@ public class CoreAnimator {
 		private boolean fastAnimation = false;
 		private boolean animationInProgress = false;
 		private int curIndex = 0;
+		@SuppressWarnings("unused")
 		private String worldName = null;
 		private transient World world = null;
 		private final transient int ticksPerFrame;

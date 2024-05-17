@@ -16,7 +16,9 @@ public class ProtectionManagerForWorld {
 	private static class Model {
 		private final Set<ProtectionBatch> batches;
 		private final Set<Point> protectedPoints;
+		@SuppressWarnings("unused")
 		private final String worldName;
+		@SuppressWarnings("unused")
 		private final transient World world;
 
 		@JsonCreator

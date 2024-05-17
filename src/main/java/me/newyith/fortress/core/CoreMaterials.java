@@ -19,6 +19,7 @@ import java.util.Set;
 public class CoreMaterials {
 	private static class Model {
 		private final Point chestPoint;
+		@SuppressWarnings("unused")
 		private final String worldName;
 		private final transient World world;
 		private final transient Set<Material> generatableWallMaterials;

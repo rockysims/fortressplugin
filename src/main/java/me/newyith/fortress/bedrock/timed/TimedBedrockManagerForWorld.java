@@ -18,6 +18,7 @@ public class TimedBedrockManagerForWorld {
 		private PriorityQueue<TimedForceReversionBatch> timedForceReversionBatches;
 		private PriorityQueue<TimedBedrockBatch> timedBedrockBatches;
 		private int curTick;
+		@SuppressWarnings("unused")
 		private final String worldName;
 		private final transient World world;
 		private final transient Random random;

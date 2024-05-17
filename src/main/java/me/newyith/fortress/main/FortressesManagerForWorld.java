@@ -45,6 +45,7 @@ public class FortressesManagerForWorld {
 
 	private static class Model {
 		private Set<GeneratorRune> generatorRunes = null;
+		@SuppressWarnings("unused")
 		private final String worldName;
 		private final transient World world;
 		private transient Map<Point, GeneratorRune> generatorRuneByPatternPoint = null;

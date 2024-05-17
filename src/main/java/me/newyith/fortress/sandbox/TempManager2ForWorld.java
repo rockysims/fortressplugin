@@ -9,7 +9,9 @@ import org.bukkit.World;
 
 public class TempManager2ForWorld {
 	private static class Model {
+		@SuppressWarnings("unused")
 		private BedrockAuthToken bedrockAuthToken;
+		@SuppressWarnings("unused")
 		private final String worldName;
 		private final transient World world;
 
