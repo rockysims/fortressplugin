@@ -14,6 +14,8 @@ import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.*;
+import org.bukkit.block.sign.Side;
+import org.bukkit.block.sign.SignSide;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -133,6 +135,7 @@ public class GeneratorRune {
 		if (model.signChunk.isLoaded() && model.chestChunk.isLoaded()) {
 			tickFuel();
 			model.core.tick();
+			updateSign(); //always update sign in case amount of fuel in chest has changed
 		}
 	}
 
@@ -185,27 +188,8 @@ public class GeneratorRune {
 	}
 
 	public void onSearchingChanged(boolean searching) {
-		//TODO: comment out again (see next line)
-		//* //commented out because flashing "Searching" for a fraction of a second looks bad
-		if (searching) {
-			setSignText("Searching", null, null);
-		} else {
-			//change back line1 to match state
-			switch (model.state) {
-				case RUNNING:
-					setSignText("Running", null, null);
-					break;
-				case PAUSED:
-					setSignText("Paused", null, null);
-					break;
-				case NEEDS_FUEL:
-					setSignText("Needs Fuel", null, null);
-					break;
-				default:
-					Debug.error("GeneratorRune::setState() couldn't find a case matching GeneratorState: " + model.state);
-			}
-		}
-		//*/
+		//TODO: remove this method (there is no longer an easy way to make the sign say "Searching" because the sign is now updated on every tick)
+		//	also the "Searching" state will be obsolete if protection spread is changed to layer by layer (instead of searching for the whole fortress immediately)
 	}
 
 	public void onPlayerCloseChest(Player player, Point chestPoint) {
@@ -235,9 +219,6 @@ public class GeneratorRune {
 			tryReplenishFuel();
 			updateState();
 		}
-
-		//always update sign in case amount of fuel in chest has changed
-		updateFuelRemainingDisplay(model.fuelTicksRemaining * TickTimer.msPerTick);
 	}
 	private void tryReplenishFuel() {
 		Chest chest = getChest();
@@ -246,9 +227,30 @@ public class GeneratorRune {
 			boolean consumedFuel = Items.tryToRemoveOneInventoryItem(inv, Material.GLOWSTONE_DUST);
 			if (consumedFuel) {
 				model.fuelTicksRemaining = FortressPlugin.config_glowstoneDustBurnTimeMs / TickTimer.msPerTick;
-				updateFuelRemainingDisplay(model.fuelTicksRemaining * TickTimer.msPerTick);
 			}
 		}
+	}
+
+	private void updateSign() {
+		String line1 = "";
+		String line2 = "";
+
+		switch (model.state) {
+			case RUNNING:
+				line1 = "Running";
+				break;
+			case PAUSED:
+				line1 = "Paused";
+				break;
+			case NEEDS_FUEL:
+				line1 = "Needs Fuel";
+				line2 = "(glowstone dust)";
+				break;
+			default:
+				Debug.error("GeneratorRune::setState() couldn't find a case matching GeneratorState: " + model.state);
+		}
+
+		setSignText(line1, line2, this.getFuelRemainingDisplayText());
 	}
 
 	private void updateState() {
@@ -273,17 +275,14 @@ public class GeneratorRune {
 //			Location anchor = model.pattern.getAnchorPoint().toLocation(world);
 			switch (state) {
 				case RUNNING:
-					setSignText("Running", "", null);
 					moveBlockTo(Material.GOLD_BLOCK, model.pattern.getRunningPoint());
 //					world.playSound(anchor, Sound.SHEEP_SHEAR, 5, 1); //5 (volume), 1 (pitch) is hopefully normal
 					break;
 				case PAUSED:
-					setSignText("Paused", "", null);
 					moveBlockTo(Material.GOLD_BLOCK, model.pattern.getPausePoint());
 //					world.playSound(anchor, Sound.IRONGOLEM_THROW, 5, 1);
 					break;
 				case NEEDS_FUEL:
-					setSignText("Needs Fuel", "(glowstone dust)", "");
 					moveBlockTo(Material.GOLD_BLOCK, model.pattern.getFuelPoint());
 					break;
 				default:
@@ -325,9 +324,9 @@ public class GeneratorRune {
 		return null;
 	}
 
-	private void updateFuelRemainingDisplay(long ms) {
-		int glowstoneDustInChest = countGlowstoneDustInChest();
-		ms += FortressPlugin.config_glowstoneDustBurnTimeMs * glowstoneDustInChest;
+	private String getFuelRemainingDisplayText() {
+		long ms = model.fuelTicksRemaining * TickTimer.msPerTick; //time remaining from current fuel
+		ms += FortressPlugin.config_glowstoneDustBurnTimeMs * countGlowstoneDustInChest(); //time from chest fuel
 
 		long s = ms / 1000;
 		long m = s / 60;
@@ -349,10 +348,11 @@ public class GeneratorRune {
 		if (s > 0) {
 			str.append(s + "s");
 		}
-		setSignText(null, null, str.toString());
+
+		return str.toString();
 	}
 
-	private boolean setSignText(String line1, String line2, String line3) {
+	private void setSignText(String line1, String line2, String line3) {
 		Point signPoint = model.pattern.getSignPoint();
 		if (signPoint != null) {
 			Block signBlock = signPoint.getBlock(model.pattern.getWorld());
@@ -360,19 +360,14 @@ public class GeneratorRune {
 				BlockState blockState = signBlock.getState();
 				if (blockState instanceof Sign) {
 					Sign sign = (Sign)blockState;
-					if (sign != null) {
-						sign.setLine(0, "Generator:");
-						if (line1 != null) {
-							sign.setLine(1, line1);
-						}
-						if (line2 != null) {
-							sign.setLine(2, line2);
-						}
-						if (line3 != null) {
-							sign.setLine(3, line3);
-						}
+					SignSide signFront = sign.getSide(Side.FRONT);
+
+					if (signFront != null) {
+						signFront.setLine(0, "Generator:");
+						signFront.setLine(1, line1);
+						signFront.setLine(2, line2);
+						signFront.setLine(3, line3);
 						sign.update();
-						return true;
 					}
 				} else {
 					//this can happen when a sign is exploded (generator broken check has to delay while explosion to finishes)
@@ -380,7 +375,6 @@ public class GeneratorRune {
 				}
 			}
 		}
-		return false;
 	}
 
 	private void moveBlockTo(Material material, Point targetPoint) {
