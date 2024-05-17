@@ -19,6 +19,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Orientable;
+import org.bukkit.block.sign.Side;
+import org.bukkit.block.sign.SignSide;
 import org.bukkit.entity.Player;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -312,14 +314,17 @@ public abstract class BaseCore {
 		Set<String> names = new HashSet<>();
 
 		if (sign != null) {
+			SignSide signFront = sign.getSide(Side.FRONT);
+			if (signFront == null) return names;
+
 			StringBuilder sb = new StringBuilder();
-			sb.append(sign.getLine(0));
+			sb.append(signFront.getLine(0));
 			sb.append("\n");
-			sb.append(sign.getLine(1));
+			sb.append(signFront.getLine(1));
 			sb.append("\n");
-			sb.append(sign.getLine(2));
+			sb.append(signFront.getLine(2));
 			sb.append("\n");
-			sb.append(sign.getLine(3));
+			sb.append(signFront.getLine(3));
 			String s = sb.toString().replaceAll(" ", "");
 
 			if (s.contains(",")) {
