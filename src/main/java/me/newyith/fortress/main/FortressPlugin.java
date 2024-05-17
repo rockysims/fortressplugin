@@ -73,6 +73,9 @@ public class FortressPlugin extends JavaPlugin {
 		Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
 		Log.sendConsole("         >> ON <<           ", ChatColor.GREEN);
 		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
+		if (!releaseBuild) {
+			Log.sendConsole("WARNING: Not release build!", ChatColor.YELLOW);
+		}
 
 		saveLoadManager = new SaveLoadManager(this);
 		saveLoadManager.load();
@@ -94,6 +97,9 @@ public class FortressPlugin extends JavaPlugin {
 		Log.sendConsole(">>    Fortress Plugin     <<", ChatColor.GOLD);
 		Log.sendConsole("         >> OFF <<          ", ChatColor.RED);
 		Log.sendConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%", ChatColor.RED);
+		if (!releaseBuild) {
+			Log.sendConsole("WARNING: Not release build!", ChatColor.YELLOW);
+		}
 	}
 
 	public static void onTick() {
