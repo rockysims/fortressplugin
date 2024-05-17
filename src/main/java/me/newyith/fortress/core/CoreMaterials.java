@@ -107,7 +107,7 @@ public class CoreMaterials {
 				switch (mat) {
 					//non protectable
 					//* //TODO: leave this block enabled (except when debugging)
-					case GRASS:
+					case GRASS_BLOCK:
 					case DIRT:
 					case DIRT_PATH:
 					case STONE:

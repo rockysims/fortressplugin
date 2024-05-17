@@ -1,9 +1,9 @@
 name: FortressPlugin
 main: me.newyith.fortress.main.FortressPlugin
-version: 1.0.3
+version: 1.0.4
 author: NewYith
 
-api-version: 1.19
+api-version: 1.20
 
 commands:
   stuck:

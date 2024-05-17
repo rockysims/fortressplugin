@@ -97,7 +97,7 @@ public class GeneratorCore extends BaseCore {
 			//particle = heart/flame/smoke (inside/outside/disabled)
 			Set<Point> generatedPoints = getGeneratedPoints();
 			boolean originGenerated = generatedPoints.contains(origin);
-			Particle particle = Particle.SMOKE_NORMAL;
+			Particle particle = Particle.SMOKE;
 			if (originGenerated) {
 				boolean inside = getPointsInsideFortress().contains(towardFace);
 				if (inside) particle = Particle.HEART;
