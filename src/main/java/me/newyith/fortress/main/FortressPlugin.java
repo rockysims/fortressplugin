@@ -18,6 +18,45 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+
+
+
+
+
+
+/* disruptor rune (or maybe "seige rune")
+
+same pattern as generator rune except iron/gold/diamond ore in place of blocks
+power redstone to activate (start deploy timer)
+	resistance = number of glowstone blocks in the fortress generator within disruption range that has the most glowstone blocks
+	persistence = number of glowstone blocks attached (touching directly or recursively) to disruptor rune
+	to activate disruptor, persistence >= resistance && 64 glowstone dust
+		once activated,
+			glowstone dust is consumed
+			rune (including attached glowstone blocks) is indestructable during deploy timer and attack timer
+			show beacon visual (going all the way to the sky) during deploy timer and attack timer?
+		glowstone blocks cannot be removed until disruptor deploy timer and attack timer have finished
+	deploy timer duration is 1 hour * resistance (deploy timer capped at 48 hours)
+		or a 1 minute deploy timer if resistance is 0
+	attack timer is 1/2 hour
+	note: resistance and persistence glowstone blocks are not consumed
+disruption sphere expands slowly?
+	visualize with magic spark particles on the surface of sphere?
+		change visualization to indicate when sphere is fully expanded
+protected fortress blocks within disruption sphere become vulnerable to explosions (tnt)
+	visualize with particles (magic sparks?) on surface of blocks
+//*/
+
+
+
+
+
+
+
+
+
+
+
 import java.util.Random;
 
 

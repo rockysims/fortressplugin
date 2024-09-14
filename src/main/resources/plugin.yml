@@ -1,6 +1,6 @@
 name: FortressPlugin
 main: me.newyith.fortress.main.FortressPlugin
-version: 1.0.5
+version: 1.0.6
 author: NewYith
 
 api-version: 1.20
