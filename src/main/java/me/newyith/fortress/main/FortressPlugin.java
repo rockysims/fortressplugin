@@ -45,6 +45,13 @@ disruption sphere expands slowly?
 		change visualization to indicate when sphere is fully expanded
 protected fortress blocks within disruption sphere become vulnerable to explosions (tnt)
 	visualize with particles (magic sparks?) on surface of blocks
+
+consider the following changes to above idea:
+	no persistence (just resistance)
+		maybe no resistance either (just go with a flat 24 hour deploy delay so attacker can choose the time)
+	make fortress generator rune sign show countdown timer to disruption (flicker between normal display and disruptor countdown)
+	show link (particles) between generator and disruptor every 15 seconds
+
 //*/
 
 
