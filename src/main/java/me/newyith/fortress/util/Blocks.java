@@ -212,7 +212,7 @@ public class Blocks {
 			int recursionLimit = (int)Math.pow(rangeLimit/2, 3);
 			long lastSleepEnd = System.currentTimeMillis();
 			int matchCount = 0;
-			int sleeplessCount = 0; //just for debugging
+			// int sleeplessCount = 0; //just for debugging
 			while (!nextLayer.isEmpty()) {
 				if (recursionLimit-- <= 0) {
 					Debug.error("Wall recursionLimit exhausted");
@@ -231,9 +231,9 @@ public class Blocks {
 //						Debug.msg("Sleeping after not sleeping " + sleeplessCount + " times.");
 						Uninterruptibles.sleepUninterruptibly(50, TimeUnit.MILLISECONDS); //use "50"ms except when debugging
 						lastSleepEnd = System.currentTimeMillis();
-						sleeplessCount = 0;
-					} else {
-						sleeplessCount++;
+					// 	sleeplessCount = 0;
+					// } else {
+					// 	sleeplessCount++;
 					}
 
 					if (recursionLimit2-- <= 0) {
