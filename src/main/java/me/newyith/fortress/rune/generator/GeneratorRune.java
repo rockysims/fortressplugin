@@ -224,7 +224,7 @@ public class GeneratorRune {
 		Chest chest = getChest();
 		if (chest != null) {
 			Inventory inv = chest.getInventory();
-			boolean consumedFuel = Items.tryToRemoveOneInventoryItem(inv, Material.GLOWSTONE_DUST);
+			boolean consumedFuel = Items.tryToRemoveInventoryItems(inv, Material.GLOWSTONE_DUST, 1);
 			if (consumedFuel) {
 				model.fuelTicksRemaining = FortressPlugin.config_glowstoneDustBurnTimeMs / TickTimer.msPerTick;
 			}
