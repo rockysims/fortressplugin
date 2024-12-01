@@ -77,6 +77,16 @@ import java.util.Random;
 
 
 
+//TODO: FIX BLOCK MATERIAL CHANGE BUG
+//To Reproduce:
+// - Create fortress rune (with fuel)
+// - Use piston to push gold block backwards (breaking the rune)
+// - Observe that pushed block is gold and so is the anchor point block
+// - Desired behavior is that blocks cannot be duplicated/changed
+//		Maybe just cancel piston push? Or maybe something better hopefully?
+
+
+
 public class FortressPlugin extends JavaPlugin {
 	public static final boolean releaseBuild = false; //TODO: change this to true for release builds
 	private static final double saveDelayMs = 5*60*1000;
