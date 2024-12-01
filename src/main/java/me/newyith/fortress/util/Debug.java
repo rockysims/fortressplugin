@@ -58,7 +58,7 @@ public class Debug {
 	private static Player getPlayer() {
 		Player player = null;
 		for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-			if (onlinePlayer.getName().equalsIgnoreCase("newyith")) {
+			if (onlinePlayer.getName().equalsIgnoreCase("fortressmod")) {
 				player = onlinePlayer;
 			}
 		}
